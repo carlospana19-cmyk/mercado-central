@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - Mercado Central</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- (Copia aquí tus enlaces de fuentes y FontAwesome) -->
+</head>
+<body class="page-dashboard">
+    <nav class="navbar-moderno">
+    <div class="logo-container">
+      <a href="index.html" class="logo-link">
+        <img src="mi_logo_central.png.jpeg" alt="Logo Mercado Central" class="logo-img">
+        <span class="logo-text">Mercado Central</span>
+      </a>
+    </div>
+    <ul class="menu-nav">
+      <li><a href="resultados.html?category=venta-inmuebles" style="color: white; text-decoration: none;">Bienes Raíces</a></li>
+      <li><a href="resultados.html?category=autos" style="color: white; text-decoration: none;">Autos</a></li>
+      <li><a href="resultados.html?category=ofertas-empleo" style="color: white; text-decoration: none;">Empleos</a></li>
+      <li><a href="resultados.html?category=servicios-profesionales" style="color: white; text-decoration: none;">Servicios</a></li>
+      <li><a href="resultados.html?category=electronica" style="color: white; text-decoration: none;">Electrónica</a></li>
+    </ul>
+    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
+    <div class="buttons-nav">
+        <!-- Este botón se mostrará solo si el usuario está conectado -->
+        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
+
+        <!-- Botones de Panel y Logout (solo para usuarios conectados) -->
+        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
+        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
+
+        <!-- Botón de Iniciar Sesión (solo para invitados) -->
+        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
+    </div>
+</nav>
+    <main class="dashboard-page">
+        <div class="dashboard-header">
+            <h1>Mi Panel de Control</h1>
+            <p>Aquí puedes ver y gestionar tus anuncios publicados.</p>
+            <button id="logout-button" class="btn">Cerrar Sesión</button>
+        </div>
+        <h2>Mis Anuncios</h2>
+        <!-- CONTENEDOR CON LAS CLASES CORRECTAS PARA EL ESTILO -->
+        <div id="my-ads-container" class="products">
+            <div class="box-container">
+                <p>Cargando tus anuncios...</p>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">
+    <div class="footer-contenedor">
+      <!-- Columna 1 -->
+      <div class="footer-col">
+        <h4>Mercado Central</h4>
+        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
+      </div>
+      <!-- Columna 2 -->
+      <div class="footer-col">
+        <h4>Enlaces rápidos</h4>
+        <ul>
+          <li><a href="#">Quiénes somos</a></li>
+          <li><a href="#">Términos y Condiciones</a></li>
+          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="#">Contáctanos</a></li>
+        </ul>
+      </div>
+      <!-- Columna 3 -->
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-links">
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="icon-social"> Facebook</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon-social"> Instagram</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter/X" class="icon-social"> Twitter/X</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="icon-social"> YouTube</a>
+        </div>
+      </div>
+    </div>
+    <!-- Copyright -->
+    <div class="footer-bottom">
+      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
+    </div>
+</footer>
+    <!-- Carga la librería de Supabase PRIMERO -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Carga NUESTRO cliente central SEGUNDO -->
+    <script src="supabase-client.js"></script>
+
+    <!-- Carga los scripts específicos de cada página DESPUÉS -->
+    <script src="navbar-logic.js"></script>
+    <script src="dashboard-logic.js"></script>
+</body>
+</html>

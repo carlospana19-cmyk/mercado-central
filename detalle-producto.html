@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Producto - Mercado Central</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="page-detalle">
+    <!-- =============================================================== -->
+    <!-- COPIA Y PEGA AQUÍ TU CÓDIGO COMPLETO DEL NAVBAR -->
+    <!-- =============================================================== -->
+    <nav class="navbar-moderno">
+    <div class="logo-container">
+      <a href="index.html" class="logo-link">
+  <img src="mi_logo_central.png.jpeg" alt="Logo Mercado Central" class="logo-img">
+        <span class="logo-text">Mercado Central</span>
+      </a>
+    </div>
+    <ul class="menu-nav">
+      <li onclick="filtrarCategoria('inmuebles')">Bienes Raíces</li>
+      <li onclick="filtrarCategoria('autos')">Autos</li>
+      <li onclick="filtrarCategoria('empleos')">Empleos</li>
+      <li onclick="filtrarCategoria('servicios')">Servicios</li>
+      <li onclick="filtrarCategoria('electronica')">Electrónica</li>
+    </ul>
+    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
+    <div class="buttons-nav">
+        <!-- Este botón se mostrará solo si el usuario está conectado -->
+        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
+
+        <!-- Botones de Panel y Logout (solo para usuarios conectados) -->
+        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
+        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
+
+        <!-- Botón de Iniciar Sesión (solo para invitados) -->
+        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
+    </div>
+  </nav>
+
+    <main class="product-detail-page">
+    <div id="product-detail-container" class="detail-grid">
+        
+        <!-- COLUMNA IZQUIERDA: GALERÍA DE IMÁGENES -->
+        <div class="gallery-container">
+            <div class="main-image-wrapper">
+                <img src="" alt="Imagen principal del producto" id="main-image">
+            </div>
+            <div class="thumbnails-wrapper" id="thumbnails-container">
+                <!-- Miniaturas verticales aquí -->
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: INFORMACIÓN DEL PRODUCTO -->
+        <div class="product-info-column">
+            <h1 id="product-name">Cargando...</h1>
+            <div class="location-info">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="product-location">Cargando...</span>
+            </div>
+            <div class="price" id="product-price">$ --.--</div>
+
+            <div class="details-section">
+                <h2>Especificaciones</h2>
+                <ul id="product-specs" class="specs-list">
+                    <!-- Specs aquí -->
+                </ul>
+            </div>
+
+            <div class="details-section">
+                <h2>Descripción</h2>
+                <p id="product-description">Cargando...</p>
+            </div>
+        </div>
+
+        <!-- COLUMNA DE CONTACTO (puede ser la tercera o ir dentro de la de info) -->
+        <div class="product-contact-column">
+             <div class="contact-seller-box">
+                <h3>Contactar al Vendedor</h3>
+                <form id="contact-form">
+                    <textarea name="message" placeholder="Hola, estoy interesado..."></textarea>
+                    <button type="submit" class="btn">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+    <!-- =============================================================== -->
+    <!-- COPIA Y PEGA AQUÍ TU CÓDIGO COMPLETO DEL FOOTER -->
+    <!-- =============================================================== -->
+    <footer class="footer">
+    <div class="footer-contenedor">
+      <!-- Columna 1 -->
+      <div class="footer-col">
+        <h4>Mercado Central</h4>
+        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
+      </div>
+
+      <!-- Columna 2 -->
+      <div class="footer-col">
+        <h4>Enlaces rápidos</h4>
+        <ul>
+          <li><a href="#">Quiénes somos</a></li>
+          <li><a href="#">Términos y Condiciones</a></li>
+          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="#">Contáctanos</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3 -->
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-links">
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="icon-social"> Facebook</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon-social"> Instagram</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter/X" class="icon-social"> Twitter/X</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="icon-social"> YouTube</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="footer-bottom">
+      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+    <!-- Carga la librería de Supabase PRIMERO -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Carga NUESTRO cliente central SEGUNDO -->
+    <script src="supabase-client.js"></script>
+
+    <!-- Carga los scripts específicos de cada página DESPUÉS -->
+    <script src="navbar-logic.js"></script>
+    <script src="product-detail-logic.js"></script>
+</body>
+</html>
