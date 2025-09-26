@@ -1,0 +1,1 @@
+- [x] Editar home-logic.js para remover la línea .order('created_at', { ascending: false }) de la consulta Supabase.
