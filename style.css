@@ -1278,22 +1278,25 @@ nav .buttons button:hover {
 /* --- Estilos para Botones de Subida de Archivos Modernos --- */
 .file-upload-btn {
     display: inline-block;
-    padding: 1.2rem 2rem;
-    background-color: var(--black);
-    color: #fff;
-    border-radius: .5rem;
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: background-color .2s ease;
-    text-align: center;
+    padding: 10px 20px !important;
+    font-size: 1.6rem !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    color: var(--color-blanco) !important;
+    background: var(--color-secundario) !important; /* ¡Forzamos el color turquesa! */
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all .2s ease !important;
+}
+
+.file-upload-btn:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
 }
 
 .file-upload-btn i {
     margin-right: .8rem;
-}
-
-.file-upload-btn:hover {
-    background-color: var(--orange);
 }
 
 /* Ocultamos el input de archivo por defecto */
@@ -1639,4 +1642,87 @@ input[type="file"] {
     .main-image-wrapper-premium {
         height: 300px;
     }
+}
+
+/* =================================================================== */
+/* ============= PARCHE DE ESTABILIZACIÓN DE ESTILO v1.0 ============= */
+/* =================================================================== */
+/* Añadir este bloque completo al FINAL de style.css para corregir    */
+/* problemas de tamaño de fuente y diseño de formularios.              */
+/* =================================================================== */
+
+/* --- 1. Corrección Global de Fuentes --- */
+/* Reseteamos el font-size del body para establecer una base más predecible.
+   Cualquier elemento sin un 'rem' o 'em' específico heredará un tamaño sensato. */
+body {
+  font-size: 1.6rem; /* Esto equivale a 16px con la base de 62.5%, un estándar seguro. */
+}
+
+/* Forzamos al footer a usar un tamaño de fuente legible y consistente,
+   ignorando cualquier regla conflictiva anterior. */
+.footer, .footer p, .footer-col ul li a, .footer-bottom {
+  font-size: 1.5rem !important; /* ~15px. Usamos !important para garantizar la anulación. */
+  line-height: 1.6;
+}
+
+.footer h4 {
+    font-size: 1.8rem !important; /* ~18px para los títulos del footer. */
+}
+
+
+/* --- 2. Estabilización de Formularios (publicar.html y editar-anuncio.html) --- */
+/* Esta sección se aplica a los contenedores de nuestros formularios principales.
+   Asumimos que ambos usan una clase como .publish-container o .form-contenedor. */
+
+.publish-container,
+.form-contenedor.moderno {
+  max-width: 700px; /* Un ancho máximo ideal para formularios. */
+  margin: 4rem auto; /* Centrado y con espacio vertical. */
+  padding: 3rem 4rem; /* Más espaciado interno. */
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12); /* Sombra más pronunciada. */
+}
+
+/* Forzamos un layout de una sola columna y espaciado generoso. */
+.publish-form .form-group,
+.form-contenedor.moderno .form-group {
+    margin-bottom: 2.5rem; /* Aumentamos el espacio entre campos. */
+}
+
+.publish-form label,
+.form-contenedor.moderno label {
+    display: block; /* Asegura que la etiqueta esté en su propia línea. */
+    margin-bottom: 0.8rem;
+    font-size: 1.6rem; /* Tamaño de etiqueta claro. */
+    font-weight: 600;
+    color: var(--color-texto);
+}
+
+.publish-form input,
+.publish-form textarea,
+.publish-form select,
+.form-contenedor.moderno .input-moderno,
+.form-contenedor.moderno textarea.input-moderno {
+    display: block;
+    width: 100%; /* Ocupan todo el ancho disponible. */
+    font-size: 1.6rem; /* Texto dentro del input legible. */
+    padding: 1.4rem;
+}
+
+/* Aseguramos que el botón de publicar/actualizar también ocupe todo el ancho. */
+.publish-form .btn,
+.form-contenedor.moderno .btn-moderno {
+    width: 100%;
+    padding: 1.5rem;
+    font-size: 1.8rem;
+    margin-top: 1.5rem; /* Espacio antes del botón. */
+}
+
+/* Y por último, nuestro botón de subida de archivos, ahora con el color correcto y garantizado. */
+.file-upload-btn {
+    background-color: #4FD1C5 !important; /* ¡Turquesa corporativo! */
+    color: white !important;
+}
+
+.file-upload-btn:hover {
+    background-color: #38B2AC !important; /* Tono más oscuro al pasar el cursor. */
 }

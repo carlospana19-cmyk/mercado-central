@@ -41,7 +41,7 @@
             <p>Completa los siguientes campos para llegar a miles de compradores.</p>
 
             <form id="publish-form" class="publish-form">
-                
+
                 <div class="form-group">
                     <label for="ad-title">Título del Anuncio</label>
                     <input type="text" id="ad-title" name="title" placeholder="Ej: Vendo Toyota Corolla 2020 en buen estado" required>
@@ -65,19 +65,39 @@
                     <input type="text" id="ad-location" name="location" placeholder="Ej: Bella Vista, Panamá" required>
                     <small>Indica la ciudad y, si es posible, el barrio o corregimiento.</small>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="ad-description">Descripción</label>
                     <textarea id="ad-description" name="description" rows="6" placeholder="Describe tu artículo en detalle. Incluye características, estado, motivo de venta, etc." required></textarea>
                 </div>
 
+                <!-- CAMPO MODERNO PARA LA IMAGEN DE PORTADA -->
                 <div class="form-group">
-    <label for="ad-image-file">Imagen Principal del Anuncio</label>
-    <input type="file" id="ad-image-file" name="imageFile" accept="image/png, image/jpeg, image/webp" required>
-    <small>Sube una foto clara de tu artículo (formatos .jpg, .png o .webp).</small>
-</div>
+                    <label>Imagen de Portada</label>
+                    <label for="ad-cover-image" class="file-upload-btn">
+                        <i class="fas fa-camera"></i> Seleccionar Portada
+                    </label>
+                    <input type="file" id="ad-cover-image" name="coverImage" accept="image/*">
+                    <span id="cover-file-name" class="file-name-display">Ningún archivo seleccionado</span>
+                </div>
 
-                <button type="submit" class="btn">Guardar Cambios</button>
+                <!-- CAMPO MODERNO PARA LA GALERÍA -->
+                <!-- CAMPO AVANZADO PARA LA GALERÍA CON DRAG & DROP -->
+                <div class="form-group">
+                    <!-- La etiqueta <label> de arriba ha sido eliminada -->
+                    <div id="gallery-drop-area" class="drop-area">
+                        <input type="file" id="ad-gallery-images" name="galleryImages" accept="image/*" multiple>
+                        <label for="ad-gallery-images" class="drop-area-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Arrastra y suelta imágenes aquí, o <strong>haz clic para seleccionar</strong>.</p>
+                            <small>Máximo 10 imágenes.</small>
+                        </label>
+                    </div>
+                    <div id="gallery-preview" class="image-preview-container"></div>
+                    <span id="gallery-files-name" class="file-name-display">Ningún archivo seleccionado</span>
+                </div>
+
+                <button type="submit" class="btn">Publicar Anuncio</button>
 
             </form>
         </div>
