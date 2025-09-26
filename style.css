@@ -1535,20 +1535,20 @@ input[type="file"] {
 }
 
 .thumbnails-wrapper-premium {
-    display: flex;
+    display: grid; /* ¡Cambiamos a Grid! */
+    grid-template-columns: repeat(5, 1fr); /* ¡Exactamente 5 columnas! */
     gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 .thumbnail-img {
-    width: 100px;
-    height: 100px;
+    width: 100%; /* Ocupará todo el espacio de su celda en la cuadrícula */
+    aspect-ratio: 1 / 1; /* Mantiene la proporción cuadrada */
     object-fit: cover;
-    border-radius: 0.5rem;
+    border-radius: .5rem;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: border-color 0.2s;
+    transition: border-color .2s ease;
 }
 
 .thumbnail-img.active,
