@@ -1129,124 +1129,7 @@ nav .buttons button:hover {
     padding: 1.5rem 3rem;
 }
 
-/* --- Estilos para la Página de Detalle del Producto --- */
 
-.product-detail-page {
-    padding: 4rem 9%;
-    background-color: #fff;
-}
-
-.product-grid {
-    display: grid;
-    grid-template-columns: 1fr; /* Una columna por defecto para móviles */
-    gap: 3rem;
-}
-
-.product-images img {
-    width: 100%;
-    height: auto;
-    border-radius: .8rem;
-    box-shadow: var(--box-shadow);
-}
-
-.product-info h1 {
-    font-size: 3.5rem;
-    color: var(--black);
-    margin-bottom: 1rem;
-}
-
-.product-info .price {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--orange);
-    margin-bottom: 2rem;
-}
-
-.details-section {
-    margin-bottom: 3rem;
-}
-
-.details-section h2 {
-    font-size: 2.2rem;
-    color: var(--black);
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #eee;
-}
-
-.details-section p {
-    font-size: 1.6rem;
-    line-height: 1.8;
-    color: #666;
-}
-
-.specs-list {
-    list-style: none;
-    padding: 0;
-}
-
-.specs-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.6rem;
-    padding: 1rem;
-    border-bottom: 1px solid #f7f7f7;
-}
-
-.specs-list li:nth-child(odd) {
-    background-color: #f9f9f9;
-}
-
-.specs-list li strong {
-    color: var(--black);
-}
-
-.contact-seller-box {
-    background: #f9f9f9;
-    padding: 2rem;
-    border-radius: .8rem;
-    box-shadow: var(--box-shadow);
-    position: sticky; /* Se queda fijo al hacer scroll */
-    top: 2rem;
-}
-
-.contact-seller-box h3 {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.contact-seller-box textarea {
-    width: 100%;
-    height: 120px;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: .5rem;
-    resize: vertical;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-.contact-seller-box .btn {
-    width: 100%;
-    margin-bottom: 1rem;
-}
-
-.contact-seller-box .phone-btn {
-    background-color: #333;
-}
-
-.contact-seller-box .phone-btn:hover {
-    background-color: var(--orange);
-}
-
-/* --- Media Query para pantallas más grandes (diseño de 3 columnas) --- */
-@media (min-width: 992px) {
-    .product-grid {
-        /* 2fr para imágenes, 3fr para info, 1.5fr para contacto */
-        grid-template-columns: 2fr 3fr 1.5fr;
-    }
-}
 
 /* --- Estilos para la Página de Publicar Anuncio --- */
 .publish-page {
@@ -1554,3 +1437,206 @@ input[type="file"] {
 .preview-image-wrapper { position: relative; width: 100px; height: 100px; }
 .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: .5rem; }
 .remove-image-btn { position: absolute; top: -5px; right: -5px; width: 22px; height: 22px; background-color: #ff4d4d; color: white; border: 2px solid white; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+/* --- Estilos para la Galería de Imágeness --- */
+.main-image-container {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    margin-bottom: 1rem;
+    border-radius: .8rem;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+#main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.thumbnails-container {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: .5rem;
+}
+.thumbnail-img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: .5rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color .2s ease;
+}
+.thumbnail-img.active,
+.thumbnail-img:hover {
+    border-color: var(--color-primario);
+}
+
+/* --- Estilos para la Página de Detalle Premium --- */
+.detalle-page-container {
+    padding: 4rem 9%;
+    background-color: #fff;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.detalle-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.detalle-header h1 {
+    font-size: 3rem;
+    color: var(--color-primario);
+    margin-bottom: 1rem;
+}
+
+.location-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #666;
+}
+
+.location-info i {
+    margin-right: 0.5rem;
+    color: var(--color-secundario);
+}
+
+.detalle-grid-premium {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 4rem;
+}
+
+.gallery-container-premium {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-image-wrapper-premium {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+#main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnails-wrapper-premium {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.thumbnail-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.thumbnail-img.active,
+.thumbnail-img:hover {
+    border-color: var(--color-primario);
+}
+
+.info-container-premium {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-box-sticky {
+    position: sticky;
+    top: 2rem;
+}
+
+.price-section {
+    margin-bottom: 2rem;
+}
+
+.price-label {
+    font-size: 1.4rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-secundario);
+}
+
+.contact-seller-box {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--sombra-suave);
+}
+
+.contact-seller-box h3 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--color-primario);
+}
+
+.contact-seller-box textarea {
+    width: 100%;
+    height: 120px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    resize: vertical;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.contact-seller-box .btn {
+    width: 100%;
+}
+
+.description-container {
+    background: #f7fafd;
+    padding: 3rem;
+    border-radius: 1rem;
+    box-shadow: var(--sombra-suave);
+}
+
+.description-container h2 {
+    font-size: 2.5rem;
+    color: var(--color-primario);
+    margin-bottom: 2rem;
+}
+
+.description-container p {
+    font-size: 1.6rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .detalle-grid-premium {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .detalle-header h1 {
+        font-size: 2.5rem;
+    }
+    .main-image-wrapper-premium {
+        height: 300px;
+    }
+}

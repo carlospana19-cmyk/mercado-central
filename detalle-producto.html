@@ -37,52 +37,50 @@
     </div>
   </nav>
 
-    <main class="product-detail-page">
-    <div id="product-detail-container" class="detail-grid">
-        
-        <!-- COLUMNA IZQUIERDA: GALERÍA DE IMÁGENES -->
-        <div class="gallery-container">
-            <div class="main-image-wrapper">
-                <img src="" alt="Imagen principal del producto" id="main-image">
+<main class="detalle-page-container">
+    <!-- Título y Ubicación (ahora van arriba del todo) -->
+    <div class="detalle-header">
+        <h1 id="product-name">Cargando Título...</h1>
+        <div class="location-info">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="product-location">Cargando Ubicación...</span>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal de Grid -->
+    <div class="detalle-grid-premium">
+        <!-- Columna Izquierda: Galería de Imágenes -->
+        <div class="gallery-container-premium">
+            <div class="main-image-wrapper-premium">
+                <img src="images/placeholder.jpg" alt="Imagen principal" id="main-image">
             </div>
-            <div class="thumbnails-wrapper" id="thumbnails-container">
-                <!-- Miniaturas verticales aquí -->
+            <div class="thumbnails-wrapper-premium" id="thumbnails-container">
+                <!-- Miniaturas generadas por JS -->
             </div>
         </div>
 
-        <!-- COLUMNA DERECHA: INFORMACIÓN DEL PRODUCTO -->
-        <div class="product-info-column">
-            <h1 id="product-name">Cargando...</h1>
-            <div class="location-info">
-                <i class="fas fa-map-marker-alt"></i>
-                <span id="product-location">Cargando...</span>
-            </div>
-            <div class="price" id="product-price">$ --.--</div>
-
-            <div class="details-section">
-                <h2>Especificaciones</h2>
-                <ul id="product-specs" class="specs-list">
-                    <!-- Specs aquí -->
-                </ul>
-            </div>
-
-            <div class="details-section">
-                <h2>Descripción</h2>
-                <p id="product-description">Cargando...</p>
+        <!-- Columna Derecha: Información y Contacto -->
+        <div class="info-container-premium">
+            <div class="info-box-sticky">
+                <div class="price-section">
+                    <span class="price-label">Precio</span>
+                    <div class="price" id="product-price">$ --.--</div>
+                </div>
+                <div class="contact-seller-box">
+                    <h3>Contactar al Vendedor</h3>
+                    <form id="contact-form">
+                        <textarea name="message" placeholder="Hola, estoy interesado en este anuncio y me gustaría tener más detalles."></textarea>
+                        <button type="submit" class="btn">Enviar Mensaje</button>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- COLUMNA DE CONTACTO (puede ser la tercera o ir dentro de la de info) -->
-        <div class="product-contact-column">
-             <div class="contact-seller-box">
-                <h3>Contactar al Vendedor</h3>
-                <form id="contact-form">
-                    <textarea name="message" placeholder="Hola, estoy interesado..."></textarea>
-                    <button type="submit" class="btn">Enviar Mensaje</button>
-                </form>
-            </div>
-        </div>
-
+    <!-- Descripción (ahora va debajo, a ancho completo) -->
+    <div class="description-container">
+        <h2>Descripción Detallada</h2>
+        <p id="product-description">Cargando descripción...</p>
     </div>
 </main>
 

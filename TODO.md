@@ -1,1 +1,3 @@
-- [x] Editar home-logic.js para remover la línea .order('created_at', { ascending: false }) de la consulta Supabase.
+- [x] Reemplazar el div gallery-container en detalle-producto.html con el nuevo bloque product-images.
+- [x] Añadir el CSS para la galería al final de style.css.
+- [x] Reemplazar el contenido de product-detail-logic.js con el código proporcionado.

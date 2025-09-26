@@ -59,9 +59,9 @@ function displayFilteredProducts(productsToDisplay) {
     productsToDisplay.forEach(product => {
         const productBox = document.createElement('div');
         productBox.classList.add('box');
-        // CORREGIDO: Usamos url_imagen, titulo y precio
+        // CORREGIDO: Usamos url_portada, titulo y precio
         productBox.innerHTML = `
-            <img src="${product.url_imagen}" alt="${product.titulo}">
+            <img src="${product.url_portada}" alt="${product.titulo}">
             <h3>${product.titulo}</h3>
             <div class="price">$${product.precio}</div>
             <div class="stars">

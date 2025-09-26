@@ -9,11 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Usamos Promise.all para hacer ambas peticiones a la vez y mejorar el rendimiento
+    // Hacemos ambas peticiones a la vez
     const [adResponse, imagesResponse] = await Promise.all([
-        // Petición 1: Obtener los datos del anuncio
         supabaseClient.from('anuncios').select('*').eq('id', adId).single(),
-        // Petición 2: Obtener las imágenes de la galería
         supabaseClient.from('imagenes').select('url_imagen').eq('anuncio_id', adId)
     ]);
 
@@ -21,8 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: images, error: imagesError } = imagesResponse;
 
     if (adError || !ad) {
-        console.error("Error al obtener el detalle del producto:", adError);
-        displayError("El anuncio que buscas no existe o ha sido eliminado.");
+        displayError("El anuncio que buscas no existe.");
     } else {
         displayProductDetails(ad, images || []);
     }
@@ -41,20 +38,17 @@ function displayProductDetails(ad, galleryImages) {
     const mainImage = document.getElementById('main-image');
     const thumbnailsContainer = document.getElementById('thumbnails-container');
     
-    // Creamos una lista con la portada primero, y luego las de la galería
-    const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(Boolean); // .filter(Boolean) elimina URLs nulas
+    const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(Boolean);
 
     if (allImages.length > 0) {
-        mainImage.src = allImages[0]; // Mostramos la primera imagen (la portada)
+        mainImage.src = allImages[0];
         thumbnailsContainer.innerHTML = '';
 
         allImages.forEach((imageUrl, index) => {
             const thumb = document.createElement('img');
             thumb.src = imageUrl;
             thumb.className = 'thumbnail-img';
-            if (index === 0) {
-                thumb.classList.add('active');
-            }
+            if (index === 0) thumb.classList.add('active');
             
             thumb.addEventListener('click', () => {
                 mainImage.src = imageUrl;
@@ -65,8 +59,7 @@ function displayProductDetails(ad, galleryImages) {
             thumbnailsContainer.appendChild(thumb);
         });
     } else {
-        // Si no hay imágenes, mostramos un placeholder
-        mainImage.src = 'images/placeholder.jpg'; // Asegúrate de tener una imagen placeholder
+        mainImage.src = 'images/placeholder.jpg';
     }
 }
 
