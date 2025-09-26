@@ -1,4 +1,5 @@
-// form-logic.js (VERSIÓN PREMIUM FINAL)
+// form-logic.js (Controla AMBAS páginas: publicar y editar)
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('publish-form');
     if (!form) return;
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let existingGalleryImages = [];
     let newGalleryFiles = [];
-    let imagenesAEliminar = [];
+    let imagesToDeleteFromStorage = [];
 
     // --- LÓGICA DE UI ---
     const categoriesHTML = `
@@ -65,45 +66,42 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let file of files) {
             if ((existingGalleryImages.length + newGalleryFiles.length) < 10) newGalleryFiles.push(file);
         }
-        renderGalleryPreview();
+        updateFileInputAndPreview();
     }
 
-    function renderGalleryPreview() {
+    function updateFileInputAndPreview() {
         galleryPreview.innerHTML = '';
-        const allImages = [...existingGalleryImages, ...newGalleryFiles];
-        galleryFilesNameDisplay.textContent = `${allImages.length} imágenes seleccionadas`;
-
+        const dataTransfer = new DataTransfer();
         existingGalleryImages.forEach(url => {
             galleryPreview.innerHTML += `<div class="preview-image-wrapper"><img src="${url}" class="preview-image"><button type="button" class="remove-image-btn" data-url="${url}">&times;</button></div>`;
         });
         newGalleryFiles.forEach((file, index) => {
+            dataTransfer.items.add(file);
             const reader = new FileReader();
             reader.onload = e => {
                 galleryPreview.innerHTML += `<div class="preview-image-wrapper"><img src="${e.target.result}" class="preview-image"><button type="button" class="remove-image-btn" data-index="${index}">&times;</button></div>`;
             };
             reader.readAsDataURL(file);
         });
+        galleryImageInput.files = dataTransfer.files;
+        galleryFilesNameDisplay.textContent = `${existingGalleryImages.length + newGalleryFiles.length} imágenes en galería`;
     }
 
     galleryPreview.addEventListener('click', e => {
         if (e.target.classList.contains('remove-image-btn')) {
             if (e.target.dataset.url) {
                 const url = e.target.dataset.url;
-                imagenesAEliminar.push(url);
-                // --- AÑADIR ESTE LOG ---
-                console.log('Imagen añadida a la lista de borrado:', url);
-                console.log('Lista de borrado actual:', imagenesAEliminar);
-                // ----------------------
+                imagesToDeleteFromStorage.push(url);
                 existingGalleryImages = existingGalleryImages.filter(imgUrl => imgUrl !== url);
             } else {
                 const index = parseInt(e.target.dataset.index);
                 newGalleryFiles.splice(index, 1);
             }
-            renderGalleryPreview();
+            updateFileInputAndPreview();
         }
     });
 
-    // --- LÓGICA PRINCIPAL ---
+    // --- LÓGICA PRINCIPAL DE LA PÁGINA ---
     const params = new URLSearchParams(window.location.search);
     const adId = params.get('id');
     const isEditMode = !!adId;
@@ -118,21 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadAdForEditing(id) {
-        const { data: ad } = await supabaseClient.from('anuncios').select('*').eq('id', id).single();
-        if (!ad) {
-            alert('No se pudo cargar el anuncio.');
-            window.location.href = 'dashboard.html';
-            return;
-        }
-        titleInput.value = ad.titulo;
-        priceInput.value = ad.precio;
-        locationInput.value = ad.ubicacion;
-        descriptionInput.value = ad.descripcion;
-        setTimeout(() => { categorySelect.value = ad.categoria; }, 1);
+        const { data: ad, error } = await supabaseClient.from('anuncios').select('*').eq('id', id).single();
+        if (ad) {
+            titleInput.value = ad.titulo;
+            priceInput.value = ad.precio;
+            locationInput.value = ad.ubicacion;
+            descriptionInput.value = ad.descripcion;
+            setTimeout(() => { categorySelect.value = ad.categoria; }, 1);
 
-        const { data: images } = await supabaseClient.from('imagenes').select('url_imagen').eq('anuncio_id', id);
-        if (images) { existingGalleryImages = images.map(i => i.url_imagen); }
-        renderGalleryPreview();
+            const { data: images } = await supabaseClient.from('imagenes').select('url_imagen').eq('anuncio_id', id);
+            if (images) { existingGalleryImages = images.map(i => i.url_imagen); }
+            updateFileInputAndPreview();
+        }
     }
 
     async function handleFormSubmit(event, existingAdId = null) {
@@ -142,11 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formButton.textContent = 'Procesando...';
 
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) { /* ... manejo de usuario no logueado ... */ return; }
+        if (!user) { window.location.href = 'login.html'; return; }
 
         const formData = new FormData(form);
         const coverFile = formData.get('coverImage');
-
+        
         const adData = {
             titulo: formData.get('title'),
             descripcion: formData.get('description'),
@@ -156,9 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
             user_id: user.id
         };
 
-        // --- LÓGICA DE SUBIDA/ACTUALIZACIÓN ---
-
-        // 1. Manejar la imagen de portada (si se subió una nueva)
         if (coverFile && coverFile.size > 0) {
             const fileName = `${Date.now()}_cover_${coverFile.name}`;
             await supabaseClient.storage.from('imagenes_anuncios').upload(fileName, coverFile);
@@ -168,61 +160,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let adIdToRedirect = existingAdId;
 
         if (isEditMode) {
-            // MODO UPDATE: Actualizamos los datos de texto del anuncio
             await supabaseClient.from('anuncios').update(adData).eq('id', existingAdId);
         } else {
-            // MODO INSERT: Creamos el anuncio
             const { data } = await supabaseClient.from('anuncios').insert(adData).select().single();
             if (data) { adIdToRedirect = data.id; }
         }
 
-        if (!adIdToRedirect) {
-            alert('Hubo un error crítico al guardar el anuncio.');
-            formButton.disabled = false; formButton.textContent = 'Guardar';
-            return;
+        if (!adIdToRedirect) { alert('Error al guardar el anuncio.'); return; }
+
+        if (isEditMode && imagesToDeleteFromStorage.length > 0) {
+            const fileNames = imagesToDeleteFromStorage.map(url => url.split('/').pop());
+            await supabaseClient.storage.from('imagenes_anuncios').remove(fileNames);
+            await supabaseClient.from('imagenes').delete().in('url_imagen', imagesToDeleteFromStorage);
         }
 
-        // --- LÓGICA DE GALERÍA INTELIGENTE ---
-
-        // 2. Borrar imágenes de la galería marcadas para eliminar
-        if (isEditMode && imagenesAEliminar.length > 0) {
-            // --- AÑADIR ESTOS LOGS ---
-            console.log('Intentando borrar estas URLs de la base de datos:', imagenesAEliminar);
-            // -------------------------
-
-            // Borramos las referencias de la base de datos.
-            const { error: deleteError } = await supabaseClient
-                .from('imagenes')
-                .delete()
-                .in('url_imagen', imagenesAEliminar);
-
-            // --- AÑADIR ESTE LOG ---
-            if (deleteError) {
-                console.error('Error devuelto por Supabase al borrar imágenes:', deleteError);
-            } else {
-                console.log('Petición de borrado a Supabase enviada con éxito.');
-            }
-            // ----------------------
-
-            // Borrar archivos de Supabase Storage explícitamente
-            for (const url of imagenesAEliminar) {
-                // Extraer la ruta del archivo desde la URL pública
-                const path = url.split('/object/public/imagenes_anuncios/')[1];
-                if (path) {
-                    const { error: storageError } = await supabaseClient
-                        .storage
-                        .from('imagenes_anuncios')
-                        .remove([path]);
-                    if (storageError) {
-                        console.error('Error al borrar archivo de Storage:', storageError, 'para URL:', url);
-                    } else {
-                        console.log('Archivo borrado de Storage exitosamente:', path);
-                    }
-                }
-            }
-        }
-
-        // 3. Subir las nuevas imágenes de la galería
         if (newGalleryFiles.length > 0) {
             const uploadPromises = newGalleryFiles.map(file => {
                 const fileName = `${Date.now()}_gallery_${file.name}`;
@@ -230,14 +181,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const results = await Promise.all(uploadPromises);
             const urls = results.map(res => res.data ? supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(res.data.path).data.publicUrl : null).filter(Boolean);
-
             if (urls.length > 0) {
                 const imagesToInsert = urls.map(url => ({ anuncio_id: adIdToRedirect, url_imagen: url }));
                 await supabaseClient.from('imagenes').insert(imagesToInsert);
             }
         }
 
-        alert(isEditMode ? '¡Anuncio actualizado con éxito!' : '¡Anuncio publicado con éxito!');
+        alert(isEditMode ? '¡Anuncio actualizado!' : '¡Anuncio publicado!');
         window.location.href = `detalle-producto.html?id=${adIdToRedirect}`;
     }
 });
