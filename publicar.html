@@ -56,6 +56,10 @@
         <label for="ad-category">Categoría</label>
         <select id="ad-category" name="category" required></select>
     </div>
+    <div id="new-category-group" class="form-group" style="display: none;">
+        <label for="new-category-input">Nombre de la Nueva Categoría</label>
+        <input type="text" id="new-category-input" name="new_category" placeholder="Ej: Instrumentos Musicales">
+    </div>
     <div class="form-group">
         <label for="ad-price">Precio (USD)</label>
         <input type="number" id="ad-price" name="price" step="0.01" min="0" required>
@@ -74,19 +78,20 @@
         <input type="file" id="ad-cover-image" name="coverImage" accept="image/*">
         <span id="cover-file-name" class="file-name-display">Ningún archivo seleccionado</span>
     </div>
+
     <div class="form-group">
-        <!-- La etiqueta <label> de arriba ha sido eliminada para un diseño más limpio -->
+        <label>Imágenes de la Galería (opcional, hasta 10)</label>
         <div id="gallery-drop-area" class="drop-area">
-            <input type="file" id="ad-gallery-images" name="galleryImages" accept="image/*" multiple>
+            <input type="file" id="ad-gallery-images" name="galleryImages" accept="image/*" multiple style="display: none;">
             <label for="ad-gallery-images" class="drop-area-label">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>Arrastra y suelta imágenes aquí, o <strong>haz clic para seleccionar</strong>.</p>
-                <small>Máximo 10 imágenes.</small>
+                <small>Añade fotos desde diferentes ángulos.</small>
             </label>
         </div>
         <div id="gallery-preview" class="image-preview-container"></div>
-        <span id="gallery-files-name" class="file-name-display"></span>
     </div>
+    
 
 <!-- pricing-selector-moderno-color-corporativo.html -->
 <div id="pricing-section" class="max-w-6xl mx-auto my-12 px-4 bg-gradient-to-br from-teal-900/20 to-cyan-900/20 rounded-3xl backdrop-blur-sm border border-teal-500/30">
