@@ -446,60 +446,97 @@ nav .buttons button:hover {
   background-color: #16a085;
 }
 
-/* ====== FOOTER ====== */
-.footer {
-  background: #0a2342;
-  color: #fff;
-  padding: 40px 0 0 0;
-  margin-top: auto; /* Empuja el footer al final de la página */
-}
+/* =================================
+   Estilos Unificados del Footer 
+   ================================= */
 
+/* Contenedor principal del footer */
+.footer {
+    background-color: #0d1a26; /* El azul oscuro de las tarjetas de precios */
+    color: #a9c1d9; /* Un color de texto claro y suave para párrafos */
+    padding: 4rem 2rem 0; /* Espaciado superior generoso, sin espaciado inferior */
+    text-align: left;
+}
 
 .footer-contenedor {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
 }
 
-.footer h4 {
-  color: #00bfae;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
+.footer-col {
+    flex: 1;
+    min-width: 250px;
 }
 
-.footer p, .footer-col ul li a {
-  line-height: 1.7;
-  font-size: 0.95rem;
-  color: #fff;
-  text-decoration: none;
-  transition: color 0.3s;
+/* Títulos de las columnas del footer */
+.footer-col h4 {
+    color: #ffffff; /* Títulos en blanco puro para más énfasis */
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    position: relative;
 }
 
-.footer-col ul { list-style: none; }
-.footer-col ul li { margin-bottom: 10px; }
-.footer-col ul li a {
-  color: #fff;
-  text-decoration: none;
-  transition: color 0.2s;
+/* Línea decorativa debajo de los títulos */
+.footer-col h4::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    background-color: #00bfae; /* Línea en color turquesa corporativo */
+    height: 3px;
+    width: 50px;
 }
-.footer-col ul li a:hover {
-  color: #ffe082;
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
 }
+
+.footer-col ul li {
+    margin-bottom: 0.8rem;
+}
+
+/* Estilo de los enlaces del footer */
+.footer-col a {
+    color: #a9c1d9; /* Mismo color que el texto base */
+    text-decoration: none;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+.footer-col a:hover {
+    color: #00bfae; /* El enlace se vuelve turquesa al pasar el ratón */
+    padding-left: 5px; /* Pequeño efecto de desplazamiento */
+}
+
 .social-links a {
-  color: #fff;
-  transition: color 0.2s;
-}
-.social-links a:hover {
-  color: #ffe082;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.8rem;
 }
 
+.icon-social {
+    width: 20px;
+    height: 20px;
+}
+
+/* Barra de copyright inferior */
 .footer-bottom {
-  background: #0a2342;
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 0.95em;
-  border-top: none;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 3rem; /* Espacio para separar del contenido superior */
+    border-top: 1px solid rgba(0, 191, 174, 0.2); /* Línea divisoria sutil */
+    /* Ya no necesita su propio background, lo hereda de .footer */
+}
+
+.footer-bottom p {
+    color: #a9c1d9;
+    font-size: 1.4rem;
 }
 
 /* ====== Formularios (Login, Registro, etc.) ====== */
@@ -1658,16 +1695,7 @@ body {
   font-size: 1.6rem; /* Esto equivale a 16px con la base de 62.5%, un estándar seguro. */
 }
 
-/* Forzamos al footer a usar un tamaño de fuente legible y consistente,
-   ignorando cualquier regla conflictiva anterior. */
-.footer, .footer p, .footer-col ul li a, .footer-bottom {
-  font-size: 1.5rem !important; /* ~15px. Usamos !important para garantizar la anulación. */
-  line-height: 1.6;
-}
 
-.footer h4 {
-    font-size: 1.8rem !important; /* ~18px para los títulos del footer. */
-}
 
 
 /* --- 2. Estabilización de Formularios (publicar.html y editar-anuncio.html) --- */
@@ -1725,4 +1753,12 @@ body {
 
 .file-upload-btn:hover {
     background-color: #38B2AC !important; /* Tono más oscuro al pasar el cursor. */
+}
+
+/* Estilos para Títulos de Páginas de Formularios y Paneles */
+.page-title {
+    font-size: 2.5rem; /* 40px */
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 0.5rem; /* 8px */
 }

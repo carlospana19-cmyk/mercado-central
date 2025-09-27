@@ -164,6 +164,34 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const { data } = await supabaseClient.from('anuncios').insert(adData).select().single();
             if (data) { adIdToRedirect = data.id; }
+
+            // Si hay un plan destacado seleccionado, guárdalo en featured_ads
+            if (window.selectedPlan) {
+                const today = new Date();
+                let daysToAdd = 7; // por defecto 7 días
+
+                if (window.selectedPlan.id === '30d') daysToAdd = 30;
+                else if (window.selectedPlan.id === '90d') daysToAdd = 90;
+
+                const endDate = new Date(today);
+                endDate.setDate(today.getDate() + daysToAdd);
+
+                const { error: featuredError } = await supabaseClient.from('featured_ads').insert({
+                    ad_id: data.id, // ID del anuncio recién creado
+                    user_id: user.id, // UID del usuario logueado
+                    start_date: today.toISOString(),
+                    end_date: endDate.toISOString(),
+                    price_paid: window.selectedPlan.price,
+                    status: 'active'
+                });
+
+                if (featuredError) {
+                    console.error('Error guardando anuncio destacado:', featuredError);
+                } else {
+                    // Opcional: actualizar is_featured = true inmediatamente
+                    await supabaseClient.from('anuncios').update({ is_featured: true }).eq('id', data.id);
+                }
+            }
         }
 
         if (!adIdToRedirect) { alert('Error al guardar el anuncio.'); return; }
