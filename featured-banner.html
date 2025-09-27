@@ -1,0 +1,70 @@
+<div id="featured-plans-simple" style="background: white; padding: 2rem; border-radius: 1rem; margin: 2rem 0; border: 1px solid #e0f2fe;">
+  <h3 style="color: #0891b2; font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">
+    ⭐ Elige cómo destacar tu anuncio
+  </h3>
+  
+  <div id="plans-list" style="margin-bottom: 2rem;"></div>
+
+  <div id="summary-section" style="display: none; padding-top: 1.5rem; border-top: 1px solid #bae6fd;">
+    <p style="color: #0891b2; font-weight: 600; margin-bottom: 0.5rem;">
+      Plan seleccionado: <span id="selected-plan-display">—</span>
+    </p>
+    <p style="color: #0d9488; font-size: 1.25rem; font-weight: 700;">
+      Total: <span id="selected-price-display">$0.00</span> USD
+    </p>
+    <button 
+      id="pay-now-btn"
+      style="background: linear-gradient(to right, #0891b2, #0d9488); color: white; border: none; padding: 0.75rem 2rem; border-radius: 9999px; font-weight: 600; margin-top: 1rem; cursor: pointer; transition: opacity 0.2s;"
+      >💳 Activar Destacado Ahora</button>
+  </div>
+</div>
+
+<script>
+  const plans = [
+    { id: '7d', name: 'Destacado 7 Días', price: 5.00, description: 'Aparece primero en búsquedas.' },
+    { id: '30d', name: 'Destacado 30 Días', price: 15.00, description: 'Máxima visibilidad por un mes.' },
+    { id: '90d', name: 'Destacado 90 Días', price: 35.00, description: 'Lidera el mercado por 3 meses.' }
+  ];
+
+  let selectedPlan = null;
+
+  function renderPlans() {
+    const container = document.getElementById('plans-list');
+    container.innerHTML = plans.map(plan => `
+      <div 
+        onclick="selectPlan('${plan.id}')" 
+        style="padding: 1rem; margin-bottom: 1rem; border: 2px solid #e0f2fe; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s; color: #0f172a;"
+        onmouseover="this.style.borderColor='#7dd3fc'; this.style.backgroundColor='#f0fdfd';"
+        onmouseout="this.style.borderColor='#e0f2fe'; this.style.backgroundColor='white';"
+      >
+        <strong style="color: #0891b2;">${plan.name}</strong> — $${plan.price.toFixed(2)} USD<br>
+        <small style="color: #334155;">${plan.description}</small>
+      </div>
+    ` ).join('');
+  }
+
+  function selectPlan(planId) {
+    selectedPlan = plans.find(p => p.id === planId);
+    
+    document.querySelectorAll('#plans-list > div').forEach(el => {
+      el.style.borderColor = '#e0f2fe';
+      el.style.backgroundColor = 'white';
+    });
+    
+    event.target.closest('div').style.borderColor = '#0891b2';
+    event.target.closest('div').style.backgroundColor = '#f0fdfd';
+
+    document.getElementById('summary-section').style.display = 'block';
+    document.getElementById('selected-plan-display').textContent = selectedPlan.name;
+    document.getElementById('selected-price-display').textContent = `$${selectedPlan.price.toFixed(2)}`;
+  }
+
+  document.getElementById('pay-now-btn')?.addEventListener('click', function() {
+    if (selectedPlan) {
+      alert(`✅ Plan seleccionado: ${selectedPlan.name}\nValor: $${selectedPlan.price}\n\nPronto integraremos el pago real.`);
+      // Aquí luego conectaremos con Supabase
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', renderPlans);
+</script>
