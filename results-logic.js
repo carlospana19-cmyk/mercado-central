@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- ACTUALIZACIÓN DE LA CONSULTA A SUPABASE ---
     // Empezamos la consulta base
-    let queryBuilder = supabaseClient.from('anuncios').select('*');
+    let queryBuilder = supabaseClient.from('anuncios').select('id, titulo, precio, url_portada, url_galeria');
 
     // Añadimos el filtro de texto si existe
     if (query) {
@@ -49,27 +49,58 @@ document.addEventListener('DOMContentLoaded', async () => {
 function displayFilteredProducts(productsToDisplay) {
     const container = document.getElementById('results-container');
     if (!container) return;
-    container.innerHTML = "";
 
     if (productsToDisplay.length === 0) {
         container.innerHTML = `<p class="no-results">No se encontraron anuncios que coincidan con tu búsqueda.</p>`;
         return;
     }
 
+    let allProductsHTML = "";
+
     productsToDisplay.forEach(product => {
-        const productBox = document.createElement('div');
-        productBox.classList.add('box');
-        // CORREGIDO: Usamos url_portada, titulo y precio
-        productBox.innerHTML = `
-            <img src="${product.url_portada}" alt="${product.titulo}">
-            <h3>${product.titulo}</h3>
-            <div class="price">$${product.precio}</div>
-            <div class="stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+        // Creamos un array unificado de imágenes. Ponemos la portada primero.
+        // Nos aseguramos de que url_galeria sea un array, aunque esté vacío.
+        const allImages = [product.url_portada, ...(product.url_galeria || [])];
+
+        const productBoxHTML = `
+            <div class="box">
+                <!-- INICIO DE LA ESTRUCTURA DEL CARRUSEL SWIPER -->
+                <div class="swiper product-swiper">
+                    <div class="swiper-wrapper">
+                        ${allImages.map(imgUrl => `
+                            <div class="swiper-slide">
+                                <img src="${imgUrl}" alt="${product.titulo}" loading="lazy">
+                            </div>
+                        `).join('')}
+                    </div>
+                    <!-- Botones de Navegación -->
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+                <!-- FIN DE LA ESTRUCTURA DEL CARRUSEL -->
+
+                <h3>${product.titulo}</h3>
+                <div class="price">${product.precio}</div>
+                <div class="stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
+                <a href="detalle-producto.html?id=${product.id}" class="btn">Ver detalles</a>
             </div>
-            <a href="detalle-producto.html?id=${product.id}" class="btn">Ver detalles</a>
         `;
-        container.appendChild(productBox);
+        allProductsHTML += productBoxHTML;
+    });
+
+    // Inyectamos todo el HTML de una vez en el contenedor.
+    container.innerHTML = allProductsHTML;
+
+    // INICIALIZAMOS TODOS LOS SWIPERS A LA VEZ
+    // Es importante hacerlo DESPUÉS de que el HTML está en el DOM.
+    const swipers = new Swiper('.product-swiper', {
+        loop: true,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
     });
 }
 
