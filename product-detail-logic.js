@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function displayProductDetails(ad, galleryImages) {
+async function displayProductDetails(ad, galleryImages) {
     document.title = `${ad.titulo} - Mercado Central`;
     
     // Rellenar datos de texto
     document.getElementById('product-name').textContent = ad.titulo;
-    document.getElementById('product-price').textContent = `$${ad.precio}`;
+    document.getElementById('product-price').textContent = `${ad.precio}`;
     document.getElementById('product-location').textContent = ad.ubicacion || 'No especificada';
     document.getElementById('product-description').textContent = ad.descripcion;
 
@@ -60,6 +60,16 @@ function displayProductDetails(ad, galleryImages) {
         });
     } else {
         mainImage.src = 'images/placeholder.jpg';
+    }
+
+    // --- LÓGICA DEL BOTÓN DE EDICIÓN ---
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const editButton = document.getElementById('edit-ad-button');
+
+    // Comprobamos si hay un usuario logueado Y si su ID coincide con el del dueño del anuncio
+    if (user && ad.user_id === user.id && editButton) {
+        editButton.href = `editar-anuncio.html?id=${ad.id}`;
+        editButton.style.display = 'block'; // Lo hacemos visible
     }
 }
 

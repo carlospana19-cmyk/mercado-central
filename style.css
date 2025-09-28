@@ -1258,7 +1258,7 @@ nav .buttons button:hover {
     color: var(--orange);
 }
 
-/* Estilos para las acciones en el Dashboard */
+/* --- Estilos para las acciones en el Dashboard (Mejorado) --- */
 .dashboard-ad-actions {
     display: flex;
     gap: 1rem;
@@ -1267,25 +1267,34 @@ nav .buttons button:hover {
     border-top: 1px solid #eee;
 }
 
-.dashboard-ad-actions button {
-    flex: 1; /* Ocupan el mismo espacio */
-    padding: .8rem;
+/* Regla base para AMBOS, el botón y el enlace */
+.dashboard-ad-actions .btn-edit,
+.dashboard-ad-actions .btn-delete {
+    flex: 1;
+    padding: 1rem;
     font-size: 1.4rem;
+    font-weight: 600; /* Texto en negrita */
     border: none;
     border-radius: .5rem;
     cursor: pointer;
+    text-align: center; /* Centra el texto en el enlace <a> */
+    text-decoration: none; /* Quita el subrayado del enlace */
     transition: all .2s ease;
 }
 
+/* Estilo específico para Editar (botón secundario) */
 .btn-edit {
     background-color: #f0f0f0;
     color: #333;
+    border: 1px solid #ddd; /* Borde sutil */
 }
 
 .btn-edit:hover {
-    background-color: #ddd;
+    background-color: #e0e0e0;
+    transform: translateY(-1px);
 }
 
+/* Estilo específico para Borrar (botón de peligro) */
 .btn-delete {
     background-color: #ff4d4d;
     color: white;
@@ -1293,6 +1302,7 @@ nav .buttons button:hover {
 
 .btn-delete:hover {
     background-color: #cc0000;
+    transform: translateY(-1px);
 }
 
 /* style.css */

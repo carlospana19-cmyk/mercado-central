@@ -83,27 +83,65 @@ document.addEventListener('DOMContentLoaded', () => {
         formButton.disabled = true;
         formButton.textContent = 'Publicando...';
 
-        const formData = new FormData(publishForm);
-        const coverImageFile = formData.get('coverImage');
-        
-        // 1. SUBIR IMAGEN DE PORTADA
-        let coverImageUrl = '';
-        if (coverImageFile && coverImageFile.size > 0) {
-            const filePath = `public/${Date.now()}_${coverImageFile.name}`;
-            await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, coverImageFile);
-            const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
-            coverImageUrl = data.publicUrl;
-        }
-
-        // 2. INSERTAR EL ANUNCIO PRINCIPAL Y OBTENER SU ID
-        const { data: { user } } = await supabaseClient.auth.getUser(); // Get user here
+        const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) {
-            alert('Debes iniciar sesión para publicar un anuncio.');
-            formButton.disabled = false;
-            formButton.textContent = 'Publicar Anuncio';
+            alert("Debes iniciar sesión para publicar.");
+            window.location.href = 'login.html';
             return;
         }
 
+        const formData = new FormData(publishForm);
+        const coverImageFile = formData.get('coverImage');
+
+        let coverImageUrl = '';
+        // --- LÓGICA DE SUBIDA DE PORTADA (CORREGIDA) ---
+        if (coverImageFile && coverImageFile.size > 0) {
+            const filePath = `public/${user.id}/${Date.now()}_${coverImageFile.name}`;
+            
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                .from('imagenes_anuncios')
+                .upload(filePath, coverImageFile);
+
+            if (uploadError) {
+                alert('Error al subir la imagen de portada.');
+                console.error('Error de subida:', uploadError);
+                formButton.disabled = false;
+                formButton.textContent = 'Publicar Anuncio';
+                return;
+            }
+
+            // ¡CORRECCIÓN CLAVE! Obtenemos la URL pública DESPUÉS de una subida exitosa.
+            const { data: publicUrlData } = supabaseClient.storage
+                .from('imagenes_anuncios')
+                .getPublicUrl(uploadData.path); // Usamos el 'path' de la respuesta de la subida
+            
+            console.log('URL pública de portada obtenida:', publicUrlData.publicUrl);
+            coverImageUrl = publicUrlData.publicUrl;
+        }
+
+        // --- LÓGICA DE SUBIDA DE GALERÍA (CORREGIDA) ---
+        const galleryUrls = [];
+        for (const file of galleryFiles) {
+            const filePath = `public/${user.id}/${Date.now()}_gallery_${file.name}`;
+            
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                .from('imagenes_anuncios')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                console.error('Error subiendo imagen de galería:', uploadError);
+                continue;
+            }
+
+            const { data: publicUrlData } = supabaseClient.storage
+                .from('imagenes_anuncios')
+                .getPublicUrl(uploadData.path);
+            
+            console.log('URL pública de galería obtenida:', publicUrlData.publicUrl);
+            galleryUrls.push(publicUrlData.publicUrl);
+        }
+
+        // --- LÓGICA DE INSERCIÓN EN BASE DE DATOS (SIN CAMBIOS) ---
         const adData = {
             titulo: formData.get('title'),
             categoria: formData.get('category'),
@@ -111,51 +149,31 @@ document.addEventListener('DOMContentLoaded', () => {
             ubicacion: formData.get('location'),
             descripcion: formData.get('description'),
             url_portada: coverImageUrl,
-            user_id: user.id // Assign user.id here
+            user_id: user.id
         };
 
         const { data: newAd, error: adError } = await supabaseClient
             .from('anuncios')
             .insert([adData])
-            .select('id') // ¡Pedimos que nos devuelva el ID!
+            .select('id')
             .single();
 
-        if (adError || !newAd) {
-            console.error('Error al publicar el anuncio:', adError);
+        if (adError) {
+            console.error('Error al publicar anuncio:', adError);
             alert('No se pudo publicar el anuncio.');
-            formButton.disabled = false;
-            formButton.textContent = 'Publicar Anuncio';
+            // ... (reactivar botón) ...
             return;
         }
 
         const newAdId = newAd.id;
 
-        // 3. SUBIR IMÁGENES DE GALERÍA Y GUARDARLAS EN LA TABLA 'imagenes'
-        if (galleryFiles.length > 0) {
-            const galleryImageObjects = [];
-
-            for (const file of galleryFiles) {
-                const filePath = `public/${Date.now()}_gallery_${file.name}`;
-                await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, file);
-                const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
-                
-                // Preparamos el objeto para la tabla 'imagenes'
-                galleryImageObjects.push({
-                    anuncio_id: newAdId,
-                    url_imagen: data.publicUrl
-                });
-            }
-
-            // Insertamos todas las imágenes de la galería de una sola vez
-            const { error: imagesError } = await supabaseClient
-                .from('imagenes')
-                .insert(galleryImageObjects);
-
-            if (imagesError) {
-                console.error('Error guardando imágenes de galería:', imagesError);
-                // El anuncio principal se creó, pero las imágenes fallaron.
-                // Se podría añadir lógica para manejar este caso.
-            }
+        if (galleryUrls.length > 0) {
+            const galleryImageObjects = galleryUrls.map(url => ({
+                anuncio_id: newAdId,
+                url_imagen: url
+            }));
+            
+            await supabaseClient.from('imagenes').insert(galleryImageObjects);
         }
 
         alert('¡Anuncio publicado con éxito!');
