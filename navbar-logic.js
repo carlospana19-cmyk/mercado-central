@@ -40,4 +40,59 @@ async function setupNavbar() {
 }
 
 // Ejecutamos la función cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', setupNavbar);
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- LÓGICA DE CARGA DE CATEGORÍAS (CENTRALIZADA Y ADAPTADA) ---
+    async function loadCategories() {
+        const categorySelectForm = document.getElementById('ad-category');
+        const categorySelectSearch = document.getElementById('categorySelect');
+        const targetSelect = categorySelectForm || categorySelectSearch;
+
+        if (!targetSelect) return;
+
+        const defaultOptionHTML = targetSelect.id === 'ad-category' 
+            ? '<option value="" disabled selected>Seleccione una categoría</option>'
+            : '<option value="all" selected>Todas las Categorías</option>';
+
+        // 1. Pedimos ambas columnas, ordenadas por grupo
+        const { data: categories, error } = await supabaseClient
+            .from('categorias')
+            .select('nombre, grupo')
+            .order('grupo', { ascending: true })
+            .order('nombre', { ascending: true });
+
+        if (error) {
+            console.error('Error al cargar categorías:', error);
+            targetSelect.innerHTML = '<option>Error</option>';
+            return;
+        }
+
+        // 2. Agrupamos las categorías
+        const groupedCategories = categories.reduce((acc, category) => {
+            const group = category.grupo;
+            if (!acc[group]) {
+                acc[group] = [];
+            }
+            acc[group].push(category);
+            return acc;
+        }, {});
+
+        // 3. Construimos el HTML con <optgroup>
+        let optionsHTML = defaultOptionHTML;
+        for (const groupName in groupedCategories) {
+            optionsHTML += `<optgroup label="${groupName}">`;
+            groupedCategories[groupName].forEach(category => {
+                optionsHTML += `<option value="${category.nombre}">${category.nombre}</option>`;
+            });
+            optionsHTML += `</optgroup>`;
+        }
+
+        targetSelect.innerHTML = optionsHTML;
+    }
+
+    // Llamamos a la función para que se ejecute en cada carga de página
+    loadCategories();
+
+
+    setupNavbar();
+});

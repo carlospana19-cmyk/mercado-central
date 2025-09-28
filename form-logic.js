@@ -21,41 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE LA APLICACIÓN ---
     // =============================================================
 
-    const newCategoryGroup = document.getElementById('new-category-group');
-    categorySelect.addEventListener('change', () => {
-        if (categorySelect.value === 'otra') {
-            newCategoryGroup.style.display = 'block';
-        } else {
-            newCategoryGroup.style.display = 'none';
-        }
-    });
-
-    // --- 1. Cargar Categorías ---
-    async function loadCategories() {
-        if (!categorySelect) return;
-        categorySelect.innerHTML = '<option>Cargando categorías...</option>';
-        const { data: categories, error } = await supabaseClient.from('categorias').select('nombre').order('nombre', { ascending: true });
-
-        if (error) {
-            console.error('Error al cargar las categorías:', error);
-            categorySelect.innerHTML = '<option>Error al cargar</option>';
-            return;
-        }
-        
-        categorySelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.nombre;
-            option.textContent = category.nombre;
-            categorySelect.appendChild(option);
-        });
-        const otraOpcion = document.createElement('option');
-        otraOpcion.value = 'otra';
-        otraOpcion.textContent = 'Otra (Sugerir una nueva)';
-        categorySelect.appendChild(otraOpcion);
-    }
-    loadCategories();
-
     // --- 2. Lógica para Mostrar Nombre de Archivo de Portada ---
     if (coverImageInput && coverFileNameDisplay) {
         coverImageInput.addEventListener('change', () => {
@@ -119,51 +84,18 @@ document.addEventListener('DOMContentLoaded', () => {
         formButton.textContent = 'Publicando...';
 
         const formData = new FormData(publishForm);
-        const categoryValue = formData.get('category');
-        const newCategoryValue = formData.get('new_category');
-        let finalCategory = categoryValue;
-
-        // Si el usuario sugirió una nueva categoría
-        if (categoryValue === 'otra' && newCategoryValue) {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                // Guardamos la sugerencia para revisión del admin
-                await supabaseClient.from('sugerencias_categoria').insert([
-                    { nombre_sugerido: newCategoryValue, sugerido_por: user.id }
-                ]);
-            }
-            finalCategory = 'Pendiente de Categoría'; // O null, como prefieras
-        }
-
         const coverImageFile = formData.get('coverImage');
         
+        // 1. SUBIR IMAGEN DE PORTADA
         let coverImageUrl = '';
         if (coverImageFile && coverImageFile.size > 0) {
             const filePath = `public/${Date.now()}_${coverImageFile.name}`;
-            const { error } = await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, coverImageFile);
-            if (error) {
-                alert('Error subiendo imagen de portada.');
-                console.error(error);
-                formButton.disabled = false;
-                formButton.textContent = 'Publicar Anuncio';
-                return;
-            }
+            await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, coverImageFile);
             const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
             coverImageUrl = data.publicUrl;
         }
 
-        const galleryUrls = [];
-        for (const file of galleryFiles) {
-            const filePath = `public/${Date.now()}_gallery_${file.name}`;
-            const { error } = await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, file);
-            if (error) {
-                console.error('Error subiendo imagen de galería:', error);
-                continue; 
-            }
-            const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
-            galleryUrls.push(data.publicUrl);
-        }
-
+        // 2. INSERTAR EL ANUNCIO PRINCIPAL Y OBTENER SU ID
         const { data: { user } } = await supabaseClient.auth.getUser(); // Get user here
         if (!user) {
             alert('Debes iniciar sesión para publicar un anuncio.');
@@ -174,25 +106,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const adData = {
             titulo: formData.get('title'),
-            categoria: finalCategory, // Use finalCategory here
+            categoria: formData.get('category'),
             precio: parseFloat(formData.get('price')),
             ubicacion: formData.get('location'),
             descripcion: formData.get('description'),
             url_portada: coverImageUrl,
-            url_galeria: galleryUrls,
-            user_id: user.id, // Assign user.id here
+            user_id: user.id // Assign user.id here
         };
 
-        const { error } = await supabaseClient.from('anuncios').insert([adData]);
+        const { data: newAd, error: adError } = await supabaseClient
+            .from('anuncios')
+            .insert([adData])
+            .select('id') // ¡Pedimos que nos devuelva el ID!
+            .single();
 
-        if (error) {
-            console.error('Error al publicar el anuncio:', error);
+        if (adError || !newAd) {
+            console.error('Error al publicar el anuncio:', adError);
             alert('No se pudo publicar el anuncio.');
             formButton.disabled = false;
             formButton.textContent = 'Publicar Anuncio';
-        } else {
-            alert('¡Anuncio publicado con éxito!');
-            window.location.href = `resultados.html`;
+            return;
         }
+
+        const newAdId = newAd.id;
+
+        // 3. SUBIR IMÁGENES DE GALERÍA Y GUARDARLAS EN LA TABLA 'imagenes'
+        if (galleryFiles.length > 0) {
+            const galleryImageObjects = [];
+
+            for (const file of galleryFiles) {
+                const filePath = `public/${Date.now()}_gallery_${file.name}`;
+                await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, file);
+                const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
+                
+                // Preparamos el objeto para la tabla 'imagenes'
+                galleryImageObjects.push({
+                    anuncio_id: newAdId,
+                    url_imagen: data.publicUrl
+                });
+            }
+
+            // Insertamos todas las imágenes de la galería de una sola vez
+            const { error: imagesError } = await supabaseClient
+                .from('imagenes')
+                .insert(galleryImageObjects);
+
+            if (imagesError) {
+                console.error('Error guardando imágenes de galería:', imagesError);
+                // El anuncio principal se creó, pero las imágenes fallaron.
+                // Se podría añadir lógica para manejar este caso.
+            }
+        }
+
+        alert('¡Anuncio publicado con éxito!');
+        window.location.href = `detalle-producto.html?id=${newAdId}`;
     });
 });

@@ -1245,7 +1245,7 @@ nav .buttons button:hover {
 .location-info i {
     color: var(--orange);
     margin-right: 1rem;
-} 
+}
 
 .box .location {
     font-size: 1.4rem;
@@ -1895,4 +1895,25 @@ body {
 
 .remove-image-btn:hover {
     background-color: #ff4d4d;
+}
+
+.box {
+    position: relative; /* Necesario para posicionar el badge */
+}
+
+.featured-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* Cambiado a la izquierda para no chocar con el corazón después */
+    background: linear-gradient(45deg, #ffc107, #ff9800);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
