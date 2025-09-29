@@ -1,108 +1,180 @@
-// editar-anuncio-logic.js (VERSIÓN FINAL Y 100% CORREGIDA)
+// editar-anuncio-logic.js (VERSIÓN FINAL CON PREVISUALIZACIÓN COMPLETA)
 
+document.addEventListener('DOMContentLoaded', async () => {
+    // =============================================================
+    // --- 1. DECLARACIONES Y REFERENCIAS ---
+    // =============================================================
+    const form = document.getElementById('publish-form');
+    if (!form) { console.error("Formulario #publish-form no encontrado."); return; }
 
-
-const form = document.getElementById('publish-form');
-let currentAdId = null;
-
-// Función para rellenar las categorías
-function fillCategorySelect() {
+    const titleInput = document.getElementById('ad-title');
     const categorySelect = document.getElementById('ad-category');
-    const categoriesHTML = `
-        <option value="" disabled>-- Selecciona una categoría --</option>
-        <optgroup label="Bienes Raíces"><option value="venta-inmuebles">Venta de Inmuebles</option><option value="alquiler-inmuebles">Alquiler de Inmuebles</option></optgroup>
-        <optgroup label="Vehículos"><option value="autos">Autos</option><option value="motos">Motos</option></optgroup>
-        <optgroup label="Marketplace"><option value="electronica">Electrónica</option><option value="hogar-muebles">Hogar y Muebles</option></optgroup>
-        <optgroup label="Empleos y Servicios"><option value="ofertas-empleo">Ofertas de Empleo</option><option value="servicios-profesionales">Servicios Profesionales</option></optgroup>
-    `;
-    categorySelect.innerHTML = categoriesHTML;
-}
+    const priceInput = document.getElementById('ad-price');
+    const locationInput = document.getElementById('ad-location');
+    const descriptionInput = document.getElementById('ad-description');
+    const coverImageInput = document.getElementById('ad-cover-image');
+    const coverFileNameDisplay = document.getElementById('cover-file-name');
+    const dropArea = document.getElementById('gallery-drop-area');
+    const galleryInput = document.getElementById('ad-gallery-images');
+    const galleryPreview = document.getElementById('gallery-preview');
 
-// Función para cargar los datos del anuncio
-async function loadAdForEditing() {
     const params = new URLSearchParams(window.location.search);
-    currentAdId = params.get('id');
+    const adId = params.get('id');
+    if (!adId) { document.body.innerHTML = '<h1>Error: ID de anuncio no proporcionado.</h1>'; return; }
 
-    if (!currentAdId) {
-        alert('ID de anuncio no válido.');
-        window.location.href = 'dashboard.html';
-        return;
-    }
+    let imagesToDelete = [];
+    let newGalleryFiles = [];
 
-    fillCategorySelect();
+    // =============================================================
+    // --- 2. LÓGICA DE CARGA DE DATOS EXISTENTES ---
+    // =============================================================
+    async function loadAdForEditing() {
+        const { data: ad, error: adError } = await supabaseClient.from('anuncios').select('*').eq('id', adId).single();
+        const { data: images, error: imagesError } = await supabaseClient.from('imagenes').select('url_imagen').eq('anuncio_id', adId);
 
-    const { data: ad, error } = await supabaseClient.from('anuncios').select('*').eq('id', currentAdId).single();
+        if (adError || !ad) { console.error("Error al cargar anuncio:", adError); return; }
 
-    if (error || !ad) {
-        alert('No se pudo cargar el anuncio para editar.');
-        window.location.href = 'dashboard.html';
-    } else {
-        // Rellenamos el formulario usando los 'name' de los inputs para más robustez
-        form.elements['title'].value = ad.titulo;
-        form.elements['price'].value = ad.precio;
-        form.elements['location'].value = ad.ubicacion;
-        form.elements['description'].value = ad.descripcion;
-        setTimeout(() => { form.elements['category'].value = ad.categoria; }, 1);
-    }
-}
+        document.querySelector('h1').textContent = 'Editar Anuncio';
+        form.querySelector('button[type="submit"]').textContent = 'Guardar Cambios';
 
-// Lógica para manejar el envío del formulario
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const formButton = form.querySelector('button[type="submit"]');
-    formButton.disabled = true;
-    formButton.textContent = 'Guardando...';
-
-    const formData = new FormData(form);
-    const newCoverImage = formData.get('coverImage');
-    const newGalleryImages = formData.getAll('galleryImages').filter(f => f.size > 0);
-
-    const updatedAd = {
-        titulo: formData.get('title'),
-        categoria: formData.get('category'),
-        precio: formData.get('price'),
-        ubicacion: formData.get('location'),
-        descripcion: formData.get('description'),
-    };
-
-    // --- LÓGICA DE ACTUALIZACIÓN DE IMAGEN DE PORTADA ---
-    if (newCoverImage && newCoverImage.size > 0) {
-        const fileName = `${Date.now()}_cover_${newCoverImage.name}`;
-        await supabaseClient.storage.from('imagenes_anuncios').upload(fileName, newCoverImage);
-        updatedAd.url_portada = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(fileName).data.publicUrl;
-    }
-
-    // --- LÓGICA DE ACTUALIZACIÓN DE GALERÍA (Más compleja: borra las viejas, sube las nuevas) ---
-    if (newGalleryImages.length > 0) {
-        // Primero, borramos las imágenes antiguas de la galería
-        await supabaseClient.from('imagenes').delete().eq('anuncio_id', currentAdId);
-
-        // Luego, subimos las nuevas
-        const uploadPromises = newGalleryImages.map(file => {
-            const fileName = `${Date.now()}_gallery_${file.name}`;
-            return supabaseClient.storage.from('imagenes_anuncios').upload(fileName, file);
-        });
-        const uploadResults = await Promise.all(uploadPromises);
-        const imageUrls = uploadResults.map(res => res.data ? supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(res.data.path).data.publicUrl : null).filter(Boolean);
+        titleInput.value = ad.titulo;
+        priceInput.value = ad.precio;
+        locationInput.value = ad.ubicacion;
+        descriptionInput.value = ad.descripcion;
+        coverFileNameDisplay.textContent = ad.url_portada ? `Portada actual: ${ad.url_portada.split('/').pop()}` : 'Ninguna portada seleccionada';
         
-        if (imageUrls.length > 0) {
-            const imagesToInsert = imageUrls.map(url => ({ anuncio_id: currentAdId, url_imagen: url }));
-            await supabaseClient.from('imagenes').insert(imagesToInsert);
+        if (images) {
+            galleryPreview.innerHTML = '';
+            images.forEach(({ url_imagen }) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'preview-image-wrapper';
+                wrapper.innerHTML = `<img src="${url_imagen}" class="preview-image"><button type="button" class="remove-image-btn" data-url="${url_imagen}">&times;</button>`;
+                galleryPreview.appendChild(wrapper);
+            });
         }
     }
 
-    // Actualizamos el anuncio con los datos de texto y la nueva URL de portada si la hay
-    const { error: updateError } = await supabaseClient.from('anuncios').update(updatedAd).eq('id', currentAdId);
+    // =============================================================
+    // --- 3. LÓGICA DE INTERACCIÓN DEL USUARIO (NUEVAS IMÁGENES) ---
+    // =============================================================
+    
+    // --- Previsualización de NUEVA portada ---
+    coverImageInput.addEventListener('change', () => {
+        if (coverImageInput.files.length > 0) {
+            coverFileNameDisplay.textContent = `Nueva portada: ${coverImageInput.files[0].name}`;
+        }
+    });
+    
+    // --- Previsualización de NUEVAS imágenes de galería (Drag & Drop) ---
+    const preventDefaults = (e) => { e.preventDefault(); e.stopPropagation(); };
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => dropArea.addEventListener(eventName, preventDefaults));
+    ['dragenter', 'dragover'].forEach(eventName => dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight')));
+    ['dragleave', 'drop'].forEach(eventName => dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight')));
+    
+    dropArea.addEventListener('drop', (e) => handleNewFiles(e.dataTransfer.files));
+    galleryInput.addEventListener('change', () => handleNewFiles(galleryInput.files));
 
-    if (updateError) {
-        alert('Hubo un error al guardar los cambios.');
-    } else {
-        alert('¡Anuncio actualizado con éxito!');
-        window.location.href = 'dashboard.html';
+    function handleNewFiles(files) {
+        [...files].forEach(file => {
+            if (galleryPreview.children.length < 10) {
+                newGalleryFiles.push(file);
+                previewNewFile(file);
+            }
+        });
     }
-    formButton.disabled = false;
-    formButton.textContent = 'Guardar Cambios';
-});
 
-// Punto de entrada principal
-document.addEventListener('DOMContentLoaded', loadAdForEditing);
+    function previewNewFile(file) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'preview-image-wrapper';
+            wrapper.innerHTML = `<img src="${reader.result}" class="preview-image"><button type="button" class="remove-image-btn new-file" data-filename="${file.name}">&times;</button>`;
+            galleryPreview.appendChild(wrapper);
+        };
+    }
+
+    galleryPreview.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-image-btn')) {
+            const wrapper = e.target.closest('.preview-image-wrapper');
+            if (e.target.dataset.url) { // Es una imagen existente
+                imagesToDelete.push(e.target.dataset.url);
+                console.log("Imágenes marcadas para eliminar:", imagesToDelete);
+            } else { // Es una imagen nueva
+                const fileName = e.target.dataset.filename;
+                newGalleryFiles = newGalleryFiles.filter(f => f.name !== fileName);
+            }
+            wrapper.remove();
+        }
+    });
+
+    // =============================================================
+    // --- 4. LÓGICA DE ENVÍO DEL FORMULARIO ---
+    // =============================================================
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formButton = form.querySelector('button[type="submit"]');
+        formButton.disabled = true;
+        formButton.textContent = 'Guardando...';
+
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) throw new Error("Sesión de usuario no encontrada.");
+
+            // 1. ELIMINAR IMÁGENES MARCADAS (DB y Storage)
+            if (imagesToDelete.length > 0) {
+                const fileNamesToDelete = imagesToDelete.map(url => url.substring(url.lastIndexOf('/') + 1));
+                await supabaseClient.storage.from('imagenes_anuncios').remove(fileNamesToDelete);
+                await supabaseClient.from('imagenes').delete().in('url_imagen', imagesToDelete);
+                console.log(`${imagesToDelete.length} imágenes existentes eliminadas.`);
+            }
+
+            // 2. SUBIR NUEVAS IMÁGENES DE GALERÍA
+            if (newGalleryFiles.length > 0) {
+                const uploadPromises = newGalleryFiles.map(async file => {
+                    const filePath = `${user.id}/${Date.now()}_gallery_${file.name}`;
+                    await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, file);
+                    const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
+                    return { url_imagen: data.publicUrl, anuncio_id: adId };
+                });
+                const newImageObjects = await Promise.all(uploadPromises);
+                await supabaseClient.from('imagenes').insert(newImageObjects);
+                console.log(`${newGalleryFiles.length} nuevas imágenes de galería subidas.`);
+            }
+
+            // 3. ACTUALIZAR DATOS DEL ANUNCIO (incluyendo nueva portada si la hay)
+            const updatedAdData = {
+                titulo: titleInput.value,
+                precio: parseFloat(priceInput.value),
+                ubicacion: locationInput.value,
+                descripcion: descriptionInput.value,
+                categoria: categorySelect.value,
+            };
+
+            if (coverImageInput.files.length > 0) {
+                const file = coverImageInput.files[0];
+                const filePath = `${user.id}/${Date.now()}_cover_${file.name}`;
+                await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, file);
+                const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
+                updatedAdData.url_portada = data.publicUrl;
+            }
+
+            await supabaseClient.from('anuncios').update(updatedAdData).eq('id', adId);
+            console.log("Datos del anuncio actualizados.");
+
+            alert('¡Anuncio actualizado con éxito!');
+            window.location.href = `detalle-producto.html?id=${adId}`;
+
+        } catch (error) {
+            console.error("Error al guardar los cambios:", error);
+            alert(`Hubo un error al guardar: ${error.message}`);
+            formButton.disabled = false;
+            formButton.textContent = 'Guardar Cambios';
+        }
+    });
+
+    // =============================================================
+    // --- 5. INICIO DE LA EJECUCIÓN ---
+    // =============================================================
+    await loadAdForEditing();
+});

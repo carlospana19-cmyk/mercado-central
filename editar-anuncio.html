@@ -128,8 +128,14 @@
     </div>
   </footer>
     
-<script src="supabase-client.js"></script>
-<script src="navbar-logic.js"></script>
-<script src="form-logic.js"></script>
+    <!-- Carga la librería de Supabase PRIMERO -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Carga NUESTRO cliente central SEGUNDO -->
+    <script src="supabase-client.js"></script>
+    
+    <!-- Carga la lógica de la barra de navegación TERCERO -->
+    <script src="navbar-logic.js"></script>
+    <!-- ¡ESTA ES LA LÍNEA CRÍTICA! Carga la lógica de la página de edición AL FINAL -->
+    <script src="editar-anuncio-logic.js"></script>
 </body>
 </html>
