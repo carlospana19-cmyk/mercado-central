@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mercado Central - Plataforma de Anuncios</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Swiper.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
   <!-- <link rel="stylesheet" href="admin.css"> -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,8 +229,12 @@
   <!-- Carga NUESTRO cliente central SEGUNDO -->
   <script src="supabase-client.js"></script>
 
+  <!-- Swiper.js JS (ANTES de nuestros scripts que lo usan) -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
   <!-- Carga los scripts específicos de cada página DESPUÉS -->
   <script src="navbar-logic.js"></script>
   <script src="home-search.js"></script>
+  <script src="home-logic.js"></script>
 </body>
 </html>

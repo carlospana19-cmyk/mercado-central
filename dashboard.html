@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Panel - Mercado Central</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <!-- (Copia aquí tus enlaces de fuentes y FontAwesome) -->
 </head>
 <body class="page-dashboard">
@@ -83,6 +85,8 @@
 
     <!-- Carga los scripts específicos de cada página DESPUÉS -->
     <script src="navbar-logic.js"></script>
+    <!-- Swiper.js JS (ANTES de nuestros scripts que lo usan) -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="dashboard-logic.js"></script>
 </body>
 </html>
