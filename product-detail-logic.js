@@ -1,3 +1,5 @@
+import { supabase } from './supabase-client.js';
+
 // product-detail-logic.js (VERSIÓN CON GALERÍA)
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,8 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Hacemos ambas peticiones a la vez
     const [adResponse, imagesResponse] = await Promise.all([
-        supabaseClient.from('anuncios').select('*').eq('id', adId).single(),
-        supabaseClient.from('imagenes').select('url_imagen').eq('anuncio_id', adId)
+        supabase.from('anuncios').select('*').eq('id', adId).single(),
+        supabase.from('imagenes').select('url_imagen').eq('anuncio_id', adId)
     ]);
 
     const { data: ad, error: adError } = adResponse;
@@ -63,7 +65,7 @@ async function displayProductDetails(ad, galleryImages) {
     }
 
     // --- LÓGICA DEL BOTÓN DE EDICIÓN ---
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     const editButton = document.getElementById('edit-ad-button');
 
     // Comprobamos si hay un usuario logueado Y si su ID coincide con el del dueño del anuncio

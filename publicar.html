@@ -4,21 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicar Anuncio - Mercado Central</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-      }
-    </style>
+    <link rel="stylesheet" href="form.css">
 </head>
 <body>
-
     <nav class="navbar-moderno">
     <div class="logo-container">
       <a href="index.html" class="logo-link">
@@ -26,415 +16,311 @@
         <span class="logo-text">Mercado Central</span>
       </a>
     </div>
-    
-    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
-    <div class="buttons-nav">
-        <!-- Este botón se mostrará solo si el usuario está conectado -->
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
+    </nav>
 
-        <!-- Botones de Panel y Logout (solo para usuarios conectados) -->
-        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
-
-        <!-- Botón de Iniciar Sesión (solo para invitados) -->
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
-    </div>
-  </nav>
-
-    <main class="publish-page">
-        <div class="publish-container">
-        
-            <h1 class="page-title">Publica tu Anuncio</h1>
-            <p>Completa los siguientes campos para llegar a miles de compradores.</p>
-
-            <form id="publish-form" class="publish-form">
-    <div class="form-group">
-        <label for="ad-title">Título del Anuncio</label>
-        <input type="text" id="ad-title" name="title" required>
-    </div>
-    <div class="form-group">
-        <label for="ad-category">Categoría</label>
-        <select id="ad-category" name="category" required></select>
-    </div>
-    <div class="form-group">
-        <label for="ad-price">Precio (USD)</label>
-        <input type="number" id="ad-price" name="price" step="0.01" min="0" required>
-    </div>
-    <div class="form-group">
-        <label for="ad-location">Ubicación</label>
-        <input type="text" id="ad-location" name="location" required>
-    </div>
-    <div class="form-group">
-        <label for="ad-description">Descripción</label>
-        <textarea id="ad-description" name="description" rows="6" required></textarea>
-    </div>
-    <div class="form-group">
-        <label>Imagen de Portada</label>
-        <label for="ad-cover-image" class="file-upload-btn"><i class="fas fa-camera"></i> Seleccionar Portada</label>
-        <input type="file" id="ad-cover-image" name="coverImage" accept="image/*">
-        <span id="cover-file-name" class="file-name-display">Ningún archivo seleccionado</span>
-    </div>
-
-    <div class="form-group">
-        <label>Imágenes de la Galería (opcional, hasta 10)</label>
-        <div id="gallery-drop-area" class="drop-area">
-            <input type="file" id="ad-gallery-images" name="galleryImages" accept="image/*" multiple style="display: none;">
-            <label for="ad-gallery-images" class="drop-area-label">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>Arrastra y suelta imágenes aquí, o <strong>haz clic para seleccionar</strong>.</p>
-                <small>Añade fotos desde diferentes ángulos.</small>
-            </label>
+    <main class="container publish-wizard">
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-title">Categoría</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-title">Ubicación</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-title">Detalles</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-title">Destacar</div>
+                </div>
+            </div>
         </div>
-        <div id="gallery-preview" class="image-preview-container"></div>
+
+        <form id="ad-form">
+            <!-- PASO 1: CATEGORÍA -->
+            <div class="form-section active" id="step-1">
+                <h2 class="section-title"><i class="fas fa-list"></i> Elige la Categoría</h2>
+                <div class="form-group">
+                    <label for="category">Categoría Principal</label>
+                    <select id="category" name="categoria_principal" required>
+                        <option value="" disabled selected>Cargando categorías...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="subcategory-group" style="display: none;">
+                    <label for="subcategory">Subcategoría</label>
+                    <select id="subcategory" name="categoria" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="continue-to-step2">
+                        Continuar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 2: UBICACIÓN -->
+            <div class="form-section" id="step-2" style="display: none;">
+                <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Ubicación del Anuncio</h2>
+
+                <div class="form-group">
+                    <label for="province">Provincia</label>
+                    <select id="province" name="provincia" required>
+                        <option value="">Selecciona una provincia</option>
+                        <option value="Panamá">Panamá</option>
+                        <option value="Panamá Oeste">Panamá Oeste</option>
+                        <option value="Colón">Colón</option>
+                        <option value="Chiriquí">Chiriquí</option>
+                        <option value="Veraguas">Veraguas</option>
+                        <option value="Coclé">Coclé</option>
+                        <option value="Los Santos">Los Santos</option>
+                        <option value="Herrera">Herrera</option>
+                        <option value="Darién">Darién</option>
+                        <option value="Bocas del Toro">Bocas del Toro</option>
+                    </select>
+    </div>
+
+                <div class="form-group" id="district-group" style="display: none;">
+                    <label for="district">Distrito / Corregimiento</label>
+                    <select id="district" name="distrito" required>
+                        <option value="">Selecciona un distrito</option>
+                    </select>
+                </div>
+        
+                <div class="form-group">
+                    <label for="address">Dirección o Sector Específico (ej: El Cangrejo, Bella Vista)</label>
+                    <input type="text" id="address" name="direccion_especifica" placeholder="Sé lo más específico posible">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary back-btn" data-target="1">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="button" class="btn btn-primary next-btn" data-target="3">
+                        Continuar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- PASO 3: DETALLES -->
+            <div class="form-section" id="step-3" style="display: none;">
+                <h2 class="section-title"><i class="fas fa-info-circle"></i> Detalles del Anuncio</h2>
+
+    <div class="form-group">
+                    <label for="title">Título del Anuncio</label>
+                    <input type="text" id="title" name="titulo" placeholder="Ej: Toyota Corolla 2020, Excelente Estado" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descripción</label>
+                    <textarea id="description" name="descripcion" rows="8" placeholder="Describe las características, estado, mantenimiento, etc." required></textarea>
+                </div>
+
+                <!-- ===== CONTENEDORES DE ATRIBUTOS DINÁMICOS ===== -->
+
+                <!-- Atributos para Vehículos (mejorado) -->
+                <div id="vehicle-details" class="attribute-section" style="display: none;">
+                    <h3 class="subsection-title">Detalles del Vehículo</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="attr-marca">Marca</label>
+                            <input type="text" id="attr-marca" name="marca" placeholder="Ej: Toyota">
+    </div>
+    <div class="form-group">
+                            <label for="attr-anio">Año</label>
+                            <input type="number" id="attr-anio" name="anio" placeholder="Ej: 2020">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="attr-kilometraje">Kilometraje</label>
+                            <input type="number" id="attr-kilometraje" name="kilometraje" placeholder="Ej: 50000">
+    </div>
+    <div class="form-group">
+                            <label for="attr-transmision">Transmisión</label>
+                            <select id="attr-transmision" name="transmision">
+                                <option value="">Selecciona</option>
+                                <option value="Automática">Automática</option>
+                                <option value="Manual">Manual</option>
+                            </select>
+    </div>
+    <div class="form-group">
+                            <label for="attr-combustible">Combustible</label>
+                            <select id="attr-combustible" name="combustible">
+                                <option value="">Selecciona</option>
+                                <option value="Gasolina">Gasolina</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Híbrido">Híbrido</option>
+                                <option value="Eléctrico">Eléctrico</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atributos para Inmuebles (inicialmente oculto) -->
+                <div id="realestate-details" class="attribute-section" style="display: none;">
+                    <h3 class="subsection-title">Detalles del Inmueble</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="attr-m2">Metros Cuadrados (m²)</label>
+                            <input type="number" id="attr-m2" data-key="m2">
+    </div>
+    <div class="form-group">
+                            <label for="attr-habitaciones">Habitaciones</label>
+                            <input type="number" id="attr-habitaciones" data-key="Habitaciones">
+    </div>
+    <div class="form-group">
+                            <label for="attr-baños">Baños</label>
+                            <input type="number" id="attr-baños" data-key="Baños">
+                        </div>
+                    </div>
+    </div>
+
+    <div class="form-group">
+                    <label for="price">Precio (USD)</label>
+                    <input type="number" id="price" name="precio" step="0.01" placeholder="15000" required>
     </div>
     
+                <!-- SECCIÓN DE SUBIDA DE IMÁGENES (REESTRUCTURADA) -->
+                <div class="form-group image-upload-section">
+                    <h3 class="subsection-title"><i class="fas fa-images"></i> Imágenes del Anuncio</h3>
 
-<!-- pricing-selector-moderno-color-corporativo.html -->
-<div id="pricing-section" class="max-w-6xl mx-auto my-12 px-4 bg-gradient-to-br from-teal-900/20 to-cyan-900/20 rounded-3xl backdrop-blur-sm border border-teal-500/30">
-  <div class="text-center mb-12">
-    <h2 class="text-3xl font-extrabold text-slate-800 sm:text-4xl drop-shadow-lg">
-      Elige cómo destacar tu anuncio
-    </h2>
-    <p class="mt-4 text-lg text-slate-800 max-w-3xl mx-auto drop-shadow-md">
-      Aumenta tus ventas con mayor visibilidad. Tu anuncio aparecerá primero en búsquedas y categorías.
-    </p>
+                    <div class="upload-group">
+                        <label for="cover-image-input">Imagen de Portada <span class="label-tag">(Obligatoria)</span></label>
+                        <div class="file-input-wrapper">
+                            <button type="button" class="btn btn-file-upload" onclick="document.getElementById('cover-image-input').click();">
+                                <i class="fas fa-camera"></i> Seleccionar Portada
+                            </button>
+                            <span id="cover-image-name" class="file-name-display">Ningún archivo seleccionado.</span>
   </div>
-
-  <div class="grid grid-cols-1 gap-8 md:grid-cols-3" id="plans-container">
-    <!-- Los planes se generarán aquí con JS -->
-  </div>
-
-  <div id="checkout-summary" class="mt-12 bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20 hidden">
-    <h3 class="text-xl font-bold text-teal-400 mb-6 flex items-center gap-2 drop-shadow">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-teal-300">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      Resumen de tu compra
-    </h3>
-
-    <div class="flex justify-between items-center py-3 border-b border-teal-500/30">
-      <span class="text-white font-medium" id="selected-plan-name">—</span>
-      <span class="text-teal-100 font-bold text-xl" id="selected-plan-price">$0.00</span>
+                        <input type="file" id="cover-image-input" name="cover_image" accept="image/*" style="display: none;" required>
     </div>
 
-    <div class="mt-6 flex justify-center">
-      <button
-        id="confirm-payment-btn"
-        class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl border border-teal-500/50"
-        >
-        <span class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-            <line x1="8" y1="10" x2="16" y2="10"></line>
-            <line x1="8" y1="14" x2="16" y2="14"></line>
-            <line x1="8" y1="18" x2="13" y2="18"></line>
-          </svg>
-          Proceder al Pago Seguro
-        </span>
-      </button>
+                    <div class="upload-group">
+                        <label for="gallery-images-input">Galería de Imágenes <span class="label-tag">(Hasta 10 imágenes)</span></label>
+                        <div id="gallery-drop-area" class="drop-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Arrastra y suelta imágenes aquí, o haz clic para seleccionar.</p>
     </div>
-
-    <p class="text-center text-sm text-teal-300 mt-4">
-      Pago procesado por Stripe · SSL Seguro · Sin cargos ocultos
-    </p>
+                        <input type="file" id="gallery-images-input" name="gallery_images" accept="image/*" multiple style="display: none;">
+                        <div id="gallery-preview-container" class="image-preview-container"></div>
   </div>
 </div>
 
-<style>
-  #pricing-section {
-    background: linear-gradient(135deg, rgba(0, 191, 174, 0.1) 0%, rgba(0, 150, 136, 0.05) 100%);
-    border: 1px solid rgba(0, 191, 174, 0.2);
-    backdrop-filter: blur(10px);
-  }
-
-  .plan-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(0, 191, 174, 0.3);
-    border-radius: 1.5rem;
-    padding: 2rem;
-    transition: all 0.4s ease;
-    position: relative;
-    /* color: #e0f2fe; */
-    backdrop-filter: blur(10px);
-  }
-
-  .plan-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 191, 174, 0.15);
-    border-color: rgba(0, 191, 174, 0.5);
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .plan-card.selected {
-    border-color: #00bfae;
-    background: rgba(0, 191, 174, 0.1);
-    box-shadow: 0 25px 50px rgba(0, 191, 174, 0.2);
-  }
-
-  .badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: linear-gradient(to right, #00bfae, #009688);
-    color: white;
-    padding: 0.35rem 1.25rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 700;
-    z-index: 10;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
-  }
-
-  .price-display {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #00bfae;
-    display: inline-block;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .price-sub {
-    font-size: 0.875rem;
-    color: #b4d4ff;
-    font-weight: 500;
-  }
-
-  .feature-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.95rem;
-    color: #e0f2fe;
-  }
-
-  .feature-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    background: rgba(0, 191, 174, 0.2);
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .select-btn {
-    display: inline-block;
-    padding: 0.75rem 2rem;
-    background: rgba(0, 191, 174, 0.1);
-    border: 1px solid rgba(0, 191, 174, 0.3);
-    border-radius: 9999px;
-    color: #00bfae;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-  }
-
-  .select-btn:hover {
-    background: rgba(0, 191, 174, 0.2);
-    border-color: #00bfae;
-    transform: translateY(-1px);
-    color: white;
-  }
-
-  #pricing-section,
-  .plan-card,
-  #checkout-summary {
-    font-family: inherit;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .plan-destacado {
-    background-color: #0d1a26 !important;
-  }
-  .plan-destacado h3,
-  .plan-destacado p,
-  .plan-destacado .price-display,
-  .plan-destacado .price-sub,
-  .plan-destacado .feature-item,
-  .plan-destacado .select-btn,
-  .plan-destacado .feature-item span,
-  .plan-destacado .text-teal-100, 
-  .plan-destacado .text-teal-200 {
-    color: #00bfae !important;
-  }
-  .plan-destacado .feature-icon {
-    background: rgba(0, 191, 174, 0.1) !important;
-  }
-  .plan-destacado .select-btn {
-    border-color: #00bfae !important;
-  }
-  .plan-destacado .feature-icon svg {
-      stroke: #00bfae !important;
-  }
-  .plan-destacado svg[stroke="#00bfae"] {
-      stroke: #00bfae;
-  }
-</style>
-
-<script>
-  const plans = [
-    {
-      id: '7d',
-      name: 'Destacado 7 Días',
-      price: 5.00,
-      description: 'Ideal para vender rápido. Aparece primero en todas las búsquedas.',
-      badge: 'MÁS POPULAR',
-      colorClass: 'from-teal-500 to-cyan-500',
-      features: ['✔️ Posición #1 en resultados', '✔️ Badge "Destacado"', '✔️ Soporte prioritario'],
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00bfae" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-      </svg>`
-    },
-    {
-      id: '30d',
-      name: 'Destacado 30 Días',
-      price: 15.00,
-      description: 'Máxima exposición durante un mes completo.',
-      badge: 'RECOMENDADO',
-      colorClass: 'from-teal-400 to-cyan-400',
-      features: ['✔️ Todo lo anterior', '✔️ Estadísticas de vistas', '✔️ Renovación automática opcional'],
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00bfae" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
-      </svg>`
-    },
-    {
-      id: '90d',
-      name: 'Destacado 90 Días',
-      price: 35.00,
-      description: 'Dominio absoluto del mercado por tres meses.',
-      badge: 'ÉLITE PRO',
-      colorClass: 'from-teal-600 to-cyan-600',
-      features: ['✔️ Todo lo anterior', '✔️ Asistente IA para optimizar tu anuncio', '✔️ Badge "Top Seller"', '✔️ Reporte mensual de rendimiento'],
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00bfae" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-      </svg>`
-    }
-  ];
-
-  let selectedPlan = null;
-
-  function renderPlans() {
-    const container = document.getElementById('plans-container');
-    container.innerHTML = plans.map((plan, i) => `
-      <div class="plan-card group cursor-pointer relative plan-destacado" data-id="${plan.id}" onclick="selectPlan('${plan.id}')">
-        ${plan.badge ? `<div class="badge bg-gradient-to-r ${plan.colorClass}">${plan.badge}</div>` : ''}
-
-        <div class="text-center mb-6">
-          ${plan.icon}
-          <h3 class="mt-4 text-xl font-bold text-teal-100">${plan.name}</h3>
-          <p class="mt-2 text-teal-200 text-sm mb-4">${plan.description}</p>
+                <!-- SECCIÓN DE INFORMACIÓN DE CONTACTO -->
+                <h3 class="subsection-title"><i class="fas fa-user-circle"></i> Información de Contacto</h3>
+                <div class="form-group">
+                    <label for="contact-name">Tu Nombre</label>
+                    <input type="text" id="contact-name" name="contact_name">
+        </div>
+                <div class="form-group">
+                    <label for="contact-email">Tu Correo Electrónico</label>
+                    <input type="email" id="contact-email" name="contact_email" readonly>
+                    <small>Este campo se rellena automáticamente y no es editable.</small>
+                </div>
+                <div class="form-group">
+                    <label for="contact-phone">Tu Teléfono (WhatsApp)</label>
+                    <input type="tel" id="contact-phone" name="contact_phone" placeholder="Ej: 6677-8899">
         </div>
 
-        <div class="text-center mb-6">
-          <div class="price-display">$${plan.price.toFixed(2)}</div>
-          <div class="price-sub">USD • Pago único</div>
-        </div>
-
-        <div class="mb-8">
-          ${plan.features.map(feature => `
-            <div class="feature-item">
-              <div class="feature-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-teal-400">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary back-btn" data-target="2">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="button" class="btn btn-primary next-btn" data-target="4">
+                        Continuar <i class="fas fa-arrow-right"></i>
+                    </button>
               </div>
-              <span class="text-teal-200">${feature.replace('✔️ ', '')}</span>
             </div>
-          ` ).join('')}
-        </div>
 
-        <div class="text-center">
-          <div class="select-btn group-hover:bg-teal-500/20">
-            Seleccionar Plan
+            <!-- PASO 4: DESTACAR -->
+            <div class="form-section" id="step-4" style="display: none;">
+                <h2 class="section-title"><i class="fas fa-rocket"></i> Elige cómo impulsar tu anuncio</h2>
+
+                <div class="form-group">
+                    <h3 class="subsection-title">Planes de Publicación</h3>
+                    <div class="membership-options">
+                        <!-- Plan Gratis -->
+                        <div class="membership-card">
+                            <input type="radio" id="plan-free" name="plan" value="free" checked>
+                            <label for="plan-free">
+                                <h4>Gratis</h4>
+                                <p class="price">$0.00</p>
+                                <ul class="benefits-list">
+                                    <li><i class="fas fa-check"></i> Anuncio por 30 días</li>
+                                    <li><i class="fas fa-check"></i> Visibilidad estándar</li>
+                                </ul>
+                            </label>
+        </div>
+                        <!-- Plan Destacado -->
+                        <div class="membership-card popular">
+                            <div class="premium-badge">Más Popular</div>
+                            <input type="radio" id="plan-destacado" name="plan" value="destacado">
+                            <label for="plan-destacado">
+                                <h4>Destacado</h4>
+                                <p class="price">$5.00</p>
+                                <ul class="benefits-list">
+                                    <li><i class="fas fa-check"></i> Todo lo del plan Gratis</li>
+                                    <li><i class="fas fa-check"></i> Anuncio por 30 días</li>
+                                    <li><i class="fas fa-check"></i> Posición #1 en búsquedas</li>
+                                    <li><i class="fas fa-check"></i> Badge "Destacado"</li>
+                                </ul>
+                            </label>
+                        </div>
+                        <!-- Plan Premium -->
+                        <div class="membership-card">
+                            <input type="radio" id="plan-premium" name="plan" value="premium">
+                            <label for="plan-premium">
+                                <h4>Premium</h4>
+                                <p class="price">$15.00</p>
+                                <ul class="benefits-list">
+                                    <li><i class="fas fa-check"></i> Todo lo del plan Destacado</li>
+                                    <li><i class="fas fa-check"></i> Anuncio por 60 días</li>
+                                    <li><i class="fas fa-check"></i> Renovación automática</li>
+                                </ul>
+                            </label>
           </div>
         </div>
       </div>
-    ` ).join('');
-  }
 
-  function selectPlan(planId) {
-    selectedPlan = plans.find(p => p.id === planId);
+                <div class="form-group">
+                    <h3 class="subsection-title">Resaltadores Adicionales (Opcional)</h3>
+                    <div class="highlight-options-modern">
+                        <label for="highlight-urgent" class="highlight-button">
+                            <input type="checkbox" id="highlight-urgent" name="highlight" value="urgent">
+                            <span>
+                                <strong>Marcar como "Urgente"</strong>
+                                <small>7 días por +$2.00</small>
+                            </span>
+                        </label>
+                        <label for="highlight-gallery" class="highlight-button">
+                            <input type="checkbox" id="highlight-gallery" name="highlight" value="gallery">
+                            <span>
+                                <strong>Aparecer en Portada</strong>
+                                <small>15 días por +$5.00</small>
+                            </span>
+                        </label>
+      </div>
+      </div>
 
-    // Quitar selección visual de otros
-    document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('selected'));
-    document.querySelector(`.plan-card[data-id="${planId}"]`).classList.add('selected');
-
-    // Mostrar resumen
-    const summary = document.getElementById('checkout-summary');
-    summary.classList.remove('hidden');
-
-    document.getElementById('selected-plan-name').textContent = selectedPlan.name;
-    document.getElementById('selected-plan-name').style.color = '#00bfae';
-    document.getElementById('selected-plan-price').textContent = `$${selectedPlan.price.toFixed(2)} USD`;
-
-    // Scroll suave al resumen
-    summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  document.getElementById('confirm-payment-btn')?.addEventListener('click', function() {
-    if (selectedPlan) {
-      alert(`🚀 ¡Perfecto!\nHas seleccionado: ${selectedPlan.name}\nValor: $${selectedPlan.price}\n\nPronto te redirigiremos al sistema de pago seguro.`);
-      // Aquí luego conectaremos con Supabase + Stripe
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', renderPlans);
-</script>
-
-    <button type="submit" class="btn">Publicar Anuncio</button>
-            </form>
-
+                <div class="final-step-actions">
+                    <!-- (La sección de login/registro se manejará con la lógica de envío) -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary back-btn" data-target="3">Atrás</button>
+                        <button type="submit" class="btn btn-primary" id="publish-ad-btn">Publicar Anuncio</button>
         </div>
+      </div>
+    </div>
+        </form>
     </main>
 
-    <footer class="footer">
-    <div class="footer-contenedor">
-      <!-- Columna 1 -->
-      <div class="footer-col">
-        <h4>Mercado Central</h4>
-        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
-      </div>
-
-      <!-- Columna 2 -->
-      <div class="footer-col">
-        <h4>Enlaces rápidos</h4>
-        <ul>
-          <li><a href="#">Quiénes somos</a></li>
-          <li><a href="#">Términos y Condiciones</a></li>
-          <li><a href="#">Política de Privacidad</a></li>
-          <li><a href="#">Contáctanos</a></li>
-        </ul>
-      </div>
-
-      <!-- Columna 3 -->
-      <div class="footer-col">
-        <h4>Síguenos</h4>
-        <div class="social-links">
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="icon-social"> Facebook</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon-social"> Instagram</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter/X" class="icon-social"> Twitter/X</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="icon-social"> YouTube</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Copyright -->
-    <div class="footer-bottom">
-      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
-    </div>
-  </footer>
+    <footer class="wizard-footer-simple"></footer>
     
-<script src="supabase-client.js"></script>
-<script src="navbar-logic.js"></script>
-<script src="form-logic.js"></script>
-
+    <!-- ======================== SCRIPTS ======================== -->
+    <script type="module" src="main.js"></script>
 </body>
 </html>

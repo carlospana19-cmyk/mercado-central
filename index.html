@@ -1,147 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mercado Central - Plataforma de Anuncios</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Swiper.js CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-  <!-- <link rel="stylesheet" href="admin.css"> -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Iconos y Swiper -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    
+    <!-- Carga de Estilos Modulares (IMPORTANTE) -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
 </head>
 <body>
-  <!-- NAVBAR -->
+    <!-- NAVBAR -->
   <nav class="navbar-moderno">
     <div class="logo-container">
       <a href="index.html" class="logo-link">
-  <img src="mi_logo_central.png.jpeg" alt="Logo Mercado Central" class="logo-img">
+                <img src="mi_logo_central.png.jpeg" alt="Logo Mercado Central" class="logo-img">
         <span class="logo-text">Mercado Central</span>
       </a>
     </div>
-    
-    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
     <div class="buttons-nav">
-        <!-- Este botón se mostrará solo si el usuario está conectado -->
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
-
-        <!-- Botones de Panel y Logout (solo para usuarios conectados) -->
-        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
-
-        <!-- Botón de Iniciar Sesión (solo para invitados) -->
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
+            <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
+            <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
+            <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
+            <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
     </div>
   </nav>
-  <style>
-    .navbar-moderno {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 28px 14px 28px;
-      background: #00bfae;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      position: relative;
-      z-index: 10;
-    }
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-    .logo-img {
-      height: 36px;
-      width: auto;
-      margin-right: 8px;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      background: #fff;
-    }
-    .logo-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.8rem; /* Aumentado para destacar */
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #fff;
-    }
-    .menu-nav {
-      display: flex;
-      gap: 18px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-  color: #fff;
-    }
-    .menu-nav li {
-  cursor: pointer;
-  transition: color 0.2s;
-    }
-    .menu-nav li:hover {
-  color: #ffe082;
-  text-decoration: underline;
-    }
-    .buttons-nav {
-      display: flex;
-      gap: 8px;
-    }
-    .buttons-nav button {
-  background: #fff;
-  color: #00bfae;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  border: none;
-  border-radius: 5px;
-  padding: 7px 16px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background 0.2s, color 0.2s;
-    }
-    .buttons-nav button:hover {
-  background: #00bfae;
-  color: #fff;
-    }
-    @media (max-width: 900px) {
-      .navbar-moderno {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 8px 10px;
-      }
-      .menu-nav {
-        gap: 10px;
-        font-size: 0.9rem;
-      }
-      .logo-text {
-        font-size: 1rem;
-        color: #fff;
-      }
-      .logo-img {
-        height: 28px;
-      }
-      .buttons-nav button {
-        padding: 6px 10px;
-        font-size: 0.9rem;
-      }
-    }
-  </style>
 
-  
-
-  <!-- ========== MEGA BUSCADOR UNIFICADO ========== -->
+    <!-- HERO MODERNO -->
 <section class="hero-search">
     <div class="hero-content">
-        <h1>Encuentra lo que necesitas, al instante.</h1>
-        <p>Explora miles de anuncios en bienes raíces, vehículos, tecnología y más.</p>
-        
+            <h1 class="hero-title-animated">Encuentra lo que necesitas, <span class="highlight-text">al instante</span></h1>
+            <p class="hero-subtitle">Más de 10,000 anuncios verificados en bienes raíces, vehículos, tecnología y mucho más</p>
         <div class="search-form-container">
             <div class="search-field">
                 <i class="fas fa-search"></i>
-                <input type="text" id="mainSearchInput" placeholder="¿Qué estás buscando?">
+                    <input type="text" id="mainSearchInput" placeholder="¿Qué estás buscando?">
             </div>
             <div class="search-field">
                 <i class="fas fa-tags"></i>
@@ -149,53 +51,77 @@
                     <option value="all">Todas las Categorías</option>
                 </select>
             </div>
-            <!-- NUEVO CAMPO DE UBICACIÓN -->
             <div class="search-field">
                 <i class="fas fa-map-marker-alt"></i>
-                <input type="text" id="locationInput" placeholder="Ubicación (ej: Panamá)">
+                    <input type="text" id="locationInput" placeholder="Ubicación (ej: Panamá)">
             </div>
-            <button id="searchButton" class="btn">Buscar</button>
+                <button id="searchButton" class="btn btn-search-hero">
+                    <i class="fas fa-search"></i>
+                    <span>Buscar</span>
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Anuncios Activos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Usuarios Registrados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Satisfacción</div>
+                </div>
+            </div>
         </div>
+    </section>
+
+    <!-- ========== BARRA DE CATEGORÍAS HORIZONTAL ========== -->
+    <section class="categories-section">
+        <div class="categories-horizontal-bar">
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-home"></i></div>
+                <h3>Bienes Raíces</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-car"></i></div>
+                <h3>Vehículos</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-laptop"></i></div>
+                <h3>Electrónica</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-couch"></i></div>
+                <h3>Hogar</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-tshirt"></i></div>
+                <h3>Moda</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-briefcase"></i></div>
+                <h3>Servicios</h3>
+            </a>
     </div>
 </section>
 
-  <!-- ========== SECCIÓN DE ANUNCIOS RECIENTES ========== -->
+    <!-- ANUNCIOS DESTACADOS -->
 <section class="products" id="products">
     <h1 class="heading"> Anuncios <span>Destacados</span> </h1>
     <div class="box-container">
-        <!-- JavaScript insertará los productos aquí -->
         <p>Cargando anuncios...</p>
-    </div>
-</section>
-
-  <!-- SECCIÓN DE ANUNCIOS CON FILTROS -->
-  <section class="contenedor-anuncios">
-    <button class="btn-filtros" onclick="toggleFiltros()">☰ Filtros</button>
-    
-    
-
-    <!-- Contenedor de tarjetas de anuncios -->
-    <div class="contenido-anuncios">
-      <h2>Resultados</h2>
-      <section class="products" id="products">
-        <div class="box-container">
-          <!-- JavaScript insertará los productos aquí mágicamente -->
-        </div>
-      </section>
-      <div id="paginacion-anuncios" class="paginacion-anuncios"></div>
     </div>
   </section>
 
-  <!-- FOOTER -->
+    <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-contenedor">
-      <!-- Columna 1 -->
       <div class="footer-col">
         <h4>Mercado Central</h4>
         <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
       </div>
-
-      <!-- Columna 2 -->
       <div class="footer-col">
         <h4>Enlaces rápidos</h4>
         <ul>
@@ -205,36 +131,23 @@
           <li><a href="#">Contáctanos</a></li>
         </ul>
       </div>
-
-      <!-- Columna 3 -->
       <div class="footer-col">
         <h4>Síguenos</h4>
         <div class="social-links">
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="icon-social"> Facebook</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon-social"> Instagram</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter/X" class="icon-social"> Twitter/X</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="icon-social"> YouTube</a>
+                    <a href="#"><i class="fab fa-facebook-f"></i> Facebook</a>
+                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                    <a href="#"><i class="fab fa-twitter"></i> Twitter/X</a>
         </div>
       </div>
     </div>
-
-    <!-- Copyright -->
     <div class="footer-bottom">
       <p>© 2024 Mercado Central - Todos los derechos reservados</p>
     </div>
   </footer>
 
-  <!-- Carga la librería de Supabase PRIMERO -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Carga NUESTRO cliente central SEGUNDO -->
-  <script src="supabase-client.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type="module" src="main.js"></script>
 
-  <!-- Swiper.js JS (ANTES de nuestros scripts que lo usan) -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-  <!-- Carga los scripts específicos de cada página DESPUÉS -->
-  <script src="navbar-logic.js"></script>
-  <script src="home-search.js"></script>
-  <script src="home-logic.js"></script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import { supabase } from './supabase-client.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // =============================================================
     // --- 1. DECLARACIONES Y REFERENCIAS ---
@@ -35,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formButton.textContent = 'Publicando...';
 
         try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("Sesión de usuario no encontrada.");
 
             let coverImageUrl = '';
@@ -44,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- CORRECCIÓN CLAVE: SEPARAMOS LA LÓGICA DE PORTADA ---
             if (coverImageFile && coverImageFile.size > 0) {
                 const filePath = `${user.id}/${Date.now()}_cover_${coverImageFile.name}`;
-                await supabaseClient.storage.from('imagenes_anuncios').upload(filePath, coverImageFile);
-                const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(filePath);
+                await supabase.storage.from('imagenes_anuncios').upload(filePath, coverImageFile);
+                const { data } = supabase.storage.from('imagenes_anuncios').getPublicUrl(filePath);
                 coverImageUrl = data.publicUrl;
             }
 
@@ -54,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newGalleryFiles.length > 0) {
                 const uploadPromises = newGalleryFiles.map(file => {
                     const filePath = `${user.id}/${Date.now()}_gallery_${file.name}`;
-                    return supabaseClient.storage.from('imagenes_anuncios').upload(filePath, file);
+                return supabase.storage.from('imagenes_anuncios').upload(filePath, file);
                 });
                 const uploadResults = await Promise.all(uploadPromises);
                 uploadResults.forEach(result => {
                     if (result.data) {
-                        const { data } = supabaseClient.storage.from('imagenes_anuncios').getPublicUrl(result.data.path);
+                    const { data } = supabase.storage.from('imagenes_anuncios').getPublicUrl(result.data.path);
                         galleryUrls.push(data.publicUrl);
                     }
                 });
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 url_galeria: galleryUrls
             };
 
-            const { data: newAd, error: adError } = await supabaseClient.from('anuncios').insert([adData]).select('id').single();
+            const { data: newAd, error: adError } = await supabase.from('anuncios').insert([adData]).select('id').single();
             if (adError) throw adError;
 
             alert('¡Anuncio publicado con éxito!');

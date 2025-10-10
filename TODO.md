@@ -1,6 +1,4 @@
-# Reparación Integral del Sistema de Publicación
+# TODO: Modificar login.html
 
-## Tareas Pendientes
-
-- [x] Reemplazar completamente el contenido de form-logic.js con el código corregido proporcionado
-- [x] Añadir el bloque CSS para restaurar los estilos de los botones de formulario al final de style.css
+- [x] Añadir id="pagina-login" a la etiqueta <body>
+- [x] Reemplazar todas las etiquetas <script> por <script type="module" src="main.js"></script>

@@ -1,0 +1,225 @@
+/* ================================================= */
+/* === ESTILOS ESPECÍFICOS PARA HOME.CSS (index.html) === */
+/* ================================================= */
+
+/* --- HERO SECTION --- */
+.hero-search {
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('URL_DE_SU_IMAGEN_DE_FONDO') no-repeat center center/cover;
+  padding: 8rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--color-blanco);
+}
+
+.hero-title-animated {
+  font-size: 4.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  opacity: 0.95;
+  font-weight: 400;
+  max-width: 700px;
+}
+
+.search-form-container {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 5rem auto;
+}
+
+@media (min-width: 768px) {
+    .search-form-container {
+        grid-template-columns: 2fr 1.5fr 1.5fr auto;
+    }
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  background: var(--color-blanco);
+  border-radius: .5rem;
+  padding: 0 1.5rem;
+}
+
+.search-field i {
+  font-size: 1.8rem;
+  color: var(--color-gris);
+  margin-right: 1rem;
+}
+
+.search-field input, .search-field select {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 1.5rem 0;
+  font-size: 1.6rem;
+  color: var(--color-texto);
+}
+
+.btn-search-hero {
+  background: var(--color-acento);
+  color: var(--color-texto);
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: none;
+  border-radius: .5rem;
+  padding: 1.5rem 3rem;
+  font-size: 1.6rem;
+}
+
+.btn-search-hero:hover {
+  background: var(--color-acento-claro);
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 6rem;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-acento-claro);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.4rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- SECCIÓN DE CATEGORÍAS --- */
+.categories-showcase {
+  background: var(--color-blanco);
+  padding: 8rem 2rem;
+}
+
+.categories-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+}
+
+.category-card {
+  background: var(--color-blanco);
+  border-radius: 2rem;
+  padding: 4rem 3rem;
+  text-align: center;
+  box-shadow: var(--sombra-media);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.category-card:hover {
+  transform: translateY(-1rem);
+  box-shadow: 0 20px 40px rgba(0, 191, 174, 0.15);
+}
+
+.category-icon {
+  width: 8rem;
+  height: 8rem;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-icon i {
+  font-size: 3rem;
+  color: white;
+}
+
+.category-card h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.category-card p {
+  font-size: 1.5rem;
+  color: var(--color-gris);
+  margin-bottom: 1.5rem;
+}
+
+.category-count {
+  display: inline-block;
+  padding: .8rem 1.6rem;
+  background: rgba(0, 191, 174, 0.1);
+  color: var(--color-primario);
+  border-radius: 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* --- SECCIÓN DE PRODUCTOS --- */
+.products {
+  padding: 8rem 5%;
+  background: var(--color-fondo);
+}
+
+.heading {
+  text-align: center;
+  font-size: 3.5rem;
+  color: var(--color-texto);
+  margin-bottom: 5rem;
+}
+
+.heading span {
+  background: var(--color-primario);
+  color: #fff;
+  display: inline-block;
+  padding: .5rem 3rem;
+  clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%);
+}
+
+/* Additional home-specific styles from style.css */
+.section-title { text-align: center; font-size: 3.2rem; font-weight: 700; margin-bottom: 5rem; }
+.section-title span { color: var(--color-primario); }
+
+/* Esta regla hace que el contenido principal se estire y empuje el footer hacia abajo */
+main, section.hero-search, section.categories-showcase, section.products {
+    flex-grow: 1;
+}
+
+/* --- TARJETAS DE PRODUCTO (.box) --- */
+.box-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr)); gap: 3rem; }
+.box { background: var(--color-blanco); border-radius: 1.6rem; box-shadow: var(--sombra-suave); overflow: hidden; display: flex; flex-direction: column; transition: all 0.4s; position: relative; }
+.box:hover { transform: translateY(-1rem); box-shadow: var(--sombra-media); }
+.box .image-container { width: 100%; aspect-ratio: 4 / 3; position: relative; background-color: #eee; }
+.box .swiper { width: 100%; height: 100%; }
+.box .swiper-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.box .content { padding: 2rem; display: flex; flex-direction: column; flex-grow: 1; }
+.box .content h3 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; height: 5rem; overflow: hidden; }
+.box .content .price { font-size: 2.4rem; font-weight: 800; color: var(--color-secundario); margin-bottom: 1rem; }
+.box .content .location { font-size: 1.4rem; color: var(--color-gris); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.box .content .btn-contact { display: flex; align-items: center; justify-content: center; gap: 1rem; width: 100%; padding: 1.4rem; background: var(--color-primario); color: var(--color-blanco); border-radius: 1rem; text-decoration: none; font-weight: 700; font-size: 1.6rem; transition: all 0.3s ease; margin-top: auto; }
+.box .content .btn-contact:hover { background: var(--color-secundario); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35); }

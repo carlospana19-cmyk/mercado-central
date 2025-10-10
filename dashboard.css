@@ -1,0 +1,88 @@
+/* dashboard.css */
+
+.dashboard-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 2rem;
+}
+
+#my-ads-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.dashboard-ad-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--sombra-suave);
+    padding: 1.5rem;
+    gap: 2rem;
+}
+
+.dashboard-ad-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.dashboard-ad-info {
+    flex-grow: 1;
+}
+
+.dashboard-ad-info h3 {
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.dashboard-ad-info p {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--color-secundario);
+    margin: 0;
+}
+
+.dashboard-ad-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.dashboard-ad-actions .btn-edit,
+.dashboard-ad-actions .btn-delete {
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-edit {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn-delete {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.dashboard-ad-details {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 1.3rem;
+    color: #7f8c8d;
+    margin-top: 1rem;
+}
+
+.dashboard-ad-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}

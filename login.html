@@ -188,13 +188,7 @@
     </div>
   </footer>
 
-  <!-- Carga la librería de Supabase PRIMERO -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Carga NUESTRO cliente central SEGUNDO -->
-  <script src="supabase-client.js"></script>
-
-  <!-- Carga los scripts específicos de cada página DESPUÉS -->
-  <script src="navbar-logic.js"></script>
-  <script src="auth-logic.js"></script>
+  <!-- Inicialización centralizada -->
+  <script type="module" src="main.js"></script>
 </body>
 </html>
