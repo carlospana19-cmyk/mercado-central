@@ -27,44 +27,39 @@
 
     <!-- CONTENIDO PRINCIPAL DE LA PÁGINA DE RESULTADOS -->
     <main class="results-page-container">
-        <div class="results-inner-wrapper">
-            <!-- === SIDEBAR DE FILTROS === -->
-            <aside id="filters-sidebar" class="filters-sidebar">
-                <h3>Filtrar Resultados</h3>
-
-                <!-- Filtro de Subcategorías (se llenará con JS) -->
-                <div class="filter-group">
-                    <label>Categoría</label>
-                    <div id="subcategory-filter-container">
-                        <p>Cargando...</p>
-                    </div>
-        </div>
-
-                <!-- Otros filtros (ejemplos) -->
-                <div class="filter-group">
-                    <label for="price-min">Precio Mín.</label>
-                    <input type="number" id="price-min" placeholder="ej: 5000">
-          </div>
-                <div class="filter-group">
-                    <label for="price-max">Precio Máx.</label>
-                    <input type="number" id="price-max" placeholder="ej: 20000">
-          </div>
-
-                <button id="apply-filters-btn" class="btn-apply-filters">Aplicar Filtros</button>
-            </aside>
-
-            <!-- === CONTENEDOR DE RESULTADOS === -->
-            <div class="results-content">
-                <div id="results-summary" style="margin-bottom: 2rem; font-size: 1.8rem;">
-                    <p>Cargando resultados...</p>
-          </div>
-
-                <div id="results-container">
-                    <!-- Los resultados de la búsqueda se insertarán aquí con JavaScript -->
+        <!-- === SIDEBAR DE FILTROS === -->
+        <aside id="filters-sidebar" class="filters-sidebar">
+            <h3>Filtrar Resultados</h3>
+            
+            <!-- Filtro de Subcategorías (se llenará con JS) -->
+            <div class="filter-group">
+                <label>Categoría</label>
+                <div id="subcategory-filter-container">
+                    <p>Cargando...</p>
                 </div>
-                <div id="pagination-controls" class="pagination-controls">
-                    <!-- Los controles de paginación se insertarán aquí con JavaScript -->
-                </div>
+    </div>
+
+            <!-- Otros filtros (ejemplos) -->
+            <div class="filter-group">
+                <label for="price-min">Precio Mín.</label>
+                <input type="number" id="price-min" placeholder="ej: 5000">
+      </div>
+            <div class="filter-group">
+                <label for="price-max">Precio Máx.</label>
+                <input type="number" id="price-max" placeholder="ej: 20000">
+      </div>
+
+            <button id="apply-filters-btn" class="btn-apply-filters">Aplicar Filtros</button>
+        </aside>
+
+        <!-- === CONTENEDOR DE RESULTADOS === -->
+        <div class="results-content">
+            <div id="results-summary" style="margin-bottom: 2rem; font-size: 1.8rem;">
+                <p>Cargando resultados...</p>
+      </div>
+
+            <div id="results-container">
+                <!-- Los resultados de la búsqueda se insertarán aquí con JavaScript -->
             </div>
         </div>
     </main>

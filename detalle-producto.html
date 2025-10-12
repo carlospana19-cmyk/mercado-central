@@ -9,9 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </head>
 <body class="page-detalle">
     <!-- =============================================================== -->
@@ -53,13 +51,11 @@
     <div class="detalle-grid-premium">
         <!-- Columna Izquierda: Galería de Imágenes -->
         <div class="gallery-container-premium">
-            <div class="swiper product-gallery-swiper">
-                <div class="swiper-wrapper" id="gallery-wrapper">
-                    <!-- Imágenes del carrusel generadas por JS -->
-                </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+            <div class="main-image-wrapper-premium">
+                <img src="images/placeholder.jpg" alt="Imagen principal" id="main-image">
+            </div>
+            <div class="thumbnails-wrapper-premium" id="thumbnails-container">
+                <!-- Miniaturas generadas por JS -->
             </div>
         </div>
 
@@ -131,12 +127,9 @@
     <!-- Carga la librería de Supabase PRIMERO -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Carga NUESTRO cliente central SEGUNDO -->
-    <script type="module" src="supabase-client.js"></script>
+    <script src="supabase-client.js"></script>
 
     <!-- Inicialización centralizada -->
     <script type="module" src="main.js"></script>
-
-    <!-- Carga la lógica específica de detalle del producto -->
-    <script type="module" src="product-detail-logic.js"></script>
 </body>
 </html>
