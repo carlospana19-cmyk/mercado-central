@@ -99,18 +99,21 @@ async function displayProductDetails(ad, galleryImages) {
         allImages.forEach((imageUrl, index) => {
             const slide = document.createElement('div');
             slide.className = 'swiper-slide';
+            // Removed debugging styles
 
             const img = document.createElement('img');
             img.src = imageUrl;
             img.alt = `Imagen ${index + 1} del producto`;
+            // Removed debugging styles
             img.onerror = () => {
-                console.warn('Error al cargar imagen del carrusel:', imageUrl);
-                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L3N2Zz4=';
+                console.warn('Error al cargar imagen del carrusel:', imageUrl); // Reverted to warn
+                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L2F2Zz4=';
             };
 
             slide.appendChild(img);
             galleryWrapperEl.appendChild(slide);
         });
+        // Removed console.log('Se han agregado imágenes al carrusel.');
 
         // Inicializar Swiper después de agregar las imágenes
         const swiper = new Swiper('.product-gallery-swiper', {
@@ -127,9 +130,13 @@ async function displayProductDetails(ad, galleryImages) {
                 delay: 3000,
                 disableOnInteraction: false,
             },
+            observer: true, // Added to observe changes in Swiper and its parents
+            observeParents: true, // Added to observe changes in parent elements
         });
 
         console.log('Carrusel Swiper inicializado');
+
+        // Removed debugging: Log DOM structure after Swiper initialization
     } else {
         console.log('No hay imágenes disponibles, usando placeholder');
         galleryWrapperEl.innerHTML = `
