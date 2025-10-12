@@ -1,0 +1,516 @@
+/* ================================================= */
+/* === FORM.CSS - ESTILOS PARA ASISTENTE Y FORMS === */
+/* ================================================= */
+
+/* 1. Asegurar la herencia de la fuente global */
+.publish-wizard, .publish-wizard select, .publish-wizard input, .publish-wizard button, .publish-wizard textarea {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* 2. Estilos para la barra de progreso */
+.progress-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.5;
+}
+
+.step.active {
+  opacity: 1;
+}
+
+.step.completed {
+  opacity: 1;
+}
+
+.step-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s;
+}
+
+.step.active .step-circle {
+  background: var(--color-primario);
+  color: white;
+}
+
+.step.completed .step-circle {
+  background: var(--color-secundario);
+  color: white;
+}
+
+.step-title {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* 3. Estilos unificados para los campos del formulario */
+.form-section {
+    background: var(--color-blanco);
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    padding: 3rem;
+    margin-bottom: 3rem;
+    border: 1px solid #eee;
+}
+
+.form-group label {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-texto);
+}
+
+.form-group select, .form-group input, .form-group textarea {
+    width: 100%;
+    padding: 1.4rem;
+    font-size: 1.6rem; /* Aumenta el tamaño de la fuente dentro de los campos */
+    border: 1px solid #ddd;
+    border-radius: .8rem;
+    background-color: #f9f9f9;
+}
+
+/* 4. Estilos modernos para los botones de navegación */
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    border-top: 1px solid #eee;
+    padding-top: 2rem;
+}
+
+.btn-group .btn {
+    padding: 1.2rem 2.8rem;
+    border-radius: .8rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    border: none;
+}
+
+.btn-group .btn-primary {
+    background: var(--color-primario);
+    color: white;
+}
+.btn-group .btn-primary:hover {
+    background: var(--color-secundario);
+}
+
+.btn-group .btn-secondary {
+    background-color: #f0f0f0;
+    color: var(--color-texto);
+}
+.btn-group .btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* ================================================= */
+/* === MARCO VISUAL PARA ASISTENTE DE PUBLICACIÓN === */
+/* ================================================= */
+
+.wizard-footer-simple {
+    background-color: #0a2342; /* Azul Marino personalizado */
+    height: 50px; /* Igual que el encabezado */
+    width: 100%;
+    margin-top: auto; /* Para que se pegue abajo */
+}
+
+/* Ajuste de layout principal para que el footer se pegue abajo */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container.publish-wizard {
+    flex-grow: 1; /* El contenido principal ocupa el espacio disponible */
+    width: 100%;
+    max-width: 700px;
+    margin: 4rem auto;
+}
+
+/* ================================================= */
+/* === RESTAURACIÓN DE ESTILOS ESPECÍFICOS (FORM.CSS) === */
+/* ================================================= */
+
+/* 1. Estilos para los botones de subida de archivos */
+.file-upload-btn {
+    display: inline-block;
+    padding: 1.2rem 2rem;
+    background-color: var(--color-secundario);
+    color: var(--color-blanco);
+    border-radius: .8rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: background-color .2s ease;
+}
+.file-upload-btn:hover {
+    background-color: var(--color-primario);
+}
+.file-name-display {
+    display: inline-block;
+    margin-left: 1.5rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    font-style: italic;
+}
+
+/* 2. Estilos para la zona de "Arrastrar y Soltar" (Drop Area) */
+.drop-area {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 5rem 3rem; /* Aumentado para mayor área clickeable */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: #fcfcfc;
+    margin-top: 1rem;
+}
+.drop-area:hover {
+    border-color: var(--color-primario);
+    background-color: var(--wizard-light, #f0fafa);
+}
+.drop-area i {
+    font-size: 3rem;
+    color: var(--color-primario);
+    margin-bottom: 1rem;
+}
+
+/* 3. Estilo HOVER para el botón "Atrás" */
+.btn-group .btn-secondary {
+    background-color: transparent;
+    color: var(--color-gris);
+    border: 2px solid #ddd;
+}
+.btn-group .btn-secondary:hover {
+    background-color: transparent;
+    color: var(--color-primario);
+    border-color: var(--color-primario);
+}
+
+/* ================================================= */
+/* === ESTILOS PARA LA SECCIÓN DE IMÁGENES REESTRUCTURADA === */
+/* ================================================= */
+
+.image-upload-section .subsection-title {
+    margin-bottom: 2rem;
+}
+
+.upload-group {
+    margin-bottom: 3rem; /* Espacio entre Portada y Galería */
+}
+
+.upload-group > label {
+    font-size: 1.8rem; /* Tamaño de letra más grande para los títulos de cada grupo */
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.label-tag {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--color-gris);
+    margin-left: 1rem;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.btn-file-upload {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    border: none;
+    border-radius: 8px;
+    padding: 1.2rem 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    transition: background-color 0.3s;
+}
+
+.btn-file-upload:hover {
+    background-color: var(--color-secundario);
+}
+
+/* ============================================= */
+/* === ESTILOS PARA PASO 4 (MOTOR DE INGRESOS) === */
+/* ============================================= */
+
+.membership-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.membership-card {
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.membership-card.popular {
+    border-color: var(--color-primario);
+    box-shadow: 0 5px 20px rgba(0, 191, 174, 0.15);
+}
+
+.membership-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sombra-suave);
+}
+
+.membership-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.membership-card input[type="radio"]:checked + label::after {
+    content: '✔';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: var(--color-primario);
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.membership-card label {
+    display: block;
+    cursor: pointer;
+    margin: 0;
+}
+
+.membership-card h4 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-texto);
+    margin-bottom: 1rem;
+}
+
+.membership-card .price {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--color-primario);
+}
+
+.benefits-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+.benefits-list li {
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.benefits-list i {
+    color: var(--color-secundario);
+    margin-right: 1rem;
+}
+
+.premium-badge {
+    background: var(--color-primario);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.highlight-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.highlight-option {
+    background: #f7fafd;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #eee;
+}
+
+.highlight-option input[type="checkbox"] {
+    margin-right: 1.5rem;
+    transform: scale(1.4);
+}
+
+/* ============================================= */
+/* === AJUSTES FINALES PARA PASO 4 === */
+/* ============================================= */
+
+.form-section {
+    background-color: #F0FAFA; /* Turquesa Pastel */
+}
+
+.membership-card {
+    border: 2px solid var(--color-primario); /* Borde Turquesa para todas */
+}
+
+.highlight-options-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.highlight-button {
+    display: block;
+    padding: 1.5rem;
+    background-color: var(--color-blanco);
+    border: 2px solid #eee;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.highlight-button input[type="checkbox"] {
+    display: none; /* Ocultamos el checkbox feo */
+}
+
+.highlight-button:hover {
+    border-color: var(--color-secundario);
+}
+
+/* Estilo para cuando el botón está SELECCIONADO */
+.highlight-button input[type="checkbox"]:checked + span {
+    color: var(--color-primario);
+}
+
+.highlight-button input[type="checkbox"]:checked {
+    /* (Workaround) Accedemos al label desde el input chequeado */
+    ~ span { color: var(--color-primario); } /* Para algunos navegadores */
+}
+
+.highlight-button:has(input:checked) {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 10px rgba(0, 191, 174, 0.2);
+}
+
+.highlight-button span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.highlight-button span strong {
+    font-size: 1.6rem;
+}
+
+.highlight-button span small {
+    font-size: 1.3rem;
+    color: var(--color-gris);
+}
+
+/* ======================================================= */
+/* === ESTILOS DE PREVISUALIZACIÓN (ALTA PRIORIDAD) === */
+/* ======================================================= */
+
+.image-preview-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1.5rem !important;
+    margin-top: 2rem !important;
+    padding-top: 2rem !important;
+    border-top: 1px solid #eee !important;
+}
+
+.preview-image-wrapper {
+    position: relative !important;
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: var(--sombra-suave) !important;
+}
+
+.preview-image-wrapper .preview-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.preview-image-wrapper .remove-image-btn {
+    position: absolute !important;
+    top: 5px !important;
+    right: 5px !important;
+    background: rgba(0,0,0,0.7) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    transition: background 0.2s !important;
+    opacity: 0 !important;
+    z-index: 10 !important; /* Asegurar que esté por encima */
+}
+
+.preview-image-wrapper:hover .remove-image-btn {
+    opacity: 1 !important;
+}
+
+.remove-image-btn:hover {
+    background: #ff4d4d !important;
+}
+
+/* Estilos específicos para la galería en publicar.html */
+#gallery-preview-container .preview-image-wrapper {
+    width: 120px !important;
+    height: 120px !important;
+}
+
+#gallery-preview-container .preview-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}

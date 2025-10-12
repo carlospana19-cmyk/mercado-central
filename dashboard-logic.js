@@ -1,63 +1,74 @@
-// dashboard-logic.js (VERSIÓN ESTABLE)
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. VERIFICAR SI HAY UN USUARIO CONECTADO
-    const { data: { user } } = await supabaseClient.auth.getUser();
+import { supabase } from './supabase-client.js';
+
+export async function initializeDashboardPage() {
+    const container = document.querySelector('#my-ads-container');
+    if (!container) { return; }
+
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        alert('Debes iniciar sesión para ver tu panel.');
         window.location.href = 'login.html';
         return;
     }
     
-    loadUserAds(user.id);
-    
-    const logoutButton = document.getElementById('logout-button');
-    logoutButton.addEventListener('click', async () => {
-        await supabaseClient.auth.signOut();
-        window.location.href = 'index.html';
-    });
-});
+    // 1. PEDIMOS LOS NUEVOS CAMPOS A SUPABASE
+    const { data: ads, error } = await supabase
+        .from('anuncios')
+        .select('*, imagenes(url_imagen)') // Seleccionamos todos los campos del anuncio
+        .eq('user_id', user.id);
 
-async function loadUserAds(userId) {
-    const container = document.querySelector('#my-ads-container .box-container');
-    if (!container) return; // Salida segura
-    
-    const { data: ads, error } = await supabaseClient.from('anuncios').select('*').eq('user_id', userId);
-        
-    if (error || !ads || ads.length === 0) {
-        container.innerHTML = '<p>Aún no has publicado ningún anuncio. <a href="publicar.html">¡Publica el primero!</a></p>';
+    if (error) {
+        container.innerHTML = '<p>Error al cargar tus anuncios.</p>';
         return;
     }
     
-    container.innerHTML = '';
-    ads.forEach(ad => {
-        const adElement = document.createElement('div');
-        adElement.className = 'box'; // Esta clase es la que aplica el estilo de tarjeta
-        adElement.innerHTML = `
-            <img src="${ad.url_portada}" alt="${ad.titulo}">
+    if (ads.length === 0) {
+        container.innerHTML = '<p>Aún no tienes anuncios. <a href="publicar.html">¡Crea uno!</a></p>';
+        return;
+    }
+
+    container.innerHTML = ads.map(ad => {
+        // 2. CREAMOS UN FRAGMENTO DE HTML PARA LOS DETALLES DEL VEHÍCULO
+        let vehicleDetailsHTML = '';
+        if (ad.anio || ad.kilometraje) {
+            vehicleDetailsHTML = `
+                <div class="dashboard-ad-details">
+                    ${ad.anio ? `<span><i class="fas fa-calendar-alt"></i> ${ad.anio}</span>` : ''}
+                    ${ad.kilometraje ? `<span><i class="fas fa-tachometer-alt"></i> ${ad.kilometraje.toLocaleString('es-PA')} km</span>` : ''}
+                    ${ad.transmision ? `<span><i class="fas fa-cogs"></i> ${ad.transmision}</span>` : ''}
+                </div>
+            `;
+        }
+
+        // 3. INTEGRAMOS LOS DETALLES EN LA TARJETA
+        return `
+            <div class="dashboard-ad-card">
+                <img src="${ad.url_portada || 'images/placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image">
+                <div class="dashboard-ad-info">
             <h3>${ad.titulo}</h3>
-            <div class="price">$${ad.precio}</div>
+                    <p>${new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio)}</p>
+                    ${vehicleDetailsHTML} 
+                </div>
             <div class="dashboard-ad-actions">
-                <button class="btn-edit" onclick="editAd('${ad.id}')">Editar</button>
-                <button class="btn-delete" onclick="deleteAd('${ad.id}', this)">Borrar</button>
+                <a href="editar-anuncio.html?id=${ad.id}" class="btn-edit">Editar</a>
+                    <button class="btn-delete" data-id="${ad.id}">Borrar</button>
+                </div>
             </div>
         `;
-        container.appendChild(adElement);
+    }).join('');
+
+    // Lógica de borrado (sin cambios)
+    container.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const adId = e.target.dataset.id;
+            if (confirm('¿Seguro que quieres borrar este anuncio?')) {
+                // Aquí necesitaríamos una lógica más compleja para borrar imágenes de Storage
+                const { error } = await supabase.from('anuncios').delete().eq('id', adId);
+                if (error) {
+                    alert('Error al borrar el anuncio.');
+                } else {
+                    e.target.closest('.dashboard-ad-card').remove();
+                }
+            }
+        });
     });
-}
-
-async function deleteAd(adId, buttonElement) {
-    if (confirm("¿Estás seguro de que quieres borrar este anuncio?")) {
-        buttonElement.textContent = "Borrando...";
-        const { error } = await supabaseClient.from('anuncios').delete().eq('id', adId);
-        if (error) {
-            alert("Hubo un error al borrar el anuncio.");
-            buttonElement.textContent = "Borrar";
-        } else {
-            buttonElement.closest('.box').remove();
-        }
-    }
-}
-
-function editAd(adId) {
-    window.location.href = `editar-anuncio.html?id=${adId}`;
 }

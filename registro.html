@@ -172,7 +172,7 @@
 
   <div class="form-box">
     <h2>Crear una Cuenta</h2>
-    <form id="signup-form">
+    <form id="register-form">
       <input type="email" id="email" name="email" placeholder="Correo electrónico">
       <input type="password" id="password" name="password" placeholder="Contraseña">
       <button type="submit">Registrarse</button>
@@ -342,8 +342,7 @@
   <!-- Carga NUESTRO cliente central SEGUNDO -->
   <script src="supabase-client.js"></script>
 
-  <!-- Carga los scripts específicos de cada página DESPUÉS -->
-  <script src="navbar-logic.js"></script>
-  <script src="auth-logic.js"></script>
+  <!-- Inicialización centralizada -->
+  <script type="module" src="main.js"></script>
 </body>
 </html>

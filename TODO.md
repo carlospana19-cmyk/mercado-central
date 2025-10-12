@@ -1,5 +1,4 @@
-- [x] Edit publicar.html to remove the <label>Imágenes de la Galería (opcional, hasta 10)</label> from the form-group div.
-- [x] Modify the gallery form-group in editar-anuncio.html: remove the drop-area div and its label, change input id to "images", rename gallery-preview to existing-images-preview-container, add new-image-preview-container div, remove the span.
-- [x] Add new style rules for customizing the file upload button in style.css.
-- [x] Correct the images input in publicar.html: add <label> with class custom-file-upload and text "Hacer clic para añadir imágenes", ensure for matches id, change input id to "images", remove drop-area, change preview id to "image-preview-container", remove span.
-- [ ] Restore the form content in publicar.html and editar-anuncio.html with the provided modern upload component design.
+# TODO: Modificar login.html
+
+- [x] Añadir id="pagina-login" a la etiqueta <body>
+- [x] Reemplazar todas las etiquetas <script> por <script type="module" src="main.js"></script>

@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Anuncio - Mercado Central</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="form.css">
 </head>
 <body>
-
     <nav class="navbar-moderno">
     <div class="logo-container">
       <a href="index.html" class="logo-link">
@@ -20,116 +16,249 @@
         <span class="logo-text">Mercado Central</span>
       </a>
     </div>
+    </nav>
+
+    <main class="container publish-wizard">
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-title">Categoría</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-title">Ubicación</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-title">Detalles</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-title">Destacar</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="edit-ad-form">
+            <!-- PASO 1: CATEGORÍA -->
+            <div class="form-section active" id="step-1">
+                <h2 class="section-title"><i class="fas fa-list"></i> Elige la Categoría</h2>
+                <div class="form-group">
+                    <label for="category">Categoría Principal</label>
+                    <select id="category" name="categoria_principal" required>
+                        <option value="" disabled selected>Cargando categorías...</option>
+                    </select>
+    </div>
+                <div class="form-group" id="subcategory-group" style="display: none;">
+                    <label for="subcategory">Subcategoría</label>
+                    <select id="subcategory" name="categoria" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="continue-to-step2">
+                        Continuar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 2: UBICACIÓN -->
+            <div class="form-section" id="step-2" style="display: none;">
+                <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Ubicación del Anuncio</h2>
+
+    <div class="form-group">
+                    <label for="province">Provincia</label>
+                    <select id="province" name="provincia" required>
+                        <option value="">Selecciona una provincia</option>
+                        <option value="Panamá">Panamá</option>
+                        <option value="Panamá Oeste">Panamá Oeste</option>
+                        <option value="Colón">Colón</option>
+                        <option value="Chiriquí">Chiriquí</option>
+                        <option value="Veraguas">Veraguas</option>
+                        <option value="Coclé">Coclé</option>
+                        <option value="Los Santos">Los Santos</option>
+                        <option value="Herrera">Herrera</option>
+                        <option value="Darién">Darién</option>
+                        <option value="Bocas del Toro">Bocas del Toro</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="district-group" style="display: none;">
+                    <label for="district">Distrito / Corregimiento</label>
+                    <select id="district" name="distrito" required>
+                        <option value="">Selecciona un distrito</option>
+                    </select>
+    </div>
+
+    <div class="form-group">
+                    <label for="address">Dirección o Sector Específico (ej: El Cangrejo, Bella Vista)</label>
+                    <input type="text" id="address" name="direccion_especifica" placeholder="Sé lo más específico posible">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary back-btn" data-target="1">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="button" class="btn btn-primary next-btn" data-target="3">
+                        Continuar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+    </div>
+
+            <!-- PASO 3: DETALLES -->
+            <div class="form-section" id="step-3" style="display: none;">
+                <h2 class="section-title"><i class="fas fa-info-circle"></i> Detalles del Anuncio</h2>
+
+    <div class="form-group">
+                    <label for="title">Título del Anuncio</label>
+                    <input type="text" id="title" name="titulo" placeholder="Ej: Toyota Corolla 2020, Excelente Estado" required>
+    </div>
+
+    <div class="form-group">
+                    <label for="description">Descripción</label>
+                    <textarea id="description" name="descripcion" rows="8" placeholder="Describe las características, estado, mantenimiento, etc." required></textarea>
+    </div>
     
-    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
-    <div class="buttons-nav">
-        <!-- Este botón se mostrará solo si el usuario está conectado -->
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
+                <!-- ===== CONTENEDORES DE ATRIBUTOS DINÁMICOS ===== -->
 
-        <!-- Botones de Panel y Logout (solo para usuarios conectados) -->
-        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
-
-        <!-- Botón de Iniciar Sesión (solo para invitados) -->
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
-    </div>
-  </nav>
-
-    <main class="publish-page">
-        <div class="publish-container">
-            <h1>Editar tu Anuncio</h1>
-            <p>Completa los siguientes campos para llegar a miles de compradores.</p>
-
-            <form id="publish-form" class="publish-form">
+                <!-- Atributos para Vehículos (mejorado) -->
+                <div id="vehicle-details" class="attribute-section" style="display: none;">
+                    <h3 class="subsection-title">Detalles del Vehículo</h3>
+                    <div class="form-row">
     <div class="form-group">
-        <label for="ad-title">Título del Anuncio</label>
-        <input type="text" id="ad-title" name="title" required>
-    </div>
-
-    <div class="form-group">
-        <label for="ad-category">Categoría</label>
-        <select id="ad-category" name="category" required></select>
-    </div>
-
-    <div class="form-group">
-        <label for="ad-price">Precio (USD)</label>
-        <input type="number" id="ad-price" name="price" step="0.01" min="0" required>
-    </div>
-
-    <div class="form-group">
-        <label for="ad-location">Ubicación</label>
-        <input type="text" id="ad-location" name="location" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="ad-description">Descripción</label>
-        <textarea id="ad-description" name="description" rows="6" required></textarea>
+                            <label for="attr-marca">Marca</label>
+                            <input type="text" id="attr-marca" name="marca" placeholder="Ej: Toyota">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-anio">Año</label>
+                            <input type="number" id="attr-anio" name="anio" placeholder="Ej: 2020">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="attr-kilometraje">Kilometraje</label>
+                            <input type="number" id="attr-kilometraje" name="kilometraje" placeholder="Ej: 50000">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-transmision">Transmisión</label>
+                            <select id="attr-transmision" name="transmision">
+                                <option value="">Selecciona</option>
+                                <option value="Automática">Automática</option>
+                                <option value="Manual">Manual</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-combustible">Combustible</label>
+                            <select id="attr-combustible" name="combustible">
+                                <option value="">Selecciona</option>
+                                <option value="Gasolina">Gasolina</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Híbrido">Híbrido</option>
+                                <option value="Eléctrico">Eléctrico</option>
+                            </select>
+                        </div>
+                    </div>
     </div>
 
+                <!-- Atributos para Inmuebles (inicialmente oculto) -->
+                <div id="realestate-details" class="attribute-section" style="display: none;">
+                    <h3 class="subsection-title">Detalles del Inmueble</h3>
+                    <div class="form-row">
     <div class="form-group">
-        <label>Imagen de Portada</label>
-        <label for="ad-cover-image" class="file-upload-btn"><i class="fas fa-camera"></i> Seleccionar Portada</label>
-        <input type="file" id="ad-cover-image" name="coverImage" accept="image/*">
-        <span id="cover-file-name" class="file-name-display">Ningún archivo seleccionado</span>
+                            <label for="attr-m2">Metros Cuadrados (m²)</label>
+                            <input type="number" id="attr-m2" data-key="m2">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-habitaciones">Habitaciones</label>
+                            <input type="number" id="attr-habitaciones" data-key="Habitaciones">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-baños">Baños</label>
+                            <input type="number" id="attr-baños" data-key="Baños">
+                        </div>
+                    </div>
     </div>
 
     <div class="form-group">
+                    <label for="price">Precio (USD)</label>
+                    <input type="number" id="price" name="precio" step="0.01" placeholder="15000" required>
+                </div>
+
+                <!-- SECCIÓN DE SUBIDA DE IMÁGENES (REESTRUCTURADA) -->
+                <div class="form-group image-upload-section">
+                    <h3 class="subsection-title"><i class="fas fa-images"></i> Imágenes del Anuncio</h3>
+
+                    <div class="upload-group">
+                        <label for="cover-image-input">Imagen de Portada <span class="label-tag">(Obligatoria)</span></label>
+                        <div class="file-input-wrapper">
+                            <button type="button" class="btn btn-file-upload" onclick="document.getElementById('cover-image-input').click();">
+                                <i class="fas fa-camera"></i> Seleccionar Portada
+                            </button>
+                            <span id="cover-image-name" class="file-name-display">Ningún archivo seleccionado.</span>
+                        </div>
+                        <input type="file" id="cover-image-input" name="cover_image" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="upload-group">
+                        <label for="gallery-images-input">Galería de Imágenes <span class="label-tag">(Hasta 10 imágenes)</span></label>
         <div id="gallery-drop-area" class="drop-area">
-            <input type="file" id="ad-gallery-images" name="galleryImages" accept="image/*" multiple>
-            <label for="ad-gallery-images" class="drop-area-label">
                 <i class="fas fa-cloud-upload-alt"></i>
-                <p>Arrastra y suelta imágenes aquí, o <strong>haz clic para seleccionar</strong>.</p>
-                <small>Máximo 10 imágenes.</small>
-            </label>
+                            <p>Arrastra y suelta imágenes aquí, o haz clic para seleccionar.</p>
         </div>
-        <div id="gallery-preview" class="image-preview-container"></div>
-        <span id="gallery-files-name" class="file-name-display"></span>
+                        <input type="file" id="gallery-images-input" name="gallery_images" accept="image/*" multiple style="display: none;">
+                        <div id="gallery-preview-container" class="image-preview-container"></div>
+                    </div>
     </div>
 
-    <button type="submit" class="btn">Publicar Anuncio</button>
-            </form>
+                <!-- SECCIÓN DE INFORMACIÓN DE CONTACTO -->
+                <h3 class="subsection-title"><i class="fas fa-user-circle"></i> Información de Contacto</h3>
+                <div class="form-group">
+                    <label for="contact-name">Tu Nombre</label>
+                    <input type="text" id="contact-name" name="contact_name">
         </div>
+                <div class="form-group">
+                    <label for="contact-email">Tu Correo Electrónico</label>
+                    <input type="email" id="contact-email" name="contact_email" readonly>
+                    <small>Este campo se rellena automáticamente y no es editable.</small>
+                </div>
+                <div class="form-group">
+                    <label for="contact-phone">Tu Teléfono (WhatsApp)</label>
+                    <input type="tel" id="contact-phone" name="contact_phone" placeholder="Ej: 6677-8899">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary back-btn" data-target="2">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="button" class="btn btn-primary next-btn" data-target="4">
+                        Continuar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+      </div>
+
+            <!-- PASO 4: FINALIZAR EDICIÓN -->
+            <div class="form-section" id="step-4" style="display: none;">
+                <h2 class="section-title"><i class="fas fa-check-circle"></i> Finalizar Edición</h2>
+
+                <div class="final-summary">
+                    <p>Has llegado al final. Revisa los pasos anteriores si necesitas hacer más cambios.</p>
+                    <p>Cuando estés listo, haz clic en "Guardar Cambios" para actualizar tu anuncio.</p>
+      </div>
+
+                <div class="final-step-actions">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary back-btn" data-target="3">Atrás</button>
+                        <button type="submit" class="btn btn-primary" id="save-changes-btn">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
+        </form>
     </main>
 
-    <footer class="footer">
-    <div class="footer-contenedor">
-      <!-- Columna 1 -->
-      <div class="footer-col">
-        <h4>Mercado Central</h4>
-        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
-      </div>
-
-      <!-- Columna 2 -->
-      <div class="footer-col">
-        <h4>Enlaces rápidos</h4>
-        <ul>
-          <li><a href="#">Quiénes somos</a></li>
-          <li><a href="#">Términos y Condiciones</a></li>
-          <li><a href="#">Política de Privacidad</a></li>
-          <li><a href="#">Contáctanos</a></li>
-        </ul>
-      </div>
-
-      <!-- Columna 3 -->
-      <div class="footer-col">
-        <h4>Síguenos</h4>
-        <div class="social-links">
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="icon-social"> Facebook</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon-social"> Instagram</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter/X" class="icon-social"> Twitter/X</a><br>
-          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="icon-social"> YouTube</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Copyright -->
-    <div class="footer-bottom">
-      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
-    </div>
-  </footer>
+    <footer class="wizard-footer-simple"></footer>
     
-<script src="supabase-client.js"></script>
-<script src="navbar-logic.js"></script>
-<script src="form-logic.js"></script>
+    <!-- ======================== SCRIPTS ======================== -->
+    <script type="module" src="main.js"></script>
 </body>
 </html>

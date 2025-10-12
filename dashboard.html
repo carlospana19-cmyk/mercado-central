@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Panel - Mercado Central</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <!-- (Copia aquí tus enlaces de fuentes y FontAwesome) -->
 </head>
-<body class="page-dashboard">
+<body id="dashboard-page" class="page-dashboard">
     <nav class="navbar-moderno">
     <div class="logo-container">
       <a href="index.html" class="logo-link">
@@ -29,19 +32,15 @@
         <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
     </div>
 </nav>
-    <main class="dashboard-page">
-        <div class="dashboard-header">
-            <h1>Mi Panel de Control</h1>
-            <p>Aquí puedes ver y gestionar tus anuncios publicados.</p>
+    <main class="dashboard-container">
+        <h1 class="page-title">Mi Panel de Control</h1>
+        <p class="page-subtitle">Aquí puedes ver y gestionar tus anuncios publicados.</p>
             <button id="logout-button" class="btn">Cerrar Sesión</button>
-        </div>
         <h2>Mis Anuncios</h2>
         <!-- CONTENEDOR CON LAS CLASES CORRECTAS PARA EL ESTILO -->
-        <div id="my-ads-container" class="products">
-            <div class="box-container">
+        <div id="my-ads-container" class="ad-list" style="flex-direction: row;">
                 <p>Cargando tus anuncios...</p>
             </div>
-        </div>
     </main>
     <footer class="footer">
     <div class="footer-contenedor">
@@ -76,13 +75,6 @@
       <p>© 2024 Mercado Central - Todos los derechos reservados</p>
     </div>
 </footer>
-    <!-- Carga la librería de Supabase PRIMERO -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Carga NUESTRO cliente central SEGUNDO -->
-    <script src="supabase-client.js"></script>
-
-    <!-- Carga los scripts específicos de cada página DESPUÉS -->
-    <script src="navbar-logic.js"></script>
-    <script src="dashboard-logic.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>

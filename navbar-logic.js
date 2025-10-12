@@ -1,43 +1,66 @@
-// navbar-logic.js
+// navbar-logic.js - VERSIÓN ROBUSTA DE ESTABILIZACIÓN
 
-// Función para actualizar la UI del Navbar
-const updateNavbarUI = (user) => {
-    const userButtons = document.querySelectorAll('.nav-btn-user');
-    const guestButtons = document.querySelectorAll('.nav-btn-guest');
+import { supabase } from './supabase-client.js';
 
-    if (user) {
-        // Si hay usuario, mostramos sus botones y ocultamos los de invitado
-        userButtons.forEach(btn => btn.style.display = 'inline-block');
-        guestButtons.forEach(btn => btn.style.display = 'none');
-    } else {
-        // Si no hay usuario, hacemos lo contrario
-        userButtons.forEach(btn => btn.style.display = 'none');
-        guestButtons.forEach(btn => btn.style.display = 'inline-block');
+export async function initializeNavbar() {
+    // 1. Obtener los elementos de la barra de navegación
+    const btnLogin = document.getElementById('btn-login');
+    const btnPublish = document.getElementById('btn-publish-logged-in');
+    const btnDashboard = document.getElementById('btn-dashboard');
+    const btnLogout = document.getElementById('btn-logout');
+
+    // Verificación de seguridad: si algún botón no existe, no continuar.
+    if (!btnLogin || !btnPublish || !btnDashboard || !btnLogout) {
+        console.error('Error crítico: Faltan botones esenciales en el navbar del HTML.');
+        return;
     }
-};
 
-// Función principal que se ejecuta al cargar la página
-async function setupNavbar() {
-    // 1. Verificamos el estado del usuario
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    updateNavbarUI(user);
+    // 2. Comprobar el estado de la sesión del usuario
+    const { data: { session }, error } = await supabase.auth.getSession();
 
-    // 2. Añadimos la lógica al botón de cerrar sesión
-    const logoutButton = document.getElementById('btn-logout');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            // No necesitamos alerta, simplemente actualizamos la UI y recargamos
-            updateNavbarUI(null);
-            window.location.href = 'index.html';
-        });
+    if (error) {
+        console.error('Error al obtener la sesión:', error);
+        // Si hay error, mostramos la vista de invitado por seguridad
+        showGuestView();
+        return;
     }
     
-    // 3. Escuchamos cambios en el estado de autenticación (login/logout en otras pestañas)
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-        updateNavbarUI(session?.user);
-    });
-}
+    if (session) {
+        // Si hay una sesión activa, el usuario está conectado
+        showUserView();
+    } else {
+        // Si no hay sesión, el usuario es un invitado
+        showGuestView();
+    }
 
-// Ejecutamos la función cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', setupNavbar);
+    // 3. Añadir la funcionalidad de "Cerrar Sesión" al botón
+    btnLogout.addEventListener('click', async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Error al cerrar sesión:', error);
+        } else {
+            // Redirigir a la página de inicio después de cerrar sesión
+            window.location.href = 'index.html';
+        }
+    });
+
+    // --- Funciones auxiliares para mostrar/ocultar botones ---
+
+    function showUserView() {
+        // Ocultar botones de invitado
+        btnLogin.style.display = 'none';
+        // Mostrar botones de usuario
+        btnPublish.style.display = 'inline-block';
+        btnDashboard.style.display = 'inline-block';
+        btnLogout.style.display = 'inline-block';
+    }
+
+    function showGuestView() {
+        // Mostrar botones de invitado
+        btnLogin.style.display = 'inline-block';
+        // Ocultar botones de usuario
+        btnPublish.style.display = 'none';
+        btnDashboard.style.display = 'none';
+        btnLogout.style.display = 'none';
+    }
+}
