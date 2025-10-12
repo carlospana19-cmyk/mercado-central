@@ -1,5 +1,9 @@
 import { supabase } from './supabase-client.js';
 
+// --- PAGINACIÓN ---
+const RESULTS_PER_PAGE = 12; // Número de resultados por página
+let currentPage = 1; // Página actual
+
 // --- FUNCIÓN PRINCIPAL DE CARGA Y FILTRADO ---
 async function loadAndFilterResults() {
     const params = new URLSearchParams(window.location.search);
@@ -11,7 +15,7 @@ async function loadAndFilterResults() {
     const priceMin = document.getElementById('price-min').value;
     const priceMax = document.getElementById('price-max').value;
 
-    let queryBuilder = supabase.from('anuncios').select('*', { count: 'exact' }); // Usamos count para el total
+    let queryBuilder = supabase.from('anuncios').select('*', { count: 'exact' });
 
     if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%`);
     if (location) queryBuilder = queryBuilder.ilike('ubicacion', `%${location}%`);
@@ -30,6 +34,11 @@ async function loadAndFilterResults() {
     if (priceMin) queryBuilder = queryBuilder.gte('precio', priceMin);
     if (priceMax) queryBuilder = queryBuilder.lte('precio', priceMax);
 
+    // --- Lógica de paginación en la consulta ---
+    const from = (currentPage - 1) * RESULTS_PER_PAGE;
+    const to = from + RESULTS_PER_PAGE - 1;
+    queryBuilder = queryBuilder.range(from, to);
+
     const { data: products, error, count } = await queryBuilder;
 
     if (error) {
@@ -40,6 +49,7 @@ async function loadAndFilterResults() {
     
     displayFilteredProducts(products || []);
     updateSummary(query, mainCategory, count || 0);
+    displayPaginationControls(count || 0); // Mostrar controles de paginación
 }
 
 // --- FUNCIONES DE RENDERIZADO ---
@@ -57,72 +67,113 @@ function displaySubcategoryFilters(subcategoriesWithCounts) {
         </label>
     `).join('');
 }
-// ... (El resto de funciones displayFilteredProducts, updateSummary, displayError se mantienen igual)
-function displayFilteredProducts(productsToDisplay) {
-    const container = document.getElementById('results-container');
-    if (!container) return;
-    container.innerHTML = "";
 
-    if (productsToDisplay.length === 0) {
-        container.innerHTML = `<p class="no-results">No se encontraron anuncios con estos filtros.</p>`;
+function displayFilteredProducts(ads) {
+    const container = document.getElementById('results-container');
+    const summary = document.getElementById('results-summary');
+
+    if (!container || !summary) {
+        console.error("Error crítico: No se encontraron los contenedores de resultados.");
         return;
     }
 
-    container.innerHTML = productsToDisplay.map(product => {
-        const isVehicle = product.anio || product.marca || product.kilometraje;
+    if (!ads || ads.length === 0) {
+        summary.innerHTML = `<p><strong>0 anuncios encontrados.</strong> Prueba con otros filtros.</p>`;
+        container.innerHTML = '';
+        return;
+    }
 
-        if (isVehicle) {
-            // --- TARJETA PREMIUM PARA VEHÍCULOS ---
-            return `
-            <article class="tarjeta-auto">
-                <img src="${product.url_portada || 'images/placeholder.jpg'}" alt="${product.titulo}">
-                <div class="contenido-auto">
-                    <div class="cabecera-auto">
-                        <h2>${product.titulo}</h2>
-                        <p class="precio">${new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(product.precio)}</p>
-                    </div>
-                    <div class="detalles-principales">
-                        ${product.anio ? `<div class="detalle-item"><i class="fas fa-calendar-alt"></i><span>${product.anio}</span></div>` : ''}
-                        ${product.kilometraje ? `<div class="detalle-item"><i class="fas fa-tachometer-alt"></i><span>${product.kilometraje.toLocaleString('es-PA')} km</span></div>` : ''}
-                        ${product.transmision ? `<div class="detalle-item"><i class="fas fa-cogs"></i><span>${product.transmision}</span></div>` : ''}
-                        ${product.combustible ? `<div class="detalle-item"><i class="fas fa-gas-pump"></i><span>${product.combustible}</span></div>` : ''}
-                    </div>
-                    <div class="ubicacion">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${product.distrito || product.provincia || 'N/A'}</span>
-                    </div>
-                    <a href="detalle-producto.html?id=${product.id}" class="btn-ver-detalles">Ver Detalles</a>
+    summary.innerHTML = `<p><strong>Encontrados ${ads.length} anuncios</strong></p>`;
+
+    const adsHTML = ads.map(ad => {
+        const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+        // Decide qué tarjeta usar. Aquí un ejemplo simple, puedes hacerlo más complejo.
+        const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
+
+        // Detalles del vehículo
+        let vehicleDetailsHTML = '';
+        if (ad.marca || ad.anio || ad.transmision || ad.combustible) {
+            vehicleDetailsHTML = `
+                <div class="vehicle-details">
+                    ${ad.marca ? `<span><i class="fas fa-car"></i> ${ad.marca}</span>` : ''}
+                    ${ad.anio ? `<span><i class="fas fa-calendar-alt"></i> ${ad.anio}</span>` : ''}
+                    ${ad.transmision ? `<span><i class="fas fa-cogs"></i> ${ad.transmision}</span>` : ''}
+                    ${ad.combustible ? `<span><i class="fas fa-gas-pump"></i> ${ad.combustible}</span>` : ''}
                 </div>
-            </article>
             `;
-        } else {
-            // --- TARJETA GENÉRICA SIMPLE ---
-            return `
-            <div class="box">
-                <div class="image-container">
-                    <img src="${product.url_portada || 'images/placeholder.jpg'}" alt="${product.titulo}">
-                </div>
-                <div class="content">
-                    <div class="price">${new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(product.precio)}</div>
-                <h3>${product.titulo}</h3>
-                    <p class="location">${product.distrito || product.provincia || 'N/A'}</p>
-                    <a href="detalle-producto.html?id=${product.id}" class="btn-contact">Contactar</a>
-                </div>
-            </div>
-        `;
         }
+
+            return `
+                <div class="${cardClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                        <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
+                    <div class="content">
+                        <div class="price">${priceFormatted}</div>
+                        <h3>${ad.titulo}</h3>
+                        <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.ubicacion || 'N/A'}</div>
+                        ${vehicleDetailsHTML}
+                    <a href="#" class="btn-contact">Contactar</a>
+                    </div>
+                </div>
+            `;
     }).join('');
+
+    container.innerHTML = adsHTML;
 }
-function updateSummary(query, category, count) { /* ... sin cambios ... */ 
+
+function updateSummary(query, category, count) {
     const summaryElement = document.getElementById('results-summary');
     if (!summaryElement) return;
     let text = `Encontrados <strong>${count}</strong> anuncios`;
     if (category !== 'all') text += ` en <strong>${category}</strong>`;
     summaryElement.innerHTML = text;
 }
-function displayError(message) { /* ... sin cambios ... */ 
+
+function displayError(message) {
     const container = document.getElementById('results-container');
     if (container) container.innerHTML = `<p class="no-results">${message}</p>`;
+}
+
+// --- FUNCIÓN DE PAGINACIÓN ---
+function displayPaginationControls(totalCount) {
+    const paginationContainer = document.getElementById('pagination-controls');
+    if (!paginationContainer) return;
+
+    const totalPages = Math.ceil(totalCount / RESULTS_PER_PAGE);
+    paginationContainer.innerHTML = ''; // Limpiar controles existentes
+
+    if (totalPages <= 1) return; // No mostrar paginación si solo hay una página
+
+    // Botón "Anterior"
+    const prevButton = document.createElement('button');
+    prevButton.textContent = 'Anterior';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+        currentPage--;
+        loadAndFilterResults();
+    });
+    paginationContainer.appendChild(prevButton);
+
+    // Números de página
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        pageButton.classList.toggle('active', i === currentPage);
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            loadAndFilterResults();
+        });
+        paginationContainer.appendChild(pageButton);
+    }
+
+    // Botón "Siguiente"
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Siguiente';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+        currentPage++;
+        loadAndFilterResults();
+    });
+    paginationContainer.appendChild(nextButton);
 }
 
 // --- INICIALIZACIÓN Y EVENT LISTENERS ---
@@ -136,8 +187,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (parentCategory) {
             const { data: subcategories, error: subcatError } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
             if(subcatError) { console.error(subcatError); return; }
-            
-            // --- NUEVA LÓGICA DE CONTEO (ROBUSTA) ---
+
+            // --- LÓGICA DE CONTEO (ROBUSTA) ---
             const subcategoriesWithCounts = [];
             for (const sub of subcategories) {
                 const { count, error } = await supabase
@@ -152,15 +203,46 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 }
             }
-            
+
             displaySubcategoryFilters(subcategoriesWithCounts);
+        } else {
+            // Si no hay categoría padre, mostrar mensaje de no subcategorías
+            displaySubcategoryFilters([]);
         }
+    } else {
+        // Si no hay categoría específica, cargar todas las categorías disponibles con conteos
+        const { data: allCategories, error: catError } = await supabase.from('categorias').select('nombre');
+        if (catError) {
+            console.error(catError);
+            displaySubcategoryFilters([]);
+            return;
+        }
+
+        const categoriesWithCounts = [];
+        for (const cat of allCategories) {
+            const { count, error } = await supabase
+                .from('anuncios')
+                .select('*', { count: 'exact', head: true })
+                .eq('categoria', cat.nombre);
+
+            if (!error && count > 0) {
+                categoriesWithCounts.push({
+                    nombre: cat.nombre,
+                    count: count
+                });
+            }
+        }
+
+        displaySubcategoryFilters(categoriesWithCounts);
     }
 
     await loadAndFilterResults();
 
     const applyBtn = document.getElementById('apply-filters-btn');
     if (applyBtn) {
-        applyBtn.addEventListener('click', loadAndFilterResults);
+        applyBtn.addEventListener('click', () => {
+            currentPage = 1; // Resetear a la primera página al aplicar filtros
+            loadAndFilterResults();
+        });
     }
 });

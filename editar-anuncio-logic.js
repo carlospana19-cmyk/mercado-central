@@ -22,7 +22,11 @@ export function initializeEditPage() {
     const galleryPreviewContainer = document.getElementById('gallery-preview-container');
     const nextBtns = form.querySelectorAll('.next-btn, #continue-to-step2');
     const backBtns = form.querySelectorAll('.back-btn');
+    const vehicleDetails = document.getElementById('vehicle-details');
+    const realestateDetails = document.getElementById('realestate-details');
     let allCategories = [];
+    let selectedMainCategory = '';
+    let selectedSubcategory = '';
 
     // --- DATOS DE DISTRITOS POR PROVINCIA ---
     const districtsByProvince = {
@@ -39,6 +43,20 @@ export function initializeEditPage() {
     };
 
     let galleryFiles = [];
+
+    // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
+    function showDynamicFields() {
+        if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
+            vehicleDetails.style.display = 'block';
+            realestateDetails.style.display = 'none';
+        } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
+            vehicleDetails.style.display = 'none';
+            realestateDetails.style.display = 'block';
+        } else {
+            vehicleDetails.style.display = 'none';
+            realestateDetails.style.display = 'none';
+        }
+    }
 
     // --- LÓGICA DE CARGA DE DATOS (VERSIÓN CORREGIDA) ---
     async function loadAdData(categories) {
@@ -95,9 +113,12 @@ export function initializeEditPage() {
         if (selectedSubcategory) {
             const parentId = selectedSubcategory.parent_id;
             categorySelect.value = parentId;
+            selectedMainCategory = categories.find(c => c.id === parentId)?.nombre || '';
             categorySelect.dispatchEvent(new Event('change'));
             setTimeout(() => {
                 subcategorySelect.value = ad.categoria;
+                selectedSubcategory = ad.categoria;
+                showDynamicFields();
             }, 100);
         }
 
@@ -281,6 +302,7 @@ export function initializeEditPage() {
     // --- EVENT LISTENERS ---
     categorySelect.addEventListener('change', () => {
         const parentId = parseInt(categorySelect.value, 10);
+        selectedMainCategory = allCategories.find(c => c.id === parentId)?.nombre || '';
         const subcategories = allCategories.filter(c => c.parent_id === parentId);
         if (subcategories.length > 0) {
             subcategoryGroup.style.display = 'block';
@@ -294,6 +316,10 @@ export function initializeEditPage() {
         } else {
             subcategoryGroup.style.display = 'none';
         }
+    });
+
+    subcategorySelect.addEventListener('change', function() {
+        selectedSubcategory = this.value;
     });
 
     provinceSelect.addEventListener('change', function() {
@@ -456,9 +482,12 @@ export function initializeEditPage() {
                 step.classList.add('completed');
             } else if (currentStepNumber === stepNumber) {
                 step.classList.add('active');
-        }
+            }
         });
 
-        // (Aquí irá la lógica de campos dinámicos para el Paso 3)
+        // Lógica de campos dinámicos para el Paso 3
+        if (stepNumber === 3) {
+            showDynamicFields();
+        }
     };
 }

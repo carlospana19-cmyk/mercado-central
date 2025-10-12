@@ -365,10 +365,13 @@ form.addEventListener('submit', async (e) => {
             if (galleryFiles.length > 0) {
                 for (const file of galleryFiles) {
                     const galleryFileName = `${user.id}/${Date.now()}-${file.name}`;
-                    const { data: { publicUrl: galleryPublicUrl } } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file).then(({ data }) => supabase.storage.from('imagenes_anuncios').getPublicUrl(data.path));
+                    const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
+                    if (galleryUploadError) throw galleryUploadError;
+
+                    const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
 
                     await supabase.from('imagenes').insert({
-                    anuncio_id: newAd.id,
+                        anuncio_id: newAd.id,
                         url_imagen: galleryPublicUrl,
                         user_id: user.id
                     });
