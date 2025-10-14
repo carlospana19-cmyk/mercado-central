@@ -135,6 +135,9 @@ async function displayProductDetails(ad, galleryImages) {
     // Agregar información detallada del inmueble si existe
     addRealEstateDetails(ad);
 
+    // Agregar información detallada de electrónica si existe
+    addElectronicsDetails(ad);
+
     // Construir la galería con validación de URLs
     const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(url => {
         if (!url) return false;
@@ -233,6 +236,76 @@ async function displayProductDetails(ad, galleryImages) {
         }
     } catch (error) {
         console.error('Error en lógica de edición:', error);
+    }
+}
+
+function addElectronicsDetails(ad) {
+    // Buscar si ya existe un contenedor de detalles de electrónica
+    let electronicsDetailsContainer = document.querySelector('.electronics-details-container');
+
+    // Si no existe, crearlo
+    if (!electronicsDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            electronicsDetailsContainer = document.createElement('div');
+            electronicsDetailsContainer.className = 'electronics-details-container';
+            descriptionContainer.parentNode.insertBefore(electronicsDetailsContainer, descriptionContainer);
+        }
+    }
+
+    // Verificar si el anuncio tiene información de electrónica en atributos_clave (JSONB)
+    const hasElectronicsInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object';
+
+    if (hasElectronicsInfo) {
+        const attr = ad.atributos_clave;
+        let specsHTML = '';
+
+        // Mapeo de atributos a iconos y etiquetas
+        const attrConfig = {
+            marca: { icon: 'fas fa-tag', label: 'Marca' },
+            modelo: { icon: 'fas fa-mobile-alt', label: 'Modelo' },
+            almacenamiento: { icon: 'fas fa-hdd', label: 'Almacenamiento', suffix: ' GB' },
+            memoria_ram: { icon: 'fas fa-microchip', label: 'Memoria RAM', suffix: ' GB' },
+            procesador: { icon: 'fas fa-microchip', label: 'Procesador' },
+            tipo_computadora: { icon: 'fas fa-laptop', label: 'Tipo' },
+            tamano_pantalla: { icon: 'fas fa-desktop', label: 'Pantalla', suffix: '"' },
+            plataforma: { icon: 'fas fa-gamepad', label: 'Plataforma' },
+            tipo_articulo: { icon: 'fas fa-tag', label: 'Tipo de Artículo' },
+            condicion: { icon: 'fas fa-star', label: 'Condición' }
+        };
+
+        // Generar HTML para cada atributo presente
+        Object.keys(attrConfig).forEach(key => {
+            if (attr[key]) {
+                const config = attrConfig[key];
+                const value = attr[key] + (config.suffix || '');
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${config.icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">${config.label}</span>
+                            <span class="spec-value">${value}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (specsHTML) {
+            electronicsDetailsContainer.innerHTML = `
+                <div class="electronics-specs-grid">
+                    <h2>Especificaciones del Artículo Electrónico</h2>
+                    <div class="specs-grid">
+                        ${specsHTML}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        // Si no hay información de electrónica, ocultar el contenedor
+        if (electronicsDetailsContainer) {
+            electronicsDetailsContainer.style.display = 'none';
+        }
     }
 }
 

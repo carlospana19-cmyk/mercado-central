@@ -342,6 +342,32 @@ function displayFilteredProducts(ads) {
             `;
         }
 
+        // --- SECCIÓN: Iconos de atributos de electrónica ---
+        let electronicsDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
+            const attr = ad.atributos_clave;
+            let details = [];
+            
+            // Mostrar hasta 3 atributos más relevantes
+            if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
+            if (attr.modelo) details.push(`<span><i class="fas fa-mobile-alt"></i> ${attr.modelo}</span>`);
+            if (attr.almacenamiento) details.push(`<span><i class="fas fa-hdd"></i> ${attr.almacenamiento} GB</span>`);
+            if (attr.memoria_ram) details.push(`<span><i class="fas fa-microchip"></i> ${attr.memoria_ram} GB RAM</span>`);
+            if (attr.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attr.procesador}</span>`);
+            if (attr.tipo_computadora) details.push(`<span><i class="fas fa-laptop"></i> ${attr.tipo_computadora}</span>`);
+            if (attr.plataforma) details.push(`<span><i class="fas fa-gamepad"></i> ${attr.plataforma}</span>`);
+            if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
+            
+            // Mostrar solo los primeros 3 atributos para no saturar la tarjeta
+            if (details.length > 0) {
+                electronicsDetailsHTML = `
+                    <div class="electronics-details">
+                        ${details.slice(0, 3).join('')}
+                    </div>
+                `;
+            }
+        }
+
             return `
                 <div class="${cardClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
                         <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
@@ -351,6 +377,7 @@ function displayFilteredProducts(ads) {
                         <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.ubicacion || 'N/A'}</div>
                         ${vehicleDetailsHTML}
                         ${realEstateDetailsHTML}
+                        ${electronicsDetailsHTML}
                     <a href="#" class="btn-contact">Contactar</a>
                     </div>
                 </div>

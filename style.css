@@ -564,6 +564,50 @@ body {
     color: var(--color-primario);
     font-size: 1.6rem;
 }
+
+/* === ESTILOS UNIFICADOS PARA TODOS LOS DETALLES DE CATEGORÍAS === */
+
+/* Inmuebles - Mismo estilo que vehículos */
+.real-estate-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.real-estate-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.real-estate-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
+
+/* Electrónica - Mismo estilo (preparado para uso futuro) */
+.electronics-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.electronics-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.electronics-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
 .box .btn-contact {
   display: block;
   text-align: center;
