@@ -19,6 +19,8 @@ export function initializePublishPage() {
     const realestateDetails = document.getElementById('realestate-details');
     const electronicsDetails = document.getElementById('electronics-details');
     const electronicsFields = document.getElementById('electronics-fields');
+    const homeFurnitureDetails = document.getElementById('home-furniture-details');
+    const homeFurnitureFields = document.getElementById('home-furniture-fields');
     const coverImageInput = document.getElementById('cover-image-input');
     const coverImageName = document.getElementById('cover-image-name');
     const galleryDropArea = document.getElementById('gallery-drop-area');
@@ -57,34 +59,61 @@ export function initializePublishPage() {
         "Fotografía": ["tipo_articulo", "marca", "modelo", "condicion"]
     };
 
+    // --- DATOS DE SUBCATEGORÍAS DE HOGAR Y MUEBLES ---
+    const homeFurnitureSubcategories = {
+        "Muebles de Sala": ["tipo_mueble", "material", "color", "dimensiones", "condicion"],
+        "Muebles de Dormitorio": ["tipo_mueble", "material", "color", "dimensiones", "condicion"],
+        "Cocina y Comedor": ["tipo_articulo", "material", "color", "condicion"],
+        "Electrodomésticos": ["tipo_electrodomestico", "marca", "modelo", "condicion"],
+        "Decoración": ["tipo_decoracion", "material", "color", "dimensiones", "condicion"],
+        "Jardín": ["tipo_articulo", "material", "condicion"]
+    };
+
     // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
-    function showDynamicFields() {
-        if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
-            vehicleDetails.style.display = 'block';
-            realestateDetails.style.display = 'none';
-            electronicsDetails.style.display = 'none';
-        } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
-            vehicleDetails.style.display = 'none';
-            realestateDetails.style.display = 'block';
-            electronicsDetails.style.display = 'none';
-        } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
-            console.log('Showing electronics section');
-            vehicleDetails.style.display = 'none';
-            realestateDetails.style.display = 'none';
-            electronicsDetails.style.display = 'block';
-            electronicsDetails.style.border = null;
-            electronicsDetails.style.padding = null;
-            electronicsDetails.style.marginTop = null;
-            electronicsDetails.style.backgroundColor = null;
-            if (selectedSubcategory) {
-                showElectronicsFields();
-            }
-        } else {
-            vehicleDetails.style.display = 'none';
-            realestateDetails.style.display = 'none';
-            electronicsDetails.style.display = 'none';
+function showDynamicFields() {
+    // Deshabilitar todos los inputs de secciones ocultas
+    vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+
+    if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
+        vehicleDetails.style.display = 'block';
+        vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+    } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'block';
+        realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+    } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'block';
+        electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        homeFurnitureDetails.style.display = 'none';
+        if (selectedSubcategory) {
+            showElectronicsFields();
         }
+    } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'block';
+        homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showHomeFurnitureFields();
+        }
+    } else {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
     }
+}
 
     function showElectronicsFields() {
         // --- LÍNEAS DE CORRECCIÓN OBLIGATORIAS ---
@@ -167,7 +196,7 @@ export function initializePublishPage() {
                 labelText = 'Plataforma';
                 const select = document.createElement('select');
                 select.id = `attr-${field}`;
-                select.name = field;
+                select.name = `electronics_${field}`;
                 select.className = 'form-control';
                 select.style.width = '100%';
                 select.style.padding = '8px';
@@ -192,7 +221,7 @@ export function initializePublishPage() {
                 labelText = 'Tipo de Artículo';
                 const select = document.createElement('select');
                 select.id = `attr-${field}`;
-                select.name = field;
+                select.name = `electronics_${field}`;
                 select.className = 'form-control';
                 select.style.width = '100%';
                 select.style.padding = '8px';
@@ -218,7 +247,7 @@ export function initializePublishPage() {
                 labelText = 'Condición';
                 const select = document.createElement('select');
                 select.id = `attr-${field}`;
-                select.name = field;
+                select.name = `electronics_${field}`;
                 select.className = 'form-control';
                 select.style.width = '100%';
                 select.style.padding = '8px';
@@ -280,6 +309,131 @@ export function initializePublishPage() {
             console.log('Added field:', field, 'to electronicsFields');
         });
         console.log('Total fields added:', fields.length);
+    }
+
+    function showHomeFurnitureFields() {
+        const fields = homeFurnitureSubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        homeFurnitureDetails.style.display = 'block';
+        homeFurnitureFields.innerHTML = '';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        homeFurnitureFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            if (field === 'tipo_mueble') {
+                labelText = 'Tipo de Mueble';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Sofá">Sofá</option>
+                    <option value="Mesa">Mesa</option>
+                    <option value="Silla">Silla</option>
+                    <option value="Estantería">Estantería</option>
+                    <option value="Cama">Cama</option>
+                    <option value="Cómoda">Cómoda</option>
+                    <option value="Armario">Armario</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_articulo') {
+                labelText = 'Tipo de Artículo';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Mesa">Mesa</option>
+                    <option value="Silla">Silla</option>
+                    <option value="Utensilio">Utensilio</option>
+                    <option value="Herramienta">Herramienta</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_electrodomestico') {
+                labelText = 'Tipo de Electrodoméstico';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Refrigerador">Refrigerador</option>
+                    <option value="Lavadora">Lavadora</option>
+                    <option value="Microondas">Microondas</option>
+                    <option value="Estufa">Estufa</option>
+                    <option value="Licuadora">Licuadora</option>
+                    <option value="Aspiradora">Aspiradora</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_decoracion') {
+                labelText = 'Tipo de Decoración';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Cuadro">Cuadro</option>
+                    <option value="Espejo">Espejo</option>
+                    <option value="Lámpara">Lámpara</option>
+                    <option value="Alfombra">Alfombra</option>
+                    <option value="Cortina">Cortina</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'condicion') {
+                labelText = 'Condición';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Nuevo">Nuevo</option>
+                    <option value="Usado - Excelente">Usado - Excelente</option>
+                    <option value="Usado - Bueno">Usado - Bueno</option>
+                    <option value="Para Restaurar">Para Restaurar</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'dimensiones') {
+                placeholder = 'Ej: 120x80x75 cm';
+                labelText = 'Dimensiones';
+            } else {
+                placeholder = `Ej: ${labelText}`;
+            }
+
+            if (field !== 'tipo_mueble' && field !== 'tipo_articulo' && field !== 'tipo_electrodomestico' && field !== 'tipo_decoracion' && field !== 'condicion') {
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.placeholder = placeholder;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(input);
+            }
+
+            homeFurnitureFields.appendChild(fieldDiv);
+        });
     }
 
     function loadContactInfo() {
@@ -604,28 +758,41 @@ form.addEventListener('submit', async (e) => {
 
             const formData = new FormData(form);
             const adData = {
-            titulo: formData.get('titulo'),
-            descripcion: formData.get('descripcion'),
-            precio: parseFloat(formData.get('precio')),
-            categoria: formData.get('categoria'),
-            provincia: formData.get('provincia'),
-            distrito: formData.get('distrito'),
+                titulo: formData.get('titulo'),
+                descripcion: formData.get('descripcion'),
+                precio: parseFloat(formData.get('precio')),
+                categoria: formData.get('categoria'),
+                provincia: formData.get('provincia'),
+                distrito: formData.get('distrito'),
                 user_id: user.id,
-            url_portada: coverPublicUrl,
-            fecha_publicacion: new Date().toISOString(),
-            // --- NUEVOS CAMPOS AÑADIDOS ---
-            marca: formData.get('marca') || null,
-            anio: formData.get('anio') ? parseInt(formData.get('anio')) : null,
-            kilometraje: formData.get('kilometraje') ? parseInt(formData.get('kilometraje')) : null,
-            transmision: formData.get('transmision') || null,
-            combustible: formData.get('combustible') || null,
-            // --- CAMPOS DE INMUEBLES ---
-            m2: formData.get('m2') ? parseInt(formData.get('m2')) : null,
-            habitaciones: formData.get('habitaciones') ? parseInt(formData.get('habitaciones')) : null,
-            baños: formData.get('baños') ? parseInt(formData.get('baños')) : null,
-            // --- CAMPOS DE ELECTRÓNICA (JSONB) ---
-            atributos_clave: selectedMainCategory.toLowerCase().includes('electrónica') ? buildElectronicsJSON(formData) : null
-        };
+                url_portada: coverPublicUrl,
+                fecha_publicacion: new Date().toISOString()
+            };
+
+            // --- CAMPOS DE VEHÍCULO (solo si es vehículo) ---
+            if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
+                adData.marca = formData.get('marca') || null;
+                adData.anio = formData.get('anio') ? parseInt(formData.get('anio')) : null;
+                adData.kilometraje = formData.get('kilometraje') ? parseInt(formData.get('kilometraje')) : null;
+                adData.transmision = formData.get('transmision') || null;
+                adData.combustible = formData.get('combustible') || null;
+            }
+
+            // --- CAMPOS DE INMUEBLES (solo si es inmueble) ---
+            if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
+                adData.m2 = formData.get('m2') ? parseInt(formData.get('m2')) : null;
+                adData.habitaciones = formData.get('habitaciones') ? parseInt(formData.get('habitaciones')) : null;
+                adData.baños = formData.get('baños') ? parseInt(formData.get('baños')) : null;
+            }
+
+            // --- ATRIBUTOS JSONB (para Electrónica, Hogar, etc.) ---
+            if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+                adData.atributos_clave = buildElectronicsJSON(formData);
+            } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
+                adData.atributos_clave = buildHomeFurnitureJSON(formData);
+            } else {
+                adData.atributos_clave = null;
+            }
         
             const { data: newAd, error: adInsertError } = await supabase
                 .from('anuncios')
@@ -664,11 +831,45 @@ form.addEventListener('submit', async (e) => {
 
     // --- FUNCIÓN PARA CONSTRUIR JSON DE ELECTRÓNICA ---
     function buildElectronicsJSON(formData) {
+        console.log('🔵 === BUILD ELECTRONICS JSON INICIADO ===');
+
         const json = {
             subcategoria: selectedSubcategory
         };
 
         const fields = electronicsSubcategories[selectedSubcategory];
+        console.log('🔵 Subcategoría:', selectedSubcategory);
+        console.log('🔵 Campos esperados:', fields);
+
+        // Mostrar TODOS los datos del FormData
+        console.log('🔵 FormData completo:');
+        for (let pair of formData.entries()) {
+            console.log(`   ${pair[0]}: "${pair[1]}"`);
+        }
+
+        if (fields) {
+            console.log('🔵 Procesando campos:');
+            fields.forEach(field => {
+                const value = formData.get(field);
+                console.log(`   → "${field}" = "${value}" (${value ? 'OK' : 'VACÍO'})`);
+                if (value) {
+                    json[field] = value;
+                }
+            });
+        }
+
+        console.log('🔵 JSON FINAL:', JSON.stringify(json, null, 2));
+        console.log('🔵 === BUILD ELECTRONICS JSON TERMINADO ===');
+        return json;
+    }
+
+    // --- FUNCIÓN PARA CONSTRUIR JSON DE HOGAR Y MUEBLES ---
+    function buildHomeFurnitureJSON(formData) {
+        const json = {
+            subcategoria: selectedSubcategory
+        };
+
+        const fields = homeFurnitureSubcategories[selectedSubcategory];
         if (fields) {
             fields.forEach(field => {
                 const value = formData.get(field);

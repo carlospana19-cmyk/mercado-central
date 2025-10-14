@@ -138,6 +138,9 @@ async function displayProductDetails(ad, galleryImages) {
     // Agregar información detallada de electrónica si existe
     addElectronicsDetails(ad);
 
+    // Agregar información detallada de hogar y muebles si existe
+    addHomeFurnitureDetails(ad);
+
     // Construir la galería con validación de URLs
     const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(url => {
         if (!url) return false;
@@ -254,10 +257,22 @@ function addElectronicsDetails(ad) {
     }
 
     // Verificar si el anuncio tiene información de electrónica en atributos_clave (JSONB)
-    const hasElectronicsInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object';
+    const hasElectronicsInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
 
     if (hasElectronicsInfo) {
         const attr = ad.atributos_clave;
+
+        // Lista de subcategorías de electrónica para verificar
+        const electronicsSubcats = ["Celulares y Teléfonos", "Computadoras", "Consolas y Videojuegos", "Audio y Video", "Fotografía"];
+
+        // Solo procesar si es realmente electrónica
+        if (!electronicsSubcats.includes(attr.subcategoria)) {
+            if (electronicsDetailsContainer) {
+                electronicsDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
         let specsHTML = '';
 
         // Mapeo de atributos a iconos y etiquetas
@@ -305,6 +320,121 @@ function addElectronicsDetails(ad) {
         // Si no hay información de electrónica, ocultar el contenedor
         if (electronicsDetailsContainer) {
             electronicsDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addHomeFurnitureDetails(ad) {
+    // Buscar si ya existe un contenedor de detalles de hogar
+    let homeFurnitureDetailsContainer = document.querySelector('.home-furniture-details-container');
+
+    // Si no existe, crearlo
+    if (!homeFurnitureDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            homeFurnitureDetailsContainer = document.createElement('div');
+            homeFurnitureDetailsContainer.className = 'home-furniture-details-container';
+            descriptionContainer.parentNode.insertBefore(homeFurnitureDetailsContainer, descriptionContainer);
+        }
+    }
+
+    // Verificar si el anuncio tiene información de hogar/muebles en atributos_clave (JSONB)
+    const hasHomeFurnitureInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasHomeFurnitureInfo) {
+        const attr = ad.atributos_clave;
+
+        // Lista de subcategorías de hogar para verificar
+        const homeFurnitureSubcats = ["Muebles de Sala", "Muebles de Dormitorio", "Cocina y Comedor", "Electrodomésticos", "Decoración", "Jardín"];
+
+        // Solo procesar si es realmente hogar/muebles
+        if (!homeFurnitureSubcats.includes(attr.subcategoria)) {
+            if (homeFurnitureDetailsContainer) {
+                homeFurnitureDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
+        // Verificar si es Hogar (no Electrónica)
+        if (attr.tipo_mueble || attr.tipo_articulo || attr.tipo_electrodomestico || attr.tipo_decoracion || attr.material) {
+            let specsHTML = '';
+
+            // Mapeo de atributos a iconos y etiquetas
+            const attrConfig = {
+                tipo_mueble: { icon: 'fas fa-couch', label: 'Tipo de Mueble' },
+                tipo_articulo: { icon: 'fas fa-utensils', label: 'Tipo de Artículo' },
+                tipo_decoracion: { icon: 'fas fa-paint-brush', label: 'Tipo' },
+                marca: { icon: 'fas fa-copyright', label: 'Marca' },
+                material: { icon: 'fas fa-cube', label: 'Material' },
+                color: { icon: 'fas fa-palette', label: 'Color' },
+                dimensiones: { icon: 'fas fa-ruler-combined', label: 'Dimensiones' },
+                condicion: { icon: 'fas fa-check-circle', label: 'Condición' }
+            };
+
+            // Iconos específicos para electrodomésticos
+            if (attr.tipo_electrodomestico) {
+                const electroIcon = {
+                    'Refrigerador': 'fas fa-snowflake',
+                    'Lavadora': 'fas fa-tint',
+                    'Microondas': 'fas fa-fire',
+                    'Estufa': 'fas fa-fire-alt',
+                    'Licuadora': 'fas fa-blender',
+                    'Aspiradora': 'fas fa-wind'
+                };
+                const icon = electroIcon[attr.tipo_electrodomestico] || 'fas fa-plug';
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">Tipo</span>
+                            <span class="spec-value">${attr.tipo_electrodomestico}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Agregar modelo solo si existe y no es electrodoméstico (para evitar duplicados)
+            if (attr.modelo) {
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="fas fa-barcode"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">Modelo</span>
+                            <span class="spec-value">${attr.modelo}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Generar HTML para cada atributo presente
+            Object.keys(attrConfig).forEach(key => {
+                if (attr[key]) {
+                    const config = attrConfig[key];
+                    specsHTML += `
+                        <div class="spec-item">
+                            <i class="${config.icon}"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">${config.label}</span>
+                                <span class="spec-value">${attr[key]}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (specsHTML) {
+                homeFurnitureDetailsContainer.innerHTML = `
+                    <div class="home-furniture-specs-grid">
+                        <h2>Detalles del Artículo</h2>
+                        <div class="specs-grid">${specsHTML}</div>
+                    </div>
+                `;
+            }
+        }
+    } else {
+        // Si no hay información de hogar, ocultar el contenedor
+        if (homeFurnitureDetailsContainer) {
+            homeFurnitureDetailsContainer.style.display = 'none';
         }
     }
 }

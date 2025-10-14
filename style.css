@@ -608,6 +608,27 @@ body {
     color: var(--color-primario);
     font-size: 1.6rem;
 }
+
+/* Hogar y Muebles - Mismo estilo */
+.home-furniture-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.home-furniture-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.home-furniture-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
 .box .btn-contact {
   display: block;
   text-align: center;

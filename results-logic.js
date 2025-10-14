@@ -346,25 +346,76 @@ function displayFilteredProducts(ads) {
         let electronicsDetailsHTML = '';
         if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
             const attr = ad.atributos_clave;
-            let details = [];
-            
-            // Mostrar hasta 3 atributos más relevantes
-            if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
-            if (attr.modelo) details.push(`<span><i class="fas fa-mobile-alt"></i> ${attr.modelo}</span>`);
-            if (attr.almacenamiento) details.push(`<span><i class="fas fa-hdd"></i> ${attr.almacenamiento} GB</span>`);
-            if (attr.memoria_ram) details.push(`<span><i class="fas fa-microchip"></i> ${attr.memoria_ram} GB RAM</span>`);
-            if (attr.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attr.procesador}</span>`);
-            if (attr.tipo_computadora) details.push(`<span><i class="fas fa-laptop"></i> ${attr.tipo_computadora}</span>`);
-            if (attr.plataforma) details.push(`<span><i class="fas fa-gamepad"></i> ${attr.plataforma}</span>`);
-            if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
-            
-            // Mostrar solo los primeros 3 atributos para no saturar la tarjeta
-            if (details.length > 0) {
-                electronicsDetailsHTML = `
-                    <div class="electronics-details">
-                        ${details.slice(0, 3).join('')}
-                    </div>
-                `;
+
+            // Lista de subcategorías de electrónica
+            const electronicsSubcats = ["Celulares y Teléfonos", "Computadoras", "Consolas y Videojuegos", "Audio y Video", "Fotografía"];
+
+            // Solo mostrar si es categoría Electrónica
+            if (attr.subcategoria && electronicsSubcats.includes(attr.subcategoria)) {
+                let details = [];
+
+                if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
+                if (attr.modelo) details.push(`<span><i class="fas fa-mobile-alt"></i> ${attr.modelo}</span>`);
+                if (attr.almacenamiento) details.push(`<span><i class="fas fa-hdd"></i> ${attr.almacenamiento} GB</span>`);
+                if (attr.memoria_ram) details.push(`<span><i class="fas fa-microchip"></i> ${attr.memoria_ram} GB RAM</span>`);
+                if (attr.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attr.procesador}</span>`);
+                if (attr.tipo_computadora) details.push(`<span><i class="fas fa-laptop"></i> ${attr.tipo_computadora}</span>`);
+                if (attr.plataforma) details.push(`<span><i class="fas fa-gamepad"></i> ${attr.plataforma}</span>`);
+                if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
+
+                // Mostrar solo los primeros 3 atributos para no saturar la tarjeta
+                if (details.length > 0) {
+                    electronicsDetailsHTML = `
+                        <div class="electronics-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // --- SECCIÓN: Iconos de atributos de hogar y muebles ---
+        let homeFurnitureDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
+            const attr = ad.atributos_clave;
+
+            // Lista de subcategorías de hogar
+            const homeFurnitureSubcats = ["Muebles de Sala", "Muebles de Dormitorio", "Cocina y Comedor", "Electrodomésticos", "Decoración", "Jardín"];
+
+            // Solo mostrar si es categoría Hogar/Muebles
+            if (attr.subcategoria && homeFurnitureSubcats.includes(attr.subcategoria)) {
+                let details = [];
+
+                // Iconos específicos por tipo de electrodoméstico
+                if (attr.tipo_electrodomestico) {
+                    const electroIcon = {
+                        'Refrigerador': 'fas fa-snowflake',
+                        'Lavadora': 'fas fa-tint',
+                        'Microondas': 'fas fa-fire',
+                        'Estufa': 'fas fa-fire-alt',
+                        'Licuadora': 'fas fa-blender',
+                        'Aspiradora': 'fas fa-wind'
+                    };
+                    const icon = electroIcon[attr.tipo_electrodomestico] || 'fas fa-plug';
+                    details.push(`<span><i class="${icon}"></i> ${attr.tipo_electrodomestico}</span>`);
+                }
+
+                if (attr.tipo_mueble) details.push(`<span><i class="fas fa-couch"></i> ${attr.tipo_mueble}</span>`);
+                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-utensils"></i> ${attr.tipo_articulo}</span>`);
+                if (attr.tipo_decoracion) details.push(`<span><i class="fas fa-paint-brush"></i> ${attr.tipo_decoracion}</span>`);
+                if (attr.material) details.push(`<span><i class="fas fa-cube"></i> ${attr.material}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-copyright"></i> ${attr.marca}</span>`);
+                if (attr.color) details.push(`<span><i class="fas fa-palette"></i> ${attr.color}</span>`);
+                if (attr.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attr.condicion}</span>`);
+
+                // Mostrar solo los primeros 3 atributos
+                if (details.length > 0) {
+                    homeFurnitureDetailsHTML = `
+                        <div class="home-furniture-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -378,6 +429,7 @@ function displayFilteredProducts(ads) {
                         ${vehicleDetailsHTML}
                         ${realEstateDetailsHTML}
                         ${electronicsDetailsHTML}
+                        ${homeFurnitureDetailsHTML}
                     <a href="#" class="btn-contact">Contactar</a>
                     </div>
                 </div>

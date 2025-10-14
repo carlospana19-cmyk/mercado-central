@@ -26,6 +26,8 @@ export function initializeEditPage() {
     const realestateDetails = document.getElementById('realestate-details');
     const electronicsDetails = document.getElementById('electronics-details');
     const electronicsFields = document.getElementById('electronics-fields');
+    const homeFurnitureDetails = document.getElementById('home-furniture-details');
+    const homeFurnitureFields = document.getElementById('home-furniture-fields');
     let allCategories = [];
     let selectedMainCategory = '';
     let selectedSubcategory = '';
@@ -55,27 +57,57 @@ export function initializeEditPage() {
         "Fotografía": ["tipo_articulo", "marca", "modelo", "condicion"]
     };
 
+    // --- DATOS DE SUBCATEGORÍAS DE HOGAR Y MUEBLES ---
+    const homeFurnitureSubcategories = {
+        "Muebles de Sala": ["tipo_mueble", "material", "color", "dimensiones", "condicion"],
+        "Muebles de Dormitorio": ["tipo_mueble", "material", "color", "dimensiones", "condicion"],
+        "Cocina y Comedor": ["tipo_articulo", "material", "color", "condicion"],
+        "Electrodomésticos": ["tipo_electrodomestico", "marca", "modelo", "condicion"],
+        "Decoración": ["tipo_decoracion", "material", "color", "dimensiones", "condicion"],
+        "Jardín": ["tipo_articulo", "material", "condicion"]
+    };
+
     // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
-    function showDynamicFields() {
-        if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
-            vehicleDetails.style.display = 'block';
-            realestateDetails.style.display = 'none';
-            electronicsDetails.style.display = 'none';
-        } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
-            vehicleDetails.style.display = 'none';
-            realestateDetails.style.display = 'block';
-            electronicsDetails.style.display = 'none';
-        } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
-            vehicleDetails.style.display = 'none';
-            realestateDetails.style.display = 'none';
-            electronicsDetails.style.display = 'block';
-            showElectronicsFields();
-        } else {
-            vehicleDetails.style.display = 'none';
-            realestateDetails.style.display = 'none';
-            electronicsDetails.style.display = 'none';
-        }
+function showDynamicFields() {
+    // Deshabilitar todos los inputs de secciones ocultas
+    vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+
+    if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
+        vehicleDetails.style.display = 'block';
+        vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+    } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'block';
+        realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+    } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'block';
+        electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        homeFurnitureDetails.style.display = 'none';
+        showElectronicsFields();
+    } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'block';
+        homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        showHomeFurnitureFields();
+    } else {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
     }
+}
 
     function showElectronicsFields() {
         const fields = electronicsSubcategories[selectedSubcategory];
@@ -196,6 +228,131 @@ export function initializeEditPage() {
         });
     }
 
+    function showHomeFurnitureFields() {
+        const fields = homeFurnitureSubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        homeFurnitureDetails.style.display = 'block';
+        homeFurnitureFields.innerHTML = '';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        homeFurnitureFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            if (field === 'tipo_mueble') {
+                labelText = 'Tipo de Mueble';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Sofá">Sofá</option>
+                    <option value="Mesa">Mesa</option>
+                    <option value="Silla">Silla</option>
+                    <option value="Estantería">Estantería</option>
+                    <option value="Cama">Cama</option>
+                    <option value="Cómoda">Cómoda</option>
+                    <option value="Armario">Armario</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_articulo') {
+                labelText = 'Tipo de Artículo';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Mesa">Mesa</option>
+                    <option value="Silla">Silla</option>
+                    <option value="Utensilio">Utensilio</option>
+                    <option value="Herramienta">Herramienta</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_electrodomestico') {
+                labelText = 'Tipo de Electrodoméstico';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Refrigerador">Refrigerador</option>
+                    <option value="Lavadora">Lavadora</option>
+                    <option value="Microondas">Microondas</option>
+                    <option value="Estufa">Estufa</option>
+                    <option value="Licuadora">Licuadora</option>
+                    <option value="Aspiradora">Aspiradora</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_decoracion') {
+                labelText = 'Tipo de Decoración';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Cuadro">Cuadro</option>
+                    <option value="Espejo">Espejo</option>
+                    <option value="Lámpara">Lámpara</option>
+                    <option value="Alfombra">Alfombra</option>
+                    <option value="Cortina">Cortina</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'condicion') {
+                labelText = 'Condición';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Nuevo">Nuevo</option>
+                    <option value="Usado - Excelente">Usado - Excelente</option>
+                    <option value="Usado - Bueno">Usado - Bueno</option>
+                    <option value="Para Restaurar">Para Restaurar</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'dimensiones') {
+                placeholder = 'Ej: 120x80x75 cm';
+                labelText = 'Dimensiones';
+            } else {
+                placeholder = `Ej: ${labelText}`;
+            }
+
+            if (field !== 'tipo_mueble' && field !== 'tipo_articulo' && field !== 'tipo_electrodomestico' && field !== 'tipo_decoracion' && field !== 'condicion') {
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.placeholder = placeholder;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(input);
+            }
+
+            homeFurnitureFields.appendChild(fieldDiv);
+        });
+    }
+
     // --- LÓGICA DE CARGA DE DATOS (VERSIÓN CORREGIDA) ---
     async function loadAdData(categories) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -293,6 +450,20 @@ if (foundCategory) {
             }
         }
 
+        // --- CARGA DE DATOS DE HOGAR Y MUEBLES DESDE JSONB ---
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' &&
+            (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble'))) {
+            const atributos = ad.atributos_clave;
+            if (atributos.subcategoria) {
+                selectedSubcategory = atributos.subcategoria;
+                setTimeout(() => {
+                    subcategorySelect.value = atributos.subcategoria;
+                    showDynamicFields();
+                    fillHomeFurnitureFields(atributos);
+                }, 100);
+            }
+        }
+
         // --- Carga de datos de vehículo ---
         document.getElementById('attr-marca').value = ad.marca || '';
         document.getElementById('attr-anio').value = ad.anio || '';
@@ -339,17 +510,33 @@ if (foundCategory) {
             distrito: formData.get('distrito'),
             direccion_especifica: formData.get('direccion_especifica'),
             contact_name: formData.get('contact_name'),
-            contact_phone: formData.get('contact_phone'),
-
-            // --- NUEVOS CAMPOS DE VEHÍCULO ---
-            marca: formData.get('marca') || null,
-            anio: formData.get('anio') ? parseInt(formData.get('anio')) : null,
-            kilometraje: formData.get('kilometraje') ? parseInt(formData.get('kilometraje')) : null,
-            transmision: formData.get('transmision') || null,
-            combustible: formData.get('combustible') || null,
-            // --- CAMPOS DE ELECTRÓNICA (JSONB) ---
-            atributos_clave: selectedMainCategory.toLowerCase().includes('electrónica') ? buildElectronicsJSON(formData) : null
+            contact_phone: formData.get('contact_phone')
         };
+
+        // --- CAMPOS DE VEHÍCULO (solo si es vehículo) ---
+        if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
+            adData.marca = formData.get('marca') || null;
+            adData.anio = formData.get('anio') ? parseInt(formData.get('anio')) : null;
+            adData.kilometraje = formData.get('kilometraje') ? parseInt(formData.get('kilometraje')) : null;
+            adData.transmision = formData.get('transmision') || null;
+            adData.combustible = formData.get('combustible') || null;
+        }
+
+        // --- CAMPOS DE INMUEBLES (solo si es inmueble) ---
+        if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
+            adData.m2 = formData.get('m2') ? parseInt(formData.get('m2')) : null;
+            adData.habitaciones = formData.get('habitaciones') ? parseInt(formData.get('habitaciones')) : null;
+            adData.baños = formData.get('baños') ? parseInt(formData.get('baños')) : null;
+        }
+
+        // --- ATRIBUTOS JSONB (para Electrónica, Hogar, etc.) ---
+        if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+            adData.atributos_clave = buildElectronicsJSON(formData);
+        } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
+            adData.atributos_clave = buildHomeFurnitureJSON(formData);
+        } else {
+            adData.atributos_clave = null;
+        }
 
         // --- 2. MANEJAR ACTUALIZACIÓN DE IMAGEN DE PORTADA (NUEVA LÓGICA) ---
         const coverImageInput = document.getElementById('cover-image-input');
@@ -481,6 +668,8 @@ if (foundCategory) {
         selectedSubcategory = this.value;
         if (selectedMainCategory.toLowerCase().includes('electrónica')) {
             showElectronicsFields();
+        } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
+            showHomeFurnitureFields();
         }
     });
 
@@ -650,9 +839,41 @@ if (foundCategory) {
         return json;
     }
 
+    // --- FUNCIÓN PARA CONSTRUIR JSON DE HOGAR Y MUEBLES ---
+    function buildHomeFurnitureJSON(formData) {
+        const json = {
+            subcategoria: selectedSubcategory
+        };
+
+        const fields = homeFurnitureSubcategories[selectedSubcategory];
+        if (fields) {
+            fields.forEach(field => {
+                const value = formData.get(field);
+                if (value) {
+                    json[field] = value;
+                }
+            });
+        }
+
+        return json;
+    }
+
     // --- FUNCIÓN PARA RELLENAR CAMPOS DE ELECTRÓNICA ---
     function fillElectronicsFields(atributos) {
         const fields = electronicsSubcategories[selectedSubcategory];
+        if (!fields) return;
+
+        fields.forEach(field => {
+            const element = document.getElementById(`attr-${field}`);
+            if (element && atributos[field]) {
+                element.value = atributos[field];
+            }
+        });
+    }
+
+    // --- FUNCIÓN PARA RELLENAR CAMPOS DE HOGAR Y MUEBLES ---
+    function fillHomeFurnitureFields(atributos) {
+        const fields = homeFurnitureSubcategories[selectedSubcategory];
         if (!fields) return;
 
         fields.forEach(field => {
