@@ -17,6 +17,8 @@ export function initializePublishPage() {
     const districtSelect = document.getElementById('district');
     const vehicleDetails = document.getElementById('vehicle-details');
     const realestateDetails = document.getElementById('realestate-details');
+    const electronicsDetails = document.getElementById('electronics-details');
+    const electronicsFields = document.getElementById('electronics-fields');
     const coverImageInput = document.getElementById('cover-image-input');
     const coverImageName = document.getElementById('cover-image-name');
     const galleryDropArea = document.getElementById('gallery-drop-area');
@@ -46,18 +48,238 @@ export function initializePublishPage() {
         'Bocas del Toro': ['Bocas del Toro', 'Changuinola', 'Almirante', 'Chiriquí Grande']
     };
 
+    // --- DATOS DE SUBCATEGORÍAS DE ELECTRÓNICA ---
+    const electronicsSubcategories = {
+        "Celulares y Teléfonos": ["marca", "modelo", "almacenamiento", "memoria_ram", "condicion"],
+        "Computadoras": ["tipo_computadora", "marca", "procesador", "memoria_ram", "almacenamiento", "tamano_pantalla", "condicion"],
+        "Consolas y Videojuegos": ["plataforma", "modelo", "almacenamiento", "condicion"],
+        "Audio y Video": ["tipo_articulo", "marca", "modelo", "condicion"],
+        "Fotografía": ["tipo_articulo", "marca", "modelo", "condicion"]
+    };
+
     // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
     function showDynamicFields() {
         if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
             vehicleDetails.style.display = 'block';
             realestateDetails.style.display = 'none';
+            electronicsDetails.style.display = 'none';
         } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
             vehicleDetails.style.display = 'none';
             realestateDetails.style.display = 'block';
+            electronicsDetails.style.display = 'none';
+        } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+            console.log('Showing electronics section');
+            vehicleDetails.style.display = 'none';
+            realestateDetails.style.display = 'none';
+            electronicsDetails.style.display = 'block';
+            electronicsDetails.style.border = null;
+            electronicsDetails.style.padding = null;
+            electronicsDetails.style.marginTop = null;
+            electronicsDetails.style.backgroundColor = null;
+            if (selectedSubcategory) {
+                showElectronicsFields();
+            }
         } else {
             vehicleDetails.style.display = 'none';
             realestateDetails.style.display = 'none';
+            electronicsDetails.style.display = 'none';
         }
+    }
+
+    function showElectronicsFields() {
+        // --- LÍNEAS DE CORRECCIÓN OBLIGATORIAS ---
+        const container = document.getElementById('electronics-fields');
+        const mainSection = document.getElementById('electronics-details'); // El contenedor padre
+
+        // Forzar visibilidad
+        if (mainSection) {
+            mainSection.style.display = 'block';
+            mainSection.style.visibility = 'visible';
+        }
+        if (container) {
+            container.innerHTML = ''; // Limpia el contenedor antes de añadir nuevos campos
+        } else {
+            console.error('¡ERROR CRÍTICO! Los contenedores HTML no se encontraron. Revisa los IDs.');
+            return; // Detiene la función si los divs no existen
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+
+        const fields = electronicsSubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        // PRIORIDAD #1: Asegurar visibilidad del contenedor principal
+        electronicsDetails.style.display = 'block';
+        electronicsDetails.style.border = null;
+        electronicsDetails.style.padding = null;
+        electronicsDetails.style.marginTop = null;
+        electronicsDetails.style.backgroundColor = null;
+
+        // PRIORIDAD #2: Limpiar el contenedor de campos
+        electronicsFields.innerHTML = '';
+
+        // PRIORIDAD #3: Añadir título descriptivo
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: var(--color-primario); margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        electronicsFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+            fieldDiv.style.marginBottom = '15px';
+            fieldDiv.style.padding = '10px';
+            fieldDiv.style.border = '1px solid #ddd';
+            fieldDiv.style.borderRadius = '5px';
+            fieldDiv.style.backgroundColor = 'white';
+            // Removed debugging styles
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            if (field === 'tipo_computadora') {
+                labelText = 'Tipo de Computadora';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.className = 'form-control';
+                select.style.width = '100%';
+                select.style.padding = '8px';
+                select.style.border = '1px solid #ccc';
+                select.style.borderRadius = '4px';
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="Escritorio">Escritorio</option>
+                `;
+                const label = document.createElement('label');
+                label.textContent = labelText;
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = 'bold';
+                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(select);
+            } else if (field === 'plataforma') {
+                labelText = 'Plataforma';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.className = 'form-control';
+                select.style.width = '100%';
+                select.style.padding = '8px';
+                select.style.border = '1px solid #ccc';
+                select.style.borderRadius = '4px';
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="PlayStation">PlayStation</option>
+                    <option value="Xbox">Xbox</option>
+                    <option value="Nintendo">Nintendo</option>
+                    <option value="PC">PC</option>
+                    <option value="Otra">Otra</option>
+                `;
+                const label = document.createElement('label');
+                label.textContent = labelText;
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = 'bold';
+                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_articulo') {
+                labelText = 'Tipo de Artículo';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.className = 'form-control';
+                select.style.width = '100%';
+                select.style.padding = '8px';
+                select.style.border = '1px solid #ccc';
+                select.style.borderRadius = '4px';
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="TV">TV</option>
+                    <option value="Auricular">Auricular</option>
+                    <option value="Parlante">Parlante</option>
+                    <option value="Cámara">Cámara</option>
+                    <option value="Lente">Lente</option>
+                    <option value="Otro">Otro</option>
+                `;
+                const label = document.createElement('label');
+                label.textContent = labelText;
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = 'bold';
+                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(select);
+            } else if (field === 'condicion') {
+                labelText = 'Condición';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.className = 'form-control';
+                select.style.width = '100%';
+                select.style.padding = '8px';
+                select.style.border = '1px solid #ccc';
+                select.style.borderRadius = '4px';
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Nuevo">Nuevo</option>
+                    <option value="Usado - Como Nuevo">Usado - Como Nuevo</option>
+                    <option value="Usado - Bueno">Usado - Bueno</option>
+                    <option value="Usado - Aceptable">Usado - Aceptable</option>
+                    <option value="Para Repuestos">Para Repuestos</option>
+                `;
+                const label = document.createElement('label');
+                label.textContent = labelText;
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = 'bold';
+                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(select);
+            } else if (field === 'memoria_ram') {
+                inputType = 'number';
+                placeholder = 'Ej: 8';
+                labelText = 'Memoria RAM (GB)';
+            } else if (field === 'almacenamiento') {
+                inputType = 'number';
+                placeholder = 'Ej: 256';
+                labelText = 'Almacenamiento (GB)';
+            } else if (field === 'tamano_pantalla') {
+                inputType = 'number';
+                placeholder = 'Ej: 15.6';
+                labelText = 'Tamaño de Pantalla (pulgadas)';
+            } else {
+                placeholder = `Ej: ${labelText}`;
+            }
+
+            if (field !== 'tipo_computadora' && field !== 'plataforma' && field !== 'tipo_articulo' && field !== 'condicion') {
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.placeholder = placeholder;
+                input.className = 'form-control';
+                input.style.width = '100%';
+                input.style.padding = '8px';
+                input.style.border = '1px solid #ccc';
+                input.style.borderRadius = '4px';
+                input.style.boxSizing = 'border-box';
+                const label = document.createElement('label');
+                label.textContent = labelText;
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = 'bold';
+                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(input);
+            }
+
+            electronicsFields.appendChild(fieldDiv);
+            console.log('Added field:', field, 'to electronicsFields');
+        });
+        console.log('Total fields added:', fields.length);
     }
 
     function loadContactInfo() {
@@ -134,12 +356,17 @@ export function initializePublishPage() {
     
     // --- LÓGICA DE CATEGORÍAS ---
     async function loadAllCategories() {
+        console.log('Fetching all categories from Supabase...');
         const { data, error } = await supabase.from('categorias').select('id, nombre, parent_id').order('nombre');
-        if (error) { console.error("Error al cargar categorías:", error); return; }
-        
+        if (error) {
+            console.error("SUPABASE FETCH FAILED:", error);
+            return;
+        }
+        console.log('Data received from Supabase:', data);
+
         allCategories = data;
         const mainCategories = allCategories.filter(c => c.parent_id === null);
-        
+
         categorySelect.innerHTML = '<option value="" disabled selected>Selecciona una categoría principal</option>';
         mainCategories.forEach(group => {
             const option = document.createElement('option');
@@ -152,7 +379,13 @@ export function initializePublishPage() {
     categorySelect.addEventListener('change', function() {
         const selectedParentId = parseInt(this.value, 10);
         selectedMainCategory = allCategories.find(c => c.id === selectedParentId)?.nombre || '';
+        console.log('Category changed. Selected Main Category:', selectedMainCategory, 'ID:', selectedParentId);
         const subcategories = allCategories.filter(c => c.parent_id === selectedParentId);
+
+        if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+            console.log('Fetching subcategories for Electronics...');
+            console.log('Subcategories data:', subcategories);
+        }
 
         if (subcategories.length > 0) {
             subcategorySelect.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
@@ -160,19 +393,36 @@ export function initializePublishPage() {
                 const option = document.createElement('option');
                 option.value = sub.nombre;
                 option.textContent = sub.nombre;
-            subcategorySelect.appendChild(option);
-    });
+                subcategorySelect.appendChild(option);
+            });
             subcategoryGroup.style.display = 'block';
+            console.log('Subcategories loaded:', subcategories.map(s => s.nombre));
         } else {
             // Si una categoría principal no tiene hijos, la tratamos como la selección final
             subcategoryGroup.style.display = 'none';
             subcategorySelect.innerHTML = '';
+            console.log('No subcategories for this main category.');
         }
+
+        // Mostrar campos dinámicos inmediatamente al cambiar categoría
+        console.log('Calling showDynamicFields from category change.');
+        showDynamicFields();
     });
 
     subcategorySelect.addEventListener('change', function() {
         selectedSubcategory = this.value;
+        console.log('Subcategory changed to:', selectedSubcategory);
+        console.log('Main category is:', selectedMainCategory);
+        if (selectedMainCategory.toLowerCase().includes('electrónica')) {
+            console.log('Main category is Electrónica. Calling showElectronicsFields.');
+            showElectronicsFields();
+        } else {
+            console.log('Main category is NOT Electrónica. Not calling showElectronicsFields.');
+        }
     });
+
+    // REMOVER EVENT LISTENER DUPLICADO si existe
+    // Verificar que no haya otro addEventListener llamando a showElectronicsFields
 
     // --- EVENT LISTENERS PARA SUBIDA DE IMÁGENES ---
     coverImageInput.addEventListener('change', function() {
@@ -314,21 +564,37 @@ export function initializePublishPage() {
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-        const publishButton = document.getElementById('publish-ad-btn');
-        publishButton.disabled = true;
-        publishButton.textContent = 'Publicando...';
+    const publishButton = document.getElementById('publish-ad-btn');
+    publishButton.disabled = true;
+    publishButton.textContent = 'Publicando...';
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            alert('Debes iniciar sesión para poder publicar.');
-            publishButton.disabled = false;
-            publishButton.textContent = 'Publicar Anuncio';
-                return;
-            }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        alert('Debes iniciar sesión para poder publicar.');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
 
-        try {
-            const coverImageFile = coverImageInput.files[0];
-            if (!coverImageFile) throw new Error("La imagen de portada es obligatoria.");
+    // --- VALIDACIÓN FINAL ANTES DE ENVIAR ---
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const price = document.getElementById('price').value.trim();
+    const category = categorySelect.value;
+    const subcategory = subcategorySelect.value;
+    const province = provinceSelect.value;
+    const district = districtSelect.value;
+    const coverImageFile = coverImageInput.files[0];
+
+    if (!title || !description || !price || !category || !subcategory || !province || !district || !coverImageFile) {
+        alert('Por favor, completa todos los campos obligatorios (Título, Descripción, Precio, Categoría, Ubicación e Imagen de Portada).');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
+
+    try {
+        if (!coverImageFile) throw new Error("La imagen de portada es obligatoria.");
 
             const coverFileName = `${user.id}/cover-${Date.now()}-${coverImageFile.name}`;
             let { error: coverUploadError } = await supabase.storage.from('imagenes_anuncios').upload(coverFileName, coverImageFile);
@@ -346,12 +612,19 @@ form.addEventListener('submit', async (e) => {
             distrito: formData.get('distrito'),
                 user_id: user.id,
             url_portada: coverPublicUrl,
+            fecha_publicacion: new Date().toISOString(),
             // --- NUEVOS CAMPOS AÑADIDOS ---
             marca: formData.get('marca') || null,
             anio: formData.get('anio') ? parseInt(formData.get('anio')) : null,
             kilometraje: formData.get('kilometraje') ? parseInt(formData.get('kilometraje')) : null,
             transmision: formData.get('transmision') || null,
-            combustible: formData.get('combustible') || null
+            combustible: formData.get('combustible') || null,
+            // --- CAMPOS DE INMUEBLES ---
+            m2: formData.get('m2') ? parseInt(formData.get('m2')) : null,
+            habitaciones: formData.get('habitaciones') ? parseInt(formData.get('habitaciones')) : null,
+            baños: formData.get('baños') ? parseInt(formData.get('baños')) : null,
+            // --- CAMPOS DE ELECTRÓNICA (JSONB) ---
+            atributos_clave: selectedMainCategory.toLowerCase().includes('electrónica') ? buildElectronicsJSON(formData) : null
         };
         
             const { data: newAd, error: adInsertError } = await supabase
@@ -388,6 +661,25 @@ form.addEventListener('submit', async (e) => {
             publishButton.textContent = 'Publicar Anuncio';
         }
 });
+
+    // --- FUNCIÓN PARA CONSTRUIR JSON DE ELECTRÓNICA ---
+    function buildElectronicsJSON(formData) {
+        const json = {
+            subcategoria: selectedSubcategory
+        };
+
+        const fields = electronicsSubcategories[selectedSubcategory];
+        if (fields) {
+            fields.forEach(field => {
+                const value = formData.get(field);
+                if (value) {
+                    json[field] = value;
+                }
+            });
+        }
+
+        return json;
+    }
 
     // --- INICIALIZACIÓN ---
     loadAllCategories();

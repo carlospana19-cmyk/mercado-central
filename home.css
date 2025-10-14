@@ -4,14 +4,114 @@
 
 /* --- HERO SECTION --- */
 .hero-search {
-  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('URL_DE_SU_IMAGEN_DE_FONDO') no-repeat center center/cover;
-  padding: 8rem 2rem;
+  position: relative;
+  padding: 8rem 2rem 4rem 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   color: var(--color-blanco);
+  min-height: 80vh;
+}
+
+/* Carrusel del Hero */
+.hero-carousel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-swiper .swiper-slide {
+  position: relative;
+}
+
+.hero-swiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4);
+}
+
+.slide-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+}
+
+.slide-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  margin: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  max-width: 1200px;
+  width: 100%;
+}
+
+/* Estilos para los controles del carrusel */
+.hero-swiper .swiper-pagination {
+  bottom: 30px;
+}
+
+.hero-swiper .swiper-pagination-bullet {
+  background: white;
+  opacity: 0.7;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+  background: var(--color-primario);
+  opacity: 1;
+}
+
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+  color: white;
+  background: rgba(0,0,0,0.3);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-top: -25px;
+}
+
+.hero-swiper .swiper-button-next:hover,
+.hero-swiper .swiper-button-prev:hover {
+  background: var(--color-primario);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .slide-title {
+    font-size: 2rem;
+  }
+
+  .hero-swiper .swiper-button-next,
+  .hero-swiper .swiper-button-prev {
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+  }
+
+  .hero-swiper .swiper-button-next::after,
+  .hero-swiper .swiper-button-prev::after {
+    font-size: 16px;
+  }
 }
 
 .hero-title-animated {
@@ -211,9 +311,49 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 /* --- TARJETAS DE PRODUCTO (.box) --- */
-.box-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr)); gap: 3rem; }
-.box { background: var(--color-blanco); border-radius: 1.6rem; box-shadow: var(--sombra-suave); overflow: hidden; display: flex; flex-direction: column; transition: all 0.4s; position: relative; }
-.box:hover { transform: translateY(-1rem); box-shadow: var(--sombra-media); }
+.box-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* Filas de anuncios */
+.ads-row {
+    display: grid;
+    gap: 3rem;
+}
+
+/* Primera fila: 2 columnas */
+.row-2-cols {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* Segunda fila: 3 columnas */
+.row-3-cols {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Tercera fila: 4 columnas */
+.row-4-cols {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Estilos base para todas las tarjetas */
+.box {
+    background: var(--color-blanco);
+    border-radius: 1.6rem;
+    box-shadow: var(--sombra-suave);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s;
+    position: relative;
+}
+
+.box:hover {
+    transform: translateY(-1rem);
+    box-shadow: var(--sombra-media);
+}
 .box .image-container { width: 100%; aspect-ratio: 4 / 3; position: relative; background-color: #eee; }
 .box .swiper { width: 100%; height: 100%; }
 .box .swiper-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -223,3 +363,27 @@ main, section.hero-search, section.categories-showcase, section.products {
 .box .content .location { font-size: 1.4rem; color: var(--color-gris); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
 .box .content .btn-contact { display: flex; align-items: center; justify-content: center; gap: 1rem; width: 100%; padding: 1.4rem; background: var(--color-primario); color: var(--color-blanco); border-radius: 1rem; text-decoration: none; font-weight: 700; font-size: 1.6rem; transition: all 0.3s ease; margin-top: auto; }
 .box .content .btn-contact:hover { background: var(--color-secundario); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35); }
+
+/* Estilos para botones del carrusel en tarjetas .box (igual que en resultados) */
+.box .swiper-button-prev,
+.box .swiper-button-next {
+  color: #ffffff !important;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  top: 50%;
+}
+
+.box .swiper-button-prev::after,
+.box .swiper-button-next::after {
+  font-size: 14px !important;
+  font-weight: bold;
+}
+
+.box .swiper-button-prev:hover,
+.box .swiper-button-next:hover {
+  background-color: var(--color-primario) !important;
+  color: white !important;
+}

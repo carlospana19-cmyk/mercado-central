@@ -64,8 +64,13 @@
 }
 
 .btn-edit {
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: var(--color-primario);
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: var(--color-secundario);
+    transform: translateY(-2px);
 }
 
 .btn-delete {

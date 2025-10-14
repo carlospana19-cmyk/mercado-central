@@ -44,6 +44,9 @@
     <div class="detalle-header">
         <h1 id="product-name">Cargando Título...</h1>
         <div class="location-info">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="product-date">Cargando...</span>
+        
             <i class="fas fa-map-marker-alt"></i>
             <span id="product-location">Cargando Ubicación...</span>
         </div>
@@ -61,6 +64,14 @@
                 <div class="swiper-button-next"></div>
                 <div class="swiper-button-prev"></div>
             </div>
+
+            <!-- Descripción justo debajo de la galería -->
+            <div class="description-below-gallery">
+                <div class="description-container">
+                    <h2>Descripción Detallada</h2>
+                    <p id="product-description">Cargando descripción...</p>
+                </div>
+            </div>
         </div>
 
         <!-- Columna Derecha: Información y Contacto -->
@@ -70,21 +81,34 @@
                     <span class="price-label">Precio</span>
                     <div class="price" id="product-price">$ --.--</div>
                 </div>
+                <div class="visits-section">
+                    <i class="fas fa-eye"></i>
+                    <span class="visits-label">Visitas</span>
+                    <div class="visits" id="product-visits">0</div>
+                </div>
                 <div class="contact-seller-box">
-                    <h3>Contactar al Vendedor</h3>
-                    <form id="contact-form">
-                        <textarea name="message" placeholder="Hola, estoy interesado en este anuncio y me gustaría tener más detalles."></textarea>
-                        <button type="submit" class="btn">Enviar Mensaje</button>
-                    </form>
+                    <h3><i class="fas fa-comments"></i> Contactar al Vendedor</h3>
+                    <div class="contact-options">
+                        <button class="btn btn-whatsapp" id="whatsapp-link" style="display: none; margin-bottom: 10px;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="btn btn-email" id="email-link" style="display: none; margin-bottom: 10px;">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                        <button class="btn btn-phone" id="phone-link" style="display: none;">
+                            <i class="fas fa-phone-alt"></i> Teléfono
+                        </button>
+                    </div>
+                    <div class="contact-form-section">
+                        <h4>O envía un mensaje directo</h4>
+                        <form id="contact-form">
+                            <textarea name="message" placeholder="Hola, estoy interesado en este anuncio y me gustaría tener más detalles."></textarea>
+                            <button type="submit" class="btn">Enviar Mensaje</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Descripción (ahora va debajo, a ancho completo) -->
-    <div class="description-container">
-        <h2>Descripción Detallada</h2>
-        <p id="product-description">Cargando descripción...</p>
     </div>
 </main>
 

@@ -48,6 +48,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         displayProductDetails(ad, images || []);
+
+        // Incrementar contador de visitas
+        try {
+            const { error: updateError } = await supabase
+                .from('anuncios')
+                .update({ visitas: (ad.visitas || 0) + 1 })
+                .eq('id', adId);
+
+            if (updateError) {
+                console.warn('Error al actualizar visitas:', updateError);
+            } else {
+                console.log('Visitas incrementadas');
+            }
+        } catch (error) {
+            console.error('Error al incrementar visitas:', error);
+        }
     } catch (error) {
         console.error('Error inesperado al cargar el producto:', error);
         displayError("Error inesperado al cargar el producto. Por favor, intenta de nuevo.");
@@ -78,6 +94,46 @@ async function displayProductDetails(ad, galleryImages) {
     productPriceEl.textContent = `$${ad.precio}`;
     productLocationEl.textContent = ad.ubicacion || 'No especificada';
     productDescriptionEl.textContent = ad.descripcion;
+
+    // Mostrar visitas
+    const productVisitsEl = document.getElementById('product-visits');
+    if (productVisitsEl) {
+        productVisitsEl.textContent = ad.visitas || 0;
+    }
+
+    // Mostrar información de contacto del vendedor
+    loadSellerContactInfo(ad);
+
+    // Calcular y mostrar fecha de publicación
+    if (ad.fecha_publicacion) {
+        const fechaPublicacion = new Date(ad.fecha_publicacion);
+        const ahora = new Date();
+        const diffTiempo = Math.abs(ahora - fechaPublicacion);
+        const diffDias = Math.floor(diffTiempo / (1000 * 60 * 60 * 24));
+
+        let textoFecha;
+        if (diffDias === 0) {
+            textoFecha = "Publicado hoy";
+        } else if (diffDias === 1) {
+            textoFecha = "Publicado hace 1 día";
+        } else if (diffDias < 30) {
+            textoFecha = `Publicado hace ${diffDias} días`;
+        } else if (diffDias < 60) {
+            textoFecha = "Publicado hace 1 mes";
+        } else {
+            textoFecha = `Publicado hace ${Math.floor(diffDias / 30)} meses`;
+        }
+
+        document.getElementById('product-date').textContent = textoFecha;
+    } else {
+        document.getElementById('product-date').textContent = "Fecha no disponible";
+    }
+
+    // Agregar información detallada del vehículo si existe
+    addVehicleDetails(ad);
+
+    // Agregar información detallada del inmueble si existe
+    addRealEstateDetails(ad);
 
     // Construir la galería con validación de URLs
     const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(url => {
@@ -177,6 +233,223 @@ async function displayProductDetails(ad, galleryImages) {
         }
     } catch (error) {
         console.error('Error en lógica de edición:', error);
+    }
+}
+
+function addVehicleDetails(ad) {
+    // Buscar si ya existe un contenedor de detalles del vehículo
+    let vehicleDetailsContainer = document.querySelector('.vehicle-details-container');
+
+    // Si no existe, crearlo
+    if (!vehicleDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            vehicleDetailsContainer = document.createElement('div');
+            vehicleDetailsContainer.className = 'vehicle-details-container';
+            descriptionContainer.parentNode.insertBefore(vehicleDetailsContainer, descriptionContainer);
+        }
+    }
+
+    // Verificar si el anuncio tiene información de vehículo
+    const hasVehicleInfo = ad.marca || ad.anio || ad.kilometraje || ad.transmision || ad.combustible;
+
+    if (hasVehicleInfo) {
+        vehicleDetailsContainer.innerHTML = `
+            <div class="vehicle-specs-grid">
+                <h2>Especificaciones del Vehículo</h2>
+                <div class="specs-grid">
+                    ${ad.marca ? `
+                        <div class="spec-item">
+                            <i class="fas fa-car"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Marca</span>
+                                <span class="spec-value">${ad.marca}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ad.anio ? `
+                        <div class="spec-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Año</span>
+                                <span class="spec-value">${ad.anio}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ad.kilometraje ? `
+                        <div class="spec-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Kilometraje</span>
+                                <span class="spec-value">${ad.kilometraje.toLocaleString('es-PA')} km</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ad.transmision ? `
+                        <div class="spec-item">
+                            <i class="fas fa-cogs"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Transmisión</span>
+                                <span class="spec-value">${ad.transmision}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ad.combustible ? `
+                        <div class="spec-item">
+                            <i class="fas fa-gas-pump"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Combustible</span>
+                                <span class="spec-value">${ad.combustible}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    } else {
+        // Si no hay información de vehículo, ocultar el contenedor
+        if (vehicleDetailsContainer) {
+            vehicleDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addRealEstateDetails(ad) {
+    // Buscar si ya existe un contenedor de detalles del inmueble
+    let realEstateDetailsContainer = document.querySelector('.real-estate-details-container');
+
+    // Si no existe, crearlo
+    if (!realEstateDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            realEstateDetailsContainer = document.createElement('div');
+            realEstateDetailsContainer.className = 'real-estate-details-container';
+            descriptionContainer.parentNode.insertBefore(realEstateDetailsContainer, descriptionContainer);
+        }
+    }
+
+    // Verificar si el anuncio tiene información de inmueble
+    const hasRealEstateInfo = ad.m2 || ad.habitaciones || ad.baños;
+
+    if (hasRealEstateInfo) {
+        realEstateDetailsContainer.innerHTML = `
+            <div class="real-estate-specs-grid">
+                <h2>Detalles del Inmueble</h2>
+                <div class="specs-grid">
+                    ${ad.m2 ? `
+                        <div class="spec-item">
+                            <i class="fas fa-ruler-combined"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Metros Cuadrados</span>
+                                <span class="spec-value">${ad.m2} m²</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ad.habitaciones ? `
+                        <div class="spec-item">
+                            <i class="fas fa-bed"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Habitaciones</span>
+                                <span class="spec-value">${ad.habitaciones}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ad.baños ? `
+                        <div class="spec-item">
+                            <i class="fas fa-bath"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">Baños</span>
+                                <span class="spec-value">${ad.baños}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    } else {
+        // Si no hay información de inmueble, ocultar el contenedor
+        if (realEstateDetailsContainer) {
+            realEstateDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+async function loadSellerContactInfo(ad) {
+    try {
+        // Obtener información del usuario vendedor desde la tabla profiles
+        const { data: sellerProfile, error } = await supabase
+            .from('profiles')
+            .select('telefono, email')
+            .eq('id', ad.user_id)
+            .single();
+
+        if (error) {
+            console.warn('Error al obtener información del vendedor:', error);
+            // Fallback: mostrar datos no disponibles
+            const sellerPhoneEl = document.getElementById('seller-phone');
+            const sellerEmailEl = document.getElementById('seller-email');
+            const whatsappLinkEl = document.getElementById('whatsapp-link');
+            const emailLinkEl = document.getElementById('email-link');
+
+            if (sellerPhoneEl) sellerPhoneEl.textContent = 'No disponible';
+            if (sellerEmailEl) sellerEmailEl.textContent = 'No disponible';
+            if (whatsappLinkEl) whatsappLinkEl.style.display = 'none';
+            if (emailLinkEl) emailLinkEl.style.display = 'none';
+            return;
+        }
+
+        // Mostrar información de contacto
+        const whatsappLinkEl = document.getElementById('whatsapp-link');
+        const emailLinkEl = document.getElementById('email-link');
+        const phoneLinkEl = document.getElementById('phone-link');
+
+        if (whatsappLinkEl && sellerProfile?.telefono) {
+            whatsappLinkEl.onclick = () => {
+                // Mostrar el número de teléfono como fondo
+                whatsappLinkEl.style.background = `linear-gradient(135deg, #25D366, #128C7E)`;
+                whatsappLinkEl.innerHTML = `<i class="fab fa-whatsapp"></i> ${sellerProfile.telefono}`;
+                setTimeout(() => {
+                    window.open(`https://wa.me/${sellerProfile.telefono.replace(/\D/g, '')}?text=Hola, estoy interesado en tu anuncio: ${ad.titulo}`, '_blank');
+                    whatsappLinkEl.innerHTML = `<i class="fab fa-whatsapp"></i> WhatsApp`;
+                }, 1000);
+            };
+            whatsappLinkEl.style.display = 'inline-block';
+        } else {
+            if (whatsappLinkEl) whatsappLinkEl.style.display = 'none';
+        }
+
+        if (emailLinkEl && sellerProfile?.email) {
+            emailLinkEl.onclick = () => {
+                // Mostrar el email como fondo
+                emailLinkEl.style.background = `linear-gradient(135deg, #007bff, #0056b3)`;
+                emailLinkEl.innerHTML = `<i class="fas fa-envelope"></i> ${sellerProfile.email}`;
+                setTimeout(() => {
+                    window.open(`mailto:${sellerProfile.email}?subject=Interesado en tu anuncio: ${ad.titulo}&body=Hola, estoy interesado en tu anuncio y me gustaría tener más detalles.`, '_blank');
+                    emailLinkEl.innerHTML = `<i class="fas fa-envelope"></i> Email`;
+                }, 1000);
+            };
+            emailLinkEl.style.display = 'inline-block';
+        } else {
+            if (emailLinkEl) emailLinkEl.style.display = 'none';
+        }
+
+        if (phoneLinkEl && sellerProfile?.telefono) {
+            phoneLinkEl.onclick = () => {
+                // Mostrar el número de teléfono como fondo
+                phoneLinkEl.style.background = `linear-gradient(135deg, #28a745, #1e7e34)`;
+                phoneLinkEl.innerHTML = `<i class="fas fa-phone-alt"></i> ${sellerProfile.telefono}`;
+                setTimeout(() => {
+                    window.open(`tel:${sellerProfile.telefono}`, '_blank');
+                    phoneLinkEl.innerHTML = `<i class="fas fa-phone-alt"></i> Teléfono`;
+                }, 1000);
+            };
+            phoneLinkEl.style.display = 'inline-block';
+        } else {
+            if (phoneLinkEl) phoneLinkEl.style.display = 'none';
+        }
+
+    } catch (error) {
+        console.error('Error al cargar información de contacto del vendedor:', error);
     }
 }
 

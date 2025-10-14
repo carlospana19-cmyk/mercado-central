@@ -9,11 +9,13 @@ export async function loadSearchCategories() {
   try {
     const { data: categories, error } = await supabase
       .from('categorias')
-      .select('nombre')
+      .select('id, nombre')
       .is('parent_id', null)
       .order('nombre');
 
     if (error) throw error;
+
+    console.log('Categorías cargadas:', categories.map(c => c.nombre));
 
     categories.forEach(category => {
       const option = document.createElement('option');
@@ -21,9 +23,86 @@ export async function loadSearchCategories() {
       option.textContent = category.nombre;
       categorySelect.appendChild(option);
     });
+
+    // Cargar categorías para los iconos
+    loadCategoryIcons(categories);
+
+    // Cargar estadísticas dinámicas
+    loadDynamicStats();
   } catch (error) {
     console.error('Error al cargar categorías:', error);
   }
+}
+
+async function loadDynamicStats() {
+  try {
+    // Contar anuncios activos
+    const { count: adsCount, error: adsError } = await supabase
+      .from('anuncios')
+      .select('*', { count: 'exact', head: true });
+
+    // Contar usuarios registrados usando auth.users
+    const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
+
+    let usersCount = 0;
+    if (!usersError && usersData && usersData.users) {
+      usersCount = usersData.users.length;
+    } else {
+      console.log('Error al contar usuarios:', usersError);
+    }
+
+    if (adsError) console.error('Error al contar anuncios:', adsError);
+    if (usersError) console.error('Error al contar usuarios:', usersError);
+
+    // Actualizar las estadísticas en el DOM
+    const adsElement = document.querySelector('.stat-item:nth-child(1) .stat-number');
+    const usersElement = document.querySelector('.stat-item:nth-child(2) .stat-number');
+
+    if (adsElement && adsCount !== null) {
+      adsElement.textContent = adsCount.toLocaleString() + '+';
+    }
+
+    if (usersElement && usersCount !== null) {
+      usersElement.textContent = usersCount.toLocaleString() + '+';
+    }
+
+    console.log(`Estadísticas actualizadas: ${adsCount} anuncios, ${usersCount} usuarios`);
+
+  } catch (error) {
+    console.error('Error al cargar estadísticas dinámicas:', error);
+  }
+}
+
+function loadCategoryIcons(categories) {
+  const categoryItems = document.querySelectorAll('.category-item');
+
+  console.log('Categorías disponibles para iconos:', categories.map(c => c.nombre));
+
+  // Mapear los iconos del HTML con las categorías de la base de datos
+  const categoryMapping = [
+    'Inmuebles',     // fa-home (antes "Bienes Raíces")
+    'Vehículos',     // fa-car
+    'Electrónica',   // fa-laptop
+    'Hogar y Muebles', // fa-couch (antes "Hogar")
+    'Moda y Belleza', // fa-tshirt (antes "Moda")
+    'Servicios'      // fa-briefcase
+  ];
+
+  categoryItems.forEach((item, index) => {
+    const categoryName = categoryMapping[index];
+    const category = categories.find(cat => cat.nombre === categoryName);
+
+    console.log(`Icono ${index} (${categoryName}): ${category ? 'ENCONTRADO' : 'NO ENCONTRADO'}`);
+
+    if (category) {
+      item.addEventListener('click', () => {
+        // Redirigir a resultados con la categoría seleccionada
+        window.location.href = `resultados.html?category=${encodeURIComponent(category.nombre)}`;
+      });
+      // Cambiar cursor para indicar que es clickeable
+      item.style.cursor = 'pointer';
+    }
+  });
 }
 
 function performSearch() {

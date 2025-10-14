@@ -16,7 +16,20 @@
         <span class="logo-text">Mercado Central</span>
       </a>
     </div>
-    </nav>
+
+    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
+    <div class="buttons-nav">
+        <!-- Este botón se mostrará solo si el usuario está conectado -->
+        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
+
+        <!-- Botones de Panel y Logout (solo para usuarios conectados) -->
+        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
+        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
+
+        <!-- Botón de Iniciar Sesión (solo para invitados) -->
+        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
+    </div>
+  </nav>
 
     <main class="container publish-wizard">
         <div class="progress-container">
@@ -117,7 +130,7 @@
 
                 <div class="form-group">
                     <label for="description">Descripción</label>
-                    <textarea id="description" name="descripcion" rows="8" placeholder="Describe las características, estado, mantenimiento, etc." required></textarea>
+                    <textarea id="description" name="descripcion" rows="8" placeholder="Describe las características, estado, mantenimiento, etc."></textarea>
                 </div>
 
                 <!-- ===== CONTENEDORES DE ATRIBUTOS DINÁMICOS ===== -->
@@ -158,24 +171,32 @@
                                 <option value="Eléctrico">Eléctrico</option>
                             </select>
                         </div>
-                    </div>
                 </div>
+            </div>
 
-                <!-- Atributos para Inmuebles (inicialmente oculto) -->
+            <!-- Atributos para Electrónica (nuevo) -->
+            <div id="electronics-details" class="attribute-section" style="display: none;">
+                <h3 class="subsection-title">Detalles del Artículo Electrónico</h3>
+                <div id="electronics-fields">
+                    <!-- Campos dinámicos se agregarán aquí por JavaScript -->
+                </div>
+            </div>
+
+            <!-- Atributos para Inmuebles (inicialmente oculto) -->
                 <div id="realestate-details" class="attribute-section" style="display: none;">
                     <h3 class="subsection-title">Detalles del Inmueble</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="attr-m2">Metros Cuadrados (m²)</label>
-                            <input type="number" id="attr-m2" data-key="m2">
+                            <input type="number" id="attr-m2" name="m2" placeholder="Ej: 120">
     </div>
     <div class="form-group">
                             <label for="attr-habitaciones">Habitaciones</label>
-                            <input type="number" id="attr-habitaciones" data-key="Habitaciones">
+                            <input type="number" id="attr-habitaciones" name="habitaciones" placeholder="Ej: 3">
     </div>
     <div class="form-group">
                             <label for="attr-baños">Baños</label>
-                            <input type="number" id="attr-baños" data-key="Baños">
+                            <input type="number" id="attr-baños" name="baños" placeholder="Ej: 2">
                         </div>
                     </div>
     </div>

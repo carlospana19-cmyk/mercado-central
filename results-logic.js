@@ -1,5 +1,230 @@
 import { supabase } from './supabase-client.js';
 
+// --- CARRUSEL DE CATEGORÍA ---
+function initializeCategoryHero() {
+    const categorySlidesContainer = document.getElementById('category-slides');
+    const categoryTitleEl = document.getElementById('category-title');
+    const categorySubtitleEl = document.getElementById('category-subtitle');
+
+    if (!categorySlidesContainer) return;
+
+    // Obtener parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const categoryParam = params.get('category') || 'all';
+    const searchQuery = params.get('q') || '';
+
+    // Configurar título y subtítulo según la categoría
+    let categoryTitle = 'Resultados de Búsqueda';
+    let categorySubtitle = 'Encuentra lo que buscas en nuestra plataforma';
+
+    if (searchQuery) {
+        categoryTitle = `Resultados para "${searchQuery}"`;
+        categorySubtitle = `Anuncios relacionados con tu búsqueda`;
+    } else if (categoryParam !== 'all') {
+        const categoryNames = {
+            'Bienes Raíces': 'Bienes Raíces',
+            'Vehículos': 'Vehículos',
+            'Electrónica': 'Electrónica',
+            'Hogar y Muebles': 'Hogar y Muebles',
+            'Moda y Belleza': 'Moda y Belleza',
+            'Servicios': 'Servicios',
+            'Empleos y Servicios': 'Empleos y Servicios',
+            'Mascotas': 'Mascotas',
+            'Negocios': 'Negocios',
+            'Comunidad': 'Comunidad'
+        };
+        categoryTitle = categoryNames[categoryParam] || 'Resultados de Búsqueda';
+        categorySubtitle = `Explora nuestra selección de ${categoryTitle.toLowerCase()}`;
+    }
+
+    if (categoryTitleEl) categoryTitleEl.textContent = categoryTitle;
+    if (categorySubtitleEl) categorySubtitleEl.textContent = categorySubtitle;
+
+    // Cargar imágenes según la categoría
+    loadCategoryImages(categoryParam);
+
+    function loadCategoryImages(category = 'all') {
+        let images = [];
+
+        switch(category) {
+            case 'Bienes Raíces':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&h=600&fit=crop',
+                        alt: 'Casa moderna con jardín',
+                        title: 'Casas y Apartamentos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=600&fit=crop',
+                        alt: 'Apartamento con vista a la ciudad',
+                        title: 'Propiedades Urbanas'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=600&fit=crop',
+                        alt: 'Terreno amplio',
+                        title: 'Terrenos Disponibles'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=1200&h=600&fit=crop',
+                        alt: 'Casa de lujo',
+                        title: 'Propiedades de Lujo'
+                    }
+                ];
+                break;
+
+            case 'Vehículos':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=600&fit=crop',
+                        alt: 'Auto deportivo rojo',
+                        title: 'Autos Deportivos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=600&fit=crop',
+                        alt: 'Camioneta familiar',
+                        title: 'Camionetas y SUVs'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=1200&h=600&fit=crop',
+                        alt: 'Motocicleta deportiva',
+                        title: 'Motocicletas'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=600&fit=crop',
+                        alt: 'Auto clásico',
+                        title: 'Autos Clásicos'
+                    }
+                ];
+                break;
+
+            case 'Electrónica':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200&h=600&fit=crop',
+                        alt: 'Laptop y dispositivos tecnológicos',
+                        title: 'Computadoras'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=600&fit=crop',
+                        alt: 'Smartphone moderno',
+                        title: 'Teléfonos Móviles'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=1200&h=600&fit=crop',
+                        alt: 'Drone volando',
+                        title: 'Drones y Gadgets'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200&h=600&fit=crop',
+                        alt: 'Consola de videojuegos',
+                        title: 'Videojuegos'
+                    }
+                ];
+                break;
+
+            case 'Hogar y Muebles':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop',
+                        alt: 'Sala moderna',
+                        title: 'Muebles para el Hogar'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=600&fit=crop',
+                        alt: 'Cocina equipada',
+                        title: 'Electrodomésticos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop',
+                        alt: 'Decoración del hogar',
+                        title: 'Decoración'
+                    }
+                ];
+                break;
+
+            case 'Moda y Belleza':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=600&fit=crop',
+                        alt: 'Ropa moderna',
+                        title: 'Ropa y Accesorios'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&h=600&fit=crop',
+                        alt: 'Productos de belleza',
+                        title: 'Belleza y Cuidado'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1200&h=600&fit=crop',
+                        alt: 'Zapatos elegantes',
+                        title: 'Calzado'
+                    }
+                ];
+                break;
+
+            default:
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=600&fit=crop',
+                        alt: 'Productos diversos',
+                        title: 'Todos los Productos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&h=600&fit=crop',
+                        alt: 'Servicios profesionales',
+                        title: 'Servicios Disponibles'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?w=1200&h=600&fit=crop',
+                        alt: 'Empleos y oportunidades',
+                        title: 'Empleos'
+                    }
+                ];
+        }
+
+        // Generar HTML de los slides
+        const slidesHTML = images.map(image => `
+            <div class="swiper-slide">
+                <img src="${image.src}" alt="${image.alt}" loading="lazy">
+                <div class="slide-overlay">
+                    <h2 class="slide-title">${image.title}</h2>
+                </div>
+            </div>
+        `).join('');
+
+        categorySlidesContainer.innerHTML = slidesHTML;
+
+        // Inicializar Swiper
+        initializeCategorySwiper();
+    }
+
+    function initializeCategorySwiper() {
+        if (window.categorySwiper) {
+            window.categorySwiper.destroy();
+        }
+
+        window.categorySwiper = new Swiper('.category-swiper', {
+            loop: true,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            }
+        });
+    }
+}
+
 // --- PAGINACIÓN ---
 const RESULTS_PER_PAGE = 12; // Número de resultados por página
 let currentPage = 1; // Página actual
@@ -37,12 +262,14 @@ async function loadAndFilterResults() {
     // --- Lógica de paginación en la consulta ---
     const from = (currentPage - 1) * RESULTS_PER_PAGE;
     const to = from + RESULTS_PER_PAGE - 1;
+    
+    console.log(`DEBUG: Paginación - currentPage: ${currentPage}, from: ${from}, to: ${to}`);
     queryBuilder = queryBuilder.range(from, to);
 
     const { data: products, error, count } = await queryBuilder;
 
     if (error) {
-        console.error("Error al obtener los anuncios:", error);
+        console.error("Error al obtener los anuncios:", error, "Query:", queryBuilder.url);
         displayError("Hubo un error al cargar los anuncios.");
         return;
     }
@@ -90,7 +317,7 @@ function displayFilteredProducts(ads) {
         // Decide qué tarjeta usar. Aquí un ejemplo simple, puedes hacerlo más complejo.
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
 
-        // Detalles del vehículo
+        // Detalles del vehículo o inmueble
         let vehicleDetailsHTML = '';
         if (ad.marca || ad.anio || ad.transmision || ad.combustible) {
             vehicleDetailsHTML = `
@@ -103,6 +330,18 @@ function displayFilteredProducts(ads) {
             `;
         }
 
+        // Detalles del inmueble
+        let realEstateDetailsHTML = '';
+        if (ad.m2 || ad.habitaciones || ad.baños) {
+            realEstateDetailsHTML = `
+                <div class="real-estate-details">
+                    ${ad.m2 ? `<span><i class="fas fa-ruler-combined"></i> ${ad.m2} m²</span>` : ''}
+                    ${ad.habitaciones ? `<span><i class="fas fa-bed"></i> ${ad.habitaciones} hab</span>` : ''}
+                    ${ad.baños ? `<span><i class="fas fa-bath"></i> ${ad.baños} baños</span>` : ''}
+                </div>
+            `;
+        }
+
             return `
                 <div class="${cardClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
                         <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
@@ -111,6 +350,7 @@ function displayFilteredProducts(ads) {
                         <h3>${ad.titulo}</h3>
                         <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.ubicacion || 'N/A'}</div>
                         ${vehicleDetailsHTML}
+                        ${realEstateDetailsHTML}
                     <a href="#" class="btn-contact">Contactar</a>
                     </div>
                 </div>
@@ -178,6 +418,9 @@ function displayPaginationControls(totalCount) {
 
 // --- INICIALIZACIÓN Y EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', async () => {
+    // Inicializar carrusel del hero de categoría
+    initializeCategoryHero();
+
     const params = new URLSearchParams(window.location.search);
     const mainCategoryName = params.get('category');
 
