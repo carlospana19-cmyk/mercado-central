@@ -140,6 +140,8 @@ async function displayProductDetails(ad, galleryImages) {
 
     // Agregar información detallada de hogar y muebles si existe
     addHomeFurnitureDetails(ad);
+    // Agregar información detallada de moda y belleza si existe
+    addFashionDetails(ad);
 
     // Construir la galería con validación de URLs
     const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(url => {
@@ -439,11 +441,87 @@ function addHomeFurnitureDetails(ad) {
     }
 }
 
-function addVehicleDetails(ad) {
-    // Buscar si ya existe un contenedor de detalles del vehículo
-    let vehicleDetailsContainer = document.querySelector('.vehicle-details-container');
+function addFashionDetails(ad) {
+    // Buscar si ya existe un contenedor de detalles de moda
+    let fashionDetailsContainer = document.querySelector('.fashion-details-container');
 
     // Si no existe, crearlo
+    if (!fashionDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            fashionDetailsContainer = document.createElement('div');
+            fashionDetailsContainer.className = 'fashion-details-container';
+            descriptionContainer.parentNode.insertBefore(fashionDetailsContainer, descriptionContainer);
+        }
+    }
+
+    // Verificar si el anuncio tiene información de moda en atributos_clave (JSONB)
+    const hasFashionInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasFashionInfo) {
+        const attr = ad.atributos_clave;
+        
+        // Lista de subcategorías de moda para verificar
+        const fashionSubcats = ["Ropa de Mujer", "Ropa de Hombre", "Ropa de Niños", "Calzado", "Bolsos y Carteras", "Accesorios", "Joyería y Relojes", "Salud y Belleza"];
+        
+        // Solo procesar si es realmente moda/belleza
+        if (fashionSubcats.includes(attr.subcategoria)) {
+            let specsHTML = '';
+
+            // Mapeo de atributos a iconos y etiquetas
+            const attrConfig = {
+                tipo_prenda: { icon: 'fas fa-tshirt', label: 'Tipo de Prenda' },
+                tipo_calzado: { icon: 'fas fa-shoe-prints', label: 'Tipo de Calzado' },
+                tipo_bolso: { icon: 'fas fa-shopping-bag', label: 'Tipo de Bolso' },
+                tipo_accesorio: { icon: 'fas fa-glasses', label: 'Tipo de Accesorio' },
+                tipo_joya: { icon: 'fas fa-gem', label: 'Tipo de Joya' },
+                tipo_producto: { icon: 'fas fa-spray-can', label: 'Tipo de Producto' },
+                talla: { icon: 'fas fa-ruler', label: 'Talla' },
+                talla_calzado: { icon: 'fas fa-ruler', label: 'Talla' },
+                edad: { icon: 'fas fa-child', label: 'Edad' },
+                marca: { icon: 'fas fa-tag', label: 'Marca' },
+                material: { icon: 'fas fa-cube', label: 'Material' },
+                color: { icon: 'fas fa-palette', label: 'Color' },
+                categoria_producto: { icon: 'fas fa-list', label: 'Categoría' },
+                condicion: { icon: 'fas fa-check-circle', label: 'Condición' }
+            };
+
+            // Generar HTML para cada atributo presente
+            Object.keys(attrConfig).forEach(key => {
+                if (attr[key]) {
+                    const config = attrConfig[key];
+                    specsHTML += `
+                        <div class="spec-item">
+                            <i class="${config.icon}"></i>
+                            <div class="spec-content">
+                                <span class="spec-label">${config.label}</span>
+                                <span class="spec-value">${attr[key]}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (specsHTML) {
+                fashionDetailsContainer.innerHTML = `
+                    <div class="fashion-specs-grid">
+                        <h2>Detalles del Artículo</h2>
+                        <div class="specs-grid">${specsHTML}</div>
+                    </div>
+                `;
+            }
+        }
+    } else {
+        // Si no hay información de moda, ocultar el contenedor
+        if (fashionDetailsContainer) {
+            fashionDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addVehicleDetails(ad) {
+    let vehicleDetailsContainer = document.querySelector('.vehicle-details-container');
+
     if (!vehicleDetailsContainer) {
         const descriptionContainer = document.querySelector('.description-container');
         if (descriptionContainer) {
@@ -453,56 +531,57 @@ function addVehicleDetails(ad) {
         }
     }
 
-    // Verificar si el anuncio tiene información de vehículo
-    const hasVehicleInfo = ad.marca || ad.anio || ad.kilometraje || ad.transmision || ad.combustible;
+    // ✅ LEER DESDE JSONB
+    const attr = ad.atributos_clave || {};
+    const hasVehicleInfo = attr.marca || attr.anio || attr.kilometraje || attr.transmision || attr.combustible;
 
     if (hasVehicleInfo) {
         vehicleDetailsContainer.innerHTML = `
             <div class="vehicle-specs-grid">
                 <h2>Especificaciones del Vehículo</h2>
                 <div class="specs-grid">
-                    ${ad.marca ? `
+                    ${attr.marca ? `
                         <div class="spec-item">
                             <i class="fas fa-car"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Marca</span>
-                                <span class="spec-value">${ad.marca}</span>
+                                <span class="spec-value">${attr.marca}</span>
                             </div>
                         </div>
                     ` : ''}
-                    ${ad.anio ? `
+                    ${attr.anio ? `
                         <div class="spec-item">
                             <i class="fas fa-calendar-alt"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Año</span>
-                                <span class="spec-value">${ad.anio}</span>
+                                <span class="spec-value">${attr.anio}</span>
                             </div>
                         </div>
                     ` : ''}
-                    ${ad.kilometraje ? `
+                    ${attr.kilometraje ? `
                         <div class="spec-item">
                             <i class="fas fa-tachometer-alt"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Kilometraje</span>
-                                <span class="spec-value">${ad.kilometraje.toLocaleString('es-PA')} km</span>
+                                <span class="spec-value">${attr.kilometraje.toLocaleString('es-PA')} km</span>
                             </div>
                         </div>
                     ` : ''}
-                    ${ad.transmision ? `
+                    ${attr.transmision ? `
                         <div class="spec-item">
                             <i class="fas fa-cogs"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Transmisión</span>
-                                <span class="spec-value">${ad.transmision}</span>
+                                <span class="spec-value">${attr.transmision}</span>
                             </div>
                         </div>
                     ` : ''}
-                    ${ad.combustible ? `
+                    ${attr.combustible ? `
                         <div class="spec-item">
                             <i class="fas fa-gas-pump"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Combustible</span>
-                                <span class="spec-value">${ad.combustible}</span>
+                                <span class="spec-value">${attr.combustible}</span>
                             </div>
                         </div>
                     ` : ''}
@@ -510,7 +589,6 @@ function addVehicleDetails(ad) {
             </div>
         `;
     } else {
-        // Si no hay información de vehículo, ocultar el contenedor
         if (vehicleDetailsContainer) {
             vehicleDetailsContainer.style.display = 'none';
         }
@@ -518,10 +596,8 @@ function addVehicleDetails(ad) {
 }
 
 function addRealEstateDetails(ad) {
-    // Buscar si ya existe un contenedor de detalles del inmueble
     let realEstateDetailsContainer = document.querySelector('.real-estate-details-container');
 
-    // Si no existe, crearlo
     if (!realEstateDetailsContainer) {
         const descriptionContainer = document.querySelector('.description-container');
         if (descriptionContainer) {
@@ -531,38 +607,39 @@ function addRealEstateDetails(ad) {
         }
     }
 
-    // Verificar si el anuncio tiene información de inmueble
-    const hasRealEstateInfo = ad.m2 || ad.habitaciones || ad.baños;
+    // ✅ LEER DESDE JSONB
+    const attr = ad.atributos_clave || {};
+    const hasRealEstateInfo = attr.m2 || attr.habitaciones || attr.baños;
 
     if (hasRealEstateInfo) {
         realEstateDetailsContainer.innerHTML = `
             <div class="real-estate-specs-grid">
                 <h2>Detalles del Inmueble</h2>
                 <div class="specs-grid">
-                    ${ad.m2 ? `
+                    ${attr.m2 ? `
                         <div class="spec-item">
                             <i class="fas fa-ruler-combined"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Metros Cuadrados</span>
-                                <span class="spec-value">${ad.m2} m²</span>
+                                <span class="spec-value">${attr.m2} m²</span>
                             </div>
                         </div>
                     ` : ''}
-                    ${ad.habitaciones ? `
+                    ${attr.habitaciones ? `
                         <div class="spec-item">
                             <i class="fas fa-bed"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Habitaciones</span>
-                                <span class="spec-value">${ad.habitaciones}</span>
+                                <span class="spec-value">${attr.habitaciones}</span>
                             </div>
                         </div>
                     ` : ''}
-                    ${ad.baños ? `
+                    ${attr.baños ? `
                         <div class="spec-item">
                             <i class="fas fa-bath"></i>
                             <div class="spec-content">
                                 <span class="spec-label">Baños</span>
-                                <span class="spec-value">${ad.baños}</span>
+                                <span class="spec-value">${attr.baños}</span>
                             </div>
                         </div>
                     ` : ''}
@@ -570,7 +647,6 @@ function addRealEstateDetails(ad) {
             </div>
         `;
     } else {
-        // Si no hay información de inmueble, ocultar el contenedor
         if (realEstateDetailsContainer) {
             realEstateDetailsContainer.style.display = 'none';
         }

@@ -20,6 +20,10 @@ export function initializePublishPage() {
     const electronicsDetails = document.getElementById('electronics-details');
     const electronicsFields = document.getElementById('electronics-fields');
     const homeFurnitureDetails = document.getElementById('home-furniture-details');
+const fashionDetails = document.getElementById('fashion-details');
+const fashionFields = document.getElementById('fashion-fields');
+    const vehicleFields = document.getElementById('vehicle-fields');
+    const realestateFields = document.getElementById('realestate-fields');
     const homeFurnitureFields = document.getElementById('home-furniture-fields');
     const coverImageInput = document.getElementById('cover-image-input');
     const coverImageName = document.getElementById('cover-image-name');
@@ -69,6 +73,35 @@ export function initializePublishPage() {
         "Jardín": ["tipo_articulo", "material", "condicion"]
     };
 
+    // --- DATOS DE SUBCATEGORÍAS DE MODA Y BELLEZA ---
+    const fashionSubcategories = {
+        "Ropa de Mujer": ["tipo_prenda", "talla", "marca", "color", "condicion"],
+        "Ropa de Hombre": ["tipo_prenda", "talla", "marca", "color", "condicion"],
+        "Ropa de Niños": ["tipo_prenda", "talla", "edad", "marca", "color", "condicion"],
+        "Calzado": ["tipo_calzado", "talla_calzado", "marca", "color", "condicion"],
+        "Bolsos y Carteras": ["tipo_bolso", "marca", "material", "color", "condicion"],
+        "Accesorios": ["tipo_accesorio", "marca", "material", "condicion"],
+        "Joyería y Relojes": ["tipo_joya", "material", "condicion"],
+        "Salud y Belleza": ["tipo_producto", "marca", "categoria_producto", "condicion"]
+    };
+
+    // --- DATOS DE SUBCATEGORÍAS DE VEHÍCULOS ---
+    const vehicleSubcategories = {
+        "Autos": ["marca", "modelo", "anio", "kilometraje", "transmision", "combustible", "color", "condicion"],
+        "Motos": ["marca", "modelo", "anio", "kilometraje", "cilindraje", "tipo_moto", "color", "condicion"],
+        "Camiones": ["marca", "modelo", "anio", "kilometraje", "transmision", "combustible", "capacidad_carga", "condicion"],
+        "Otros Vehículos": ["marca", "modelo", "anio", "tipo_vehiculo", "condicion"]
+    };
+
+    // --- DATOS DE SUBCATEGORÍAS DE INMUEBLES ---
+    const realEstateSubcategories = {
+        "Casas": ["tipo_operacion", "m2", "habitaciones", "baños", "estacionamientos", "condicion"],
+        "Apartamentos": ["tipo_operacion", "m2", "habitaciones", "baños", "estacionamientos", "piso", "condicion"],
+        "Terrenos": ["tipo_operacion", "m2", "uso_suelo", "servicios"],
+        "Locales Comerciales": ["tipo_operacion", "m2", "baños", "ubicacion_comercial", "condicion"],
+        "Oficinas": ["tipo_operacion", "m2", "baños", "estacionamientos", "piso", "condicion"]
+    };
+
     // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
 function showDynamicFields() {
     // Deshabilitar todos los inputs de secciones ocultas
@@ -76,25 +109,29 @@ function showDynamicFields() {
     realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
     electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
     homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
 
     if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
         vehicleDetails.style.display = 'block';
-        vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         realestateDetails.style.display = 'none';
         electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
     } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
         vehicleDetails.style.display = 'none';
         realestateDetails.style.display = 'block';
-        realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
     } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
         vehicleDetails.style.display = 'none';
         realestateDetails.style.display = 'none';
         electronicsDetails.style.display = 'block';
-        electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showElectronicsFields();
         }
@@ -103,15 +140,27 @@ function showDynamicFields() {
         realestateDetails.style.display = 'none';
         electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'block';
+        fashionDetails.style.display = 'none';
         homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showHomeFurnitureFields();
+        }
+    } else if (selectedMainCategory.toLowerCase().includes('moda') || selectedMainCategory.toLowerCase().includes('belleza') || selectedMainCategory.toLowerCase().includes('ropa')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'block';
+        fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showFashionFields();
         }
     } else {
         vehicleDetails.style.display = 'none';
         realestateDetails.style.display = 'none';
         electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
     }
 }
 
@@ -435,6 +484,192 @@ function showDynamicFields() {
             homeFurnitureFields.appendChild(fieldDiv);
         });
     }
+function showFashionFields() {
+    const fields = fashionSubcategories[selectedSubcategory];
+    if (!fields) {
+        console.log('No fields found for subcategory:', selectedSubcategory);
+        return;
+    }
+
+    console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+    fashionDetails.style.display = 'block';
+    fashionFields.innerHTML = '';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+    fashionFields.appendChild(titleDiv);
+
+    fields.forEach(field => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'form-group';
+
+        let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        let inputType = 'text';
+        let placeholder = '';
+
+        if (field === 'tipo_prenda') {
+            labelText = 'Tipo de Prenda';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Camisa">Camisa</option>
+                <option value="Pantalón">Pantalón</option>
+                <option value="Vestido">Vestido</option>
+                <option value="Falda">Falda</option>
+                <option value="Blusa">Blusa</option>
+                <option value="Chaqueta">Chaqueta</option>
+                <option value="Sudadera">Sudadera</option>
+                <option value="Short">Short</option>
+                <option value="Otro">Otro</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'tipo_calzado') {
+            labelText = 'Tipo de Calzado';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Tenis">Tenis</option>
+                <option value="Zapatos Formales">Zapatos Formales</option>
+                <option value="Sandalias">Sandalias</option>
+                <option value="Botas">Botas</option>
+                <option value="Tacones">Tacones</option>
+                <option value="Otro">Otro</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'tipo_bolso') {
+            labelText = 'Tipo de Bolso';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Bolso de Mano">Bolso de Mano</option>
+                <option value="Mochila">Mochila</option>
+                <option value="Cartera">Cartera</option>
+                <option value="Bolso de Viaje">Bolso de Viaje</option>
+                <option value="Otro">Otro</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'tipo_accesorio') {
+            labelText = 'Tipo de Accesorio';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Reloj">Reloj</option>
+                <option value="Gafas de Sol">Gafas de Sol</option>
+                <option value="Cinturón">Cinturón</option>
+                <option value="Bufanda">Bufanda</option>
+                <option value="Gorra">Gorra</option>
+                <option value="Otro">Otro</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'tipo_joya') {
+            labelText = 'Tipo de Joya';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Anillo">Anillo</option>
+                <option value="Collar">Collar</option>
+                <option value="Pulsera">Pulsera</option>
+                <option value="Aretes">Aretes</option>
+                <option value="Otro">Otro</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'tipo_producto') {
+            labelText = 'Tipo de Producto';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Maquillaje">Maquillaje</option>
+                <option value="Cuidado de la Piel">Cuidado de la Piel</option>
+                <option value="Perfume">Perfume</option>
+                <option value="Cuidado del Cabello">Cuidado del Cabello</option>
+                <option value="Productos de Baño">Productos de Baño</option>
+                <option value="Otro">Otro</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'talla') {
+            labelText = 'Talla';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'edad') {
+            labelText = 'Edad';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="0-12 meses">0-12 meses</option>
+                <option value="1-2 años">1-2 años</option>
+                <option value="3-4 años">3-4 años</option>
+                <option value="5-6 años">5-6 años</option>
+                <option value="7-8 años">7-8 años</option>
+                <option value="9-10 años">9-10 años</option>
+                <option value="11-12 años">11-12 años</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else if (field === 'condicion') {
+            labelText = 'Condición';
+            const select = document.createElement('select');
+            select.id = `attr-${field}`;
+            select.name = field;
+            select.innerHTML = `
+                <option value="">Selecciona</option>
+                <option value="Nuevo con Etiqueta">Nuevo con Etiqueta</option>
+                <option value="Nuevo sin Etiqueta">Nuevo sin Etiqueta</option>
+                <option value="Poco Uso">Poco Uso</option>
+                <option value="Usado">Usado</option>
+                <option value="Excelente Estado">Excelente Estado</option>
+            `;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(select);
+        } else {
+            placeholder = `Ej: ${labelText}`;
+        }
+
+        if (field !== 'tipo_prenda' && field !== 'tipo_calzado' && field !== 'tipo_bolso' && field !== 'tipo_accesorio' && field !== 'tipo_joya' && field !== 'tipo_producto' && field !== 'talla' && field !== 'edad' && field !== 'condicion') {
+            const input = document.createElement('input');
+            input.type = inputType;
+            input.id = `attr-${field}`;
+            input.name = field;
+            input.placeholder = placeholder;
+            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+            fieldDiv.appendChild(input);
+        }
+
+        fashionFields.appendChild(fieldDiv);
+    });
+}
 
     function loadContactInfo() {
         if (userInfo) {
@@ -769,30 +1004,8 @@ form.addEventListener('submit', async (e) => {
                 fecha_publicacion: new Date().toISOString()
             };
 
-            // --- CAMPOS DE VEHÍCULO (solo si es vehículo) ---
-            if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
-                adData.marca = formData.get('marca') || null;
-                adData.anio = formData.get('anio') ? parseInt(formData.get('anio')) : null;
-                adData.kilometraje = formData.get('kilometraje') ? parseInt(formData.get('kilometraje')) : null;
-                adData.transmision = formData.get('transmision') || null;
-                adData.combustible = formData.get('combustible') || null;
-            }
-
-            // --- CAMPOS DE INMUEBLES (solo si es inmueble) ---
-            if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
-                adData.m2 = formData.get('m2') ? parseInt(formData.get('m2')) : null;
-                adData.habitaciones = formData.get('habitaciones') ? parseInt(formData.get('habitaciones')) : null;
-                adData.baños = formData.get('baños') ? parseInt(formData.get('baños')) : null;
-            }
-
-            // --- ATRIBUTOS JSONB (para Electrónica, Hogar, etc.) ---
-            if (selectedMainCategory.toLowerCase().includes('electrónica')) {
-                adData.atributos_clave = buildElectronicsJSON(formData);
-            } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
-                adData.atributos_clave = buildHomeFurnitureJSON(formData);
-            } else {
-                adData.atributos_clave = null;
-            }
+            // --- ATRIBUTOS UNIFICADOS (TODAS las categorías van a JSONB) ---
+            adData.atributos_clave = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
         
             const { data: newAd, error: adInsertError } = await supabase
                 .from('anuncios')
@@ -880,6 +1093,102 @@ form.addEventListener('submit', async (e) => {
         }
 
         return json;
+    }
+
+    // ✅ FUNCIÓN UNIFICADA PARA TODAS LAS CATEGORÍAS
+    function buildUnifiedAttributesJSON(formData, mainCategory, subcategory) {
+        // ✅ LOGS AL INICIO (AGREGAR ESTAS 5 LÍNEAS)
+        console.log('🔵 === INICIO buildUnifiedAttributesJSON ===');
+        console.log('🔵 mainCategory:', mainCategory);
+        console.log('🔵 mainCategory.toLowerCase():', mainCategory.toLowerCase());
+        console.log('🔵 subcategory:', subcategory);
+        console.log('🔵 ¿Incluye "inmueble"?', mainCategory.toLowerCase().includes('inmueble'));
+        
+        const json = {};
+        
+        // Agregar subcategoría si existe
+        if (subcategory) {
+            json.subcategoria = subcategory;
+        }
+        
+        // --- VEHÍCULOS ---
+        if (mainCategory.toLowerCase().includes('vehículo') || 
+            mainCategory.toLowerCase().includes('auto') || 
+            mainCategory.toLowerCase().includes('carro')) {
+            
+            const vehicleFields = ['marca', 'anio', 'kilometraje', 'transmision', 'combustible'];
+            vehicleFields.forEach(field => {
+                const value = formData.get(field);
+                if (value) {
+                    json[field] = (field === 'anio' || field === 'kilometraje') 
+                        ? parseInt(value) 
+                        : value;
+                }
+            });
+        }
+        
+        // --- INMUEBLES ---
+        if (mainCategory.toLowerCase().includes('inmueble') || 
+            mainCategory.toLowerCase().includes('casa') || 
+            mainCategory.toLowerCase().includes('apartamento')) {
+            
+            // ✅ LOGS DENTRO DEL IF (AGREGAR ESTAS LÍNEAS)
+            console.log('🟢 ENTRÓ AL BLOQUE DE INMUEBLES');
+            
+            const realEstateFields = ['m2', 'habitaciones', 'baños'];
+            realEstateFields.forEach(field => {
+                const value = formData.get(field);
+                console.log(`🟢 Campo "${field}":`, value);
+                if (value) {
+                    json[field] = parseInt(value);
+                }
+            });
+        }
+        
+        // --- ELECTRÓNICA ---
+        if (mainCategory.toLowerCase().includes('electrónica')) {
+            const fields = electronicsSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+        
+        // --- HOGAR Y MUEBLES ---
+        if (mainCategory.toLowerCase().includes('hogar') || 
+            mainCategory.toLowerCase().includes('mueble')) {
+            const fields = homeFurnitureSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+        
+        // --- MODA Y BELLEZA ---
+        if (mainCategory.toLowerCase().includes('moda') || 
+            mainCategory.toLowerCase().includes('belleza') || 
+            mainCategory.toLowerCase().includes('ropa')) {
+            const fields = fashionSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+        
+        console.log('� JSON FINAL:', json);
+        return Object.keys(json).length > 0 ? json : null;
     }
 
     // --- INICIALIZACIÓN ---

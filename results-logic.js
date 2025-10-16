@@ -317,41 +317,63 @@ function displayFilteredProducts(ads) {
         // Decide qué tarjeta usar. Aquí un ejemplo simple, puedes hacerlo más complejo.
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
 
-        // Detalles del vehículo o inmueble
-        let vehicleDetailsHTML = '';
-        if (ad.marca || ad.anio || ad.transmision || ad.combustible) {
-            vehicleDetailsHTML = `
-                <div class="vehicle-details">
-                    ${ad.marca ? `<span><i class="fas fa-car"></i> ${ad.marca}</span>` : ''}
-                    ${ad.anio ? `<span><i class="fas fa-calendar-alt"></i> ${ad.anio}</span>` : ''}
-                    ${ad.transmision ? `<span><i class="fas fa-cogs"></i> ${ad.transmision}</span>` : ''}
-                    ${ad.combustible ? `<span><i class="fas fa-gas-pump"></i> ${ad.combustible}</span>` : ''}
-                </div>
-            `;
-        }
+        // Define categoria here, as it's used in multiple blocks
+        const categoria = ad.categoria ? ad.categoria.toLowerCase() : '';
 
-        // Detalles del inmueble
+        // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
+        let vehicleDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+            
+            // SOLO mostrar si es categoría de VEHÍCULO
+            if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
+                if (attr.marca || attr.anio || attr.transmision || attr.combustible || attr.kilometraje) {
+                    let details = [];
+                    if (attr.marca) details.push(`<span><i class="fas fa-car"></i> ${attr.marca}</span>`);
+                    if (attr.anio) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attr.anio}</span>`);
+                    if (attr.kilometraje) details.push(`<span><i class="fas fa-tachometer-alt"></i> ${attr.kilometraje.toLocaleString()} km</span>`);
+                    if (attr.transmision) details.push(`<span><i class="fas fa-cogs"></i> ${attr.transmision}</span>`);
+                    if (attr.combustible) details.push(`<span><i class="fas fa-gas-pump"></i> ${attr.combustible}</span>`);
+                    
+                    if (details.length > 0) {
+                        vehicleDetailsHTML = `<div class="vehicle-details">${details.slice(0, 3).join('')}</div>`;
+                    }
+                }
+            }
+        }
+        
+        // --- DETALLES DE INMUEBLES (desde JSONB) ---
         let realEstateDetailsHTML = '';
-        if (ad.m2 || ad.habitaciones || ad.baños) {
-            realEstateDetailsHTML = `
-                <div class="real-estate-details">
-                    ${ad.m2 ? `<span><i class="fas fa-ruler-combined"></i> ${ad.m2} m²</span>` : ''}
-                    ${ad.habitaciones ? `<span><i class="fas fa-bed"></i> ${ad.habitaciones} hab</span>` : ''}
-                    ${ad.baños ? `<span><i class="fas fa-bath"></i> ${ad.baños} baños</span>` : ''}
-                </div>
-            `;
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+            
+            // SOLO mostrar si es categoría de INMUEBLE
+            if (categoria.includes('inmueble') || categoria.includes('casa') || categoria.includes('apartamento') || categoria.includes('propiedad')) {
+                if (attr.m2 || attr.habitaciones || attr.baños) {
+                    let details = [];
+                    if (attr.m2) details.push(`<span><i class="fas fa-ruler-combined"></i> ${attr.m2} m²</span>`);
+                    if (attr.habitaciones) details.push(`<span><i class="fas fa-bed"></i> ${attr.habitaciones} hab</span>`);
+                    if (attr.baños) details.push(`<span><i class="fas fa-bath"></i> ${attr.baños} baños</span>`);
+                    
+                    if (details.length > 0) {
+                        realEstateDetailsHTML = `<div class="real-estate-details">${details.join('')}</div>`;
+                    }
+                }
+            }
         }
 
         // --- SECCIÓN: Iconos de atributos de electrónica ---
         let electronicsDetailsHTML = '';
-        if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
             const attr = ad.atributos_clave;
 
             // Lista de subcategorías de electrónica
-            const electronicsSubcats = ["Celulares y Teléfonos", "Computadoras", "Consolas y Videojuegos", "Audio y Video", "Fotografía"];
+            const electronicsSubcats = ["celulares y teléfonos", "computadoras", "consolas y videojuegos", "audio y video", "fotografía", "electrónica"];
 
             // Solo mostrar si es categoría Electrónica
-            if (attr.subcategoria && electronicsSubcats.includes(attr.subcategoria)) {
+            if (electronicsSubcats.some(subcat => categoria.includes(subcat))) {
                 let details = [];
 
                 if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
@@ -376,14 +398,14 @@ function displayFilteredProducts(ads) {
 
         // --- SECCIÓN: Iconos de atributos de hogar y muebles ---
         let homeFurnitureDetailsHTML = '';
-        if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
             const attr = ad.atributos_clave;
 
             // Lista de subcategorías de hogar
-            const homeFurnitureSubcats = ["Muebles de Sala", "Muebles de Dormitorio", "Cocina y Comedor", "Electrodomésticos", "Decoración", "Jardín"];
+            const homeFurnitureSubcats = ["muebles de sala", "muebles de dormitorio", "cocina y comedor", "electrodomésticos", "decoración", "jardín", "hogar y muebles"];
 
             // Solo mostrar si es categoría Hogar/Muebles
-            if (attr.subcategoria && homeFurnitureSubcats.includes(attr.subcategoria)) {
+            if (homeFurnitureSubcats.some(subcat => categoria.includes(subcat))) {
                 let details = [];
 
                 // Iconos específicos por tipo de electrodoméstico
@@ -418,6 +440,39 @@ function displayFilteredProducts(ads) {
                 }
             }
         }
+        // --- SECCIÓN: Iconos de atributos de moda y belleza ---
+        let fashionDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            
+            // Lista de subcategorías de moda
+            const fashionSubcats = ["ropa de mujer", "ropa de hombre", "ropa de niños", "calzado", "bolsos y carteras", "accesorios", "joyería y relojes", "salud y belleza", "moda y belleza"];
+            
+            // Solo mostrar si es categoría Moda y Belleza
+            if (fashionSubcats.some(subcat => categoria.includes(subcat))) {
+                let details = [];
+                
+                if (attr.tipo_prenda) details.push(`<span><i class="fas fa-tshirt"></i> ${attr.tipo_prenda}</span>`);
+                if (attr.tipo_calzado) details.push(`<span><i class="fas fa-shoe-prints"></i> ${attr.tipo_calzado}</span>`);
+                if (attr.tipo_bolso) details.push(`<span><i class="fas fa-shopping-bag"></i> ${attr.tipo_bolso}</span>`);
+                if (attr.tipo_accesorio) details.push(`<span><i class="fas fa-glasses"></i> ${attr.tipo_accesorio}</span>`);
+                if (attr.tipo_joya) details.push(`<span><i class="fas fa-gem"></i> ${attr.tipo_joya}</span>`);
+                if (attr.tipo_producto) details.push(`<span><i class="fas fa-spray-can"></i> ${attr.tipo_producto}</span>`);
+                if (attr.talla) details.push(`<span><i class="fas fa-ruler"></i> Talla ${attr.talla}</span>`);
+                if (attr.talla_calzado) details.push(`<span><i class="fas fa-ruler"></i> Talla ${attr.talla_calzado}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
+                if (attr.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attr.condicion}</span>`);
+                
+                // Mostrar solo los primeros 3 atributos
+                if (details.length > 0) {
+                    fashionDetailsHTML = `
+                        <div class="fashion-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
 
             return `
                 <div class="${cardClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
@@ -430,6 +485,7 @@ function displayFilteredProducts(ads) {
                         ${realEstateDetailsHTML}
                         ${electronicsDetailsHTML}
                         ${homeFurnitureDetailsHTML}
+                        ${fashionDetailsHTML}
                     <a href="#" class="btn-contact">Contactar</a>
                     </div>
                 </div>

@@ -454,7 +454,7 @@ body {
 /* Contenedor de las tarjetas - ¡AQUÍ ESTÁ LA CORRECCIÓN! */
 #results-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; /* Adjusted min-width for more cards per row */
   gap: 2.5rem !important;
 }
 
@@ -626,6 +626,27 @@ body {
 }
 
 .home-furniture-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+} /* Cierre de .home-furniture-details i */
+
+/* Moda y Belleza - Mismo estilo */
+.fashion-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.fashion-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fashion-details i {
     color: var(--color-primario);
     font-size: 1.6rem;
 }
@@ -903,7 +924,7 @@ body {
 
 #results-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Allow smaller cards to fit more per row */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Allow smaller cards to fit more per row */
   gap: 2rem; /* Adjusted gap */
   width: 100%;
 }
@@ -987,7 +1008,7 @@ body {
   }
   
   #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Allow more cards in wider screens */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Allow more cards in wider screens */
     gap: 1.5rem;
   }
 }
@@ -1006,7 +1027,7 @@ body {
   }
   
   #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust card size for stacked layout */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjust card size for stacked layout */
     gap: 1rem;
   }
 }
