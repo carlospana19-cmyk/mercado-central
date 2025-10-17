@@ -402,10 +402,10 @@ function displayFilteredProducts(ads) {
             const attr = ad.atributos_clave;
 
             // Lista de subcategorías de hogar
-            const homeFurnitureSubcats = ["muebles de sala", "muebles de dormitorio", "cocina y comedor", "electrodomésticos", "decoración", "jardín", "hogar y muebles"];
+            const homeFurnitureSubcats = ["Artículos de Cocina", "Decoración", "Electrodomésticos", "Jardín y Exterior", "Muebles"];
 
             // Solo mostrar si es categoría Hogar/Muebles
-            if (homeFurnitureSubcats.some(subcat => categoria.includes(subcat))) {
+            if (attr.subcategoria && homeFurnitureSubcats.includes(attr.subcategoria)) {
                 let details = [];
 
                 // Iconos específicos por tipo de electrodoméstico
@@ -474,6 +474,146 @@ function displayFilteredProducts(ads) {
             }
         }
 
+        // --- SECCIÓN: Iconos de atributos de deportes y hobbies ---
+        let sportsDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+            
+            const sportsSubcats = ["Bicicletas", "Coleccionables", "Deportes", "Instrumentos Musicales", "Libros, Revistas y Comics", "Otros Hobbies"];
+            
+            if (attr.subcategoria && sportsSubcats.includes(attr.subcategoria)) {
+                let details = [];
+                
+                // Iconos específicos por subcategoría
+                if (attr.tipo_bicicleta) details.push(`<span><i class="fas fa-bicycle"></i> ${attr.tipo_bicicleta}</span>`);
+                if (attr.tipo_instrumento) details.push(`<span><i class="fas fa-music"></i> ${attr.tipo_instrumento}</span>`);
+                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-tag"></i> ${attr.tipo_articulo}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-copyright"></i> ${attr.marca}</span>`);
+                if (attr.aro) details.push(`<span><i class="fas fa-circle-notch"></i> Aro ${attr.aro}</span>`);
+                if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
+                
+                if (details.length > 0) {
+                    sportsDetailsHTML = `
+                        <div class="sports-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // --- SECCIÓN: Iconos de atributos de mascotas ---
+        let petsDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+            
+            const petsSubcats = ["Perros", "Gatos", "Aves", "Peces", "Otros Animales", "Accesorios para Mascotas"];
+            
+            if (attr.subcategoria && petsSubcats.includes(attr.subcategoria)) {
+                let details = [];
+                
+                if (attr.tipo_anuncio) details.push(`<span><i class="fas fa-paw"></i> ${attr.tipo_anuncio}</span>`);
+                if (attr.tipo_accesorio) details.push(`<span><i class="fas fa-bone"></i> ${attr.tipo_accesorio}</span>`);
+                if (attr.raza) details.push(`<span><i class="fas fa-dog"></i> ${attr.raza}</span>`);
+                if (attr.edad_mascota) details.push(`<span><i class="fas fa-birthday-cake"></i> ${attr.edad_mascota}</span>`);
+                if (attr.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attr.genero}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-copyright"></i> ${attr.marca}</span>`);
+                
+                if (details.length > 0) {
+                    petsDetailsHTML = `
+                        <div class="pets-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // --- SECCIÓN: Iconos de atributos de servicios ---
+        let servicesDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+            
+            const servicesSubcats = ["Servicios de Construcción", "Servicios de Educación", "Servicios de Eventos", "Servicios de Salud", "Servicios de Tecnología", "Servicios para el Hogar", "Otros Servicios"];
+            
+            if (attr.subcategoria && servicesSubcats.includes(attr.subcategoria)) {
+                let details = [];
+                
+                if (attr.tipo_servicio) details.push(`<span><i class="fas fa-wrench"></i> ${attr.tipo_servicio}</span>`);
+                if (attr.modalidad) details.push(`<span><i class="fas fa-location-arrow"></i> ${attr.modalidad}</span>`);
+                if (attr.experiencia) details.push(`<span><i class="fas fa-award"></i> ${attr.experiencia}</span>`);
+                
+                if (details.length > 0) {
+                    servicesDetailsHTML = `
+                        <div class="services-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // --- SECCIÓN: Iconos de atributos de negocios ---
+        let businessDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+            
+            const businessSubcats = ["Equipos para Negocios", "Maquinaria para Negocios", "Negocios en Venta"];
+            
+            if (attr.subcategoria && businessSubcats.includes(attr.subcategoria)) {
+                let details = [];
+                
+                if (attr.tipo_negocio) details.push(`<span><i class="fas fa-briefcase"></i> ${attr.tipo_negocio}</span>`);
+                if (attr.tipo_equipo) details.push(`<span><i class="fas fa-cogs"></i> ${attr.tipo_equipo}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
+                if (attr.modelo) details.push(`<span><i class="fas fa-barcode"></i> ${attr.modelo}</span>`);
+                if (attr.años_operacion) details.push(`<span><i class="fas fa-calendar-check"></i> ${attr.años_operacion}</span>`);
+                if (attr.incluye) details.push(`<span><i class="fas fa-check-circle"></i> ${attr.incluye}</span>`);
+                if (attr.razon_venta) details.push(`<span><i class="fas fa-info-circle"></i> ${attr.razon_venta}</span>`);
+                if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
+                
+                if (details.length > 0) {
+                    businessDetailsHTML = `
+                        <div class="business-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // --- SECCIÓN: Iconos de atributos de comunidad ---
+        let communityDetailsHTML = '';
+        if (ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.categoria) {
+            const attr = ad.atributos_clave;
+            const categoria = ad.categoria.toLowerCase();
+
+            const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
+            
+            if (attr.subcategoria && communitySubcats.includes(attr.subcategoria)) {
+                let details = [];
+                
+                if (attr.tipo_evento) details.push(`<span><i class="fas fa-calendar-day"></i> ${attr.tipo_evento}</span>`);
+                if (attr.tipo_actividad) details.push(`<span><i class="fas fa-users"></i> ${attr.tipo_actividad}</span>`);
+                if (attr.tipo_clase) details.push(`<span><i class="fas fa-chalkboard-teacher"></i> ${attr.tipo_clase}</span>`);
+                if (attr.nivel) details.push(`<span><i class="fas fa-chart-line"></i> ${attr.nivel}</span>`);
+                if (attr.modalidad) details.push(`<span><i class="fas fa-map-marker-alt"></i> ${attr.modalidad}</span>`);
+                if (attr.fecha_evento) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attr.fecha_evento}</span>`);
+                
+                if (details.length > 0) {
+                    communityDetailsHTML = `
+                        <div class="community-details">
+                            ${details.slice(0, 3).join('')}
+                        </div>
+                    `;
+                }
+            }
+        }
+
             return `
                 <div class="${cardClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
                         <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
@@ -486,6 +626,11 @@ function displayFilteredProducts(ads) {
                         ${electronicsDetailsHTML}
                         ${homeFurnitureDetailsHTML}
                         ${fashionDetailsHTML}
+                        ${sportsDetailsHTML}
+                        ${petsDetailsHTML}
+                        ${servicesDetailsHTML}
+                        ${businessDetailsHTML}
+                        ${communityDetailsHTML}
                     <a href="#" class="btn-contact">Contactar</a>
                     </div>
                 </div>

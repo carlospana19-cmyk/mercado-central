@@ -565,6 +565,121 @@ body {
     font-size: 1.6rem;
 }
 
+/* ========================================
+   ESTILOS PARA DEPORTES Y HOBBIES
+   ======================================== */
+.sports-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.sports-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sports-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
+
+/* ========================================
+   ESTILOS PARA MASCOTAS
+   ======================================== */
+.pets-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.pets-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pets-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
+
+/* ========================================
+   ESTILOS PARA SERVICIOS
+   ======================================== */
+.services-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.services-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.services-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
+
+/* ========================================
+   ESTILOS PARA NEGOCIOS
+   ======================================== */
+.business-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.business-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.business-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
+
+/* ========================================
+   ESTILOS PARA COMUNIDAD
+   ======================================== */
+.community-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    margin-bottom: 1rem;
+}
+
+.community-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.community-details i {
+    color: var(--color-primario);
+    font-size: 1.6rem;
+}
+
 /* === ESTILOS UNIFICADOS PARA TODOS LOS DETALLES DE CATEGORÍAS === */
 
 /* Inmuebles - Mismo estilo que vehículos */

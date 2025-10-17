@@ -143,6 +143,21 @@ async function displayProductDetails(ad, galleryImages) {
     // Agregar información detallada de moda y belleza si existe
     addFashionDetails(ad);
 
+    // Agregar información detallada de deportes y hobbies si existe
+    addSportsDetails(ad);
+
+    // Agregar información detallada de mascotas si existe
+    addPetsDetails(ad);
+
+    // Agregar información detallada de servicios si existe
+    addServicesDetails(ad);
+
+    // Agregar información detallada de negocios si existe
+    addBusinessDetails(ad);
+
+    // Agregar información detallada de comunidad si existe
+    addCommunityDetails(ad);
+
     // Construir la galería con validación de URLs
     const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(url => {
         if (!url) return false;
@@ -347,7 +362,7 @@ function addHomeFurnitureDetails(ad) {
         const attr = ad.atributos_clave;
 
         // Lista de subcategorías de hogar para verificar
-        const homeFurnitureSubcats = ["Muebles de Sala", "Muebles de Dormitorio", "Cocina y Comedor", "Electrodomésticos", "Decoración", "Jardín"];
+        const homeFurnitureSubcats = ["Artículos de Cocina", "Decoración", "Electrodomésticos", "Jardín y Exterior", "Muebles"];
 
         // Solo procesar si es realmente hogar/muebles
         if (!homeFurnitureSubcats.includes(attr.subcategoria)) {
@@ -519,6 +534,365 @@ function addFashionDetails(ad) {
     }
 }
 
+function addSportsDetails(ad) {
+    let sportsDetailsContainer = document.querySelector('.sports-details-container');
+
+    if (!sportsDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            sportsDetailsContainer = document.createElement('div');
+            sportsDetailsContainer.className = 'sports-details-container';
+            descriptionContainer.parentNode.insertBefore(sportsDetailsContainer, descriptionContainer);
+        }
+    }
+
+    const hasSportsInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasSportsInfo) {
+        const attr = ad.atributos_clave;
+        const sportsSubcats = ["Bicicletas", "Coleccionables", "Deportes", "Instrumentos Musicales", "Libros, Revistas y Comics", "Otros Hobbies"];
+
+        if (!sportsSubcats.includes(attr.subcategoria)) {
+            if (sportsDetailsContainer) {
+                sportsDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
+        let specsHTML = '';
+
+        const attrConfig = {
+            tipo_bicicleta: { icon: 'fas fa-bicycle', label: 'Tipo de Bicicleta' },
+            tipo_instrumento: { icon: 'fas fa-music', label: 'Tipo de Instrumento' },
+            tipo_articulo: { icon: 'fas fa-tag', label: 'Tipo de Artículo' },
+            marca: { icon: 'fas fa-copyright', label: 'Marca' },
+            modelo: { icon: 'fas fa-barcode', label: 'Modelo' },
+            aro: { icon: 'fas fa-circle-notch', label: 'Aro' },
+            condicion: { icon: 'fas fa-star', label: 'Condición' },
+            material: { icon: 'fas fa-cube', label: 'Material' },
+            genero: { icon: 'fas fa-venus-mars', label: 'Género' },
+            disciplina: { icon: 'fas fa-running', label: 'Disciplina' },
+            autor: { icon: 'fas fa-user-edit', label: 'Autor' },
+            editorial: { icon: 'fas fa-building', label: 'Editorial' },
+            formato: { icon: 'fas fa-book', label: 'Formato' },
+            idioma: { icon: 'fas fa-language', label: 'Idioma' },
+            estado_libro: { icon: 'fas fa-book-reader', label: 'Estado del Libro' }
+        };
+
+        Object.keys(attrConfig).forEach(key => {
+            if (attr[key]) {
+                const config = attrConfig[key];
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${config.icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">${config.label}</span>
+                            <span class="spec-value">${attr[key]}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (specsHTML) {
+            sportsDetailsContainer.innerHTML = `
+                <div class="sports-specs-grid">
+                    <h2>Detalles de Deportes y Hobbies</h2>
+                    <div class="specs-grid">
+                        ${specsHTML}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (sportsDetailsContainer) {
+            sportsDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addPetsDetails(ad) {
+    let petsDetailsContainer = document.querySelector('.pets-details-container');
+
+    if (!petsDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            petsDetailsContainer = document.createElement('div');
+            petsDetailsContainer.className = 'pets-details-container';
+            descriptionContainer.parentNode.insertBefore(petsDetailsContainer, descriptionContainer);
+        }
+    }
+
+    const hasPetsInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasPetsInfo) {
+        const attr = ad.atributos_clave;
+        const petsSubcats = ["Perros", "Gatos", "Aves", "Peces", "Otros Animales", "Accesorios para Mascotas"];
+
+        if (!petsSubcats.includes(attr.subcategoria)) {
+            if (petsDetailsContainer) {
+                petsDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
+        let specsHTML = '';
+
+        const attrConfig = {
+            tipo_anuncio: { icon: 'fas fa-paw', label: 'Tipo de Anuncio' },
+            tipo_accesorio: { icon: 'fas fa-bone', label: 'Tipo de Accesorio' },
+            raza: { icon: 'fas fa-dog', label: 'Raza' },
+            edad_mascota: { icon: 'fas fa-birthday-cake', label: 'Edad' },
+            genero: { icon: 'fas fa-venus-mars', label: 'Género' },
+            tamano: { icon: 'fas fa-ruler-combined', label: 'Tamaño' },
+            color: { icon: 'fas fa-palette', label: 'Color' },
+            marca: { icon: 'fas fa-copyright', label: 'Marca' },
+            condicion: { icon: 'fas fa-star', label: 'Condición' }
+        };
+
+        Object.keys(attrConfig).forEach(key => {
+            if (attr[key]) {
+                const config = attrConfig[key];
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${config.icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">${config.label}</span>
+                            <span class="spec-value">${attr[key]}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (specsHTML) {
+            petsDetailsContainer.innerHTML = `
+                <div class="pets-specs-grid">
+                    <h2>Detalles de Mascotas</h2>
+                    <div class="specs-grid">
+                        ${specsHTML}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (petsDetailsContainer) {
+            petsDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addServicesDetails(ad) {
+    let servicesDetailsContainer = document.querySelector('.services-details-container');
+
+    if (!servicesDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            servicesDetailsContainer = document.createElement('div');
+            servicesDetailsContainer.className = 'services-details-container';
+            descriptionContainer.parentNode.insertBefore(servicesDetailsContainer, descriptionContainer);
+        }
+    }
+
+    const hasServicesInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasServicesInfo) {
+        const attr = ad.atributos_clave;
+        const servicesSubcats = ["Servicios de Construcción", "Servicios de Educación", "Servicios de Eventos", "Servicios de Salud", "Servicios de Tecnología", "Servicios para el Hogar", "Otros Servicios"];
+
+        if (!servicesSubcats.includes(attr.subcategoria)) {
+            if (servicesDetailsContainer) {
+                servicesDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
+        let specsHTML = '';
+
+        const attrConfig = {
+            tipo_servicio: { icon: 'fas fa-wrench', label: 'Tipo de Servicio' },
+            modalidad: { icon: 'fas fa-location-arrow', label: 'Modalidad' },
+            experiencia: { icon: 'fas fa-award', label: 'Experiencia' },
+            especialidad: { icon: 'fas fa-briefcase', label: 'Especialidad' },
+            certificaciones: { icon: 'fas fa-certificate', label: 'Certificaciones' },
+            idiomas: { icon: 'fas fa-language', label: 'Idiomas' },
+            disponibilidad: { icon: 'fas fa-calendar-alt', label: 'Disponibilidad' }
+        };
+
+        Object.keys(attrConfig).forEach(key => {
+            if (attr[key]) {
+                const config = attrConfig[key];
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${config.icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">${config.label}</span>
+                            <span class="spec-value">${attr[key]}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (specsHTML) {
+            servicesDetailsContainer.innerHTML = `
+                <div class="services-specs-grid">
+                    <h2>Detalles del Servicio</h2>
+                    <div class="specs-grid">
+                        ${specsHTML}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (servicesDetailsContainer) {
+            servicesDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addBusinessDetails(ad) {
+    let businessDetailsContainer = document.querySelector('.business-details-container');
+
+    if (!businessDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            businessDetailsContainer = document.createElement('div');
+            businessDetailsContainer.className = 'business-details-container';
+            descriptionContainer.parentNode.insertBefore(businessDetailsContainer, descriptionContainer);
+        }
+    }
+
+    const hasBusinessInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasBusinessInfo) {
+        const attr = ad.atributos_clave;
+        const businessSubcats = ["Equipos para Negocios", "Maquinaria para Negocios", "Negocios en Venta"];
+
+        if (!businessSubcats.includes(attr.subcategoria)) {
+            if (businessDetailsContainer) {
+                businessDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
+        let specsHTML = '';
+
+        const attrConfig = {
+            tipo_negocio: { icon: 'fas fa-briefcase', label: 'Tipo de Negocio' },
+            tipo_equipo: { icon: 'fas fa-cogs', label: 'Tipo de Equipo' },
+            condicion: { icon: 'fas fa-star', label: 'Condición' },
+            antiguedad: { icon: 'fas fa-calendar-alt', label: 'Antigüedad' },
+            incluye: { icon: 'fas fa-box-open', label: 'Incluye' },
+            razon_venta: { icon: 'fas fa-question-circle', label: 'Razón de Venta' },
+            rentabilidad: { icon: 'fas fa-chart-line', label: 'Rentabilidad' },
+            empleados: { icon: 'fas fa-users', label: 'Empleados' }
+        };
+
+        Object.keys(attrConfig).forEach(key => {
+            if (attr[key]) {
+                const config = attrConfig[key];
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${config.icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">${config.label}</span>
+                            <span class="spec-value">${attr[key]}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (specsHTML) {
+            businessDetailsContainer.innerHTML = `
+                <div class="business-specs-grid">
+                    <h2>Detalles del Negocio</h2>
+                    <div class="specs-grid">
+                        ${specsHTML}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (businessDetailsContainer) {
+            businessDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
+function addCommunityDetails(ad) {
+    let communityDetailsContainer = document.querySelector('.community-details-container');
+
+    if (!communityDetailsContainer) {
+        const descriptionContainer = document.querySelector('.description-container');
+        if (descriptionContainer) {
+            communityDetailsContainer = document.createElement('div');
+            communityDetailsContainer.className = 'community-details-container';
+            descriptionContainer.parentNode.insertBefore(communityDetailsContainer, descriptionContainer);
+        }
+    }
+
+    const hasCommunityInfo = ad.atributos_clave && typeof ad.atributos_clave === 'object' && ad.atributos_clave.subcategoria;
+
+    if (hasCommunityInfo) {
+        const attr = ad.atributos_clave;
+        const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
+
+        if (!communitySubcats.includes(attr.subcategoria)) {
+            if (communityDetailsContainer) {
+                communityDetailsContainer.style.display = 'none';
+            }
+            return;
+        }
+
+        let specsHTML = '';
+
+        const attrConfig = {
+            tipo_evento: { icon: 'fas fa-calendar-day', label: 'Tipo de Evento' },
+            tipo_actividad: { icon: 'fas fa-users', label: 'Tipo de Actividad' },
+            tipo_clase: { icon: 'fas fa-chalkboard-teacher', label: 'Tipo de Clase' },
+            nivel: { icon: 'fas fa-chart-line', label: 'Nivel' },
+            modalidad: { icon: 'fas fa-map-marker-alt', label: 'Modalidad' },
+            fecha_evento: { icon: 'fas fa-calendar-alt', label: 'Fecha del Evento' },
+            hora_evento: { icon: 'fas fa-clock', label: 'Hora del Evento' },
+            organizador: { icon: 'fas fa-user-tie', label: 'Organizador' },
+            costo: { icon: 'fas fa-dollar-sign', label: 'Costo' },
+            requisitos: { icon: 'fas fa-clipboard-list', label: 'Requisitos' }
+        };
+
+        Object.keys(attrConfig).forEach(key => {
+            if (attr[key]) {
+                const config = attrConfig[key];
+                specsHTML += `
+                    <div class="spec-item">
+                        <i class="${config.icon}"></i>
+                        <div class="spec-content">
+                            <span class="spec-label">${config.label}</span>
+                            <span class="spec-value">${attr[key]}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (specsHTML) {
+            communityDetailsContainer.innerHTML = `
+                <div class="community-specs-grid">
+                    <h2>Detalles de Comunidad</h2>
+                    <div class="specs-grid">
+                        ${specsHTML}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (communityDetailsContainer) {
+            communityDetailsContainer.style.display = 'none';
+        }
+    }
+}
+
 function addVehicleDetails(ad) {
     let vehicleDetailsContainer = document.querySelector('.vehicle-details-container');
 
@@ -533,6 +907,12 @@ function addVehicleDetails(ad) {
 
     // ✅ LEER DESDE JSONB
     const attr = ad.atributos_clave || {};
+
+    const categoria = ad.categoria?.toLowerCase() || '';
+    if (!categoria.includes('vehículo') && !categoria.includes('auto') && !categoria.includes('carro') && !categoria.includes('moto')) {
+        if (vehicleDetailsContainer) vehicleDetailsContainer.style.display = 'none';
+        return;
+    }
     const hasVehicleInfo = attr.marca || attr.anio || attr.kilometraje || attr.transmision || attr.combustible;
 
     if (hasVehicleInfo) {

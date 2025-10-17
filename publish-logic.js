@@ -20,8 +20,18 @@ export function initializePublishPage() {
     const electronicsDetails = document.getElementById('electronics-details');
     const electronicsFields = document.getElementById('electronics-fields');
     const homeFurnitureDetails = document.getElementById('home-furniture-details');
-const fashionDetails = document.getElementById('fashion-details');
-const fashionFields = document.getElementById('fashion-fields');
+    const fashionDetails = document.getElementById('fashion-details');
+    const fashionFields = document.getElementById('fashion-fields');
+    const sportsDetails = document.getElementById('sports-details');
+    const sportsFields = document.getElementById('sports-fields');
+    const petsDetails = document.getElementById('pets-details');
+    const petsFields = document.getElementById('pets-fields');
+    const servicesDetails = document.getElementById('services-details');
+    const servicesFields = document.getElementById('services-fields');
+    const businessDetails = document.getElementById('business-details');
+    const businessFields = document.getElementById('business-fields');
+    const communityDetails = document.getElementById('community-details');
+    const communityFields = document.getElementById('community-fields');
     const vehicleFields = document.getElementById('vehicle-fields');
     const realestateFields = document.getElementById('realestate-fields');
     const homeFurnitureFields = document.getElementById('home-furniture-fields');
@@ -60,17 +70,16 @@ const fashionFields = document.getElementById('fashion-fields');
         "Computadoras": ["tipo_computadora", "marca", "procesador", "memoria_ram", "almacenamiento", "tamano_pantalla", "condicion"],
         "Consolas y Videojuegos": ["plataforma", "modelo", "almacenamiento", "condicion"],
         "Audio y Video": ["tipo_articulo", "marca", "modelo", "condicion"],
-        "Fotografía": ["tipo_articulo", "marca", "modelo", "condicion"]
+        "Fotografía": ["tipo_equipo", "marca", "modelo", "condicion"]
     };
 
     // --- DATOS DE SUBCATEGORÍAS DE HOGAR Y MUEBLES ---
     const homeFurnitureSubcategories = {
-        "Muebles de Sala": ["tipo_mueble", "material", "color", "dimensiones", "condicion"],
-        "Muebles de Dormitorio": ["tipo_mueble", "material", "color", "dimensiones", "condicion"],
-        "Cocina y Comedor": ["tipo_articulo", "material", "color", "condicion"],
-        "Electrodomésticos": ["tipo_electrodomestico", "marca", "modelo", "condicion"],
+        "Artículos de Cocina": ["tipo_articulo", "material", "marca", "condicion"],
         "Decoración": ["tipo_decoracion", "material", "color", "dimensiones", "condicion"],
-        "Jardín": ["tipo_articulo", "material", "condicion"]
+        "Electrodomésticos": ["tipo_electrodomestico", "marca", "modelo", "condicion"],
+        "Jardín y Exterior": ["tipo_articulo", "material", "condicion"],
+        "Muebles": ["tipo_mueble", "material", "color", "dimensiones", "condicion"]
     };
 
     // --- DATOS DE SUBCATEGORÍAS DE MODA Y BELLEZA ---
@@ -83,6 +92,61 @@ const fashionFields = document.getElementById('fashion-fields');
         "Accesorios": ["tipo_accesorio", "marca", "material", "condicion"],
         "Joyería y Relojes": ["tipo_joya", "material", "condicion"],
         "Salud y Belleza": ["tipo_producto", "marca", "categoria_producto", "condicion"]
+    };
+
+    // ========================================
+    // CONFIGURACIÓN DE SUBCATEGORÍAS - DEPORTES Y HOBBIES
+    // ========================================
+    const sportsSubcategories = {
+        "Bicicletas": ["tipo_bicicleta", "marca", "aro", "condicion"],
+        "Coleccionables": ["tipo_articulo", "marca", "condicion"],
+        "Deportes": ["tipo_articulo", "marca", "talla", "condicion"],
+        "Instrumentos Musicales": ["tipo_instrumento", "marca", "condicion"],
+        "Libros, Revistas y Comics": ["tipo_articulo", "autor_fabricante", "condicion"],
+        "Otros Hobbies": ["tipo_articulo", "marca", "condicion"]
+    };
+
+    // ========================================
+    // CONFIGURACIÓN DE SUBCATEGORÍAS - MASCOTAS
+    // ========================================
+    const petsSubcategories = {
+        "Perros": ["tipo_anuncio", "raza", "edad_mascota", "genero"],
+        "Gatos": ["tipo_anuncio", "raza", "edad_mascota", "genero"],
+        "Aves": ["tipo_anuncio", "raza", "edad_mascota", "genero"],
+        "Peces": ["tipo_anuncio", "raza", "edad_mascota"],
+        "Otros Animales": ["tipo_anuncio", "raza", "edad_mascota", "genero"],
+        "Accesorios para Mascotas": ["tipo_accesorio", "marca", "condicion"]
+    };
+
+    // ========================================
+    // CONFIGURACIÓN DE SUBCATEGORÍAS - SERVICIOS
+    // ========================================
+    const servicesSubcategories = {
+        "Servicios de Construcción": ["tipo_servicio", "modalidad", "experiencia"],
+        "Servicios de Educación": ["tipo_servicio", "modalidad", "experiencia"],
+        "Servicios de Eventos": ["tipo_servicio", "modalidad", "experiencia"],
+        "Servicios de Salud": ["tipo_servicio", "modalidad", "experiencia"],
+        "Servicios de Tecnología": ["tipo_servicio", "modalidad", "experiencia"],
+        "Servicios para el Hogar": ["tipo_servicio", "modalidad", "experiencia"],
+        "Otros Servicios": ["tipo_servicio", "modalidad", "experiencia"]
+    };
+
+    // ========================================
+    // CONFIGURACIÓN DE SUBCATEGORÍAS - NEGOCIOS
+    // ========================================
+    const businessSubcategories = {
+        "Equipos para Negocios": ["tipo_equipo", "marca", "modelo", "condicion"],
+        "Maquinaria para Negocios": ["tipo_equipo", "marca", "modelo", "condicion", "anio"],
+        "Negocios en Venta": ["tipo_negocio", "años_operacion", "incluye", "razon_venta"]
+    };
+
+    // ========================================
+    // CONFIGURACIÓN DE SUBCATEGORÍAS - COMUNIDAD
+    // ========================================
+    const communitySubcategories = {
+        "Clases y Cursos": ["tipo_clase", "modalidad", "nivel"],
+        "Eventos": ["tipo_evento", "fecha_evento", "ubicacion_evento"],
+        "Otros": ["tipo_anuncio"]
     };
 
     // --- DATOS DE SUBCATEGORÍAS DE VEHÍCULOS ---
@@ -110,6 +174,11 @@ function showDynamicFields() {
     electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
     homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
     fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
 
     if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
         vehicleDetails.style.display = 'block';
@@ -151,9 +220,89 @@ function showDynamicFields() {
         electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'none';
         fashionDetails.style.display = 'block';
+        sportsDetails.style.display = 'none';
+        petsDetails.style.display = 'none';
+        servicesDetails.style.display = 'none';
+        businessDetails.style.display = 'none';
+        communityDetails.style.display = 'none';
         fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showFashionFields();
+        }
+    } else if (selectedMainCategory.toLowerCase().includes('deportes') || selectedMainCategory.toLowerCase().includes('hobbies')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        sportsDetails.style.display = 'block';
+        petsDetails.style.display = 'none';
+        servicesDetails.style.display = 'none';
+        businessDetails.style.display = 'none';
+        communityDetails.style.display = 'none';
+        sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showSportsFields();
+        }
+    } else if (selectedMainCategory.toLowerCase().includes('mascota')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        sportsDetails.style.display = 'none';
+        petsDetails.style.display = 'block';
+        servicesDetails.style.display = 'none';
+        businessDetails.style.display = 'none';
+        communityDetails.style.display = 'none';
+        petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showPetsFields();
+        }
+    } else if (selectedMainCategory.toLowerCase().includes('servicio')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        sportsDetails.style.display = 'none';
+        petsDetails.style.display = 'none';
+        servicesDetails.style.display = 'block';
+        businessDetails.style.display = 'none';
+        communityDetails.style.display = 'none';
+        servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showServicesFields();
+        }
+    } else if (selectedMainCategory.toLowerCase().includes('negocio')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        sportsDetails.style.display = 'none';
+        petsDetails.style.display = 'none';
+        servicesDetails.style.display = 'none';
+        businessDetails.style.display = 'block';
+        communityDetails.style.display = 'none';
+        businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showBusinessFields();
+        }
+    } else if (selectedMainCategory.toLowerCase().includes('comunidad')) {
+        vehicleDetails.style.display = 'none';
+        realestateDetails.style.display = 'none';
+        electronicsDetails.style.display = 'none';
+        homeFurnitureDetails.style.display = 'none';
+        fashionDetails.style.display = 'none';
+        sportsDetails.style.display = 'none';
+        petsDetails.style.display = 'none';
+        servicesDetails.style.display = 'none';
+        businessDetails.style.display = 'none';
+        communityDetails.style.display = 'block';
+        communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        if (selectedSubcategory) {
+            showCommunityFields();
         }
     } else {
         vehicleDetails.style.display = 'none';
@@ -161,6 +310,11 @@ function showDynamicFields() {
         electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'none';
         fashionDetails.style.display = 'none';
+        sportsDetails.style.display = 'none';
+        petsDetails.style.display = 'none';
+        servicesDetails.style.display = 'none';
+        businessDetails.style.display = 'none';
+        communityDetails.style.display = 'none';
     }
 }
 
@@ -266,31 +420,25 @@ function showDynamicFields() {
                 label.style.fontWeight = 'bold';
                 fieldDiv.appendChild(label);
                 fieldDiv.appendChild(select);
-            } else if (field === 'tipo_articulo') {
-                labelText = 'Tipo de Artículo';
+            } else if (field === 'tipo_equipo') {
+                labelText = 'Tipo de Equipo Fotográfico';
                 const select = document.createElement('select');
                 select.id = `attr-${field}`;
-                select.name = `electronics_${field}`;
-                select.className = 'form-control';
-                select.style.width = '100%';
-                select.style.padding = '8px';
-                select.style.border = '1px solid #ccc';
-                select.style.borderRadius = '4px';
+                select.name = field;
                 select.innerHTML = `
                     <option value="">Selecciona</option>
-                    <option value="TV">TV</option>
-                    <option value="Auricular">Auricular</option>
-                    <option value="Parlante">Parlante</option>
-                    <option value="Cámara">Cámara</option>
+                    <option value="Cámara Digital">Cámara Digital</option>
+                    <option value="Cámara Réflex">Cámara Réflex</option>
+                    <option value="Cámara Mirrorless">Cámara Mirrorless</option>
                     <option value="Lente">Lente</option>
+                    <option value="Flash">Flash</option>
+                    <option value="Trípode">Trípode</option>
+                    <option value="Estabilizador">Estabilizador</option>
+                    <option value="Drone">Drone con Cámara</option>
+                    <option value="Accesorios">Accesorios</option>
                     <option value="Otro">Otro</option>
                 `;
-                const label = document.createElement('label');
-                label.textContent = labelText;
-                label.style.display = 'block';
-                label.style.marginBottom = '5px';
-                label.style.fontWeight = 'bold';
-                fieldDiv.appendChild(label);
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
                 fieldDiv.appendChild(select);
             } else if (field === 'condicion') {
                 labelText = 'Condición';
@@ -333,7 +481,7 @@ function showDynamicFields() {
                 placeholder = `Ej: ${labelText}`;
             }
 
-            if (field !== 'tipo_computadora' && field !== 'plataforma' && field !== 'tipo_articulo' && field !== 'condicion') {
+            if (field !== 'tipo_computadora' && field !== 'plataforma' && field !== 'tipo_equipo' && field !== 'condicion') {
                 const input = document.createElement('input');
                 input.type = inputType;
                 input.id = `attr-${field}`;
@@ -407,14 +555,33 @@ function showDynamicFields() {
                 const select = document.createElement('select');
                 select.id = `attr-${field}`;
                 select.name = field;
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Mesa">Mesa</option>
-                    <option value="Silla">Silla</option>
-                    <option value="Utensilio">Utensilio</option>
-                    <option value="Herramienta">Herramienta</option>
-                    <option value="Otro">Otro</option>
-                `;
+                
+                // Opciones dinámicas según subcategoría
+                let options = '';
+                if (selectedSubcategory === 'Artículos de Cocina') {
+                    options = `
+                        <option value="">Selecciona</option>
+                        <option value="Utensilios">Utensilios</option>
+                        <option value="Vajilla">Vajilla</option>
+                        <option value="Ollas y Sartenes">Ollas y Sartenes</option>
+                        <option value="Cuchillería">Cuchillería</option>
+                        <option value="Otro">Otro</option>
+                    `;
+                } else if (selectedSubcategory === 'Jardín y Exterior') {
+                    options = `
+                        <option value="">Selecciona</option>
+                        <option value="Herramientas de Jardín">Herramientas de Jardones</option>
+                        <option value="Muebles de Jardín">Muebles de Jardín</option>
+                        <option value="Plantas y Macetas">Plantas y Macetas</option>
+                        <option value="Parrillas">Parrillas</option>
+                        <option value="Iluminación Exterior">Iluminación Exterior</option>
+                        <option value="Otro">Otro</option>
+                    `;
+                } else {
+                    options = `<option value="">Selecciona</option><option value="Otro">Otro</option>`;
+                }
+                
+                select.innerHTML = options;
                 fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
                 fieldDiv.appendChild(select);
             } else if (field === 'tipo_electrodomestico') {
@@ -671,6 +838,565 @@ function showFashionFields() {
     });
 }
 
+    function showSportsFields() {
+        const fields = sportsSubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        sportsDetails.style.display = 'block';
+        sportsFields.innerHTML = '';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        sportsFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            const fieldConfigs = {
+                tipo_bicicleta: {
+                    label: 'Tipo de Bicicleta',
+                    type: 'select',
+                    options: ['Mountain Bike', 'Ruta', 'BMX', 'Eléctrica', 'Híbrida', 'Infantil']
+                },
+                tipo_articulo: selectedSubcategory === 'Deportes' ? {
+                    label: 'Tipo de Artículo',
+                    type: 'select',
+                    options: ['Ropa Deportiva', 'Calzado Deportivo', 'Balones', 'Raquetas', 'Guantes', 'Cascos', 'Pesas', 'Otros']
+                } : {
+                    label: 'Tipo de Artículo',
+                    type: 'text',
+                    placeholder: 'Ej: Álbum de estampas, Libro de cocina, etc.'
+                },
+                tipo_instrumento: {
+                    label: 'Tipo de Instrumento',
+                    type: 'select',
+                    options: ['Guitarra', 'Bajo', 'Batería', 'Piano/Teclado', 'Viento', 'Cuerdas', 'Otro']
+                },
+                marca: (() => {
+                    const placeholders = {
+                        'Bicicletas': 'Ej: Trek, Giant, Specialized, BMX, Rali',
+                        'Instrumentos Musicales': 'Ej: Yamaha, Fender, Gibson, Roland',
+                        'Deportes': 'Ej: Nike, Adidas, Puma, Reebok',
+                        'Coleccionables': 'Ej: Panini, Marvel, Hot Wheels, Lego',
+                        'Libros, Revistas y Comics': 'Ej: Editorial Planeta, Marvel Comics, DC',
+                        'Otros Hobbies': 'Ej: Marca del artículo'
+                    };
+                    return {
+                        label: 'Marca', 
+                        type: 'text',
+                        placeholder: placeholders[selectedSubcategory] || 'Ej: Marca del artículo'
+                    };
+                })(),
+                aro: {
+                    label: 'Aro',
+                    type: 'select',
+                    options: ['12"', '16"', '20"', '24"', '26"', '27.5"', '29"']
+                },
+                talla: { 
+                    label: 'Talla', 
+                    type: 'text',
+                    placeholder: 'Ej: S, M, L, XL, 42'
+                },
+                autor_fabricante: { 
+                    label: 'Autor/Fabricante', 
+                    type: 'text',
+                    placeholder: 'Ej: Gabriel García Márquez'
+                },
+                condicion: {
+                    label: 'Condición',
+                    type: 'select',
+                    options: ['Nueva', 'Usada', 'Como Nueva']
+                }
+            };
+
+            const config = fieldConfigs[field];
+
+            if (!config) {
+                console.warn(`No configuration found for field: ${field}`);
+                return;
+            }
+
+            const label = document.createElement('label');
+            label.setAttribute('for', `attr-${field}`);
+            label.textContent = `${config.label}:`;
+            fieldDiv.appendChild(label);
+
+            if (config.type === 'select') {
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.className = 'form-control';
+                select.innerHTML = `
+                    <option value="">Selecciona ${config.label}</option>
+                    ${config.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                `;
+                fieldDiv.appendChild(select);
+            } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.className = 'form-control';
+                input.placeholder = config.placeholder || '';
+                fieldDiv.appendChild(input);
+            }
+
+            sportsFields.appendChild(fieldDiv);
+        });
+    }
+
+    function showPetsFields() {
+        const fields = petsSubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        petsDetails.style.display = 'block';
+        petsFields.innerHTML = '';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        petsFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            if (field === 'tipo_anuncio') {
+                labelText = 'Tipo de Anuncio';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Adopción">Adopción</option>
+                    <option value="Venta">Venta</option>
+                    <option value="Encontrado">Encontrado</option>
+                    <option value="Perdido">Perdido</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_accesorio') {
+                labelText = 'Tipo de Accesorio';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Collar">Collar</option>
+                    <option value="Correa">Correa</option>
+                    <option value="Jaula">Jaula</option>
+                    <option value="Comida">Comida</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'genero') {
+                labelText = 'Género';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Macho">Macho</option>
+                    <option value="Hembra">Hembra</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'condicion') {
+                labelText = 'Condición';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Nuevo">Nuevo</option>
+                    <option value="Usado - Bueno">Usado - Bueno</option>
+                    <option value="Usado - Regular">Usado - Regular</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'edad_mascota') {
+                inputType = 'number';
+                placeholder = 'Ej: 2';
+                labelText = 'Edad de la Mascota (años)';
+            } else {
+                placeholder = `Ej: ${labelText}`;
+            }
+
+            if (field !== 'tipo_anuncio' && field !== 'tipo_accesorio' && field !== 'genero' && field !== 'condicion') {
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.placeholder = placeholder;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(input);
+            }
+
+            petsFields.appendChild(fieldDiv);
+        });
+    }
+
+    function showServicesFields() {
+        const fields = servicesSubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        servicesDetails.style.display = 'block';
+        servicesFields.innerHTML = '';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        servicesFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            const fieldConfigs = {
+                tipo_servicio: (() => {
+                    const serviceTypes = {
+                        'Servicios de Construcción': {
+                            type: 'select',
+                            options: ['Construcción General', 'Remodelación', 'Albañilería', 'Pintura', 'Electricidad', 'Plomería', 'Carpintería', 'Techado', 'Otros']
+                        },
+                        'Servicios de Educación': {
+                            type: 'select',
+                            options: ['Clases Particulares', 'Tutoría Académica', 'Preparación de Exámenes', 'Idiomas', 'Música', 'Arte', 'Deportes', 'Informática', 'Otros']
+                        },
+                        'Servicios de Eventos': {
+                            type: 'select',
+                            options: ['Organización de Eventos', 'Catering', 'Decoración', 'Fotografía', 'Video', 'Música/DJ', 'Animación', 'Alquiler de Equipos', 'Otros']
+                        },
+                        'Servicios de Salud': {
+                            type: 'select',
+                            options: ['Consultas Médicas', 'Terapia Física', 'Psicología', 'Nutrición', 'Enfermería', 'Cuidado de Adultos Mayores', 'Masajes Terapéuticos', 'Otros']
+                        },
+                        'Servicios de Tecnología': {
+                            type: 'select',
+                            options: ['Reparación de Computadoras', 'Reparación de Celulares', 'Desarrollo Web', 'Diseño Gráfico', 'Soporte Técnico', 'Instalación de Redes', 'Consultoría IT', 'Otros']
+                        },
+                        'Servicios para el Hogar': {
+                            type: 'select',
+                            options: ['Limpieza', 'Jardinería', 'Reparaciones Generales', 'Cerrajería', 'Fumigación', 'Mudanzas', 'Lavandería', 'Cuidado de Niños', 'Otros']
+                        },
+                        'Otros Servicios': {
+                            type: 'text',
+                            placeholder: 'Describe el tipo de servicio'
+                        }
+                    };
+                    
+                    const config = serviceTypes[selectedSubcategory] || serviceTypes['Otros Servicios'];
+                    return {
+                        label: 'Tipo de Servicio',
+                        ...config
+                    };
+                })(),
+                modalidad: {
+                    label: 'Modalidad',
+                    type: 'select',
+                    options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido']
+                },
+                experiencia: {
+                    label: 'Experiencia',
+                    type: 'select',
+                    options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años']
+                }
+            };
+
+            const config = fieldConfigs[field];
+
+            if (!config) {
+                console.warn(`No configuration found for field: ${field}`);
+                return;
+            }
+
+            const label = document.createElement('label');
+            label.setAttribute('for', `attr-${field}`);
+            label.textContent = `${config.label}:`;
+            fieldDiv.appendChild(label);
+
+            if (config.type === 'select') {
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.className = 'form-control';
+                select.innerHTML = `
+                    <option value="">Selecciona ${config.label}</option>
+                    ${config.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                `;
+                fieldDiv.appendChild(select);
+            } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.className = 'form-control';
+                input.placeholder = config.placeholder || '';
+                fieldDiv.appendChild(input);
+            }
+
+            servicesFields.appendChild(fieldDiv);
+        });
+    }
+
+function showBusinessFields() {
+    const fields = businessSubcategories[selectedSubcategory];
+    if (!fields) {
+        console.log('No fields found for subcategory:', selectedSubcategory);
+        return;
+    }
+
+    const businessDetails = document.getElementById('business-details');
+    const businessFields = document.getElementById('business-fields');
+    
+    if (!businessDetails || !businessFields) {
+        console.error('Contenedor de negocios no encontrado');
+        return;
+    }
+
+    businessDetails.style.display = 'block';
+    
+    // ✅ TÍTULO DINÁMICO según subcategoría
+    businessFields.innerHTML = `<h4>Detalles de ${selectedSubcategory}</h4>`;
+
+    // ✅ CONFIGURACIÓN DINÁMICA de campos
+    const fieldConfigs = {
+        tipo_equipo: selectedSubcategory === 'Equipos para Negocios' ? {
+            label: 'Tipo de Equipo',
+            type: 'select',
+            options: ['Computadoras', 'Impresoras', 'Fotocopiadoras', 'Teléfonos/Centrales', 'Muebles de Oficina', 'Cajas Registradoras/POS', 'Equipos de Seguridad', 'Aire Acondicionado', 'Máquina de Café', 'Otros']
+        } : selectedSubcategory === 'Maquinaria para Negocios' ? {
+            label: 'Tipo de Maquinaria',
+            type: 'select',
+            options: ['Maquinaria Industrial', 'Equipos de Construcción', 'Equipos de Restaurante', 'Equipos de Panadería', 'Equipos de Lavandería', 'Equipos Agrícolas', 'Equipos de Limpieza Industrial', 'Generadores', 'Compresores', 'Otros']
+        } : null,
+        
+        tipo_negocio: {
+            label: 'Tipo de Negocio',
+            type: 'select',
+            options: ['Restaurante', 'Cafetería', 'Tienda de Ropa', 'Supermercado/Minisuper', 'Farmacia', 'Ferretería', 'Oficina/Consultorio', 'Taller/Mecánica', 'Salón de Belleza', 'Gimnasio', 'Industrial', 'Otros']
+        },
+        
+        marca: { 
+            label: 'Marca', 
+            type: 'text',
+            placeholder: 'Ej: HP, Dell, Samsung'
+        },
+        
+        modelo: { 
+            label: 'Modelo', 
+            type: 'text',
+            placeholder: 'Ej: Modelo del equipo'
+        },
+        
+        anio: { 
+            label: 'Año', 
+            type: 'number',
+            placeholder: 'Ej: 2020'
+        },
+        
+        años_operacion: {
+            label: 'Años de Operación',
+            type: 'select',
+            options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años', 'Más de 10 años']
+        },
+        
+        incluye: { 
+            label: 'Qué Incluye', 
+            type: 'text', 
+            placeholder: 'Ej: Local propio, inventario, equipos, clientela'
+        },
+        
+        razon_venta: {
+            label: 'Razón de Venta',
+            type: 'select',
+            options: ['Cambio de rubro', 'Viaje al extranjero', 'Jubilación', 'Falta de tiempo', 'Problemas de salud', 'Otros']
+        },
+        
+        condicion: {
+            label: 'Condición',
+            type: 'select',
+            options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Reacondicionado', 'Para Repuestos']
+        }
+    };
+
+    // ✅ GENERAR CAMPOS solo si existen en fields Y en fieldConfigs
+    fields.forEach(field => {
+        const config = fieldConfigs[field];
+        
+        // ✅ Si el config es null (como tipo_equipo en "Negocio en Venta"), saltar
+        if (!config) {
+            console.log(`Campo "${field}" no tiene configuración para ${selectedSubcategory}, omitiendo`);
+            return;
+        }
+
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'form-group';
+
+        if (config.type === 'select') {
+            fieldDiv.innerHTML = `
+                <label for="attr-${field}">${config.label}:</label>
+                <select id="attr-${field}" name="${field}" class="form-control">
+                    <option value="">Selecciona ${config.label}</option>
+                    ${config.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                </select>
+            `;
+        } else if (config.type === 'number') {
+            fieldDiv.innerHTML = `
+                <label for="attr-${field}">${config.label}:</label>
+                <input type="number" id="attr-${field}" name="${field}" class="form-control" placeholder="${config.placeholder || ''}" min="1900" max="2030">
+            `;
+        } else {
+            fieldDiv.innerHTML = `
+                <label for="attr-${field}">${config.label}:</label>
+                <input type="text" id="attr-${field}" name="${field}" class="form-control" placeholder="${config.placeholder || ''}">
+            `;
+        }
+
+        businessFields.appendChild(fieldDiv);
+    });
+}
+
+    function showCommunityFields() {
+        const fields = communitySubcategories[selectedSubcategory];
+        if (!fields) {
+            console.log('No fields found for subcategory:', selectedSubcategory);
+            return;
+        }
+
+        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+
+        communityDetails.style.display = 'block';
+        communityFields.innerHTML = '';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        communityFields.appendChild(titleDiv);
+
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+
+            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let inputType = 'text';
+            let placeholder = '';
+
+            if (field === 'tipo_clase') {
+                labelText = 'Tipo de Clase';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Idioma">Idioma</option>
+                    <option value="Música">Música</option>
+                    <option value="Deporte">Deporte</option>
+                    <option value="Arte">Arte</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_evento') {
+                labelText = 'Tipo de Evento';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Concierto">Concierto</option>
+                    <option value="Fiesta">Fiesta</option>
+                    <option value="Conferencia">Conferencia</option>
+                    <option value="Otro">Otro</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'tipo_anuncio') {
+                labelText = 'Tipo de Anuncio';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Oferta">Oferta</option>
+                    <option value="Búsqueda">Búsqueda</option>
+                    <option value="Anuncio General">Anuncio General</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'modalidad') {
+                labelText = 'Modalidad';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Presencial">Presencial</option>
+                    <option value="Virtual">Virtual</option>
+                    <option value="Híbrido">Híbrido</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'nivel') {
+                labelText = 'Nivel';
+                const select = document.createElement('select');
+                select.id = `attr-${field}`;
+                select.name = field;
+                select.innerHTML = `
+                    <option value="">Selecciona</option>
+                    <option value="Principiante">Principiante</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                `;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(select);
+            } else if (field === 'fecha_evento') {
+                inputType = 'date';
+                labelText = 'Fecha del Evento';
+            } else {
+                placeholder = `Ej: ${labelText}`;
+            }
+
+            if (field !== 'tipo_clase' && field !== 'tipo_evento' && field !== 'tipo_anuncio' && field !== 'modalidad' && field !== 'nivel') {
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.id = `attr-${field}`;
+                input.name = field;
+                input.placeholder = placeholder;
+                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
+                fieldDiv.appendChild(input);
+            }
+
+            communityFields.appendChild(fieldDiv);
+        });
+    }
+
     function loadContactInfo() {
         if (userInfo) {
             contactName.value = userInfo.user_metadata?.full_name || userInfo.email.split('@')[0];
@@ -805,8 +1531,29 @@ function showFashionFields() {
         if (selectedMainCategory.toLowerCase().includes('electrónica')) {
             console.log('Main category is Electrónica. Calling showElectronicsFields.');
             showElectronicsFields();
+        } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
+            console.log('Main category is Hogar y Muebles. Calling showHomeFurnitureFields.');
+            showHomeFurnitureFields();
+        } else if (selectedMainCategory.toLowerCase().includes('moda') || selectedMainCategory.toLowerCase().includes('belleza') || selectedMainCategory.toLowerCase().includes('ropa')) {
+            console.log('Main category is Moda y Belleza. Calling showFashionFields.');
+            showFashionFields();
+        } else if (selectedMainCategory.toLowerCase().includes('deportes') || selectedMainCategory.toLowerCase().includes('hobbies')) {
+            console.log('Main category is Deportes y Hobbies. Calling showSportsFields.');
+            showSportsFields();
+        } else if (selectedMainCategory.toLowerCase().includes('mascota')) {
+            console.log('Main category is Mascotas. Calling showPetsFields.');
+            showPetsFields();
+        } else if (selectedMainCategory.toLowerCase().includes('servicio')) {
+            console.log('Main category is Servicios. Calling showServicesFields.');
+            showServicesFields();
+        } else if (selectedMainCategory.toLowerCase().includes('negocio')) {
+            console.log('Main category is Negocios. Calling showBusinessFields.');
+            showBusinessFields();
+        } else if (selectedMainCategory.toLowerCase().includes('comunidad')) {
+            console.log('Main category is Comunidad. Calling showCommunityFields.');
+            showCommunityFields();
         } else {
-            console.log('Main category is NOT Electrónica. Not calling showElectronicsFields.');
+            console.log('Main category does not have dynamic fields.');
         }
     });
 
@@ -1188,6 +1935,73 @@ form.addEventListener('submit', async (e) => {
         }
         
         console.log('� JSON FINAL:', json);
+        // --- DEPORTES Y HOBBIES ---
+        if (mainCategory.toLowerCase().includes('deporte') ||
+            mainCategory.toLowerCase().includes('hobbies')) {
+            const fields = sportsSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+
+        // --- MASCOTAS ---
+        if (mainCategory.toLowerCase().includes('mascota')) {
+            const fields = petsSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+
+        // --- SERVICIOS ---
+        if (mainCategory.toLowerCase().includes('servicio')) {
+            const fields = servicesSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+
+        // --- NEGOCIOS ---
+        if (mainCategory.toLowerCase().includes('negocio')) {
+            const fields = businessSubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = (field === 'anio') ? parseInt(value) : value;
+                    }
+                });
+            }
+        }
+
+        // --- COMUNIDAD ---
+        if (mainCategory.toLowerCase().includes('comunidad')) {
+            const fields = communitySubcategories[subcategory];
+            if (fields) {
+                fields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        json[field] = value;
+                    }
+                });
+            }
+        }
+
+        console.log(' JSON FINAL:', json);
         return Object.keys(json).length > 0 ? json : null;
     }
 
