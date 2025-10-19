@@ -2,6 +2,28 @@
 
 import { supabase } from './supabase-client.js';
 
+// CONFIGURACIÓN DE PLANES
+const PLAN_LIMITS = {
+    'free': { maxFotos: 3, hasVideo: false, hasCarousel: false, priority: 0 },
+    'basico': { maxFotos: 5, hasVideo: false, hasCarousel: false, priority: 1 },
+    'premium': { maxFotos: 10, hasVideo: false, hasCarousel: true, priority: 2 },
+    'destacado': { maxFotos: 15, hasVideo: false, hasCarousel: true, priority: 3 },
+    'top': { maxFotos: 20, hasVideo: true, hasCarousel: true, priority: 4 }
+};
+
+// VALIDAR CANTIDAD DE FOTOS
+function validateImageCount(plan) {
+    const selectedPlan = plan || 'free';
+    const limit = PLAN_LIMITS[selectedPlan].maxFotos;
+    const currentImages = document.querySelectorAll('.image-preview').length;
+    
+    if (currentImages >= limit) {
+        alert(`El plan ${selectedPlan.toUpperCase()} permite máximo ${limit} fotos`);
+        return false;
+    }
+    return true;
+}
+
 export function initializePublishPage() {
     const form = document.getElementById('ad-form');
     if (!form) return;
@@ -1575,7 +1597,7 @@ function showBusinessFields() {
     // =======================================================
 
     let galleryFiles = [];
-    const MAX_FILES = 10;
+    // const MAX_FILES = 10; // Ahora se define por el plan
 
     // 1. FUNCIÓN DE RENDERIZADO (CORREGIDA)
     const renderPreviews = () => {
@@ -1585,7 +1607,7 @@ function showBusinessFields() {
             reader.onload = (e) => {
                 const wrapper = document.createElement('div');
                 // La clase que SÍ está en nuestro CSS
-                wrapper.className = 'preview-image-wrapper';
+                wrapper.className = 'preview-image-wrapper image-preview'; // Añadir clase para conteo
 
                 wrapper.innerHTML = `
                     <img src="${e.target.result}" class="preview-image">
@@ -1599,12 +1621,19 @@ function showBusinessFields() {
 
     // 2. FUNCIÓN PARA AÑADIR ARCHIVOS (CORREGIDA)
     const addFiles = (newFiles) => {
+        const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
+        const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free'; // Usar 'free' como default
+
         const filesToAdd = Array.from(newFiles);
-        if (galleryFiles.length + filesToAdd.length > MAX_FILES) {
-            alert(`Solo puedes subir un máximo de ${MAX_FILES} imágenes.`);
-            filesToAdd.splice(MAX_FILES - galleryFiles.length); // Cortamos el exceso
+        
+        // Validar cada archivo antes de añadirlo
+        for (const file of filesToAdd) {
+            if (!validateImageCount(selectedPlan)) {
+                alert('No puedes añadir más imágenes con tu plan actual.');
+                return; // Detener si no se puede añadir más
+            }
+            galleryFiles.push(file);
         }
-        galleryFiles.push(...filesToAdd);
         renderPreviews();
     };
 
@@ -1764,32 +1793,35 @@ form.addEventListener('submit', async (e) => {
 
             // 2. Calcular la fecha de expiración del plan
             const VIGENCIA_GRATIS_DIAS = 30;
+            const VIGENCIA_BASICO_DIAS = 30;
+            const VIGENCIA_PREMIUM_DIAS = 30;
             const VIGENCIA_DESTACADO_DIAS = 30;
-            const VIGENCIA_PREMIUM_DIAS = 60;
+            const VIGENCIA_TOP_DIAS = 30;
 
-            let diasDeVigencia = VIGENCIA_GRATIS_DIAS;
-            if (selectedPlan === 'destacado') {
-                diasDeVigencia = VIGENCIA_DESTACADO_DIAS;
-            } else if (selectedPlan === 'premium') {
-                diasDeVigencia = VIGENCIA_PREMIUM_DIAS;
-            }
+            let diasDeVigencia = 30; // Todos los planes 30 días
+
+            // ELIMINAR o COMENTAR cualquier lógica que cambie los días según el plan
+            // if (selectedPlan === 'basico') {
+            //     diasDeVigencia = VIGENCIA_BASICO_DIAS;
+            // } else if (selectedPlan === 'premium') {
+            //     diasDeVigencia = VIGENCIA_PREMIUM_DIAS;
+            // } else if (selectedPlan === 'destacado') {
+            //     diasDeVigencia = VIGENCIA_DESTACADO_DIAS;
+            // } else if (selectedPlan === 'top') {
+            //     diasDeVigencia = VIGENCIA_TOP_DIAS;
+            // }
 
             const fechaExpiracion = new Date();
             fechaExpiracion.setDate(fechaExpiracion.getDate() + diasDeVigencia);
 
-            // 3. Obtener los "enhancements" (add-ons opcionales)
-            const isUrgent = document.getElementById('enhancement-urgent') ? document.getElementById('enhancement-urgent').checked : false;
-            const onHomepage = document.getElementById('enhancement-homepage') ? document.getElementById('enhancement-homepage').checked : false;
+            // 3. Los "enhancements" (add-ons opcionales) han sido eliminados.
 
-            const enhancements = {
-                is_urgent: isUrgent,
-                on_homepage: onHomepage
-            };
-
-            // 4. Añadir los nuevos datos al objeto principal del anuncio
+            // 4. Añadir los datos del plan al objeto principal del anuncio
             adData.featured_plan = selectedPlan;
             adData.featured_until = fechaExpiracion.toISOString();
-            adData.enhancements = enhancements;
+            adData.plan_priority = PLAN_LIMITS[selectedPlan].priority; // AGREGAR
+            adData.max_images = PLAN_LIMITS[selectedPlan].maxFotos; // AGREGAR
+            // adData.enhancements = enhancements; // Eliminado: ya no hay enhancements
 
             // ==================================================================
             // === FIN: LÓGICA PARA PLANES Y MEJORAS ===

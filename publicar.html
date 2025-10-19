@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="form.css">
+    <link rel="stylesheet" href="publish.css">
 </head>
 <body>
     <nav class="navbar-moderno">
@@ -298,90 +299,139 @@
               </div>
             </div>
 
-            <!-- PASO 4: DESTACAR -->
             <div class="form-section" id="step-4" style="display: none;">
-                <h2 class="section-title"><i class="fas fa-rocket"></i> Elige cómo impulsar tu anuncio</h2>
-
-                <div class="form-group">
-                    <h3 class="subsection-title">Planes de Publicación</h3>
-                    <div class="membership-options">
-                        <!-- Plan Gratis -->
-                        <div class="membership-card">
-                            <input type="radio" id="plan-free" name="plan" value="free" checked>
-                            <label for="plan-free">
-                                <h4>Gratis</h4>
-                                <p class="price">$0.00</p>
-                                <ul class="benefits-list">
-                                    <li><i class="fas fa-check"></i> Anuncio por 30 días</li>
-                                    <li><i class="fas fa-check"></i> Visibilidad estándar</li>
-                                </ul>
-                            </label>
+    <h2 class="section-title"><i class="fas fa-rocket"></i> Elige tu plan de publicación</h2>
+    
+    <div class="plans-container">
+        <!-- Plan GRATIS -->
+        <div class="plan-card gratis">
+            <div class="plan-header">
+                <h3 class="plan-title">GRATIS</h3>
+                <p class="plan-duration">30 días</p>
+                <p class="plan-price">$0.00</p>
+            </div>
+            <div class="plan-body">
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check"></i> Publicación básica</li>
+                    <li><i class="fas fa-check"></i> Hasta 3 fotos</li>
+                    <li><i class="fas fa-check"></i> Visibilidad estándar</li>
+                    <li><i class="fas fa-times"></i> Sin destacados</li>
+                    <li><i class="fas fa-times"></i> Sin estadísticas</li>
+                </ul>
+                <label class="plan-select">
+                    <input type="radio" name="plan" value="free" checked>
+                    <span class="plan-button">Seleccionar</span>
+                </label>
+            </div>
         </div>
-                        <!-- Plan Destacado -->
-                        <div class="membership-card popular">
-                            <div class="premium-badge">Más Popular</div>
-                            <input type="radio" id="plan-destacado" name="plan" value="destacado">
-                            <label for="plan-destacado">
-                                <h4>Destacado</h4>
-                                <p class="price">$5.00</p>
-                                <ul class="benefits-list">
-                                    <li><i class="fas fa-check"></i> Todo lo del plan Gratis</li>
-                                    <li><i class="fas fa-check"></i> Anuncio por 30 días</li>
-                                    <li><i class="fas fa-check"></i> Posición #1 en búsquedas</li>
-                                    <li><i class="fas fa-check"></i> Badge "Destacado"</li>
-                                </ul>
-                            </label>
-                        </div>
-                        <!-- Plan Premium -->
-                        <div class="membership-card">
-                            <input type="radio" id="plan-premium" name="plan" value="premium">
-                            <label for="plan-premium">
-                                <h4>Premium</h4>
-                                <p class="price">$15.00</p>
-                                <ul class="benefits-list">
-                                    <li><i class="fas fa-check"></i> Todo lo del plan Destacado</li>
-                                    <li><i class="fas fa-check"></i> Anuncio por 60 días</li>
-                                    <li><i class="fas fa-check"></i> Renovación automática</li>
-                                </ul>
-                            </label>
-          </div>
-        </div>
-      </div>
 
-                <div class="form-group">
-                    <h3 class="subsection-title">Resaltadores Adicionales (Opcional)</h3>
-                    <div class="highlight-options-modern">
-                        <label for="highlight-urgent" class="highlight-button">
-                            <input type="checkbox" id="highlight-urgent" name="highlight" value="urgent">
-                            <span>
-                                <strong>Marcar como "Urgente"</strong>
-                                <small>7 días por +$2.00</small>
-                            </span>
-                        </label>
-                        <label for="highlight-gallery" class="highlight-button">
-                            <input type="checkbox" id="highlight-gallery" name="highlight" value="gallery">
-                            <span>
-                                <strong>Aparecer en Portada</strong>
-                                <small>15 días por +$5.00</small>
-                            </span>
-                        </label>
-      </div>
-      </div>
-
-                <div class="final-step-actions">
-                    <!-- (La sección de login/registro se manejará con la lógica de envío) -->
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-secondary back-btn" data-target="3">Atrás</button>
-                        <button type="submit" class="btn btn-primary" id="publish-ad-btn">Publicar Anuncio</button>
+        <!-- Plan BÁSICO -->
+        <div class="plan-card basico">
+            <span class="badge-basico" title="Plan Básico"><i class="fas fa-medal"></i></span>
+            <div class="plan-header">
+                <h3 class="plan-title">BÁSICO</h3>
+                <p class="plan-duration">30 días</p>
+                <p class="plan-price">$5.00</p>
+            </div>
+            <div class="plan-body">
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check"></i> Hasta 5 fotos</li>
+                    <li><i class="fas fa-check"></i> Borde bronce</li>
+                    <li><i class="fas fa-check"></i> Sobre anuncios gratis</li>
+                    <li><i class="fas fa-times"></i> Sin carrusel</li>
+                    <li><i class="fas fa-times"></i> Sin estadísticas</li>
+                </ul>
+                <label class="plan-select">
+                    <input type="radio" name="plan" value="basico">
+                    <span class="plan-button">Seleccionar</span>
+                </label>
+            </div>
         </div>
-      </div>
+
+        <!-- Plan PREMIUM -->
+        <div class="plan-card premium">
+            <span class="badge-premium" title="Plan Premium"><i class="fas fa-medal"></i></span>
+            <div class="plan-header">
+                <h3 class="plan-title">PREMIUM</h3>
+                <p class="plan-duration">30 días</p>
+                <p class="plan-price">$15.00</p>
+            </div>
+            <div class="plan-body">
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check"></i> Hasta 10 fotos + carrusel</li>
+                    <li><i class="fas fa-check"></i> Borde plateado</li>
+                    <li><i class="fas fa-check"></i> Sección Premium</li>
+                    <li><i class="fas fa-check"></i> Estadísticas básicas</li>
+                    <li><i class="fas fa-times"></i> Sin video</li>
+                </ul>
+                <label class="plan-select">
+                    <input type="radio" name="plan" value="premium">
+                    <span class="plan-button">Seleccionar</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Plan DESTACADO -->
+        <div class="plan-card destacado">
+            <span class="badge-destacado" title="Plan Destacado"><i class="fas fa-medal"></i></span>
+            <div class="plan-header">
+                <h3 class="plan-title">DESTACADO</h3>
+                <p class="plan-duration">30 días</p>
+                <p class="plan-price">$25.00</p>
+            </div>
+            <div class="plan-body">
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check"></i> 15 fotos + carrusel auto</li>
+                    <li><i class="fas fa-check"></i> Borde dorado animado</li>
+                    <li><i class="fas fa-check"></i> Banner principal</li>
+                    <li><i class="fas fa-check"></i> Badge DESTACADO</li>
+                    <li><i class="fas fa-check"></i> Estadísticas detalladas</li>
+                <li><i class="fas fa-check"></i> 1 video</li>
+                </ul>
+                <label class="plan-select">
+                    <input type="radio" name="plan" value="destacado">
+                    <span class="plan-button">Seleccionar</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Plan TOP -->
+        <div class="plan-card top">
+            <span class="badge-top" title="Plan TOP"><i class="fas fa-crown"></i></span>
+            <div class="plan-header">
+                <h3 class="plan-title">TOP</h3>
+                <p class="plan-duration">30 días</p>
+                <p class="plan-price">$45.00</p>
+            </div>
+            <div class="plan-body">
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check"></i> 20 fotos + 1 video</li>
+                    <li><i class="fas fa-check"></i> Top 3 búsquedas</li>
+                    <li><i class="fas fa-check"></i> Redes sociales</li>
+                    <li><i class="fas fa-check"></i> Newsletter semanal</li>
+                    <li><i class="fas fa-check"></i> Estadísticas tiempo real</li>
+                </ul>
+                <label class="plan-select">
+                    <input type="radio" name="plan" value="top">
+                    <span class="plan-button">Seleccionar</span>
+                </label>
+            </div>
+        </div>
     </div>
+
+    <div class="final-step-actions">
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary back-btn" data-target="3">Atrás</button>
+            <button type="submit" class="btn btn-primary" id="publish-ad-btn">Publicar Anuncio</button>
+        </div>
+    </div>
+</div>
         </form>
     </main>
 
     <footer class="wizard-footer-simple"></footer>
     
     <!-- ======================== SCRIPTS ======================== -->
-    <script type="module" src="main.js"></script>
+    <script type="module" src="main.js" defer></script>
 </body>
 </html>

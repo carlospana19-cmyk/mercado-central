@@ -311,34 +311,6 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 /* --- TARJETAS DE PRODUCTO (.box) --- */
-.box-container {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-}
-
-/* Filas de anuncios */
-.ads-row {
-    display: grid;
-    gap: 3rem;
-}
-
-/* Primera fila: 2 columnas */
-.row-2-cols {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-/* Segunda fila: 3 columnas */
-.row-3-cols {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-/* Tercera fila: 4 columnas */
-.row-4-cols {
-    grid-template-columns: repeat(4, 1fr);
-}
-
-/* Estilos base para todas las tarjetas */
 .box {
     background: var(--color-blanco);
     border-radius: 1.6rem;
@@ -349,41 +321,172 @@ main, section.hero-search, section.categories-showcase, section.products {
     transition: all 0.4s;
     position: relative;
 }
-
 .box:hover {
     transform: translateY(-1rem);
     box-shadow: var(--sombra-media);
 }
-.box .image-container { width: 100%; aspect-ratio: 4 / 3; position: relative; background-color: #eee; }
-.box .swiper { width: 100%; height: 100%; }
-.box .swiper-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.box .content { padding: 2rem; display: flex; flex-direction: column; flex-grow: 1; }
-.box .content h3 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; height: 5rem; overflow: hidden; }
-.box .content .price { font-size: 2.4rem; font-weight: 800; color: var(--color-secundario); margin-bottom: 1rem; }
-.box .content .location { font-size: 1.4rem; color: var(--color-gris); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
-.box .content .btn-contact { display: flex; align-items: center; justify-content: center; gap: 1rem; width: 100%; padding: 1.4rem; background: var(--color-primario); color: var(--color-blanco); border-radius: 1rem; text-decoration: none; font-weight: 700; font-size: 1.6rem; transition: all 0.3s ease; margin-top: auto; }
-.box .content .btn-contact:hover { background: var(--color-secundario); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35); }
+.box .image-container {
+    width: 100%;
+    height: 240px; /* Ajustada la altura para una imagen más grande */
+    position: relative;
+    background-color: #eee;
+}
+.box .swiper {
+    width: 100%;
+    height: 100%;
+}
+.box .swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.box .content {
+    width: 100%;
+    /* CLAVE: Aumenta el padding a 25px para un espaciado generoso. */
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    box-sizing: border-box;
+}
+/* 1. Estilos del Precio: CLAVE para el diseño de Bienes Raíces. */
+.box .content .price {
+    height: auto;
+    /* Lo hacemos muy grande y muy negrita. */
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-texto);
+    /* Separación grande del título/nombre del producto. */
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+/* 2. Estilos del Título/Nombre del Producto (e.g., kia picanto) */
+.box .content h3 {
+    height: auto;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #444;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    /* Separación más pequeña con el siguiente elemento. */
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+/* 3. Estilos de Ubicación/Texto Secundario (e.g., Colón, tu oportunidad) */
+.box .content .location {
+    height: auto;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* CLAVE: Gran espacio después de la ubicación. */
+    margin-bottom: 25px;
+    flex-shrink: 0;
+}
+
+/* 4. Estilos de Detalles Adicionales (Año, KM, M2, etc.) */
+.box .content .property-details {
+    height: auto;
+    /* CLAVE: Reducimos el tamaño de la fuente. */
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    color: var(--color-gris);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.box .content .property-details i {
+    font-size: 1.6rem;
+}
+
+/* 5. Estilos del campo de descripción */
+.box .content .description {
+    height: auto; /* Allow height to be flexible */
+    min-height: 20px; /* Ensure it takes up space even if empty */
+    font-size: 1.3rem;
+    color: var(--color-texto);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limitar a 2 líneas */
+    -webkit-box-orient: vertical;
+    margin-bottom: 15px; /* Add some margin below the description */
+    flex-grow: 1; /* Allow description to grow and fill space */
+    flex-shrink: 1; /* Allow description to shrink if needed */
+}
+
+/* 6. Estilos del Botón de Contacto: Ancho completo y color Turquesa */
+.box .content .btn-contact {
+    width: 100%;
+    height: auto;
+    padding: 1.2rem 2rem;
+    border-radius: 6px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: var(--color-primario); /* Turquesa */
+    color: var(--color-blanco);
+    margin-top: auto;
+    align-self: stretch;
+    flex-shrink: 0;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.box .content .btn-contact:hover {
+    background: var(--color-secundario); /* Turquesa más oscuro */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35);
+}
 
 /* Estilos para botones del carrusel en tarjetas .box (igual que en resultados) */
 .box .swiper-button-prev,
 .box .swiper-button-next {
-  color: #ffffff !important;
-  background-color: rgba(0, 0, 0, 0.3);
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  transform: translateY(-50%);
-  top: 50%;
+    color: #ffffff !important;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    top: 50%;
 }
 
 .box .swiper-button-prev::after,
 .box .swiper-button-next::after {
-  font-size: 14px !important;
-  font-weight: bold;
+    font-size: 14px !important;
+    font-weight: bold;
 }
 
 .box .swiper-button-prev:hover,
 .box .swiper-button-next:hover {
-  background-color: var(--color-primario) !important;
-  color: white !important;
+    background-color: var(--color-primario) !important;
+    color: white !important;
+}
+
+/* --- MEDIA QUERY PARA MÓVILES --- */
+@media (max-width: 768px) {
+    /* La cuadrícula de anuncios cambia de 2 columnas a 1 columna */
+    .ads-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    /* Asegura que la tarjeta use todo el ancho en móviles */
+    .box {
+        width: 100%; 
+        margin: 0 auto; 
+    }
 }

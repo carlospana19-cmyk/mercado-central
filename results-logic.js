@@ -271,7 +271,7 @@ async function loadAndFilterResults() {
     // Paginación
     const from = (currentPage - 1) * RESULTS_PER_PAGE;
     const to = from + RESULTS_PER_PAGE - 1;
-    queryBuilder = queryBuilder.range(from, to);
+    queryBuilder = queryBuilder.limit(RESULTS_PER_PAGE).range(from, to);
 
     const { data: products, error, count } = await queryBuilder;
 
@@ -281,18 +281,18 @@ async function loadAndFilterResults() {
         return;
     }
 
-    // SISTEMA DE DESTACADOS: Ordenar anuncios por plan
-    // Premium primero, luego Destacado, luego Free
+    // ORDENAMIENTO POR PRIORIDAD DE PLAN
     products.sort((a, b) => {
-        const planOrder = { 'premium': 1, 'destacado': 2, 'free': 3 };
-        const orderA = planOrder[a.featured_plan] || 4;
-        const orderB = planOrder[b.featured_plan] || 4;
-
-        // Si tienen el mismo plan, ordenar por fecha más reciente
-        if (orderA === orderB) {
-            return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
+        // Primero por prioridad de plan
+        const priorityA = a.plan_priority || 0;
+        const priorityB = b.plan_priority || 0;
+        
+        if (priorityA !== priorityB) {
+            return priorityB - priorityA; // Mayor prioridad primero
         }
-        return orderA - orderB;
+        
+        // Si mismo plan, por fecha
+        return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
     });
 
     displayFilteredProducts(products || []);
@@ -343,12 +343,18 @@ function displayFilteredProducts(ads) {
         let badgeHTML = '';
         let cardExtraClass = '';
         
-        if (ad.featured_plan === 'premium') {
-            badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-star"></i></span>';
+        if (ad.featured_plan === 'basico') {
+            badgeHTML = '<span class="badge-basico" title="Plan Básico"><i class="fas fa-medal"></i></span>';
+            cardExtraClass = 'card-basico';
+        } else if (ad.featured_plan === 'premium') {
+            badgeHTML = '<span class="badge-premium" title="Plan Premium"><i class="fas fa-medal"></i></span>';
             cardExtraClass = 'card-premium';
         } else if (ad.featured_plan === 'destacado') {
-            badgeHTML = '<span class="badge-destacado" title="Anuncio Destacado"><i class="fas fa-star"></i></span>';
+            badgeHTML = '<span class="badge-destacado" title="Plan Destacado"><i class="fas fa-medal"></i></span>';
             cardExtraClass = 'card-destacado';
+        } else if (ad.featured_plan === 'top') {
+            badgeHTML = '<span class="badge-top" title="Plan TOP"><i class="fas fa-crown"></i></span>';
+            cardExtraClass = 'card-top';
         }
         
         // Badge de urgente con ícono de reloj
@@ -658,7 +664,7 @@ return `
         ${urgentBadge}
         
         <div class="property-image">
-            <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
+            <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}" loading="lazy">
         </div>
         
         <div class="property-details">
@@ -772,22 +778,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(subcatError) { console.error(subcatError); return; }
 
             // --- LÓGICA DE CONTEO (ROBUSTA) ---
-            const subcategoriesWithCounts = [];
-            for (const sub of subcategories) {
-                const { count, error } = await supabase
-                    .from('anuncios')
-                    .select('*', { count: 'exact', head: true }) // head:true hace que no traiga datos, solo el conteo. Es más rápido.
-                    .eq('categoria', sub.nombre);
-
-                if (!error) {
-                    subcategoriesWithCounts.push({
-                        nombre: sub.nombre,
-                        count: count
-                    });
-                }
-            }
-
-            displaySubcategoryFilters(subcategoriesWithCounts);
+            // Bloque de conteo de subcategorías eliminado para optimización.
+            displaySubcategoryFilters([]); // Mostrar sin conteos por ahora
         } else {
             // Si no hay categoría padre, mostrar mensaje de no subcategorías
             displaySubcategoryFilters([]);
@@ -801,22 +793,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const categoriesWithCounts = [];
-        for (const cat of allCategories) {
-            const { count, error } = await supabase
-                .from('anuncios')
-                .select('*', { count: 'exact', head: true })
-                .eq('categoria', cat.nombre);
-
-            if (!error && count > 0) {
-                categoriesWithCounts.push({
-                    nombre: cat.nombre,
-                    count: count
-                });
-            }
-        }
-
-        displaySubcategoryFilters(categoriesWithCounts);
+        // Bloque de conteo de categorías eliminado para optimización.
+        displaySubcategoryFilters([]); // Mostrar sin conteos por ahora
     }
 
     await loadAndFilterResults();

@@ -22,7 +22,7 @@ export function initializeHomePage() {
             const { data: ads, error } = await supabase
                 .from('anuncios')
                 .select('*')
-                .in('featured_plan', ['destacado', 'premium'])
+                .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                 .order('fecha_publicacion', { ascending: false })
                 .limit(15); // Aumentamos el límite para tener suficientes anuncios
 
@@ -47,12 +47,18 @@ export function initializeHomePage() {
                 let badgeHTML = '';
                 let cardExtraClass = '';
 
-                if (ad.featured_plan === 'premium') {
-                    badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-star"></i></span>';
-                    cardExtraClass = 'card-premium';
+                if (ad.featured_plan === 'top') {
+                    badgeHTML = '<span class="badge-top" title="Anuncio TOP"><i class="fas fa-gem"></i></span>';
+                    cardExtraClass = 'card-top';
                 } else if (ad.featured_plan === 'destacado') {
-                    badgeHTML = '<span class="badge-destacado" title="Anuncio Destacado"><i class="fas fa-star"></i></span>';
+                    badgeHTML = '<span class="badge-destacado" title="Anuncio Destacado"><i class="fas fa-medal"></i></span>';
                     cardExtraClass = 'card-destacado';
+                } else if (ad.featured_plan === 'premium') {
+                    badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-award"></i></span>';
+                    cardExtraClass = 'card-premium';
+                } else if (ad.featured_plan === 'basico') {
+                    badgeHTML = '<span class="badge-basico" title="Anuncio Básico"><i class="fas fa-certificate"></i></span>';
+                    cardExtraClass = 'card-basico';
                 }
 
                 let urgentBadge = '';
@@ -77,6 +83,7 @@ export function initializeHomePage() {
                             <div class="price">${priceFormatted}</div>
                             <h3>${ad.titulo}</h3>
                             <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
+                            <div class="description">${ad.descripcion || ''}</div> <!-- Descripción detallada -->
                             ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
                             <a href="#" class="btn-contact">Contactar</a>
                         </div>
