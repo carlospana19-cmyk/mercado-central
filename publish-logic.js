@@ -1753,6 +1753,47 @@ form.addEventListener('submit', async (e) => {
 
             // --- ATRIBUTOS UNIFICADOS (TODAS las categorías van a JSONB) ---
             adData.atributos_clave = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
+
+            // ==================================================================
+            // === INICIO: LÓGICA PARA PLANES Y MEJORAS ===
+            // ==================================================================
+
+            // 1. Obtener el plan seleccionado
+            const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
+            const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'gratis';
+
+            // 2. Calcular la fecha de expiración del plan
+            const VIGENCIA_GRATIS_DIAS = 30;
+            const VIGENCIA_DESTACADO_DIAS = 30;
+            const VIGENCIA_PREMIUM_DIAS = 60;
+
+            let diasDeVigencia = VIGENCIA_GRATIS_DIAS;
+            if (selectedPlan === 'destacado') {
+                diasDeVigencia = VIGENCIA_DESTACADO_DIAS;
+            } else if (selectedPlan === 'premium') {
+                diasDeVigencia = VIGENCIA_PREMIUM_DIAS;
+            }
+
+            const fechaExpiracion = new Date();
+            fechaExpiracion.setDate(fechaExpiracion.getDate() + diasDeVigencia);
+
+            // 3. Obtener los "enhancements" (add-ons opcionales)
+            const isUrgent = document.getElementById('enhancement-urgent') ? document.getElementById('enhancement-urgent').checked : false;
+            const onHomepage = document.getElementById('enhancement-homepage') ? document.getElementById('enhancement-homepage').checked : false;
+
+            const enhancements = {
+                is_urgent: isUrgent,
+                on_homepage: onHomepage
+            };
+
+            // 4. Añadir los nuevos datos al objeto principal del anuncio
+            adData.featured_plan = selectedPlan;
+            adData.featured_until = fechaExpiracion.toISOString();
+            adData.enhancements = enhancements;
+
+            // ==================================================================
+            // === FIN: LÓGICA PARA PLANES Y MEJORAS ===
+            // ==================================================================
         
             const { data: newAd, error: adInsertError } = await supabase
                 .from('anuncios')

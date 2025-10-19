@@ -11,139 +11,120 @@ export function initializeHomePage() {
 
     async function loadFeaturedAds() {
         console.log("SENSOR 2: loadFeaturedAds() ha comenzado.");
-        
+
         const container = document.querySelector('#products .box-container');
         if (!container) {
             console.error("FALLO CRÍTICO: No se encontró el contenedor '#products .box-container'.");
             return;
         }
-        
+
         try {
             const { data: ads, error } = await supabase
-            .from('anuncios')
+                .from('anuncios')
                 .select('*')
-                .eq('is_featured', true)
-                .limit(8);
+                .in('featured_plan', ['destacado', 'premium'])
+                .order('fecha_publicacion', { ascending: false })
+                .limit(15); // Aumentamos el límite para tener suficientes anuncios
 
-        if (error) {
-                // Esto lanzará un error que veremos en la consola.
-                throw error;
-            }
-            
+            if (error) throw error;
+
             console.log("SENSOR 3: Datos recibidos de Supabase:", ads);
 
             if (!ads || ads.length === 0) {
                 container.innerHTML = '<p>No hay anuncios destacados en este momento.</p>';
-                console.log("SENSOR 4: No se encontraron anuncios destacados.");
-            return;
-        }
+                return;
+            }
 
-            // Crear filas con diferentes números de columnas
+            // === INICIO: Lógica de renderizado por filas personalizadas ===
             let adsHTML = '';
+            let processedAds = 0;
 
-            // Primera fila: 2 columnas
-            if (ads.length >= 2) {
+            const generateCardHTML = (ad) => {
+                const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
+                const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+                
+                const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
+                let badgeHTML = '';
+                let cardExtraClass = '';
+
+                if (ad.featured_plan === 'premium') {
+                    badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-star"></i></span>';
+                    cardExtraClass = 'card-premium';
+                } else if (ad.featured_plan === 'destacado') {
+                    badgeHTML = '<span class="badge-destacado" title="Anuncio Destacado"><i class="fas fa-star"></i></span>';
+                    cardExtraClass = 'card-destacado';
+                }
+
+                let urgentBadge = '';
+                if (ad.enhancements && ad.enhancements.is_urgent) {
+                    urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
+                }
+
+                return `
+                    <div class="${cardClass} ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                        ${badgeHTML}
+                        ${urgentBadge}
+                        <div class="image-container">
+                            <div class="swiper product-swiper">
+                                <div class="swiper-wrapper">
+                                    ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
+                                </div>
+                                <div class="swiper-button-prev"></div>
+                                <div class="swiper-button-next"></div>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="price">${priceFormatted}</div>
+                            <h3>${ad.titulo}</h3>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
+                            ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
+                            <a href="#" class="btn-contact">Contactar</a>
+                        </div>
+                    </div>`;
+            };
+
+            // Fila 1: 2 columnas
+            if (processedAds < ads.length) {
+                const rowAds = ads.slice(processedAds, processedAds + 2);
                 adsHTML += '<div class="ads-row row-2-cols">';
-                for (let i = 0; i < 2 && i < ads.length; i++) {
-                    const ad = ads[i];
-                    console.log("DEBUG: Procesando anuncio:", ad.titulo, "Categoría:", ad.categoria, "Atributos:", ad.atributos_clave);
-                    const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
-                    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
-
-                    adsHTML += `
-                        <div class="box">
-                            <div class="image-container">
-                    <div class="swiper product-swiper">
-                        <div class="swiper-wrapper">
-                                        ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
-                        </div>
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
-                    </div>
-                            </div>
-                            <div class="content">
-                                <div class="price">${priceFormatted}</div>
-                    <h3>${ad.titulo}</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
-                                ${generateElectronicsDetails(ad)}
-                            </div>
-                        </div>`;
-                }
+                adsHTML += rowAds.map(generateCardHTML).join('');
                 adsHTML += '</div>';
+                processedAds += rowAds.length;
             }
 
-            // Segunda fila: 3 columnas
-            if (ads.length >= 5) {
+            // Fila 2: 3 columnas
+            if (processedAds < ads.length) {
+                const rowAds = ads.slice(processedAds, processedAds + 3);
                 adsHTML += '<div class="ads-row row-3-cols">';
-                for (let i = 2; i < 5 && i < ads.length; i++) {
-                    const ad = ads[i];
-                    const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
-                    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
-
-                    adsHTML += `
-                        <div class="box">
-                            <div class="image-container">
-                    <div class="swiper product-swiper">
-                        <div class="swiper-wrapper">
-                                        ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
-                        </div>
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
-                    </div>
-                            </div>
-                            <div class="content">
-                                <div class="price">${priceFormatted}</div>
-                    <h3>${ad.titulo}</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
-                                ${generateElectronicsDetails(ad)}
-                            </div>
-                        </div>`;
-                }
+                adsHTML += rowAds.map(generateCardHTML).join('');
                 adsHTML += '</div>';
+                processedAds += rowAds.length;
             }
 
-            // Tercera fila: 4 columnas
-            if (ads.length > 5) {
+            // Filas restantes: 4 columnas
+            while (processedAds < ads.length) {
+                const rowAds = ads.slice(processedAds, processedAds + 4);
                 adsHTML += '<div class="ads-row row-4-cols">';
-                for (let i = 5; i < ads.length; i++) {
-                    const ad = ads[i];
-                    const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
-                    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
-
-                    adsHTML += `
-                        <div class="box">
-                            <div class="image-container">
-                    <div class="swiper product-swiper">
-                        <div class="swiper-wrapper">
-                                        ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
-                        </div>
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
-                    </div>
-                            </div>
-                            <div class="content">
-                                <div class="price">${priceFormatted}</div>
-                    <h3>${ad.titulo}</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
-                                ${generateElectronicsDetails(ad)}
-                            </div>
-                        </div>`;
-                }
+                adsHTML += rowAds.map(generateCardHTML).join('');
                 adsHTML += '</div>';
+                processedAds += rowAds.length;
             }
-            
+            // === FIN: Lógica de renderizado ===
+
             container.innerHTML = adsHTML;
             console.log("SENSOR 5: HTML de anuncios insertado en el DOM.");
 
-            // Inicializar Swiper
-            new Swiper('.product-swiper', {
-                loop: true,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
+            // Inicializar Swiper para cada tarjeta
+            document.querySelectorAll('.product-swiper').forEach(swiperEl => {
+                new Swiper(swiperEl, {
+                    loop: swiperEl.querySelectorAll('.swiper-slide').length > 1, // Activar loop solo si hay más de 1 imagen
+                    navigation: {
+                        nextEl: swiperEl.querySelector('.swiper-button-next'),
+                        prevEl: swiperEl.querySelector('.swiper-button-prev'),
+                    },
+                });
             });
-            console.log("SENSOR 6: Swiper inicializado.");
+            console.log("SENSOR 6: Swipers inicializados.");
 
         } catch (e) {
             console.error("FALLO CRÍTICO DURANTE LA CARGA:", e);
@@ -155,46 +136,202 @@ export function initializeHomePage() {
     loadFeaturedAds();
 }
 
-// Mapeo de campos de electrónica a iconos y etiquetas
-const electronicsFieldMap = {
-    "marca": { icon: "fas fa-tag", label: "Marca" },
-    "modelo": { icon: "fas fa-mobile-alt", label: "Modelo" },
-    "almacenamiento": { icon: "fas fa-hdd", label: "Almacenamiento" },
-    "memoria_ram": { icon: "fas fa-memory", label: "RAM" },
-    "condicion": { icon: "fas fa-star", label: "Condición" },
-    "tipo_computadora": { icon: "fas fa-laptop", label: "Tipo" },
-    "procesador": { icon: "fas fa-microchip", label: "Procesador" },
-    "tamano_pantalla": { icon: "fas fa-desktop", label: "Pantalla" },
-    "plataforma": { icon: "fas fa-gamepad", label: "Plataforma" },
-    "tipo_articulo": { icon: "fas fa-camera", label: "Tipo" }
-};
+function generateAttributesHTML(attributes, category) {
+    if (!attributes || Object.keys(attributes).length === 0) {
+        return '';
+    }
 
-function generateElectronicsDetails(ad) {
-    let detailsHtml = '';
-    if (ad.categoria && ad.categoria.toLowerCase().includes('electrónica') && ad.atributos_clave) {
-        const atributos = ad.atributos_clave;
-        detailsHtml += '<div class="electronics-details-card">';
-        for (const key in atributos) {
-            if (atributos.hasOwnProperty(key) && key !== 'subcategoria') {
-                const fieldInfo = electronicsFieldMap[key];
-                if (fieldInfo) {
-                    let value = atributos[key];
-                    if (key === 'almacenamiento' || key === 'memoria_ram') {
-                        value += ' GB';
-                    } else if (key === 'tamano_pantalla') {
-                        value += ' pulgadas';
-                    }
-                    detailsHtml += `
-                        <div class="detail-item">
-                            <i class="${fieldInfo.icon}"></i>
-                            <span>${fieldInfo.label}: ${value}</span>
-                        </div>`;
-                }
+    const categoria = category ? category.toLowerCase() : '';
+
+    let detailsHTML = '';
+
+    // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
+    if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
+        if (attributes.marca || attributes.anio || attributes.transmision || attributes.combustible || attributes.kilometraje) {
+            let details = [];
+            if (attributes.marca) details.push(`<span><i class="fas fa-car"></i> ${attributes.marca}</span>`);
+            if (attributes.anio) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attributes.anio}</span>`);
+            if (attributes.kilometraje) details.push(`<span><i class="fas fa-tachometer-alt"></i> ${attributes.kilometraje.toLocaleString()} km</span>`);
+            if (attributes.transmision) details.push(`<span><i class="fas fa-cogs"></i> ${attributes.transmision}</span>`);
+            if (attributes.combustible) details.push(`<span><i class="fas fa-gas-pump"></i> ${attributes.combustible}</span>`);
+            
+            if (details.length > 0) {
+                detailsHTML += `<div class="vehicle-details">${details.slice(0, 3).join('')}</div>`;
             }
         }
-        detailsHtml += '</div>';
     }
-    return detailsHtml;
+    
+    // --- DETALLES DE INMUEBLES (desde JSONB) ---
+    if (categoria.includes('inmueble') || categoria.includes('casa') || categoria.includes('apartamento') || categoria.includes('propiedad')) {
+        if (attributes.m2 || attributes.habitaciones || attributes.baños) {
+            let details = [];
+            if (attributes.m2) details.push(`<span><i class="fas fa-ruler-combined"></i> ${attributes.m2} m²</span>`);
+            if (attributes.habitaciones) details.push(`<span><i class="fas fa-bed"></i> ${attributes.habitaciones} hab</span>`);
+            if (attributes.baños) details.push(`<span><i class="fas fa-bath"></i> ${attributes.baños} baños</span>`);
+            
+            if (details.length > 0) {
+                detailsHTML += `<div class="real-estate-details">${details.join('')}</div>`;
+            }
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de electrónica ---
+    const electronicsSubcats = ["celulares y teléfonos", "computadoras", "consolas y videojuegos", "audio y video", "fotografía", "electrónica"];
+    if (electronicsSubcats.some(subcat => categoria.includes(subcat))) {
+        let details = [];
+
+        if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+        if (attributes.modelo) details.push(`<span><i class="fas fa-mobile-alt"></i> ${attributes.modelo}</span>`);
+        if (attributes.almacenamiento) details.push(`<span><i class="fas fa-hdd"></i> ${attributes.almacenamiento} GB</span>`);
+        if (attributes.memoria_ram) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.memoria_ram} GB RAM</span>`);
+        if (attributes.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.procesador}</span>`);
+        if (attributes.tipo_computadora) details.push(`<span><i class="fas fa-laptop"></i> ${attributes.tipo_computadora}</span>`);
+        if (attributes.plataforma) details.push(`<span><i class="fas fa-gamepad"></i> ${attributes.plataforma}</span>`);
+        if (attributes.condicion) details.push(`<span><i class="fas fa-star"></i> ${attributes.condicion}</span>`);
+        if (attributes.tipo_articulo) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.tipo_articulo}</span>`);
+
+        if (details.length > 0) {
+            detailsHTML += `<div class="electronics-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de hogar y muebles ---
+    const homeFurnitureSubcats = ["Artículos de Cocina", "Decoración", "Electrodomésticos", "Jardín y Exterior", "Muebles"];
+    if (attributes.subcategoria && homeFurnitureSubcats.includes(attributes.subcategoria)) {
+        let details = [];
+
+        if (attributes.tipo_electrodomestico) {
+            const electroIcon = {
+                'Refrigerador': 'fas fa-snowflake',
+                'Lavadora': 'fas fa-tint',
+                'Microondas': 'fas fa-fire',
+                'Estufa': 'fas fa-fire-alt',
+                'Licuadora': 'fas fa-blender',
+                'Aspiradora': 'fas fa-wind'
+            };
+            const icon = electroIcon[attributes.tipo_electrodomestico] || 'fas fa-plug';
+            details.push(`<span><i class="${icon}"></i> ${attributes.tipo_electrodomestico}</span>`);
+        }
+
+        if (attributes.tipo_mueble) details.push(`<span><i class="fas fa-couch"></i> ${attributes.tipo_mueble}</span>`);
+        if (attributes.tipo_articulo) details.push(`<span><i class="fas fa-couch"></i> ${attributes.tipo_articulo}</span>`);
+        if (attributes.tipo_decoracion) details.push(`<span><i class="fas fa-paint-brush"></i> ${attributes.tipo_decoracion}</span>`);
+        if (attributes.material) details.push(`<span><i class="fas fa-cube"></i> ${attributes.material}</span>`);
+        if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+        if (attributes.color) details.push(`<span><i class="fas fa-palette"></i> ${attributes.color}</span>`);
+        if (attributes.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.condicion}</span>`);
+
+        if (details.length > 0) {
+            detailsHTML += `<div class="home-furniture-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de moda y belleza ---
+    const fashionSubcats = ["ropa de mujer", "ropa de hombre", "ropa de niños", "calzado", "bolsos y carteras", "accesorios", "joyería y relojes", "salud y belleza", "moda y belleza"];
+    if (fashionSubcats.some(subcat => categoria.includes(subcat))) {
+        let details = [];
+        
+        if (attributes.tipo_prenda) details.push(`<span><i class="fas fa-tshirt"></i> ${attributes.tipo_prenda}</span>`);
+        if (attributes.tipo_calzado) details.push(`<span><i class="fas fa-shoe-prints"></i> ${attributes.tipo_calzado}</span>`);
+        if (attributes.tipo_bolso) details.push(`<span><i class="fas fa-shopping-bag"></i> ${attributes.tipo_bolso}</span>`);
+        if (attributes.tipo_accesorio) details.push(`<span><i class="fas fa-glasses"></i> ${attributes.tipo_accesorio}</span>`);
+        if (attributes.tipo_joya) details.push(`<span><i class="fas fa-gem"></i> ${attributes.tipo_joya}</span>`);
+        if (attributes.tipo_producto) details.push(`<span><i class="fas fa-spray-can"></i> ${attributes.tipo_producto}</span>`);
+        if (attributes.talla) details.push(`<span><i class="fas fa-ruler"></i> Talla ${attributes.talla}</span>`);
+        if (attributes.talla_calzado) details.push(`<span><i class="fas fa-ruler"></i> Talla ${attributes.talla_calzado}</span>`);
+        if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+        if (attributes.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.condicion}</span>`);
+        
+        if (details.length > 0) {
+            detailsHTML += `<div class="fashion-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de deportes y hobbies ---
+    const sportsSubcats = ["Bicicletas", "Coleccionables", "Deportes", "Instrumentos Musicales", "Libros, Revistas y Comics", "Otros Hobbies"];
+    if (attributes.subcategoria && sportsSubcats.includes(attributes.subcategoria)) {
+        let details = [];
+        
+        if (attributes.tipo_bicicleta) details.push(`<span><i class="fas fa-bicycle"></i> ${attributes.tipo_bicicleta}</span>`);
+        if (attributes.tipo_instrumento) details.push(`<span><i class="fas fa-music"></i> ${attributes.tipo_instrumento}</span>`);
+        if (attributes.tipo_articulo) details.push(`<span><i class="fas fa-trophy"></i> ${attributes.tipo_articulo}</span>`);
+        if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+        if (attributes.aro) details.push(`<span><i class="fas fa-circle-notch"></i> Aro ${attributes.aro}</span>`);
+        if (attributes.condicion) details.push(`<span><i class="fas fa-star"></i> ${attributes.condicion}</span>`);
+        
+        if (details.length > 0) {
+            detailsHTML += `<div class="sports-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de mascotas ---
+    const petsSubcats = ["Perros", "Gatos", "Aves", "Peces", "Otros Animales", "Accesorios para Mascotas"];
+    if (attributes.subcategoria && petsSubcats.includes(attributes.subcategoria)) {
+        let details = [];
+        
+        if (attributes.tipo_anuncio) details.push(`<span><i class="fas fa-paw"></i> ${attributes.tipo_anuncio}</span>`);
+        if (attributes.tipo_accesorio) details.push(`<span><i class="fas fa-bone"></i> ${attributes.tipo_accesorio}</span>`);
+        if (attributes.raza) details.push(`<span><i class="fas fa-dog"></i> ${attributes.raza}</span>`);
+        if (attributes.edad_mascota) details.push(`<span><i class="fas fa-birthday-cake"></i> ${attributes.edad_mascota}</span>`);
+        if (attributes.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attributes.genero}</span>`);
+        if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+        
+        if (details.length > 0) {
+            detailsHTML += `<div class="pets-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de servicios ---
+    const servicesSubcats = ["Servicios de Construcción", "Servicios de Educación", "Servicios de Eventos", "Servicios de Salud", "Servicios de Tecnología", "Servicios para el Hogar", "Otros Servicios"];
+    if (attributes.subcategoria && servicesSubcats.includes(attributes.subcategoria)) {
+        let details = [];
+        
+        if (attributes.tipo_servicio) details.push(`<span><i class="fas fa-wrench"></i> ${attributes.tipo_servicio}</span>`);
+        if (attributes.modalidad) details.push(`<span><i class="fas fa-location-arrow"></i> ${attributes.modalidad}</span>`);
+        if (attributes.experiencia) details.push(`<span><i class="fas fa-award"></i> ${attributes.experiencia}</span>`);
+        
+        if (details.length > 0) {
+            detailsHTML += `<div class="services-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de negocios ---
+    const businessSubcats = ["Equipos para Negocios", "Maquinaria para Negocios", "Negocios en Venta"];
+    if (attributes.subcategoria && businessSubcats.includes(attributes.subcategoria)) {
+        let details = [];
+        
+        if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-briefcase"></i> ${attributes.tipo_negocio}</span>`);
+        if (attributes.tipo_equipo) details.push(`<span><i class="fas fa-cogs"></i> ${attributes.tipo_equipo}</span>`);
+        if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+        if (attributes.modelo) details.push(`<span><i class="fas fa-barcode"></i> ${attributes.modelo}</span>`);
+        if (attributes.años_operacion) details.push(`<span><i class="fas fa-calendar-check"></i> ${attributes.años_operacion}</span>`);
+        if (attributes.incluye) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.incluye}</span>`);
+        if (attributes.razon_venta) details.push(`<span><i class="fas fa-info-circle"></i> ${attributes.razon_venta}</span>`);
+        if (attributes.condicion) details.push(`<span><i class="fas fa-star"></i> ${attributes.condicion}</span>`);
+        
+        if (details.length > 0) {
+            detailsHTML += `<div class="business-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    // --- SECCIÓN: Iconos de atributos de comunidad ---
+    const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
+    if (attributes.subcategoria && communitySubcats.includes(attributes.subcategoria)) {
+        let details = [];
+        
+        if (attributes.tipo_evento) details.push(`<span><i class="fas fa-calendar-day"></i> ${attributes.tipo_evento}</span>`);
+        if (attributes.tipo_actividad) details.push(`<span><i class="fas fa-users"></i> ${attributes.tipo_actividad}</span>`);
+        if (attributes.tipo_clase) details.push(`<span><i class="fas fa-chalkboard-teacher"></i> ${attributes.tipo_clase}</span>`);
+        if (attributes.nivel) details.push(`<span><i class="fas fa-chart-line"></i> ${attributes.nivel}</span>`);
+        if (attributes.modalidad) details.push(`<span><i class="fas fa-map-marker-alt"></i> ${attributes.modalidad}</span>`);
+        if (attributes.fecha_evento) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attributes.fecha_evento}</span>`);
+        
+        if (details.length > 0) {
+            detailsHTML += `<div class="community-details">${details.slice(0, 3).join('')}</div>`;
+        }
+    }
+
+    return detailsHTML;
 }
 
 // Función para inicializar el carrusel del hero

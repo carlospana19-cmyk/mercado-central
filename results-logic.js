@@ -240,30 +240,37 @@ async function loadAndFilterResults() {
     const priceMin = document.getElementById('price-min').value;
     const priceMax = document.getElementById('price-max').value;
 
-    let queryBuilder = supabase.from('anuncios').select('*', { count: 'exact' });
+    const now = new Date().toISOString();
 
+    let queryBuilder = supabase
+      .from('anuncios')
+      .select('*', { count: 'exact' })
+      // Prioridad: premium y destacados activos primero
+      .order('featured_plan', { ascending: false })
+      .order('featured_until', { ascending: false, nullsFirst: false })
+      .order('fecha_publicacion', { ascending: false });
+
+    // Filtros existentes (mantener igual)
     if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%`);
     if (location) queryBuilder = queryBuilder.ilike('ubicacion', `%${location}%`);
 
     if (selectedSubcategories.length > 0) {
-        queryBuilder = queryBuilder.in('categoria', selectedSubcategories);
+      queryBuilder = queryBuilder.in('categoria', selectedSubcategories);
     } else if (mainCategory !== 'all') {
-        const { data: parentCategory } = await supabase.from('categorias').select('id').eq('nombre', mainCategory).single();
-        if (parentCategory) {
-            const { data: subcategories } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
-            const allCategoryNames = [mainCategory, ...subcategories.map(s => s.nombre)];
-            queryBuilder = queryBuilder.in('categoria', allCategoryNames);
-        }
+      const { data: parentCategory } = await supabase.from('categorias').select('id').eq('nombre', mainCategory).single();
+      if (parentCategory) {
+        const { data: subcategories } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
+        const allCategoryNames = [mainCategory, ...subcategories.map(s => s.nombre)];
+        queryBuilder = queryBuilder.in('categoria', allCategoryNames);
+      }
     }
 
     if (priceMin) queryBuilder = queryBuilder.gte('precio', priceMin);
     if (priceMax) queryBuilder = queryBuilder.lte('precio', priceMax);
 
-    // --- Lógica de paginación en la consulta ---
+    // Paginación
     const from = (currentPage - 1) * RESULTS_PER_PAGE;
     const to = from + RESULTS_PER_PAGE - 1;
-    
-    console.log(`DEBUG: Paginación - currentPage: ${currentPage}, from: ${from}, to: ${to}`);
     queryBuilder = queryBuilder.range(from, to);
 
     const { data: products, error, count } = await queryBuilder;
@@ -273,7 +280,21 @@ async function loadAndFilterResults() {
         displayError("Hubo un error al cargar los anuncios.");
         return;
     }
-    
+
+    // SISTEMA DE DESTACADOS: Ordenar anuncios por plan
+    // Premium primero, luego Destacado, luego Free
+    products.sort((a, b) => {
+        const planOrder = { 'premium': 1, 'destacado': 2, 'free': 3 };
+        const orderA = planOrder[a.featured_plan] || 4;
+        const orderB = planOrder[b.featured_plan] || 4;
+
+        // Si tienen el mismo plan, ordenar por fecha más reciente
+        if (orderA === orderB) {
+            return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
+        }
+        return orderA - orderB;
+    });
+
     displayFilteredProducts(products || []);
     updateSummary(query, mainCategory, count || 0);
     displayPaginationControls(count || 0); // Mostrar controles de paginación
@@ -311,14 +332,30 @@ function displayFilteredProducts(ads) {
     }
 
     summary.innerHTML = `<p><strong>Encontrados ${ads.length} anuncios</strong></p>`;
+    container.className = 'results-container-flex';
 
     const adsHTML = ads.map(ad => {
         const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
-        // Decide qué tarjeta usar. Aquí un ejemplo simple, puedes hacerlo más complejo.
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
-
-        // Define categoria here, as it's used in multiple blocks
         const categoria = ad.categoria ? ad.categoria.toLowerCase() : '';
+        
+        // SISTEMA DE DESTACADOS: Badges con estrellas
+        let badgeHTML = '';
+        let cardExtraClass = '';
+        
+        if (ad.featured_plan === 'premium') {
+            badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-star"></i></span>';
+            cardExtraClass = 'card-premium';
+        } else if (ad.featured_plan === 'destacado') {
+            badgeHTML = '<span class="badge-destacado" title="Anuncio Destacado"><i class="fas fa-star"></i></span>';
+            cardExtraClass = 'card-destacado';
+        }
+        
+        // Badge de urgente con ícono de reloj
+        let urgentBadge = '';
+        if (ad.enhancements && ad.enhancements.is_urgent) {
+            urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
+        }
 
         // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
         let vehicleDetailsHTML = '';
@@ -384,6 +421,7 @@ function displayFilteredProducts(ads) {
                 if (attr.tipo_computadora) details.push(`<span><i class="fas fa-laptop"></i> ${attr.tipo_computadora}</span>`);
                 if (attr.plataforma) details.push(`<span><i class="fas fa-gamepad"></i> ${attr.plataforma}</span>`);
                 if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
+                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-microchip"></i> ${attr.tipo_articulo}</span>`);
 
                 // Mostrar solo los primeros 3 atributos para no saturar la tarjeta
                 if (details.length > 0) {
@@ -423,10 +461,10 @@ function displayFilteredProducts(ads) {
                 }
 
                 if (attr.tipo_mueble) details.push(`<span><i class="fas fa-couch"></i> ${attr.tipo_mueble}</span>`);
-                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-utensils"></i> ${attr.tipo_articulo}</span>`);
+                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-couch"></i> ${attr.tipo_articulo}</span>`);
                 if (attr.tipo_decoracion) details.push(`<span><i class="fas fa-paint-brush"></i> ${attr.tipo_decoracion}</span>`);
                 if (attr.material) details.push(`<span><i class="fas fa-cube"></i> ${attr.material}</span>`);
-                if (attr.marca) details.push(`<span><i class="fas fa-copyright"></i> ${attr.marca}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
                 if (attr.color) details.push(`<span><i class="fas fa-palette"></i> ${attr.color}</span>`);
                 if (attr.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attr.condicion}</span>`);
 
@@ -488,8 +526,8 @@ function displayFilteredProducts(ads) {
                 // Iconos específicos por subcategoría
                 if (attr.tipo_bicicleta) details.push(`<span><i class="fas fa-bicycle"></i> ${attr.tipo_bicicleta}</span>`);
                 if (attr.tipo_instrumento) details.push(`<span><i class="fas fa-music"></i> ${attr.tipo_instrumento}</span>`);
-                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-tag"></i> ${attr.tipo_articulo}</span>`);
-                if (attr.marca) details.push(`<span><i class="fas fa-copyright"></i> ${attr.marca}</span>`);
+                if (attr.tipo_articulo) details.push(`<span><i class="fas fa-trophy"></i> ${attr.tipo_articulo}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
                 if (attr.aro) details.push(`<span><i class="fas fa-circle-notch"></i> Aro ${attr.aro}</span>`);
                 if (attr.condicion) details.push(`<span><i class="fas fa-star"></i> ${attr.condicion}</span>`);
                 
@@ -519,7 +557,7 @@ function displayFilteredProducts(ads) {
                 if (attr.raza) details.push(`<span><i class="fas fa-dog"></i> ${attr.raza}</span>`);
                 if (attr.edad_mascota) details.push(`<span><i class="fas fa-birthday-cake"></i> ${attr.edad_mascota}</span>`);
                 if (attr.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attr.genero}</span>`);
-                if (attr.marca) details.push(`<span><i class="fas fa-copyright"></i> ${attr.marca}</span>`);
+                if (attr.marca) details.push(`<span><i class="fas fa-tag"></i> ${attr.marca}</span>`);
                 
                 if (details.length > 0) {
                     petsDetailsHTML = `
@@ -614,27 +652,49 @@ function displayFilteredProducts(ads) {
             }
         }
 
-            return `
-                <div class="${cardClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
-                        <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
-                    <div class="content">
-                        <div class="price">${priceFormatted}</div>
-                        <h3>${ad.titulo}</h3>
-                        <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.ubicacion || 'N/A'}</div>
-                        ${vehicleDetailsHTML}
-                        ${realEstateDetailsHTML}
-                        ${electronicsDetailsHTML}
-                        ${homeFurnitureDetailsHTML}
-                        ${fashionDetailsHTML}
-                        ${sportsDetailsHTML}
-                        ${petsDetailsHTML}
-                        ${servicesDetailsHTML}
-                        ${businessDetailsHTML}
-                        ${communityDetailsHTML}
-                    <a href="#" class="btn-contact">Contactar</a>
-                    </div>
+return `
+    <div class="property-card ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+        ${badgeHTML}
+        ${urgentBadge}
+        
+        <div class="property-image">
+            <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}">
+        </div>
+        
+        <div class="property-details">
+            <div class="property-header">
+                <div class="property-seller-name">${ad.contact_name || 'Usuario Verificado'}</div>
+                <div class="property-price-and-tag">
+                    <span class="property-price">${priceFormatted}</span>
+                    ${ad.enhancements && ad.enhancements.is_urgent ? '<span class="tag-oportunidad">Oportunidad</span>' : ''}
                 </div>
-            `;
+                <div class="property-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${ad.provincia || 'Panamá'}, ${ad.distrito || ad.ubicacion || 'N/A'}
+                </div>
+                <h2 class="property-title">${ad.titulo}</h2>
+                <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
+            </div>
+            
+            <div class="property-attributes">
+                ${vehicleDetailsHTML.replace(/<div class="vehicle-details">|<\/div>/g, '')}
+                ${realEstateDetailsHTML.replace(/<div class="real-estate-details">|<\/div>/g, '')}
+                ${electronicsDetailsHTML.replace(/<div class="electronics-details">|<\/div>/g, '')}
+                ${homeFurnitureDetailsHTML.replace(/<div class="home-furniture-details">|<\/div>/g, '')}
+                ${fashionDetailsHTML.replace(/<div class="fashion-details">|<\/div>/g, '')}
+                ${sportsDetailsHTML.replace(/<div class="sports-details">|<\/div>/g, '')}
+                ${petsDetailsHTML.replace(/<div class="pets-details">|<\/div>/g, '')}
+                ${servicesDetailsHTML.replace(/<div class="services-details">|<\/div>/g, '')}
+                ${businessDetailsHTML.replace(/<div class="business-details">|<\/div>/g, '')}
+                ${communityDetailsHTML.replace(/<div class="community-details">|<\/div>/g, '')}
+            </div>
+            
+            <a href="detalle-producto.html?id=${ad.id}" class="btn-contact-card" onclick="contactar(${ad.id}, '${ad.contact_phone || ''}');">
+                Contactar ahora
+            </a>
+        </div>
+    </div>
+`;
     }).join('');
 
     container.innerHTML = adsHTML;

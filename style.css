@@ -1,4 +1,199 @@
 /* ================================================= */
+/* ========== NUEVAS TARJETAS HORIZONTALES PARA RESULTADOS ========== */
+.results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.property-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    width: 100%;
+    max-width: 900px; /* Ancho fijo para escritorio */
+    height: 300px; /* Altura fija para escritorio */
+    transition: box-shadow 0.3s ease;
+    position: relative;
+    align-items: stretch; /* Asegura que los hijos directos (imagen y detalles) se estiren a la misma altura */
+}
+
+.property-card:hover {
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+.property-card.card-premium {
+    border: 2px solid #d4d4d4;
+    box-shadow: 0 4px 20px rgba(192,192,192,0.3);
+}
+
+.property-card.card-destacado {
+    border: 2px solid #ffd700;
+    box-shadow: 0 4px 20px rgba(255,215,0,0.2);
+}
+
+.property-image {
+    width: 40%; /* Ancho especificado por el usuario */
+    height: 100%; /* Ocupa toda la altura de la tarjeta */
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+    flex-shrink: 0;  /* Evita que se encoja */
+}
+
+.property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Importante: recorta la imagen sin distorsión */
+    object-position: center;  /* Centra la imagen */
+    transition: transform 0.3s ease;
+}
+
+.property-card:hover .property-image img {
+    transform: scale(1.05);
+}
+
+.property-details {
+    width: 60%; /* Ancho especificado por el usuario */
+    padding: 20px; /* Espaciado interno especificado por el usuario */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* overflow: hidden; */  /* Evita desbordamiento - Comentado para mostrar todo el contenido */
+}
+
+.property-header {
+    margin-bottom: 10px; /* Ajustado para un espaciado más compacto */
+}
+
+.property-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px; /* Ajustado para un espaciado más compacto */
+    line-height: 1.3;
+    letter-spacing: normal !important;  /* Corrige espaciado entre letras */
+    word-spacing: normal !important;    /* Corrige espaciado entre palabras */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.property-location {
+    font-size: 14px; /* Ligeramente más pequeño */
+    color: #666;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px; /* Ajustado para un espaciado más compacto */
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+.property-location i {
+    color: var(--color-primario);
+    margin-right: 8px;
+}
+
+.property-attributes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Reducido el espacio entre atributos */
+    margin: 10px 0; /* Reducido el margen */
+    font-size: 13px; /* Ligeramente más pequeño */
+    color: #666;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+.property-attributes span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;  /* Evita que el texto se separe */
+    letter-spacing: normal !important;
+}
+
+.property-attributes i {
+    color: var(--color-primario);
+    font-size: 16px;
+}
+
+.property-price-section { /* Esta sección ya no se usa como tal, sus elementos se movieron */
+    display: none; /* Ocultar si no se usa */
+}
+
+.property-price {
+    font-size: 36px; /* Aumentado para ser más prominente */
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.property-tags {
+    display: none; /* Ocultar si no se usa */
+}
+
+.tag-urgent { /* Este estilo se reemplazará por .tag-oportunidad */
+    display: none;
+}
+
+.property-footer { /* Esta sección ya no se usa como tal */
+    display: none;
+}
+
+.property-seller { /* Esta sección ya no se usa como tal */
+    display: none;
+}
+
+.property-seller strong { /* Esta sección ya no se usa como tal */
+    display: none;
+}
+
+.btn-contact-card {
+    background-color: var(--color-primario); /* Color turquesa original de la página */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px; /* Más pequeño */
+    font-size: 14px; /* Ligeramente más pequeño */
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    margin-top: 15px; /* Espacio superior para el botón */
+    align-self: flex-start; /* Alinea el botón a la izquierda si hay espacio */
+}
+
+.btn-contact-card:hover {
+    background-color: #2980b9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .property-card {
+        flex-direction: column;
+        height: auto; /* Permitir que la altura se ajuste al contenido en móviles */
+        max-width: 100%; /* Asegurar que ocupe todo el ancho disponible */
+    }
+    
+    .property-image {
+        width: 100%;
+        height: 200px; /* Altura fija para imagen en móviles */
+    }
+    
+    .property-details {
+        width: 100%;
+        padding: 15px; /* Ajustado para móviles */
+    }
+    
+    .property-price {
+        font-size: 26px; /* Ajustado para móviles */
+    }
+}
 /* === STYLE.CSS - ESTILOS MAESTROS UNIFICADOS === */
 /* ================================================= */
 
@@ -452,11 +647,11 @@ body {
 /* --- 14. ESTILOS UNIFICADOS PARA TARJETAS DE ANUNCIO --- */
 
 /* Contenedor de las tarjetas - ¡AQUÍ ESTÁ LA CORRECCIÓN! */
-#results-container {
+/* #results-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; /* Adjusted min-width for more cards per row */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
   gap: 2.5rem !important;
-}
+} */
 
 /* Estilo Base para AMBAS tarjetas (simple y premium) */
 .box, .tarjeta-auto {
@@ -464,8 +659,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  /* display: flex; */ /* Comentado para evitar conflicto con nuevos estilos */
+  /* flex-direction: column; */ /* Comentado para evitar conflicto con nuevos estilos */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -481,20 +676,20 @@ body {
   Cualquier elemento que sea hijo directo del contenedor de resultados
   debe comportarse como un elemento de la cuadrícula.
 */
-#results-container > * {
-  width: 100%; /* Ocupa el espacio asignado por la cuadrícula */
-  min-width: 0; /* Previene desbordamientos */
-}
+/* #results-container > * {
+  width: 100%;
+  min-width: 0;
+} */
 
 /* 
   Aseguramos que ambas tarjetas tengan las propiedades flex correctas
   para que su contenido interno se organice bien.
 */
-.box, .tarjeta-auto {
+/* .box, .tarjeta-auto {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Ocupa toda la altura de la celda de la cuadrícula */
-}
+  height: 100%;
+} */
 
 /* 
   Aseguramos que el contenido de la tarjeta se expanda
@@ -1037,12 +1232,12 @@ body {
   /* Ya no necesita width: 100% ni min-width: 0 */
 }
 
-#results-container {
+/* #results-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Allow smaller cards to fit more per row */
-  gap: 2rem; /* Adjusted gap */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
   width: 100%;
-}
+} */
 
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
 .filters-sidebar h3 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 1rem; }
@@ -1055,11 +1250,11 @@ body {
 /* --- PARCHE DE EMERGENCIA PARA TARJETA-AUTO EN CUADRÍCULA --- */
 
 /* 1. Asegurar que la tarjeta respete la cuadrícula y tenga estructura flex */
-.tarjeta-auto {
+/* .tarjeta-auto {
   display: flex !important;
   flex-direction: column !important;
-  height: 100%; /* Ocupa la altura de la celda de la cuadrícula */
-}
+  height: 100%;
+} */
 
 /* 2. Forzar altura fija del contenedor de imagen para evitar desbordamiento */
 .tarjeta-auto .image-container {
@@ -1536,7 +1731,246 @@ body {
         width: 2.5rem;
     }
 
-    .spec-value {
-        font-size: 1.6rem;
+.spec-value {
+    font-size: 1.6rem;
     }
+}
+
+/* Estilos para las filas de anuncios personalizados */
+.ads-row {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem; /* Espacio entre filas */
+}
+
+.ads-row:last-child {
+  margin-bottom: 0;
+}
+
+.row-2-cols {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.row-3-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.row-4-cols {
+  grid-template-columns: repeat(4, 1fr);
+}
+/* ========== SISTEMA DE DESTACADOS ========== */
+
+/* Contenedor de badges */
+.badge-premium,
+.badge-destacado,
+.badge-urgent {
+    position: absolute;
+    top: 10px;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    cursor: default;
+}
+
+/* Badge Premium - Estrella Diamante/Platino */
+.badge-premium {
+    left: 10px;
+    background: linear-gradient(135deg, #e3e3e3 0%, #ffffff 50%, #d4d4d4 100%);
+    border: 2px solid #b8b8b8;
+}
+
+.badge-premium i {
+    color: #6a6a6a;
+    text-shadow: 0 0 10px rgba(255,255,255,0.8);
+    animation: sparkle 2s infinite;
+}
+
+/* Badge Destacado - Estrella Dorada */
+.badge-destacado {
+    left: 10px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+    border: 2px solid #ffb300;
+}
+
+.badge-destacado i {
+    color: #ff8c00;
+    text-shadow: 0 0 10px rgba(255,215,0,0.6);
+    animation: glow 2s infinite;
+}
+
+/* Badge Urgente */
+.badge-urgent {
+    right: 10px;
+    background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%);
+    border: 2px solid #cc0000;
+}
+
+.badge-urgent i {
+    color: white;
+    animation: pulse 1s infinite;
+}
+
+/* Tarjetas Premium - Borde diamante */
+.card-premium {
+    border: 2px solid #d4d4d4;
+    box-shadow: 0 4px 15px rgba(192,192,192,0.3);
+    position: relative;
+    overflow: visible;
+}
+
+/* Tarjetas Destacadas - Borde dorado */
+.card-destacado {
+    border: 2px solid #ffd700;
+    box-shadow: 0 4px 15px rgba(255,215,0,0.2);
+    position: relative;
+    overflow: visible;
+}
+
+/* Animaciones */
+@keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+}
+
+@keyframes glow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Asegurar que las tarjetas tengan position relative */
+.box, .tarjeta-auto {
+    position: relative;
+}
+
+/* Nuevos estilos para la estructura de la tarjeta */
+.property-seller-name {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.property-price-and-tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tag-oportunidad {
+    background-color: #8a2be2; /* Color morado de la competencia */
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.property-description {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limitar a 2 líneas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* CORREGIR ESPACIADO DE TEXTO - Agregar/Modificar en style.css */
+
+.property-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.3;
+    letter-spacing: normal !important;  /* Corrige espaciado entre letras */
+    word-spacing: normal !important;    /* Corrige espaciado entre palabras */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.property-location {
+    font-size: 15px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+.property-attributes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 15px 0;
+    font-size: 14px;
+    color: #666;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+.property-attributes span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;  /* Evita que el texto se separe */
+    letter-spacing: normal !important;
+}
+
+/* Reset general para todas las tarjetas */
+.property-card * {
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+/* Si el problema persiste, forzar valores específicos */
+.property-details {
+    letter-spacing: 0 !important;
+    word-spacing: 0 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+/* CORREGIR LAYOUT DE RESULTADOS - Agregar en style.css */
+#results-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 25px !important;
+    padding: 20px !important;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.results-container-flex {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 25px !important;
+}
+
+/* Eliminar estilos de grid anteriores */
+#results-container.grid {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Asegurar que las tarjetas ocupen todo el ancho */
+.property-card {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
 }
