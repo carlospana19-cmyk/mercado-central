@@ -57,7 +57,7 @@ export function initializeHomePage() {
                     badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-award"></i></span>';
                     cardExtraClass = 'card-premium';
                 } else if (ad.featured_plan === 'basico') {
-                    badgeHTML = '<span class="badge-basico" title="Anuncio Básico"><i class="fas fa-certificate"></i></span>';
+                    badgeHTML = '<span class="badge-basico" title="Anuncio Básico"><i class="fas fa-medal"></i></span>';
                     cardExtraClass = 'card-basico';
                 }
 

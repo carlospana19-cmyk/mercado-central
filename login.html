@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body id="pagina-login">
 
   <!-- NAVBAR MODERNO -->
   <nav class="navbar-moderno">
@@ -33,122 +33,19 @@
         <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
     </div>
   </nav>
-  <style>
-    body {
-      background: #e0f7fa;
-      font-family: 'Poppins', sans-serif;
-    }
-    .navbar-moderno {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 28px 14px 28px;
-      background: #00bfae;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      position: relative;
-      z-index: 10;
-    }
-    .logo-container a {
-      color: #fff !important;
-    }
-    .logo-img {
-      height: 36px;
-      width: auto;
-      margin-right: 8px;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      background: #fff;
-    }
-    .logo-text {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: #fff;
-    }
-    .menu-nav {
-      display: flex;
-      gap: 18px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #fff;
-    }
-    .menu-nav li {
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    .menu-nav li:hover {
-      color: #ffe082;
-      text-decoration: underline;
-    }
-    .buttons-nav {
-      display: flex;
-      gap: 8px;
-    }
-    .buttons-nav button {
-      background: #fff;
-      color: #00bfae;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      border: none;
-      border-radius: 5px;
-      padding: 7px 16px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: background 0.2s, color 0.2s;
-    }
-    .buttons-nav button:hover {
-      background: #00bfae;
-      color: #fff;
-    }
-    .form-box {
-      border: 2px solid #00bfae;
-      border-radius: 10px;
-      padding: 30px;
-      max-width: 400px;
-      margin: 40px auto;
-      background: #e0f7fa;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .form-box h2 {
-      font-family:'Poppins',sans-serif;
-      font-size:1.5rem;
-      font-weight:700;
-      color:#00bfae;
-      letter-spacing:1px;
-    }
-    .form-box button {
-      background: #00bfae !important;
-      color: #fff !important;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: background 0.2s, color 0.2s;
-    }
-    .form-box button:hover {
-      background: #009688 !important;
-      color: #fff !important;
-    }
-  </style>
 
-  <div class="form-box">
-    <h2>Iniciar Sesión</h2>
-    <form id="login-form">
-      <input type="email" id="email" name="email" placeholder="Correo electrónico">
-      <input type="password" id="password" name="password" placeholder="Contraseña">
-      <button type="submit">Entrar</button>
-    </form>
-    <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+  <div class="login-center-container">
+    <main class="auth-main">
+      <div class="form-box">
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+          <input type="email" id="email" name="email" placeholder="Correo electrónico">
+          <input type="password" id="password" name="password" placeholder="Contraseña">
+          <button type="submit">Entrar</button>
+        </form>
+        <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+      </div>
+    </main>
   </div>
 
   <footer class="footer">
@@ -189,6 +86,6 @@
   </footer>
 
   <!-- Inicialización centralizada -->
-  <script type="module" src="main.js" defer></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>

@@ -1846,16 +1846,6 @@ body {
     50% { transform: scale(1.1); opacity: 0.8; }
 }
 
-@keyframes sparkle {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.2) rotate(180deg); }
-}
-
-@keyframes glow {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
-
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
@@ -2110,4 +2100,152 @@ body {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
+}
+
+/* APLICAR EFECTO SPARKLE A TODOS LOS ÍCONOS DE MEDALLAS */
+.badge-basico i,
+.badge-premium i,
+.badge-destacado i,
+.badge-top i {
+    animation: sparkle 2s infinite !important;
+}
+
+/* ASEGURAR QUE SPARKLE ESTÉ DEFINIDO */
+@keyframes sparkle {
+    0%, 100% { 
+        transform: scale(1) rotate(0deg); 
+    }
+    50% { 
+        transform: scale(1.2) rotate(180deg); 
+    }
+}
+
+/* OPCIONAL: Si quieres diferentes velocidades para cada una */
+.badge-basico i { animation-duration: 2.5s !important; }
+.badge-premium i { animation-duration: 2s !important; }
+.badge-destacado i { animation-duration: 1.8s !important; }
+.badge-top i { animation-duration: 1.5s !important; }
+
+/* === ESTILOS ESPECÍFICOS PARA LA PÁGINA DE AUTENTICACIÓN (LOGIN/REGISTRO) === */
+
+/* 1. Centrar el Contenido en la Pantalla */
+body#pagina-login {
+    /* Eliminamos el flexbox del body para que el navbar y footer no se vean afectados */
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    min-height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
+    margin: 0;
+    padding: 0; /* Reset padding to allow navbar/footer to span full width */
+    background-color: #f4f6f9; /* Fondo ligero */
+}
+
+/* Nuevo contenedor para centrar el formulario de login */
+.login-center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; /* Permite que ocupe el espacio restante entre navbar y footer */
+    padding: 20px; /* Añadir padding aquí en lugar del body */
+}
+
+/* 2. Estilo de la Tarjeta (form-box) */
+.form-box {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Ancho máximo para el formulario */
+    text-align: center;
+}
+
+/* 3. Estilos Internos */
+.form-box h2 {
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-size: 2rem;
+}
+
+.form-box input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Importante para el padding */
+    font-size: 1rem;
+}
+
+.form-box button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #00bfae; /* Color principal (Turquesa) */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: background-color 0.3s;
+}
+
+.form-box button[type="submit"]:hover {
+    background-color: #00a093;
+}
+
+.form-box p {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.form-box a {
+    color: #00bfae;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* === ESTILOS PARA LA GALERÍA DE IMÁGENES (Vistas Previas) === */
+
+/* Contenedor principal de todas las vistas previas (si existe) */
+.gallery-previews-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las imágenes fluyan a la siguiente línea */
+    gap: 10px; /* Espacio entre cada vista previa */
+    padding: 10px 0;
+}
+
+/* Contenedor individual de cada imagen (div.gallery-preview-item) */
+.gallery-preview-item {
+    position: relative;
+    width: 100px; /* Tamaño fijo deseado para el ancho */
+    height: 100px; /* Tamaño fijo deseado para la altura */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden; /* Oculta cualquier parte de la imagen que exceda el tamaño del contenedor */
+}
+
+/* La Imagen (img.gallery-img) */
+.gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ¡CLAVE! Asegura que la imagen llene el contenedor sin deformarse */
+    display: block;
+}
+
+/* Botón de eliminar (ajuste de posición) */
+.delete-image-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 3px 6px;
+    line-height: 1;
+    z-index: 10;
 }

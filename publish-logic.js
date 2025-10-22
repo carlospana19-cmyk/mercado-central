@@ -86,6 +86,276 @@ export function initializePublishPage() {
         'Bocas del Toro': ['Bocas del Toro', 'Changuinola', 'Almirante', 'Chiriquí Grande']
     };
 
+    // --- CONFIGURACIÓN GENÉRICA DE CAMPOS POR CATEGORÍA ---
+    const categoryFieldConfigs = {
+        'electrónica': {
+            'Celulares y Teléfonos': {
+                'marca': { type: 'text', placeholder: 'Ej: Samsung' },
+                'modelo': { type: 'text', placeholder: 'Ej: Galaxy S21' },
+                'almacenamiento': { type: 'number', placeholder: 'Ej: 128' },
+                'memoria_ram': { type: 'number', placeholder: 'Ej: 8' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Como Nuevo', 'Usado - Bueno', 'Usado - Aceptable', 'Para Repuestos'] }
+            },
+            'Computadoras': {
+                'tipo_computadora': { type: 'select', options: ['Laptop', 'Escritorio'] },
+                'marca': { type: 'text', placeholder: 'Ej: Dell' },
+                'procesador': { type: 'text', placeholder: 'Ej: Intel i5' },
+                'memoria_ram': { type: 'number', placeholder: 'Ej: 16' },
+                'almacenamiento': { type: 'number', placeholder: 'Ej: 512' },
+                'tamano_pantalla': { type: 'number', placeholder: 'Ej: 15.6' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Como Nuevo', 'Usado - Bueno', 'Usado - Aceptable', 'Para Repuestos'] }
+            },
+            'Consolas y Videojuegos': {
+                'plataforma': { type: 'select', options: ['PlayStation', 'Xbox', 'Nintendo', 'PC', 'Otra'] },
+                'modelo': { type: 'text', placeholder: 'Ej: PlayStation 5' },
+                'almacenamiento': { type: 'number', placeholder: 'Ej: 500' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Como Nuevo', 'Usado - Bueno', 'Usado - Aceptable', 'Para Repuestos'] }
+            },
+            'Audio y Video': {
+                'tipo_articulo': { type: 'text', placeholder: 'Ej: Altavoz' },
+                'marca': { type: 'text', placeholder: 'Ej: Sony' },
+                'modelo': { type: 'text', placeholder: 'Ej: WH-1000XM4' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Como Nuevo', 'Usado - Bueno', 'Usado - Aceptable', 'Para Repuestos'] }
+            },
+            'Fotografía': {
+                'tipo_equipo': { type: 'select', options: ['Cámara Digital', 'Cámara Réflex', 'Cámara Mirrorless', 'Lente', 'Flash', 'Trípode', 'Estabilizador', 'Drone con Cámara', 'Accesorios', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: Canon' },
+                'modelo': { type: 'text', placeholder: 'Ej: EOS R5' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Como Nuevo', 'Usado - Bueno', 'Usado - Aceptable', 'Para Repuestos'] }
+            }
+        },
+        'hogar y muebles': {
+            'Artículos de Cocina': {
+                'tipo_articulo': { type: 'select', options: ['Utensilios', 'Vajilla', 'Ollas y Sartenes', 'Cuchillería', 'Otro'] },
+                'material': { type: 'text', placeholder: 'Ej: Acero inoxidable' },
+                'marca': { type: 'text', placeholder: 'Ej: Oster' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Para Restaurar'] }
+            },
+            'Decoración': {
+                'tipo_decoracion': { type: 'select', options: ['Cuadro', 'Espejo', 'Lámpara', 'Alfombra', 'Cortina', 'Otro'] },
+                'material': { type: 'text', placeholder: 'Ej: Madera' },
+                'color': { type: 'text', placeholder: 'Ej: Blanco' },
+                'dimensiones': { type: 'text', placeholder: 'Ej: 120x80x75 cm' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Para Restaurar'] }
+            },
+            'Electrodomésticos': {
+                'tipo_electrodomestico': { type: 'select', options: ['Refrigerador', 'Lavadora', 'Microondas', 'Estufa', 'Licuadora', 'Aspiradora', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: LG' },
+                'modelo': { type: 'text', placeholder: 'Ej: WM3488HW' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Para Restaurar'] }
+            },
+            'Jardín y Exterior': {
+                'tipo_articulo': { type: 'select', options: ['Herramientas de Jardín', 'Muebles de Jardín', 'Plantas y Macetas', 'Parrillas', 'Iluminación Exterior', 'Otro'] },
+                'material': { type: 'text', placeholder: 'Ej: Metal' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Para Restaurar'] }
+            },
+            'Muebles': {
+                'tipo_mueble': { type: 'select', options: ['Sofá', 'Mesa', 'Silla', 'Estantería', 'Cama', 'Cómoda', 'Armario', 'Otro'] },
+                'material': { type: 'text', placeholder: 'Ej: Madera' },
+                'color': { type: 'text', placeholder: 'Ej: Marrón' },
+                'dimensiones': { type: 'text', placeholder: 'Ej: 200x90x80 cm' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Para Restaurar'] }
+            }
+        },
+        'moda y belleza': {
+            'Ropa de Mujer': {
+                'tipo_prenda': { type: 'select', options: ['Camisa', 'Pantalón', 'Vestido', 'Falda', 'Blusa', 'Chaqueta', 'Sudadera', 'Short', 'Otro'] },
+                'talla': { type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+                'marca': { type: 'text', placeholder: 'Ej: Zara' },
+                'color': { type: 'text', placeholder: 'Ej: Negro' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Ropa de Hombre': {
+                'tipo_prenda': { type: 'select', options: ['Camisa', 'Pantalón', 'Vestido', 'Falda', 'Blusa', 'Chaqueta', 'Sudadera', 'Short', 'Otro'] },
+                'talla': { type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+                'marca': { type: 'text', placeholder: 'Ej: Levi\'s' },
+                'color': { type: 'text', placeholder: 'Ej: Azul' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Ropa de Niños': {
+                'tipo_prenda': { type: 'select', options: ['Camisa', 'Pantalón', 'Vestido', 'Falda', 'Blusa', 'Chaqueta', 'Sudadera', 'Short', 'Otro'] },
+                'talla': { type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+                'edad': { type: 'select', options: ['0-12 meses', '1-2 años', '3-4 años', '5-6 años', '7-8 años', '9-10 años', '11-12 años'] },
+                'marca': { type: 'text', placeholder: 'Ej: Disney' },
+                'color': { type: 'text', placeholder: 'Ej: Rojo' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Calzado': {
+                'tipo_calzado': { type: 'select', options: ['Tenis', 'Zapatos Formales', 'Sandalias', 'Botas', 'Tacones', 'Otro'] },
+                'talla_calzado': { type: 'text', placeholder: 'Ej: 42' },
+                'marca': { type: 'text', placeholder: 'Ej: Nike' },
+                'color': { type: 'text', placeholder: 'Ej: Blanco' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Bolsos y Carteras': {
+                'tipo_bolso': { type: 'select', options: ['Bolso de Mano', 'Mochila', 'Cartera', 'Bolso de Viaje', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: Gucci' },
+                'material': { type: 'text', placeholder: 'Ej: Cuero' },
+                'color': { type: 'text', placeholder: 'Ej: Negro' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Accesorios': {
+                'tipo_accesorio': { type: 'select', options: ['Reloj', 'Gafas de Sol', 'Cinturón', 'Bufanda', 'Gorra', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: Rolex' },
+                'material': { type: 'text', placeholder: 'Ej: Oro' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Joyería y Relojes': {
+                'tipo_joya': { type: 'select', options: ['Anillo', 'Collar', 'Pulsera', 'Aretes', 'Otro'] },
+                'material': { type: 'text', placeholder: 'Ej: Oro' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            },
+            'Salud y Belleza': {
+                'tipo_producto': { type: 'select', options: ['Maquillaje', 'Cuidado de la Piel', 'Perfume', 'Cuidado del Cabello', 'Productos de Baño', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: L\'Oréal' },
+                'categoria_producto': { type: 'text', placeholder: 'Ej: Shampoo' },
+                'condicion': { type: 'select', options: ['Nuevo con Etiqueta', 'Nuevo sin Etiqueta', 'Poco Uso', 'Usado', 'Excelente Estado'] }
+            }
+        },
+        'deportes y hobbies': {
+            'Bicicletas': {
+                'tipo_bicicleta': { type: 'select', options: ['Mountain Bike', 'Ruta', 'BMX', 'Eléctrica', 'Híbrida', 'Infantil'] },
+                'marca': { type: 'text', placeholder: 'Ej: Trek' },
+                'aro': { type: 'select', options: ['12"', '16"', '20"', '24"', '26"', '27.5"', '29"'] },
+                'condicion': { type: 'select', options: ['Nueva', 'Usada', 'Como Nueva'] }
+            },
+            'Coleccionables': {
+                'tipo_articulo': { type: 'text', placeholder: 'Ej: Álbum de estampas' },
+                'marca': { type: 'text', placeholder: 'Ej: Panini' },
+                'condicion': { type: 'select', options: ['Nueva', 'Usada', 'Como Nueva'] }
+            },
+            'Deportes': {
+                'tipo_articulo': { type: 'select', options: ['Ropa Deportiva', 'Calzado Deportivo', 'Balones', 'Raquetas', 'Guantes', 'Cascos', 'Pesas', 'Otros'] },
+                'marca': { type: 'text', placeholder: 'Ej: Adidas' },
+                'talla': { type: 'text', placeholder: 'Ej: M' },
+                'condicion': { type: 'select', options: ['Nueva', 'Usada', 'Como Nueva'] }
+            },
+            'Instrumentos Musicales': {
+                'tipo_instrumento': { type: 'select', options: ['Guitarra', 'Bajo', 'Batería', 'Piano/Teclado', 'Viento', 'Cuerdas', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: Yamaha' },
+                'condicion': { type: 'select', options: ['Nueva', 'Usada', 'Como Nueva'] }
+            },
+            'Libros, Revistas y Comics': {
+                'tipo_articulo': { type: 'text', placeholder: 'Ej: Libro de cocina' },
+                'autor_fabricante': { type: 'text', placeholder: 'Ej: Gabriel García Márquez' },
+                'condicion': { type: 'select', options: ['Nueva', 'Usada', 'Como Nueva'] }
+            },
+            'Otros Hobbies': {
+                'tipo_articulo': { type: 'text', placeholder: 'Ej: Juego de mesa' },
+                'marca': { type: 'text', placeholder: 'Ej: Hasbro' },
+                'condicion': { type: 'select', options: ['Nueva', 'Usada', 'Como Nueva'] }
+            }
+        },
+        'mascotas': {
+            'Perros': {
+                'tipo_anuncio': { type: 'select', options: ['Adopción', 'Venta', 'Encontrado', 'Perdido'] },
+                'raza': { type: 'text', placeholder: 'Ej: Labrador' },
+                'edad_mascota': { type: 'number', placeholder: 'Ej: 2' },
+                'genero': { type: 'select', options: ['Macho', 'Hembra'] }
+            },
+            'Gatos': {
+                'tipo_anuncio': { type: 'select', options: ['Adopción', 'Venta', 'Encontrado', 'Perdido'] },
+                'raza': { type: 'text', placeholder: 'Ej: Siamés' },
+                'edad_mascota': { type: 'number', placeholder: 'Ej: 1' },
+                'genero': { type: 'select', options: ['Macho', 'Hembra'] }
+            },
+            'Aves': {
+                'tipo_anuncio': { type: 'select', options: ['Adopción', 'Venta', 'Encontrado', 'Perdido'] },
+                'raza': { type: 'text', placeholder: 'Ej: Canario' },
+                'edad_mascota': { type: 'number', placeholder: 'Ej: 1' },
+                'genero': { type: 'select', options: ['Macho', 'Hembra'] }
+            },
+            'Peces': {
+                'tipo_anuncio': { type: 'select', options: ['Adopción', 'Venta', 'Encontrado', 'Perdido'] },
+                'raza': { type: 'text', placeholder: 'Ej: Betta' }
+            },
+            'Otros Animales': {
+                'tipo_anuncio': { type: 'select', options: ['Adopción', 'Venta', 'Encontrado', 'Perdido'] },
+                'raza': { type: 'text', placeholder: 'Ej: Conejo' },
+                'edad_mascota': { type: 'number', placeholder: 'Ej: 3' },
+                'genero': { type: 'select', options: ['Macho', 'Hembra'] }
+            },
+            'Accesorios para Mascotas': {
+                'tipo_accesorio': { type: 'select', options: ['Collar', 'Correa', 'Jaula', 'Comida', 'Otro'] },
+                'marca': { type: 'text', placeholder: 'Ej: Pedigree' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Bueno', 'Usado - Regular'] }
+            }
+        },
+        'servicios': {
+            'Servicios de Construcción': {
+                'tipo_servicio': { type: 'select', options: ['Construcción General', 'Remodelación', 'Albañilería', 'Pintura', 'Electricidad', 'Plomería', 'Carpintería', 'Techado', 'Otros'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            },
+            'Servicios de Educación': {
+                'tipo_servicio': { type: 'select', options: ['Clases Particulares', 'Tutoría Académica', 'Preparación de Exámenes', 'Idiomas', 'Música', 'Arte', 'Deportes', 'Informática', 'Otros'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            },
+            'Servicios de Eventos': {
+                'tipo_servicio': { type: 'select', options: ['Organización de Eventos', 'Catering', 'Decoración', 'Fotografía', 'Video', 'Música/DJ', 'Animación', 'Alquiler de Equipos', 'Otros'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            },
+            'Servicios de Salud': {
+                'tipo_servicio': { type: 'select', options: ['Consultas Médicas', 'Terapia Física', 'Psicología', 'Nutrición', 'Enfermería', 'Cuidado de Adultos Mayores', 'Masajes Terapéuticos', 'Otros'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            },
+            'Servicios de Tecnología': {
+                'tipo_servicio': { type: 'select', options: ['Reparación de Computadoras', 'Reparación de Celulares', 'Desarrollo Web', 'Diseño Gráfico', 'Soporte Técnico', 'Instalación de Redes', 'Consultoría IT', 'Otros'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            },
+            'Servicios para el Hogar': {
+                'tipo_servicio': { type: 'select', options: ['Limpieza', 'Jardinería', 'Reparaciones Generales', 'Cerrajería', 'Fumigación', 'Mudanzas', 'Lavandería', 'Cuidado de Niños', 'Otros'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            },
+            'Otros Servicios': {
+                'tipo_servicio': { type: 'text', placeholder: 'Describe el tipo de servicio' },
+                'modalidad': { type: 'select', options: ['Presencial', 'A domicilio', 'Virtual/Online', 'Híbrido'] },
+                'experiencia': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años'] }
+            }
+        },
+        'negocios': {
+            'Equipos para Negocios': {
+                'tipo_equipo': { type: 'select', options: ['Computadoras', 'Impresoras', 'Fotocopiadoras', 'Teléfonos/Centrales', 'Muebles de Oficina', 'Cajas Registradoras/POS', 'Equipos de Seguridad', 'Aire Acondicionado', 'Máquina de Café', 'Otros'] },
+                'marca': { type: 'text', placeholder: 'Ej: HP' },
+                'modelo': { type: 'text', placeholder: 'Ej: LaserJet' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Reacondicionado', 'Para Repuestos'] }
+            },
+            'Maquinaria para Negocios': {
+                'tipo_equipo': { type: 'select', options: ['Maquinaria Industrial', 'Equipos de Construcción', 'Equipos de Restaurante', 'Equipos de Panadería', 'Equipos de Lavandería', 'Equipos Agrícolas', 'Equipos de Limpieza Industrial', 'Generadores', 'Compresores', 'Otros'] },
+                'marca': { type: 'text', placeholder: 'Ej: Caterpillar' },
+                'modelo': { type: 'text', placeholder: 'Ej: Excavadora' },
+                'anio': { type: 'number', placeholder: 'Ej: 2020' },
+                'condicion': { type: 'select', options: ['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Reacondicionado', 'Para Repuestos'] }
+            },
+            'Negocios en Venta': {
+                'tipo_negocio': { type: 'select', options: ['Restaurante', 'Cafetería', 'Tienda de Ropa', 'Supermercado/Minisuper', 'Farmacia', 'Ferretería', 'Oficina/Consultorio', 'Taller/Mecánica', 'Salón de Belleza', 'Gimnasio', 'Industrial', 'Otros'] },
+                'años_operacion': { type: 'select', options: ['Menos de 1 año', '1-3 años', '3-5 años', 'Más de 5 años', 'Más de 10 años'] },
+                'incluye': { type: 'text', placeholder: 'Ej: Local propio, inventario, equipos, clientela' },
+                'razon_venta': { type: 'select', options: ['Cambio de rubro', 'Viaje al extranjero', 'Jubilación', 'Falta de tiempo', 'Problemas de salud', 'Otros'] }
+            }
+        },
+        'comunidad': {
+            'Clases y Cursos': {
+                'tipo_clase': { type: 'select', options: ['Idioma', 'Música', 'Deporte', 'Arte', 'Otro'] },
+                'modalidad': { type: 'select', options: ['Presencial', 'Virtual', 'Híbrido'] },
+                'nivel': { type: 'select', options: ['Principiante', 'Intermedio', 'Avanzado'] }
+            },
+            'Eventos': {
+                'tipo_evento': { type: 'select', options: ['Concierto', 'Fiesta', 'Conferencia', 'Otro'] },
+                'fecha_evento': { type: 'date' },
+                'ubicacion_evento': { type: 'text', placeholder: 'Ej: Teatro Nacional' }
+            },
+            'Otros': {
+                'tipo_anuncio': { type: 'select', options: ['Oferta', 'Búsqueda', 'Anuncio General'] }
+            }
+        }
+    };
+
     // --- DATOS DE SUBCATEGORÍAS DE ELECTRÓNICA ---
     const electronicsSubcategories = {
         "Celulares y Teléfonos": ["marca", "modelo", "almacenamiento", "memoria_ram", "condicion"],
@@ -1440,12 +1710,21 @@ function showBusinessFields() {
 
     // --- FUNCIÓN DE NAVEGACIÓN (ROBUSTA) ---
     const navigateToStep = (stepNumber) => {
-        allSteps.forEach(step => step.style.display = 'none');
-        const targetStep = document.getElementById(`step-${stepNumber}`);
-        if(targetStep) targetStep.style.display = 'block';
+        // Ocultar todos los pasos
+        document.querySelectorAll('.form-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Mostrar el paso específico
+        document.getElementById(`step-${stepNumber}`).style.display = 'block';
+        
+        // SI es paso 4, actualizar restricciones del plan
+        if (stepNumber === 4) {
+            const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value;
+            if (selectedPlan) {
+                updatePlanRestrictions(selectedPlan);
+            }
 
-        // --- LÓGICA COMPLETA Y VERIFICADA PARA EL PASO 3 (REEMPLAZAR) ---
-        if (stepNumber === 3) {
             const titleInput = document.getElementById('title');
             const mainCategoryText = categorySelect.options[categorySelect.selectedIndex].text; // Usamos la categoría principal
             const subcategoryValue = subcategorySelect.value;
@@ -1478,7 +1757,7 @@ function showBusinessFields() {
             showDynamicFields();
             loadContactInfo();
         }
-        // --- FIN DEL BLOQUE A REEMPLAZAR ---
+        // --- FIN DEL BLOQUE DE NAVEGACIÓN ---
 
         progressSteps.forEach((step, index) => {
             step.classList.remove('active', 'completed');
@@ -1607,11 +1886,11 @@ function showBusinessFields() {
             reader.onload = (e) => {
                 const wrapper = document.createElement('div');
                 // La clase que SÍ está en nuestro CSS
-                wrapper.className = 'preview-image-wrapper image-preview'; // Añadir clase para conteo
+                wrapper.className = 'gallery-preview-item image-preview'; // Usar la clase del CSS
 
                 wrapper.innerHTML = `
-                    <img src="${e.target.result}" class="preview-image">
-                    <button type="button" class="remove-image-btn" data-index="${index}">&times;</button>
+                    <img src="${e.target.result}" class="gallery-img">
+                    <button type="button" class="delete-image-btn" data-index="${index}"><i class="fas fa-times-circle"></i></button>
                 `;
                 galleryPreviewContainer.appendChild(wrapper);
             };
@@ -1619,21 +1898,49 @@ function showBusinessFields() {
         });
     };
 
-    // 2. FUNCIÓN PARA AÑADIR ARCHIVOS (CORREGIDA)
+    // 2. FUNCIÓN PARA AÑADIR ARCHIVOS (AHORA VÁLIDA EL LOTE Y CADA ARCHIVO)
     const addFiles = (newFiles) => {
-        const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
-        const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free'; // Usar 'free' como default
+        // 1. OBTENER PLAN SELECCIONADO Y LÍMITES
+        const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
 
-        const filesToAdd = Array.from(newFiles);
-        
-        // Validar cada archivo antes de añadirlo
-        for (const file of filesToAdd) {
-            if (!validateImageCount(selectedPlan)) {
-                alert('No puedes añadir más imágenes con tu plan actual.');
-                return; // Detener si no se puede añadir más
-            }
-            galleryFiles.push(file);
+        const limits = {
+            'free': 3,
+            'basico': 5,
+            'premium': 10,
+            'destacado': 15,
+            'top': 20
+        };
+        const maxAllowed = limits[selectedPlan];
+
+        const filesArray = Array.from(newFiles);
+        const currentImagesCount = galleryFiles.length; // Usar el array REAL
+        const totalImagesAfterAdd = currentImagesCount + filesArray.length;
+
+        // 2. VALIDACIÓN DEL LOTE COMPLETO
+        if (totalImagesAfterAdd > maxAllowed) {
+            // Calcular cuántas fotos se pueden añadir realmente
+            const availableSlots = maxAllowed - currentImagesCount;
+
+            alert(`⚠️ LÍMITE EXCEDIDO\n\nPlan ${selectedPlan.toUpperCase()}: máximo ${maxAllowed} fotos\nYa tienes: ${currentImagesCount}\nIntentas agregar: ${filesArray.length}\n\nSolo se añadirán las primeras ${availableSlots} fotos, si hay espacio.`);
+
+            // Si no hay slots disponibles, simplemente salir
+            if (availableSlots <= 0) return;
+
+            // Si hay slots, truncar la matriz de archivos a añadir
+            const filesToProcess = filesArray.slice(0, availableSlots);
+
+            // Procesar solo los archivos que caben
+            filesToProcess.forEach(file => {
+                galleryFiles.push(file);
+            });
+
+        } else {
+            // Si el lote completo cabe, añadir todos
+            filesArray.forEach(file => {
+                galleryFiles.push(file);
+            });
         }
+
         renderPreviews();
     };
 
@@ -1643,34 +1950,113 @@ function showBusinessFields() {
         // Abrir selector de archivos al hacer clic
         galleryDropArea.addEventListener('click', () => galleryImagesInput.click());
 
-        // Manejar archivos seleccionados
-        galleryImagesInput.addEventListener('change', (e) => {
+        galleryImagesInput.addEventListener('change', function(e) {
             addFiles(e.target.files);
-            e.target.value = null; // Reset para poder seleccionar el mismo archivo de nuevo
+            e.target.value = null; // Resetear para poder seleccionar el mismo archivo de nuevo
         });
 
-        // Manejar eliminación de imágenes
         galleryPreviewContainer.addEventListener('click', (e) => {
-            if (e.target && e.target.classList.contains('remove-image-btn')) {
-                const indexToRemove = parseInt(e.target.dataset.index, 10);
-                if (!isNaN(indexToRemove)) {
-                    galleryFiles.splice(indexToRemove, 1);
-                    renderPreviews(); // Re-renderizar
-                }
+            if (e.target.classList.contains('delete-image-btn') || e.target.closest('.delete-image-btn')) {
+                const btn = e.target.closest('.delete-image-btn');
+                const index = parseInt(btn.dataset.index, 10);
+                galleryFiles.splice(index, 1); // Eliminar del array
+                renderPreviews(); // Volver a renderizar
             }
         });
 
-        // (Opcional) Lógica de Arrastrar y Soltar
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            galleryDropArea.addEventListener(eventName, e => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
+        // Drag and drop functionality
+        galleryDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            galleryDropArea.classList.add('drag-over');
         });
-        galleryDropArea.addEventListener('drop', e => {
+
+        galleryDropArea.addEventListener('dragleave', () => {
+            galleryDropArea.classList.remove('drag-over');
+        });
+
+        galleryDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            galleryDropArea.classList.remove('drag-over');
             addFiles(e.dataTransfer.files);
         });
     }
+
+    // VALIDACIÓN ESTRICTA DE IMÁGENES POR PLAN
+    const imageInput = document.getElementById('gallery-images-input'); // Changed from 'images' to 'gallery-images-input'
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            // Obtener plan seleccionado
+            const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+            
+            // Límites por plan
+            const limits = {
+                'free': 3,
+                'basico': 5,
+                'premium': 10,
+                'destacado': 15,
+                'top': 20
+            };
+            
+            const maxAllowed = limits[selectedPlan];
+            const filesSelected = this.files.length;
+            
+            // BLOQUEO INMEDIATO si excede
+            if (filesSelected > maxAllowed) {
+                alert(`❌ LÍMITE EXCEDIDO\n\nPlan ${selectedPlan.toUpperCase()}: máximo ${maxAllowed} fotos\nSeleccionaste: ${filesSelected} fotos\n\nPor favor selecciona ${maxAllowed} o menos.`);
+                
+                // LIMPIAR INPUT Y PREVIEW
+                this.value = '';
+                
+                // Limpiar previews existentes
+                const previewContainer = document.getElementById('gallery-preview-container'); // Changed from '.image-preview-container'
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
+                
+                return false;
+            }
+            
+            // También verificar imágenes ya cargadas
+            const existingPreviews = document.querySelectorAll('.gallery-preview-item').length; // Changed from '.image-preview'
+            const totalImages = existingPreviews + filesSelected;
+            
+            if (totalImages > maxAllowed) {
+                alert(`❌ Ya tienes ${existingPreviews} fotos.\nSolo puedes agregar ${maxAllowed - existingPreviews} más.`);
+                this.value = '';
+                return false;
+            }
+            
+            // Si pasa validación, mostrar preview
+            console.log(`✅ ${filesSelected} fotos válidas para plan ${selectedPlan}`);
+            // Aquí llamar función de preview
+        });
+    }
+
+    // TAMBIÉN actualizar límite cuando cambia el plan
+    function updateImageLimit() {
+        const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+        const limits = {'free': 3, 'basico': 5, 'premium': 10, 'destacado': 15, 'top': 20};
+        const maxFiles = limits[selectedPlan];
+        
+        const imageInput = document.getElementById('gallery-images-input'); // Changed from 'images'
+        if (imageInput) {
+            imageInput.setAttribute('max', maxFiles);
+            
+            // Mostrar límite visualmente
+            let limitText = document.querySelector('.image-limit-info');
+            if (!limitText) {
+                limitText = document.createElement('p');
+                limitText.className = 'image-limit-info';
+                imageInput.parentElement.appendChild(limitText);
+            }
+            limitText.innerHTML = `📸 Límite: ${maxFiles} fotos (Plan ${selectedPlan})`;
+        }
+    }
+
+    // Llamar cuando cambie el plan
+    document.querySelectorAll('input[name="plan"]').forEach(radio => {
+        radio.addEventListener('change', updateImageLimit);
+    });
 
     provinceSelect.addEventListener('change', function() {
         const selectedProvince = this.value;
@@ -1726,6 +2112,8 @@ function showBusinessFields() {
         });
     });
 
+
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -1769,7 +2157,7 @@ form.addEventListener('submit', async (e) => {
 
             const formData = new FormData(form);
             const adData = {
-                titulo: formData.get('titulo'),
+                titulo: document.getElementById('titulo').value,
                 descripcion: formData.get('descripcion'),
                 precio: parseFloat(formData.get('precio')),
                 categoria: formData.get('categoria'),
@@ -2007,7 +2395,7 @@ form.addEventListener('submit', async (e) => {
             }
         }
         
-        console.log('� JSON FINAL:', json);
+        console.log(' JSON FINAL:', json);
         // --- DEPORTES Y HOBBIES ---
         if (mainCategory.toLowerCase().includes('deporte') ||
             mainCategory.toLowerCase().includes('hobbies')) {
@@ -2081,4 +2469,159 @@ form.addEventListener('submit', async (e) => {
     // --- INICIALIZACIÓN ---
     loadAllCategories();
     getUserInfo();
+
+// --- INICIO: NAVEGACIÓN AUTOMÁTICA DE PLANES v2 (AGENTE 11) ---
+
+console.log("Agente 11: Ejecutando script de navegación v2 (por clic en tarjeta).");
+
+// 1. Definimos los límites de los planes (si no está ya definido globalmente).
+const PLAN_LIMITS_V2 = {
+    'free': { maxFotos: 3 },
+    'basico': { maxFotos: 5 },
+    'premium': { maxFotos: 10 },
+    'destacado': { maxFotos: 15 },
+    'top': { maxFotos: 20 }
+};
+
+// 2. Seleccionamos TODOS los contenedores de las tarjetas de plan.
+const planCards = document.querySelectorAll('.plan-card');
+console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
+
+// 3. Añadimos un listener de 'click' a CADA tarjeta.
+planCards.forEach(card => {
+    card.addEventListener('click', function() {
+
+        // 4. Encuentra el radio button DENTRO de esta tarjeta y márcalo.
+        const radio = this.querySelector('input[type="radio"]');
+        if (!radio) {
+            console.error("Error: No se encontró un radio button dentro de la tarjeta clickeada.");
+            return;
+        }
+
+        // Si ya estaba seleccionado, no hacemos nada para evitar múltiples ejecuciones.
+        if (radio.checked) {
+            // Opcional: Podríamos añadir un log para saber que no se hace nada.
+            // console.log("Agente 11: El plan ya estaba seleccionado.");
+            // return;
+        }
+
+        radio.checked = true;
+        const selectedPlan = radio.value;
+        console.log(`Agente 11: Clic detectado en tarjeta. Plan seleccionado: ${selectedPlan}.`);
+
+        // --- Lógica de navegación ---
+        setTimeout(() => {
+            const step3 = document.getElementById('step-3');
+            const step4 = document.getElementById('step-4');
+
+            if (step3 && step4) {
+                console.log("Agente 11: Navegando a step-4.");
+                navigateToStep(4); // Call the robust navigation function
+            } else {
+                console.error("Error: No se encontraron #step-3 o #step-4.");
+            }
+        }, 300); // Reducimos un poco el tiempo para una sensación más rápida.
+
+        // --- Lógica para actualizar los límites de fotos ---
+        const limits = PLAN_LIMITS_V2[selectedPlan];
+        if (!limits) {
+            console.error(`Error: No se encontraron límites para el plan "${selectedPlan}".`);
+            return;
+        }
+
+        const maxFiles = limits.maxFotos;
+        const fileInput = document.getElementById('gallery-images-input');
+
+        if (fileInput) {
+            fileInput.setAttribute('data-max-files', maxFiles);
+
+            const helpTextContainer = fileInput.closest('.drop-area') || fileInput.parentElement;
+            let existingHelpText = helpTextContainer.querySelector('.help-text');
+
+            if (existingHelpText) {
+                existingHelpText.remove();
+            }
+
+            const helpText = document.createElement('p');
+            helpText.className = 'help-text';
+            helpText.style.marginTop = '10px';
+            helpText.innerHTML = `📸 Tu plan <strong>${selectedPlan.toUpperCase()}</strong> permite hasta <strong>${maxFiles}</strong> fotos.`;
+            helpTextContainer.appendChild(helpText);
+        }
+    });
+});
+
+/* === FUNCIÓN CORREGIDA Y FINAL PARA GESTIONAR LA RESTRICCIÓN VISUAL === */
+
+const updatePlanRestrictions = (selectedPlan) => {
+    console.log('🔍 DEBUG: updatePlanRestrictions called with plan:', selectedPlan);
+
+    // ESTANDARIZAR EL VALOR DEL PLAN A MINÚSCULAS para que coincida con 'destacado' y 'top'
+    const planValue = selectedPlan.toLowerCase();
+    console.log('🔍 DEBUG: planValue (lowercase):', planValue);
+
+    // 1. RESTRICCIÓN PARA CAMPOS TOP (Video y Redes Sociales)
+    const topFields = document.querySelectorAll('.plan-top-feature');
+    console.log('🔍 DEBUG: Found topFields:', topFields.length);
+
+    const disableTop = planValue !== 'top'; // Solo se habilita si es el plan 'top'
+    console.log('🔍 DEBUG: disableTop (true if not top):', disableTop);
+
+    topFields.forEach(div => {
+        div.style.opacity = disableTop ? '0.4' : '1';
+        div.style.pointerEvents = disableTop ? 'none' : 'auto';
+
+        const input = div.querySelector('input, select, textarea');
+        if (input) input.disabled = disableTop;
+    });
+
+    // 2. RESTRICCIÓN PARA EL BADGE DESTACADO
+    const destacadoFields = document.querySelectorAll('.plan-destacado-feature');
+    console.log('🔍 DEBUG: Found destacadoFields:', destacadoFields.length);
+
+    // Habilitado si el plan es 'destacado' O 'top'
+    const enableDestacado = (planValue === 'destacado' || planValue === 'top');
+    const disableDestacado = !enableDestacado;
+    console.log('🔍 DEBUG: enableDestacado:', enableDestacado, 'disableDestacado:', disableDestacado);
+
+    destacadoFields.forEach(div => {
+        console.log('🔍 DEBUG: Processing destacadoField:', div);
+        div.style.opacity = disableDestacado ? '0.4' : '1';
+        div.style.pointerEvents = disableDestacado ? 'none' : 'auto';
+
+        const input = div.querySelector('input, select, textarea');
+        console.log('🔍 DEBUG: Input found:', input);
+        if (input) {
+            input.disabled = disableDestacado;
+            console.log('🔍 DEBUG: Input disabled set to:', disableDestacado);
+
+            // Si se deshabilita (plan inferior), desmarca el checkbox
+            if (disableDestacado && input && input.type === 'checkbox') {
+                console.log('🔍 DEBUG: Unchecking checkbox');
+                input.checked = false;
+            }
+        }
+    });
+};
+
+
+/* === PASO CLAVE: ENLAZAR LA FUNCIÓN A LOS EVENTOS === */
+
+// 1. Enlazar al cambio de plan (para actualizar al seleccionar un radio diferente)
+document.querySelectorAll('input[name="plan"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        console.log('Plan cambiado a:', this.value);
+        updatePlanRestrictions(this.value);
+        
+        // Navegar automáticamente al paso 4
+        setTimeout(() => {
+            navigateToStep(4);
+        }, 500);
+    });
+});
+
+
+// 2. Enlazar a la carga inicial de la página (para el plan preseleccionado)
+const initialPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+updatePlanRestrictions(initialPlan);
 }
