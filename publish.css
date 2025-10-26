@@ -198,3 +198,22 @@
         grid-template-columns: 1fr; 
     }
 }
+
+/* Estilos para el layout de tres columnas en step-4 */
+.details-container {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+.detail-column {
+  flex: 1;
+  min-width: 300px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* === Bordes de color por plan === */
+.plan-premium { border: 3px solid #c0c0c0; /* plateado */ }
+.plan-destacado { border: 3px solid #ffd700; /* dorado */ }
+.plan-top { border: 3px solid #9b59b6; /* púrpura */ }

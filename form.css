@@ -3,8 +3,16 @@
 /* ================================================= */
 
 /* 1. Asegurar la herencia de la fuente global */
-.publish-wizard, .publish-wizard select, .publish-wizard input, .publish-wizard button, .publish-wizard textarea {
-    font-family: 'Poppins', sans-serif;
+body,
+input,
+select,
+textarea,
+button,
+label,
+.section-title,
+.subsection-title {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2f3542;
 }
 
 /* 2. Estilos para la barra de progreso */
@@ -136,6 +144,9 @@
 
 /* Ajuste de layout principal para que el footer se pegue abajo */
 body {
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -144,8 +155,13 @@ body {
 main.container.publish-wizard {
     flex-grow: 1; /* El contenido principal ocupa el espacio disponible */
     width: 100%;
-    max-width: 700px;
+    max-width: 1200px;
     margin: 4rem auto;
+}
+
+#ad-form {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* ================================================= */
@@ -504,6 +520,10 @@ main.container.publish-wizard {
 }
 
 /* Estilos específicos para la galería en publicar.html */
+#gallery-preview-container {
+    min-height: 160px;
+}
+
 #gallery-preview-container .preview-image-wrapper {
     width: 120px !important;
     height: 120px !important;
@@ -723,4 +743,307 @@ main.container.publish-wizard {
 /* Extra específico por si acaso */
 #step-4 .premium .plan-header * {
     color: white !important;
+}
+
+.details-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 40px 50px;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    background: linear-gradient(135deg, #f5f7fa, #eef1f8);
+    border-radius: 20px;
+}
+
+.detail-column {
+    flex: 1;
+    min-width: 420px;
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 14px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+    font-family: "Poppins", "Segoe UI", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f3c88;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.subsection-title {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f3c88;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 8px;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 6px;
+}
+
+input, select, textarea {
+    font-size: 1rem;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccd1d9;
+    margin-bottom: 18px;
+}
+
+.form-group small { /* Estilo para el texto de ayuda general */
+    font-size: 0.9rem; /* Ajustado para un tamaño consistente */
+}
+
+.plan-destacado-feature label {
+    line-height: 1.5;
+    word-spacing: 1px;
+}
+
+#gallery-preview-container {
+    min-height: 200px;
+}
+
+.plan-top-feature,
+.plan-destacado-feature {
+    color: #2b2b2b;          /* tono de negro elegante */
+    font-weight: 500;        /* semibold para más presencia */
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.plan-top-feature small,
+.plan-destacado-feature small {
+    color: #555;             /* gris medio para las notas debajo */
+    font-size: 0.9rem; /* Ajustado para que coincida con el texto de ayuda */
+    line-height: 1.6;
+}
+
+.image-upload-section {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.images-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 35px 40px;
+    margin-top: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.image-upload-section {
+    width: 100%;
+    text-align: center;
+}
+
+#gallery-drop-area {
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    padding: 40px 20px;
+    background: #f8f9ff;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+#gallery-drop-area:hover {
+    background: #eef1ff;
+}
+
+#gallery-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+#gallery-preview-container img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.plan-info {
+    margin-top: 18px;
+    color: #2c3e50;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+.plan-info strong {
+    color: #1a237e;
+}
+
+.plan-limit-info {
+    margin-top: 15px;
+    text-align: center;
+    color: #2c3e50;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.plan-limit-info p {
+    margin: 4px 0;
+}
+#gallery-drop-area {
+    margin-bottom: 10px;  /* espacio entre cuadro y texto */
+}
+
+/* Estilos para el nuevo layout del Paso 4 */
+.details-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    background: #f8f9fa;
+    border-radius: 15px;
+}
+
+.left-column {
+    flex: 0 0 400px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 25px;
+}
+
+.right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.section-block {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 25px 30px;
+}
+
+/* Ajustes para títulos de bloques específicos en Paso 4 */
+.contact-block .subsection-title,
+.images-block .subsection-title {
+    font-size: 1.5rem; /* Más grande que subsection-title, pero quizás un poco menos que section-title */
+    font-weight: 700;
+    color: #1a1d29; /* Mismo color que section-title */
+    text-align: left; /* Mantener alineación a la izquierda si es el caso, o centrar si se desea */
+    border-bottom: none; /* Eliminar el borde inferior si se quiere un aspecto más de título principal */
+    padding-bottom: 0;
+    margin-bottom: 20px; /* Ajustar margen */
+}
+
+.contact-block .subsection-title i,
+.images-block .subsection-title i {
+    font-size: 1.8rem; /* Icono más grande */
+    margin-right: 10px;
+    color: #667eea; /* Color del icono, si se desea diferente */
+}
+
+/* === Fondo general moderno === */
+body {
+    background: linear-gradient(135deg, #e2e8f0 0%, #d6dcff 100%);
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    color: #2c3e50;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* === Contenedor principal del Step‑4 === */
+.details-layout {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px 50px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+    max-width: 1400px;
+    margin: 50px auto;
+}
+
+/* === Caja lateral izquierda y bloques derechos === */
+.left-column,
+.section-block {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    padding: 30px 35px;
+    border: none;
+}
+
+/* === Títulos de secciones === */
+.section-title {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #1a1d29;
+    text-align: center;
+    letter-spacing: 0.4px;
+    margin-bottom: 25px;
+}
+
+.subsection-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    border-bottom: 2px solid #667eea;
+    color: #253858;
+    margin-bottom: 15px;
+    padding-bottom: 6px;
+}
+
+/* === Inputs y textos === */
+label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2e3b55;
+}
+
+input, select, textarea {
+    font-size: 0.95rem;
+    border: 1px solid #ccd1d9;
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 6px rgba(102, 126, 234, 0.25);
+}
+
+/* === Botón principal === */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: #fff !important;
+    border-radius: 10px;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    transform: translateY(-3px);
 }

@@ -133,6 +133,13 @@ export function initializeHomePage() {
             });
             console.log("SENSOR 6: Swipers inicializados.");
 
+            // Desactivar la acción de abrir detalle cuando el clic proviene del carrusel de imágenes
+            document.querySelectorAll('.box .image-container, .tarjeta-auto .image-container').forEach(imgContainer => {
+                imgContainer.addEventListener('click', e => {
+                    e.stopPropagation(); // Evita que el clic llegue al onclick del padre
+                });
+            });
+
         } catch (e) {
             console.error("FALLO CRÍTICO DURANTE LA CARGA:", e);
             if(container) container.innerHTML = `<p>Ocurrió un error al cargar los anuncios. Detalles: ${e.message}</p>`;
@@ -492,6 +499,17 @@ function initializeHeroCarousel() {
 
     // Exponer función global para cambiar imágenes dinámicamente
     window.updateHeroCarousel = loadCategoryImages;
+
+// Ejecutar solo si estamos en el index
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.body.id === 'index-page') {
+    document.querySelectorAll('.hero-swiper').forEach(swiperEl => {
+      swiperEl.addEventListener('click', e => {
+        e.stopPropagation();
+      });
+    });
+  }
+});
 }
 
 // Función para actualizar el carrusel cuando se cambia de categoría

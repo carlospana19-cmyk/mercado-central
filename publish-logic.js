@@ -1,6 +1,9 @@
 // publish-logic.js - VERSIÓN FINAL CON SINCRONIZACIÓN COMPLETA
 
 import { supabase } from './supabase-client.js';
+import { checkUserLoggedIn } from './auth-logic.js';
+
+checkUserLoggedIn();
 
 // CONFIGURACIÓN DE PLANES
 const PLAN_LIMITS = {
@@ -31,9 +34,9 @@ export function initializePublishPage() {
     // --- ELEMENTOS DEL DOM ---
     const allSteps = form.querySelectorAll('.form-section');
     const progressSteps = document.querySelectorAll('.step');
-    const categorySelect = document.getElementById('category');
+    const categorySelect = document.getElementById('categoria');
     const subcategoryGroup = document.getElementById('subcategory-group');
-    const subcategorySelect = document.getElementById('subcategory');
+    const subcategorySelect = document.getElementById('subcategoria');
     const provinceSelect = document.getElementById('province');
     const districtGroup = document.getElementById('district-group');
     const districtSelect = document.getElementById('district');
@@ -460,6 +463,13 @@ export function initializePublishPage() {
 
     // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
 function showDynamicFields() {
+    // Limpia todas las secciones dinámicas antes de mostrar la nueva
+    document.querySelectorAll('.attribute-section').forEach(section => {
+        section.style.display = 'none';
+        const inputs = section.querySelectorAll('input, select, textarea');
+        inputs.forEach(el => el.value = '');
+    });
+
     // Deshabilitar todos los inputs de secciones ocultas
     vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
     realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
@@ -474,146 +484,65 @@ function showDynamicFields() {
 
     if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
         vehicleDetails.style.display = 'block';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
         vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
     } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
-        vehicleDetails.style.display = 'none';
         realestateDetails.style.display = 'block';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
         realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
     } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
         electronicsDetails.style.display = 'block';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
         electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showElectronicsFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
         homeFurnitureDetails.style.display = 'block';
-        fashionDetails.style.display = 'none';
         homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showHomeFurnitureFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('moda') || selectedMainCategory.toLowerCase().includes('belleza') || selectedMainCategory.toLowerCase().includes('ropa')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
         fashionDetails.style.display = 'block';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
         fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showFashionFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('deportes') || selectedMainCategory.toLowerCase().includes('hobbies')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
         sportsDetails.style.display = 'block';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
         sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showSportsFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('mascota')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
         petsDetails.style.display = 'block';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
         petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showPetsFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('servicio')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
         servicesDetails.style.display = 'block';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
         servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showServicesFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('negocio')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
         businessDetails.style.display = 'block';
-        communityDetails.style.display = 'none';
         businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showBusinessFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('comunidad')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
         communityDetails.style.display = 'block';
         communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showCommunityFields();
         }
-    } else {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
     }
 }
 
-    function showElectronicsFields() {
-        // --- LÍNEAS DE CORRECCIÓN OBLIGATORIAS ---
-        const container = document.getElementById('electronics-fields');
-        const mainSection = document.getElementById('electronics-details'); // El contenedor padre
+function showElectronicsFields() {
+    // --- LÍNEAS DE CORRECCIÓN OBLIGATORIAS ---
+    const container = document.getElementById('electronics-fields');
+    const mainSection = document.getElementById('electronics-details'); // El contenedor padre
 
         // Forzar visibilidad
         if (mainSection) {
@@ -648,7 +577,7 @@ function showDynamicFields() {
 
         // PRIORIDAD #3: Añadir título descriptivo
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: var(--color-primario); margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        
         electronicsFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -813,7 +742,6 @@ function showDynamicFields() {
         homeFurnitureFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         homeFurnitureFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -956,8 +884,7 @@ function showFashionFields() {
     fashionFields.innerHTML = '';
 
     const titleDiv = document.createElement('div');
-    titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
-    fashionFields.appendChild(titleDiv);
+
 
     fields.forEach(field => {
         const fieldDiv = document.createElement('div');
@@ -1143,7 +1070,6 @@ function showFashionFields() {
         sportsFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         sportsFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -1260,7 +1186,6 @@ function showFashionFields() {
         petsFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         petsFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -1360,7 +1285,6 @@ function showFashionFields() {
         servicesFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         servicesFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -1474,9 +1398,10 @@ function showBusinessFields() {
     }
 
     businessDetails.style.display = 'block';
+    businessFields.innerHTML = ''; // Limpia el contenedor antes de añadir nuevos campos
     
     // ✅ TÍTULO DINÁMICO según subcategoría
-    businessFields.innerHTML = `<h4>Detalles de ${selectedSubcategory}</h4>`;
+    
 
     // ✅ CONFIGURACIÓN DINÁMICA de campos
     const fieldConfigs = {
@@ -1589,7 +1514,7 @@ function showBusinessFields() {
         communityFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        
         communityFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -2155,9 +2080,19 @@ form.addEventListener('submit', async (e) => {
             
             const { data: { publicUrl: coverPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(coverFileName);
 
+            // Subir imágenes de galería
+            const uploadedGalleryUrls = [];
+            for (const file of galleryFiles) {
+                const galleryFileName = `${user.id}/gallery-${Date.now()}-${file.name}`;
+                const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
+                if (galleryUploadError) throw galleryUploadError;
+                const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
+                uploadedGalleryUrls.push(galleryPublicUrl);
+            }
+
             const formData = new FormData(form);
             const adData = {
-                titulo: document.getElementById('titulo').value,
+                titulo: document.getElementById('title').value,
                 descripcion: formData.get('descripcion'),
                 precio: parseFloat(formData.get('precio')),
                 categoria: formData.get('categoria'),
@@ -2165,6 +2100,7 @@ form.addEventListener('submit', async (e) => {
                 distrito: formData.get('distrito'),
                 user_id: user.id,
                 url_portada: coverPublicUrl,
+                url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
                 fecha_publicacion: new Date().toISOString()
             };
 
@@ -2223,22 +2159,6 @@ form.addEventListener('submit', async (e) => {
 
             if (adInsertError) throw adInsertError;
 
-            if (galleryFiles.length > 0) {
-                for (const file of galleryFiles) {
-                    const galleryFileName = `${user.id}/${Date.now()}-${file.name}`;
-                    const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
-                    if (galleryUploadError) throw galleryUploadError;
-
-                    const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
-
-                    await supabase.from('imagenes').insert({
-                        anuncio_id: newAd.id,
-                        url_imagen: galleryPublicUrl,
-                        user_id: user.id
-                    });
-                }
-            }
-            
             alert('¡Anuncio publicado con éxito!');
             window.location.href = 'dashboard.html';
 
@@ -2531,7 +2451,6 @@ planCards.forEach(card => {
 
         const maxFiles = limits.maxFotos;
         const fileInput = document.getElementById('gallery-images-input');
-
         if (fileInput) {
             fileInput.setAttribute('data-max-files', maxFiles);
 

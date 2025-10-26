@@ -311,7 +311,9 @@ function displaySubcategoryFilters(subcategoriesWithCounts) {
     container.innerHTML = subcategoriesWithCounts.map(sub => `
         <label class="subcategory-label">
             <input type="checkbox" name="subcategory" value="${sub.nombre}">
-            ${sub.nombre} <span style="color: #7f8c8d; font-size: 1.2rem;">(${sub.count})</span>
+            ${sub.nombre} ${sub.count !== undefined && sub.count !== null
+                ? `<span style="color:#7f8c8d; font-size:1.2rem;">(${sub.count})</span>`
+                : ''}
         </label>
     `).join('');
 }
@@ -658,13 +660,28 @@ function displayFilteredProducts(ads) {
             }
         }
 
+        console.log('Anuncio:', ad.featured_plan, ad.url_portada, ad.url_galeria);
 return `
     <div class="property-card ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
         ${badgeHTML}
         ${urgentBadge}
         
         <div class="property-image">
-            <img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}" loading="lazy">
+            ${['premium','destacado','top'].includes(ad.featured_plan)
+              ? `
+              <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
+                <div class="swiper-wrapper">
+                  ${Array.isArray(ad.url_galeria) && ad.url_galeria.length
+                    ? ad.url_galeria.map(img =>
+                        `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`
+                      ).join('')
+                    : `<div class="swiper-slide"><img src="${ad.url_portada}" alt="${ad.titulo}" loading="lazy"></div>`}
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+              </div>`
+              : `<img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image" loading="lazy">`}
         </div>
         
         <div class="property-details">
@@ -704,6 +721,28 @@ return `
     }).join('');
 
     container.innerHTML = adsHTML;
+
+    // Inicializar Swiper para cada tarjeta .mini-gallery
+    document.querySelectorAll('.mini-gallery').forEach(el => {
+      const slides = el.querySelectorAll('.swiper-slide').length;
+      new Swiper(el, {
+        loop: slides > 1,
+        pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+        navigation: {
+          nextEl: el.querySelector('.swiper-button-next'),
+          prevEl: el.querySelector('.swiper-button-prev'),
+        },
+        slidesPerView: 1,
+        autoplay: slides > 1 ? { delay: 4000, disableOnInteraction: false } : false,
+      });
+    });
+
+    // Bloquear propagación de clic solo dentro del contenedor de imágenes
+    document.querySelectorAll('.property-image').forEach(imgContainer => {
+      imgContainer.addEventListener('click', e => {
+        e.stopPropagation();  // evita que llegue al onclick de .property-card
+      });
+    });
 }
 
 function updateSummary(query, category, count) {
@@ -777,9 +816,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data: subcategories, error: subcatError } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
             if(subcatError) { console.error(subcatError); return; }
 
-            // --- LÓGICA DE CONTEO (ROBUSTA) ---
-            // Bloque de conteo de subcategorías eliminado para optimización.
-            displaySubcategoryFilters([]); // Mostrar sin conteos por ahora
+            // Calcular la cantidad de anuncios por subcategoría
+            const subcategoriesWithCounts = await Promise.all(
+              subcategories.map(async sub => {
+                const { data, count, error: countError } = await supabase
+                  .from('anuncios')
+                  .select('id', { count: 'exact' })
+                  .eq('categoria', sub.nombre);
+
+                if (countError) console.error('Error al contar', sub.nombre, countError);
+                return { ...sub, count: count || 0 };
+              })
+            );
+
+            // Mostrar el resultado completo
+            displaySubcategoryFilters(subcategoriesWithCounts);
         } else {
             // Si no hay categoría padre, mostrar mensaje de no subcategorías
             displaySubcategoryFilters([]);
@@ -794,7 +845,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Bloque de conteo de categorías eliminado para optimización.
-        displaySubcategoryFilters([]); // Mostrar sin conteos por ahora
+        const allCategoriesWithCounts = await Promise.all(
+          allCategories.map(async cat => {
+            const { data, count, error: countError } = await supabase
+              .from('anuncios')
+              .select('id', { count: 'exact' })
+              .eq('categoria', cat.nombre);
+            if (countError) console.error('Error al contar', cat.nombre, countError);
+            return { ...cat, count: count || 0 };
+          })
+        );
+        displaySubcategoryFilters(allCategoriesWithCounts); // Mostrar todas las categorías
     }
 
     await loadAndFilterResults();

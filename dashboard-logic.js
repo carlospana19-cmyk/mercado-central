@@ -1,12 +1,18 @@
 import { supabase } from './supabase-client.js';
+import { checkUserLoggedIn } from './auth-logic.js';
 
 export async function initializeDashboardPage() {
+    checkUserLoggedIn();
     const container = document.querySelector('#my-ads-container');
     if (!container) { return; }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        window.location.href = 'login.html';
+    
+    
+    // 1. PEDIMOS LOS NUEVOS CAMPOS A SUPABASE
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error('No se pudo obtener el usuario.', userError);
+        container.innerHTML = '<p>Error de autenticación. Por favor, inicia sesión de nuevo.</p>';
         return;
     }
     
@@ -44,7 +50,13 @@ export async function initializeDashboardPage() {
             <div class="dashboard-card" data-ad-id="${ad.id}">
                 <img src="${ad.url_portada || 'images/placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image">
                 <div class="dashboard-ad-info">
-            <h3>${ad.titulo}</h3>
+            
+                    <div class="dashboard-ad-title">
+                        <h3>${ad.titulo}</h3>
+                    </div>
+                    <div class="dashboard-ad-price">
+                        ${ad.precio ? `$${ad.precio.toLocaleString('es-PA')}` : 'Precio a convenir'}
+                    </div>
                     ${vehicleDetailsHTML} 
                 </div>
             <div class="dashboard-ad-actions">
@@ -100,14 +112,30 @@ document.addEventListener('click', function(e) {
         const adId = deleteButton.dataset.adId; 
 
         if (adId) {
-            console.log(`Agente 11: Botón de borrar clickeado. ID a eliminar: ${adId}`);
+            
             deleteAd(adId);
         } else {
             // Este log nos ayudará a confirmar si el ID sigue faltando en el botón.
-            console.error('Agente 11: Error - Se hizo clic en un botón de borrar, pero no se encontró el atributo "data-ad-id". Verifica cómo se genera el botón en el HTML.');
+            
         }
     }
 });
 
 // --- FIN: LISTENER DE ELIMINACIÓN CORREGIDO ---
 }
+
+async function logout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        console.error('Error al cerrar sesión:', error);
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutButton = document.getElementById('btn-logout');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+    }
+});

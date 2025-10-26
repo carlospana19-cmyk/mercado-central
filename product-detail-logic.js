@@ -20,25 +20,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Hacemos ambas peticiones a la vez
         console.log('Realizando consultas a la base de datos...');
         const [adResponse, imagesResponse] = await Promise.all([
-            supabase.from('anuncios').select('*').eq('id', adId).single(),
-            supabase.from('imagenes').select('url_imagen').eq('anuncio_id', adId)
+            supabase.from('anuncios').select('*').eq('id', adId).single()
         ]);
 
         const { data: ad, error: adError } = adResponse;
-        const { data: images, error: imagesError } = imagesResponse;
 
         console.log('Respuesta del anuncio:', { ad, adError });
-        console.log('Respuesta de imágenes:', { images, imagesError });
 
         if (adError) {
             console.error('Error al cargar el anuncio:', adError);
             displayError("Error al cargar el anuncio. Por favor, intenta de nuevo.");
             return;
-        }
-
-        if (imagesError) {
-            console.warn('Error al cargar las imágenes:', imagesError);
-            // No fallamos completamente si solo hay error en imágenes
         }
 
         if (!ad) {
@@ -47,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        displayProductDetails(ad, images || []);
+        displayProductDetails(ad);
 
         // Incrementar contador de visitas
         try {
@@ -70,9 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-async function displayProductDetails(ad, galleryImages) {
+async function displayProductDetails(ad) {
     console.log('Mostrando detalles del producto:', ad);
-    console.log('Imágenes de galería:', galleryImages);
 
     // Verificar que los elementos del DOM existan
     const productNameEl = document.getElementById('product-name');
@@ -158,45 +149,34 @@ async function displayProductDetails(ad, galleryImages) {
     // Agregar información detallada de comunidad si existe
     addCommunityDetails(ad);
 
-    // Construir la galería con validación de URLs
-    const allImages = [ad.url_portada, ...galleryImages.map(img => img.url_imagen)].filter(url => {
-        if (!url) return false;
-        try {
-            new URL(url);
-            return true;
-        } catch {
-            console.warn('URL de imagen inválida:', url);
-            return false;
+    // Construir la galería usando url_galeria o url_portada
+    const galleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length
+        ? ad.url_galeria
+        : [ad.url_portada];
+
+    console.log('Imágenes válidas para mostrar:', galleryImages);
+
+    if (galleryImages.length > 0) {
+        const galleryWrapper = document.getElementById('gallery-wrapper');
+        galleryWrapper.innerHTML = galleryImages
+            .map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}"></div>`)
+            .join('');
+
+        // Insertar control para duplicar imagen si solo hay una
+        const currentSlides = galleryWrapper.querySelectorAll('.swiper-slide');
+
+        if (currentSlides.length === 1) {
+            // duplicar una vez la misma imagen, así Swiper puede desplazarse
+            const clone = currentSlides[0].cloneNode(true);
+            galleryWrapper.appendChild(clone);
         }
-    });
 
-    console.log('Imágenes válidas para mostrar:', allImages);
+        const slidesCount = document.querySelectorAll('.product-gallery-swiper .swiper-slide').length;
 
-    if (allImages.length > 0) {
-        galleryWrapperEl.innerHTML = '';
-
-        allImages.forEach((imageUrl, index) => {
-            const slide = document.createElement('div');
-            slide.className = 'swiper-slide';
-            // Removed debugging styles
-
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.alt = `Imagen ${index + 1} del producto`;
-            // Removed debugging styles
-            img.onerror = () => {
-                console.warn('Error al cargar imagen del carrusel:', imageUrl); // Reverted to warn
-                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L2F2Zz4=';
-            };
-
-            slide.appendChild(img);
-            galleryWrapperEl.appendChild(slide);
-        });
-        // Removed console.log('Se han agregado imágenes al carrusel.');
-
-        // Inicializar Swiper después de agregar las imágenes
-        const swiper = new Swiper('.product-gallery-swiper', {
-            loop: true,
+        window.detailSwiper = new Swiper('.product-gallery-swiper', {
+            loop: slidesCount > 1,      // loop solo si hay más de una imagen (ahora mínimo 2)
+            slidesPerView: 1,
+            spaceBetween: 0,
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
@@ -205,17 +185,16 @@ async function displayProductDetails(ad, galleryImages) {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             },
-            autoplay: {
-                delay: 3000,
-                disableOnInteraction: false,
-            },
-            observer: true, // Added to observe changes in Swiper and its parents
-            observeParents: true, // Added to observe changes in parent elements
+            autoplay: slidesCount > 1 ? { delay: 4000, disableOnInteraction: false } : false,
+            effect: 'slide',            // usar desplazamiento normal (sin crossFade)
+        });
+
+        // Mostrar flechas aunque haya una sola imagen (ahora mínimo 2 si se duplicó)
+        document.querySelectorAll('.swiper-button-next, .swiper-button-prev').forEach(btn => {
+            btn.style.display = 'flex';
         });
 
         console.log('Carrusel Swiper inicializado');
-
-        // Removed debugging: Log DOM structure after Swiper initialization
     } else {
         console.log('No hay imágenes disponibles, usando placeholder');
         galleryWrapperEl.innerHTML = `
@@ -224,9 +203,21 @@ async function displayProductDetails(ad, galleryImages) {
             </div>
         `;
 
-        // Inicializar Swiper con una sola imagen
-        const swiper = new Swiper('.product-gallery-swiper', {
-            loop: false,
+        // Configurar Swiper para una sola imagen placeholder
+        const galleryWrapper = document.querySelector('.product-gallery-swiper .swiper-wrapper');
+        const currentSlides = galleryWrapper.querySelectorAll('.swiper-slide');
+
+        if (currentSlides.length === 1) {
+            const clone = currentSlides[0].cloneNode(true);
+            galleryWrapper.appendChild(clone);
+        }
+
+        const slidesCount = document.querySelectorAll('.product-gallery-swiper .swiper-slide').length;
+
+        window.detailSwiper = new Swiper('.product-gallery-swiper', {
+            loop: slidesCount > 1,
+            slidesPerView: 1,
+            spaceBetween: 0,
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
@@ -235,8 +226,15 @@ async function displayProductDetails(ad, galleryImages) {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             },
-            autoplay: false, // Desactivar autoplay para una sola imagen
+            autoplay: false, // Desactivar autoplay para placeholder
+            effect: 'slide',
         });
+
+        document.querySelectorAll('.swiper-button-next, .swiper-button-prev').forEach(btn => {
+            btn.style.display = 'flex';
+        });
+
+        console.log('Carrusel Swiper inicializado con placeholder');
     }
 
     // --- LÓGICA DEL BOTÓN DE EDICIÓN ---
