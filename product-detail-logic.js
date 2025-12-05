@@ -185,7 +185,7 @@ async function displayProductDetails(ad) {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             },
-            autoplay: slidesCount > 1 ? { delay: 4000, disableOnInteraction: false } : false,
+            autoplay: false, // Desactivar autoplay - solo click en flechas
             effect: 'slide',            // usar desplazamiento normal (sin crossFade)
         });
 

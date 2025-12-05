@@ -1,6 +1,14 @@
 import { supabase } from './supabase-client.js';
 import { checkUserLoggedIn } from './auth-logic.js';
 
+export function setupDashboard() {
+  // Llama a la función que ya existe para inicializar el dashboard
+  if (typeof initializeDashboardPage === 'function') {
+    initializeDashboardPage();
+  }
+  console.log('Dashboard cargado correctamente.');
+}
+
 export async function initializeDashboardPage() {
     checkUserLoggedIn();
     const container = document.querySelector('#my-ads-container');

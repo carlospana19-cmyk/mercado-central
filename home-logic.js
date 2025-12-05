@@ -30,6 +30,14 @@ export function initializeHomePage() {
 
             console.log("SENSOR 3: Datos recibidos de Supabase:", ads);
 
+            // DIAGNÓSTICO: Verificar atributos_clave en cada anuncio
+            ads.forEach((ad, index) => {
+                console.log(`Anuncio ${index + 1} - ID: ${ad.id}, Título: ${ad.titulo}`);
+                console.log(`Atributos_clave:`, ad.atributos_clave);
+                console.log(`Categoría: ${ad.categoria}`);
+                console.log(`---`);
+            });
+
             if (!ads || ads.length === 0) {
                 container.innerHTML = '<p>No hay anuncios destacados en este momento.</p>';
                 return;
@@ -44,22 +52,53 @@ export function initializeHomePage() {
                 const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
                 
                 const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
-                let badgeHTML = '';
-                let cardExtraClass = '';
+// BADGE ESTELAR METÁLICO – versión SVG simple
+let badgeHTML = '';
+let cardExtraClass = '';
 
-                if (ad.featured_plan === 'top') {
-                    badgeHTML = '<span class="badge-top" title="Anuncio TOP"><i class="fas fa-gem"></i></span>';
-                    cardExtraClass = 'card-top';
-                } else if (ad.featured_plan === 'destacado') {
-                    badgeHTML = '<span class="badge-destacado" title="Anuncio Destacado"><i class="fas fa-medal"></i></span>';
-                    cardExtraClass = 'card-destacado';
-                } else if (ad.featured_plan === 'premium') {
-                    badgeHTML = '<span class="badge-premium" title="Anuncio Premium"><i class="fas fa-award"></i></span>';
-                    cardExtraClass = 'card-premium';
-                } else if (ad.featured_plan === 'basico') {
-                    badgeHTML = '<span class="badge-basico" title="Anuncio Básico"><i class="fas fa-medal"></i></span>';
-                    cardExtraClass = 'card-basico';
-                }
+const badgeSVG = (colorClass) => `
+<svg class="simple-badge-svg ${colorClass}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Aro de estrella (12 puntas) -->
+    <path d="M50 2 
+             L63.5 18.5 L84.5 15.5 
+             L87.5 36.5 L100 50 
+             L87.5 63.5 L84.5 84.5 
+             L63.5 81.5 L50 98 
+             L36.5 81.5 L15.5 84.5 
+             L12.5 63.5 L0 50 
+             L12.5 36.5 L15.5 15.5 
+             L36.5 18.5 Z" 
+          class="badge-star-bg"/>
+
+    <!-- Círculo blanco de fondo -->
+    <circle cx="50" cy="50" r="32" 
+            fill="white" 
+            stroke="white" 
+            stroke-width="1"/>
+
+    <!-- Estrella central - SOLO CONTORNO (stroke), sin relleno -->
+    <polygon points="50,28 57,45 75,45 61,56 66,73 50,60 32,70 38,53 25,43 42,43" 
+             class="badge-center-star"
+             fill="none"
+             stroke-width="2.5"
+             stroke-linecap="round"
+             stroke-linejoin="round"/>
+</svg>
+`;
+
+if (ad.featured_plan === "top") {
+  badgeHTML = badgeSVG("diamond-badge");
+  cardExtraClass = "card-top";
+} else if (ad.featured_plan === "destacado") {
+  badgeHTML = badgeSVG("gold-badge");
+  cardExtraClass = "card-destacado";
+} else if (ad.featured_plan === "premium") {
+  badgeHTML = badgeSVG("silver-badge");
+  cardExtraClass = "card-premium";
+} else if (ad.featured_plan === "basico") {
+  badgeHTML = badgeSVG("bronze-badge");
+  cardExtraClass = "card-basico";
+}
 
                 let urgentBadge = '';
                 if (ad.enhancements && ad.enhancements.is_urgent) {
@@ -67,10 +106,10 @@ export function initializeHomePage() {
                 }
 
                 return `
-                    <div class="${cardClass} ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
-                        ${badgeHTML}
-                        ${urgentBadge}
-                        <div class="image-container">
+                    <div class="${cardClass} card ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                       ${badgeHTML}
+                         ${urgentBadge}
+                         <div class="image-container">
                             <div class="swiper product-swiper">
                                 <div class="swiper-wrapper">
                                     ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
@@ -151,11 +190,15 @@ export function initializeHomePage() {
 }
 
 function generateAttributesHTML(attributes, category) {
+    console.log('🔍 generateAttributesHTML called with:', { attributes, category });
+
     if (!attributes || Object.keys(attributes).length === 0) {
+        console.log('❌ No attributes or empty, returning empty string');
         return '';
     }
 
     const categoria = category ? category.toLowerCase() : '';
+    console.log('📝 Category processed:', categoria);
 
     let detailsHTML = '';
 
@@ -345,6 +388,7 @@ function generateAttributesHTML(attributes, category) {
         }
     }
 
+    console.log('✅ generateAttributesHTML returning:', detailsHTML);
     return detailsHTML;
 }
 

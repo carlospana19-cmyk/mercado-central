@@ -6,7 +6,7 @@ import { initializeHomePage } from './home-logic.js';
 import { loadSearchCategories, initializeSearchButton } from './home-search.js';
 import { initializePublishPage } from './publish-logic.js';
 import { initializeEditPage } from './editar-anuncio-logic.js';
-import { initializeAuthPages } from './auth-logic.js';
+import { initializeAuthPages, checkUserLoggedIn } from './auth-logic.js';
 import { initializeDashboardPage } from './dashboard-logic.js';
 
 // --- FUNCIÓN CENTRAL DE AUTENTICACIÓN ---
@@ -26,6 +26,16 @@ function updateUIBasedOnAuthState() {
             if (btnDashboard) btnDashboard.style.display = 'inline-block';
             if (btnLogout) btnLogout.style.display = 'inline-block';
             if (btnLogin) btnLogin.style.display = 'none';
+
+            // Agregar listener al botón de logout
+            if (btnLogout) {
+                btnLogout.addEventListener('click', async () => {
+                    console.log("🚪 Cerrando sesión...");
+                    await supabase.auth.signOut();
+                    console.log("✅ Sesión cerrada");
+                    window.location.href = 'login.html';
+                });
+            }
         } else {
             // --- USUARIO INVITADO ---
             if (btnPublish) btnPublish.style.display = 'none';
@@ -50,9 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         initializePublishPage();
     } else if (path.endsWith('editar-anuncio.html')) {
         initializeEditPage();
-    } else if (path.endsWith('login.html') || path.endsWith('registro.html')) {
+    } else if (path.endsWith('login.html') || path.endsWith('registro.html') || path.endsWith('forgot-password.html') || path.endsWith('reset-password.html')) {
         initializeAuthPages(); // <-- ESTA ES LA LÍNEA QUE REPARA EL LOGIN
     } else if (path.endsWith('dashboard.html')) {
         initializeDashboardPage();
+    }
+
+    // Verificar autenticación solo si NO estamos en login, registro, forgot-password o reset-password
+    if (!path.endsWith('login.html') && !path.endsWith('registro.html') && !path.endsWith('forgot-password.html') && !path.endsWith('reset-password.html')) {
+        checkUserLoggedIn();
     }
 });

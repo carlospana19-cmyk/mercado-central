@@ -301,6 +301,60 @@
   clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%);
 }
 
+/* === CONTENEDOR PRINCIPAL DE TARJETAS === */
+.box-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos para las filas de anuncios personalizados */
+.ads-row {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 2rem; /* Espacio entre filas */
+  width: 100%;
+}
+
+.ads-row:last-child {
+  margin-bottom: 0;
+}
+
+.row-2-cols {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.row-3-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.row-4-cols {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Responsive para filas */
+@media (max-width: 1200px) {
+  .row-4-cols {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .row-2-cols,
+  .row-3-cols,
+  .row-4-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .row-2-cols,
+  .row-3-cols,
+  .row-4-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Additional home-specific styles from style.css */
 .section-title { text-align: center; font-size: 3.2rem; font-weight: 700; margin-bottom: 5rem; }
 .section-title span { color: var(--color-primario); }
@@ -330,10 +384,14 @@ main, section.hero-search, section.categories-showcase, section.products {
     height: 240px; /* Ajustada la altura para una imagen más grande */
     position: relative;
     background-color: #eee;
+    border-radius: 1.2rem;
+    overflow: hidden;
 }
 .box .swiper {
     width: 100%;
     height: 100%;
+    border-radius: 1.2rem;
+    overflow: hidden;
 }
 .box .swiper-slide img {
     display: block;

@@ -44,6 +44,21 @@ export function initializeEditPage() {
     let selectedMainCategory = '';
     let selectedSubcategory = '';
 
+    // --- Mapeo de categorías principales a placeholders ---
+    const placeholderMap = {
+        'Vehículos': (sub) => `Ej: Vendo ${sub || 'Vehículo'}, Como Nuevo`,
+        'Inmuebles': (sub) => `Ej: Se Vende ${sub || 'Propiedad'} en [Ubicación]`,
+        'Empleos y Servicios': (sub) => `Ej: Ofrezco Servicios de ${sub || 'Profesional'}`,
+        'Servicios': (sub) => `Ej: ${sub || 'Servicio'} a Domicilio`,
+        'Comunidad': (sub) => `Ej: ${sub || 'Anuncio de Comunidad'}`,
+        'Mascotas': (sub) => `Ej: Adopción Responsable de ${sub || 'Mascota'}`,
+        'Electrónica': (sub) => `Ej: ${sub || 'Artículo Electrónico'} en Buen Estado`,
+        'Hogar y Muebles': (sub) => `Ej: Vendo ${sub || 'Mueble'} para Sala`,
+        'Moda y Belleza': (sub) => `Ej: Vendo ${sub || 'Artículo de Moda'}, Talla M`,
+        'Deportes y Hobbies': (sub) => `Ej: Vendo ${sub || 'Artículo Deportivo'}, Poco Uso`,
+        'Negocios': (sub) => `Ej: Oportunidad de Inversión en ${sub || 'Negocio'}`
+    };
+
     // --- DATOS DE DISTRITOS POR PROVINCIA ---
     const districtsByProvince = {
         'Panamá': ['Panamá', 'San Miguelito', 'Arraiján', 'Capira', 'Chame', 'La Chorrera', 'Cerro Punta'],
@@ -1325,6 +1340,10 @@ function showBusinessFields() {
             return;
         }
 
+        // Guardar temporalmente la categoría y subcategoría en sessionStorage
+        window.sessionStorage.setItem('editAdCategory', ad.categoria || '');
+        window.sessionStorage.setItem('editAdSubcategory', ad.subcategoria || '');
+
         // 2. OBTENER IMÁGENES DE LA GALERÍA DESDE LA TABLA 'imagenes'
         const { data: images, error: imagesError } = await supabase
             .from('imagenes')
@@ -1352,58 +1371,83 @@ function showBusinessFields() {
             document.getElementById('address').value = ad.direccion_especifica;
         }
 
-// Rellenar categorías
-const foundCategory = categories.find(c => c.nombre === ad.categoria);
-if (foundCategory) {
-    const parentId = foundCategory.parent_id;
-    categorySelect.value = parentId;
-    selectedMainCategory = categories.find(c => c.id === parentId)?.nombre || '';
-    categorySelect.dispatchEvent(new Event('change'));
-    setTimeout(() => {
-        subcategorySelect.value = ad.categoria;
-        selectedSubcategory = ad.categoria;
-        showDynamicFields();
-    }, 100);
+// 5. RELLENAR CATEGORÍAS — versión completa estable final
+const normalize = (s) =>
+  s?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+if (Array.isArray(categories) && categories.length) {
+  const categorySelect = document.getElementById("category");
+  const subcategorySelect = document.getElementById("subcategory");
+  const subcategoryGroup = document.getElementById("subcategory-group");
+
+  const adCat = normalize(ad.categoria);
+  const adSub = normalize(ad.subcategoria);
+
+  // Buscar coincidencias por nombre (no por ID)
+  const foundMainCat = categories.find(
+    (c) => !c.parent_id && normalize(c.nombre) === adCat
+  );
+  const foundSubCat = categories.find(
+    (c) => c.parent_id && normalize(c.nombre) === adSub
+  );
+
+  if (foundMainCat) {
+    // Asignar categoría principal
+    categorySelect.value = foundMainCat.nombre;
+    selectedMainCategory = foundMainCat.nombre;
+
+    // Poblar subcategorías de esa categoría
+    const subcats = categories.filter((c) => c.parent_id === foundMainCat.id);
+    if (subcats.length > 0) {
+      subcategoryGroup.style.display = "block";
+      subcategorySelect.innerHTML = '<option value="">Selecciona</option>';
+
+      subcats.forEach((s) => {
+        const opt = document.createElement("option");
+        opt.value = s.nombre;
+        opt.textContent = s.nombre;
+        subcategorySelect.appendChild(opt);
+      });
+
+      if (foundSubCat) {
+        subcategorySelect.value = foundSubCat.nombre;
+        selectedSubcategory = foundSubCat.nombre;
+      } else if (ad.subcategoria) {
+        console.warn(
+          `Subcategoría '${ad.subcategoria}' no coincide con las del grupo '${foundMainCat.nombre}'.`
+        );
+        subcategorySelect.value = "";
+        selectedSubcategory = "";
+      } else {
+        subcategorySelect.value = "";
+        selectedSubcategory = "";
+      }
+    } else {
+      // Categoría sin subcategorías asociadas
+      subcategoryGroup.style.display = "none";
+      subcategorySelect.innerHTML = "";
+      selectedSubcategory = "";
+    }
+  } else {
+    // No se encontró coincidencia con categorías principales
+    console.warn(
+      `Categoría '${ad.categoria}' no encontrada en el catálogo de categorías cargadas.`
+    );
+    categorySelect.value = "";
+    subcategoryGroup.style.display = "none";
+    subcategorySelect.innerHTML = "";
+    selectedMainCategory = "";
+    selectedSubcategory = "";
+  }
+
+  // Mostrar los campos dinámicos basados en la categoría/subcategoría actual
+  showDynamicFields();
+} else {
+  // Fallback si no hay categorías cargadas
+  console.warn(
+    "⚠️ No se encontraron categorías en memoria al intentar rellenar el formulario de edición."
+  );
 }
-
-        // Precargar imagen de portada
-        if (ad.url_portada) {
-            coverImageName.textContent = ad.url_portada.split('/').pop();
-        }
-
-        // Rellenar datos de contacto (NUEVA LÓGICA)
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            document.getElementById('contact-email').value = user.email;
-        }
-        // Rellenar con los datos guardados en el anuncio
-        if (ad.contact_name) {
-            document.getElementById('contact-name').value = ad.contact_name;
-        }
-        if (ad.contact_phone) {
-            document.getElementById('contact-phone').value = ad.contact_phone;
-        }
-
-        // --- Carga de datos de atributos unificados (desde JSONB) ---
-        if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
-            const atributos = ad.atributos_clave;
-            if (atributos.subcategoria) {
-                selectedSubcategory = atributos.subcategoria;
-                setTimeout(() => {
-                    subcategorySelect.value = atributos.subcategoria;
-                    showDynamicFields();
-                    fillUnifiedAttributesJSON(atributos, selectedMainCategory, selectedSubcategory);
-                }, 100);
-            } else {
-                // Si no hay subcategoría en atributos_clave, pero sí hay atributos, rellenar con la categoría principal
-                fillUnifiedAttributesJSON(atributos, selectedMainCategory, selectedSubcategory);
-            }
-        }
-
-        // --- Carga de datos de atributos unificados ---
-        if (ad.atributos_clave && typeof ad.atributos_clave === 'object') {
-            fillUnifiedAttributesJSON(ad.atributos_clave, selectedMainCategory, selectedSubcategory);
-        }
 
 
         // RENDERIZAR IMÁGENES DE GALERÍA EXISTENTES (NUEVA LÓGICA)
@@ -1420,20 +1464,28 @@ if (foundCategory) {
                 galleryPreviewContainer.appendChild(wrapper);
             });
         }
+
     }
 
-    // --- LÓGICA DE GUARDADO DE CAMBIOS (FORM SUBMIT) - VERSIÓN FINAL ---
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const saveButton = document.getElementById('save-changes-btn');
-        saveButton.disabled = true;
-        saveButton.textContent = 'Guardando...';
+    // --- FUNCIÓN PARA GUARDAR CAMBIOS DEL ANUNCIO ---
+    async function saveEditedAd() {
+        const saveButton = document.getElementById('btn-save-edit');
+        if (saveButton) {
+            saveButton.disabled = true;
+            saveButton.textContent = 'Guardando...';
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const adId = urlParams.get('id');
-        if (!adId) { /* ... manejo de error ... */ return; }
+        if (!adId) {
+            alert("ID de anuncio no encontrado. No se pueden guardar los cambios.");
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Guardar cambios';
+            }
+            return;
+        }
 
-        // 1. Recolectar datos de texto del formulario
         const formData = new FormData(form);
         const adData = {
             titulo: formData.get('titulo'),
@@ -1444,22 +1496,28 @@ if (foundCategory) {
             distrito: formData.get('distrito'),
             direccion_especifica: formData.get('direccion_especifica'),
             contact_name: formData.get('contact_name'),
-            contact_phone: formData.get('contact_phone')
+            contact_phone: formData.get('contact_phone'),
+            contact_email: formData.get('contact_email') // Added this line
         };
 
-        // --- ATRIBUTOS UNIFICADOS (TODAS las categorías van a JSONB) ---
         adData.atributos_clave = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
 
-        // --- 2. MANEJAR ACTUALIZACIÓN DE IMAGEN DE PORTADA (NUEVA LÓGICA) ---
+        // --- MANEJAR ACTUALIZACIÓN DE IMAGEN DE PORTADA ---
         const coverImageInput = document.getElementById('cover-image-input');
         const coverImageFile = coverImageInput.files[0];
 
         if (coverImageFile) {
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { alert("Error de sesión."); return; }
+            if (!user) {
+                alert("Error de sesión. No se puede subir la nueva portada.");
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Guardar cambios';
+                }
+                return;
+            }
 
             const fileName = `${user.id}/cover-${Date.now()}-${coverImageFile.name}`;
-
             const { error: uploadError } = await supabase.storage
                 .from('imagenes_anuncios')
                 .upload(fileName, coverImageFile);
@@ -1467,8 +1525,10 @@ if (foundCategory) {
             if (uploadError) {
                 console.error('Error al subir nueva portada:', uploadError);
                 alert('Hubo un error al subir la nueva imagen de portada.');
-                saveButton.disabled = false;
-                saveButton.textContent = 'Guardar Cambios';
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Guardar cambios';
+                }
                 return;
             }
 
@@ -1476,11 +1536,10 @@ if (foundCategory) {
                 .from('imagenes_anuncios')
                 .getPublicUrl(fileName);
 
-            // Añadir la nueva URL al objeto que se va a actualizar
             adData.url_portada = publicUrl;
         }
 
-        // 3. Actualizar datos en la tabla 'anuncios' (ahora incluye la nueva portada si la hay)
+        // --- ACTUALIZAR DATOS EN LA TABLA 'anuncios' ---
         const { error: updateError } = await supabase
             .from('anuncios')
             .update(adData)
@@ -1489,25 +1548,33 @@ if (foundCategory) {
         if (updateError) {
             console.error('Error al actualizar el anuncio:', updateError);
             alert('Hubo un error al guardar los cambios.');
-            saveButton.disabled = false;
-            saveButton.textContent = 'Guardar Cambios';
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Guardar cambios';
+            }
             return;
         }
 
-        // 4. Subir nuevas imágenes de la galería (lógica existente)
+        // --- Subir nuevas imágenes de la galería (lógica existente) ---
         if (galleryFiles.length > 0) {
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { alert("Error de sesión."); return; }
+            if (!user) {
+                alert("Error de sesión. No se pueden subir las imágenes de la galería.");
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Guardar cambios';
+                }
+                return;
+            }
 
             for (const file of galleryFiles) {
                 const fileName = `${user.id}/${Date.now()}-${file.name}`;
-
                 const { error: uploadError } = await supabase.storage
                     .from('imagenes_anuncios')
                     .upload(fileName, file);
 
                 if (uploadError) {
-                    console.error('Error al subir imagen:', uploadError);
+                    console.error('Error al subir imagen de galería:', uploadError);
                     continue;
                 }
 
@@ -1525,7 +1592,7 @@ if (foundCategory) {
 
         alert('¡Anuncio actualizado correctamente!');
         window.location.href = `dashboard.html`;
-    });
+    }
 
     // --- LÓGICA DE CATEGORÍAS ---
     async function loadAllCategories() {
@@ -1541,6 +1608,22 @@ if (foundCategory) {
             option.textContent = group.nombre;
             categorySelect.appendChild(option);
         });
+
+        // ✅ Al final de loadAllCategories()
+        const urlParams = new URLSearchParams(window.location.search);
+        const adId = urlParams.get('id');
+
+        if (adId) {
+            // Estamos en modo edición, colocar la categoría real si ya fue guardada temporalmente
+            const storedCategory = window.sessionStorage.getItem('editAdCategory');
+            const storedSubcategory = window.sessionStorage.getItem('editAdSubcategory');
+            const categorySelect = document.getElementById('category');
+            const subcategorySelect = document.getElementById('subcategory');
+
+            if (storedCategory) categorySelect.value = storedCategory;
+            if (storedSubcategory) subcategorySelect.value = storedSubcategory;
+        }
+
         return allCategories; // Devolvemos los datos para usarlos después
     }
 
@@ -1554,7 +1637,18 @@ if (foundCategory) {
 
     initialize();
 
+    // --- EVENT LISTENER PARA EL BOTÓN DE GUARDAR CAMBIOS ---
+    const saveBtn = document.getElementById('btn-save-edit');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await saveEditedAd();
+        });
+    }
+
     // --- EVENT LISTENERS ---
+    const titleInput = document.getElementById('title');
+
     categorySelect.addEventListener('change', () => {
         const parentId = parseInt(categorySelect.value, 10);
         selectedMainCategory = allCategories.find(c => c.id === parentId)?.nombre || '';
@@ -1574,6 +1668,15 @@ if (foundCategory) {
 
         // Mostrar campos dinámicos inmediatamente al cambiar categoría
         showDynamicFields();
+
+        // Actualizar placeholder del título
+        if (titleInput) {
+            let currentPlaceholder = 'Ej: Título descriptivo de tu anuncio';
+            if (selectedMainCategory && placeholderMap[selectedMainCategory]) {
+                currentPlaceholder = placeholderMap[selectedMainCategory]('');
+            }
+            titleInput.placeholder = currentPlaceholder;
+        }
     });
 
     subcategorySelect.addEventListener('change', function() {
@@ -1596,6 +1699,11 @@ if (foundCategory) {
             showBusinessFields();
         } else if (selectedMainCategory.toLowerCase().includes('comunidad')) {
             showCommunityFields();
+        }
+
+        // Actualizar placeholder del título basado en subcategoría
+        if (titleInput && selectedMainCategory && placeholderMap[selectedMainCategory]) {
+            titleInput.placeholder = placeholderMap[selectedMainCategory](selectedSubcategory);
         }
     });
 
@@ -1866,7 +1974,7 @@ if (foundCategory) {
                     }
                 });
             }
-        }
+            }
 
         // --- NEGOCIOS ---
         if (mainCategory.toLowerCase().includes('negocio')) {

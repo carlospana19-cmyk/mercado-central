@@ -1814,7 +1814,7 @@ function showBusinessFields() {
                 wrapper.className = 'gallery-preview-item image-preview'; // Usar la clase del CSS
 
                 wrapper.innerHTML = `
-                    <img src="${e.target.result}" class="gallery-img">
+                    <img src="${e.target.result}" class="gallery-img" style="max-width: 100px; max-height: 100px; object-fit: cover; border-radius: 8px;">
                     <button type="button" class="delete-image-btn" data-index="${index}"><i class="fas fa-times-circle"></i></button>
                 `;
                 galleryPreviewContainer.appendChild(wrapper);
@@ -2064,12 +2064,16 @@ form.addEventListener('submit', async (e) => {
     const district = districtSelect.value;
     const coverImageFile = coverImageInput.files[0];
 
-    if (!title || !description || !price || !category || !subcategory || !province || !district || !coverImageFile) {
+    if (!title || !description || !price || !category || !province || !district || !coverImageFile) {
         alert('Por favor, completa todos los campos obligatorios (Título, Descripción, Precio, Categoría, Ubicación e Imagen de Portada).');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
+
+    // Obtener nombres de categoría y subcategoría
+    const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+    const subcategoryName = subcategorySelect.value; // Ya es el nombre
 
     try {
         if (!coverImageFile) throw new Error("La imagen de portada es obligatoria.");
@@ -2095,7 +2099,7 @@ form.addEventListener('submit', async (e) => {
                 titulo: document.getElementById('title').value,
                 descripcion: formData.get('descripcion'),
                 precio: parseFloat(formData.get('precio')),
-                categoria: formData.get('categoria'),
+                categoria: categoryName,
                 provincia: formData.get('provincia'),
                 distrito: formData.get('distrito'),
                 user_id: user.id,
@@ -2105,7 +2109,11 @@ form.addEventListener('submit', async (e) => {
             };
 
             // --- ATRIBUTOS UNIFICADOS (TODAS las categorías van a JSONB) ---
-            adData.atributos_clave = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
+            adData.atributos_clave = buildUnifiedAttributesJSON(formData, categoryName, subcategoryName);
+
+            // DIAGNÓSTICO: Hacer global para debugging
+            window.atributos_clave = adData.atributos_clave;
+            console.log('🌐 Variable global window.atributos_clave asignada:', window.atributos_clave);
 
             // ==================================================================
             // === INICIO: LÓGICA PARA PLANES Y MEJORAS ===
@@ -2231,7 +2239,13 @@ form.addEventListener('submit', async (e) => {
         console.log('🔵 mainCategory.toLowerCase():', mainCategory.toLowerCase());
         console.log('🔵 subcategory:', subcategory);
         console.log('🔵 ¿Incluye "inmueble"?', mainCategory.toLowerCase().includes('inmueble'));
-        
+
+        // DIAGNÓSTICO: Mostrar todos los campos del formData
+        console.log('📋 FormData entries:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`   ${key}: "${value}"`);
+        }
+
         const json = {};
         
         // Agregar subcategoría si existe
@@ -2383,6 +2397,7 @@ form.addEventListener('submit', async (e) => {
         }
 
         console.log(' JSON FINAL:', json);
+        console.log('🔵 === FIN buildUnifiedAttributesJSON ===');
         return Object.keys(json).length > 0 ? json : null;
     }
 
