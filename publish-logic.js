@@ -75,6 +75,30 @@ export function initializePublishPage() {
     let selectedSubcategory = '';
     let userInfo = null;
 
+    // --- CONTADORES DE CARACTERES EN TIEMPO REAL ---
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+
+    if (titleInput) {
+        titleInput.addEventListener('input', () => {
+            const count = titleInput.value.length;
+            const charCountElement = titleInput.parentElement.querySelector('.char-count');
+            if (charCountElement) {
+                charCountElement.textContent = `(${count}/100)`;
+            }
+        });
+    }
+
+    if (descriptionInput) {
+        descriptionInput.addEventListener('input', () => {
+            const count = descriptionInput.value.length;
+            const charCountElement = descriptionInput.parentElement.querySelector('.char-count');
+            if (charCountElement) {
+                charCountElement.textContent = `(${count}/1000)`;
+            }
+        });
+    }
+
     // --- DATOS DE DISTRITOS POR PROVINCIA (EJEMPLO ESTÁTICO) ---
     const districtsByProvince = {
         'Panamá': ['Panamá', 'San Miguelito', 'Arraiján', 'Capira', 'Chame', 'La Chorrera', 'Cerro Punta'],
@@ -2063,9 +2087,39 @@ form.addEventListener('submit', async (e) => {
     const province = provinceSelect.value;
     const district = districtSelect.value;
     const coverImageFile = coverImageInput.files[0];
+    const termsAgreement = document.getElementById('terms-agreement');
 
-    if (!title || !description || !price || !category || !province || !district || !coverImageFile) {
-        alert('Por favor, completa todos los campos obligatorios (Título, Descripción, Precio, Categoría, Ubicación e Imagen de Portada).');
+    // Validaciones mejoradas
+    if (!title || title.length < 10) {
+        alert('El título debe tener al menos 10 caracteres.');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
+
+    if (!description || description.length < 30) {
+        alert('La descripción debe tener al menos 30 caracteres para mejor visibilidad.');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
+
+    if (!price || parseFloat(price) < 1) {
+        alert('Por favor, ingresa un precio válido.');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
+
+    if (!category || !province || !district || !coverImageFile) {
+        alert('Por favor, completa todos los campos obligatorios (Categoría, Ubicación e Imagen de Portada).');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
+
+    if (!termsAgreement || !termsAgreement.checked) {
+        alert('Debes aceptar los Términos y Condiciones para continuar.');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;

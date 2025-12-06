@@ -77,19 +77,41 @@ label,
 }
 
 .form-group label {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 1rem;
     color: var(--color-texto);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .form-group select, .form-group input, .form-group textarea {
     width: 100%;
-    padding: 1.4rem;
-    font-size: 1.6rem; /* Aumenta el tamaño de la fuente dentro de los campos */
-    border: 1px solid #ddd;
-    border-radius: .8rem;
-    background-color: #f9f9f9;
+    padding: 1.6rem;
+    font-size: 1.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+.form-group select:hover,
+.form-group input:hover,
+.form-group textarea:hover {
+    border-color: #00bfae;
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.1);
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #00bfae;
+    box-shadow: 0 0 0 5px rgba(0, 191, 174, 0.15);
+    background-color: #f0fffe;
 }
 
 /* 4. Estilos modernos para los botones de navegación */
@@ -116,19 +138,27 @@ label,
 }
 
 .btn-group .btn-primary {
-    background: var(--color-primario);
+    background: linear-gradient(135deg, #00bfae 0%, #008f88 100%);
     color: white;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.3);
 }
 .btn-group .btn-primary:hover {
-    background: var(--color-secundario);
+    background: linear-gradient(135deg, #008f88 0%, #007070 100%);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.4);
+    transform: translateY(-2px);
 }
 
 .btn-group .btn-secondary {
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdb 100%);
     color: var(--color-texto);
+    border: 2px solid #bdc3c7;
 }
 .btn-group .btn-secondary:hover {
-    background-color: #e0e0e0;
+    background: linear-gradient(135deg, #d5dbdb 0%, #bdc3c7 100%);
+    border-color: #95a5a6;
+    transform: translateY(-2px);
 }
 
 /* ================================================= */
@@ -153,10 +183,14 @@ body {
 }
 
 main.container.publish-wizard {
-    flex-grow: 1; /* El contenido principal ocupa el espacio disponible */
+    flex-grow: 1;
     width: 100%;
-    max-width: 1200px;
-    margin: 4rem auto;
+    max-width: 1400px;
+    margin: 2rem auto;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 50%, #f0fffe 100%);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 191, 174, 0.08);
 }
 
 #ad-form {
@@ -192,23 +226,52 @@ main.container.publish-wizard {
 
 /* 2. Estilos para la zona de "Arrastrar y Soltar" (Drop Area) */
 .drop-area {
-    border: 2px dashed #ddd;
-    border-radius: 8px;
-    padding: 5rem 3rem; /* Aumentado para mayor área clickeable */
+    border: 3px dashed #00bfae;
+    border-radius: 16px;
+    padding: 6rem 3rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
-    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f0fffe 0%, #e8faf8 100%);
     margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
 }
+
+.drop-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 191, 174, 0.05), transparent);
+    pointer-events: none;
+}
+
 .drop-area:hover {
-    border-color: var(--color-primario);
-    background-color: var(--wizard-light, #f0fafa);
+    border-color: #008f88;
+    background: linear-gradient(135deg, #e8faf8 0%, #d9f5f2 100%);
+    box-shadow: 0 8px 24px rgba(0, 191, 174, 0.2);
+    transform: translateY(-2px);
 }
+
+.drop-area:hover i {
+    transform: scale(1.15) rotate(5deg);
+}
+
 .drop-area i {
-    font-size: 3rem;
-    color: var(--color-primario);
+    font-size: 3.5rem;
+    color: #00bfae;
     margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.drop-area p {
+    font-size: 1.6rem;
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
 }
 
 /* 3. Estilo HOVER para el botón "Atrás" */
@@ -252,26 +315,57 @@ main.container.publish-wizard {
 .file-input-wrapper {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.8rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 1.8rem;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+    flex-wrap: wrap;
+}
+
+.file-input-wrapper:hover {
+    border-color: #00bfae;
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
+}
+
+.file-input-wrapper input[type="file"] {
+    display: none;
 }
 
 .btn-file-upload {
-    background-color: var(--color-primario);
-    color: var(--color-blanco);
+    background: linear-gradient(135deg, #00bfae 0%, #008f88 100%);
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
-    padding: 1.2rem 2rem;
-    font-size: 1.5rem;
-    font-weight: 600;
+    border-radius: 10px;
+    padding: 1.4rem 2.4rem;
+    font-size: 1.6rem;
+    font-weight: 700;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    transition: background-color 0.3s;
+    gap: 0.8rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-file-upload:hover {
-    background-color: var(--color-secundario);
+    background: linear-gradient(135deg, #008f88 0%, #007070 100%);
+    box-shadow: 0 6px 16px rgba(0, 191, 174, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-file-upload:active {
+    transform: translateY(0px);
+}
+
+.file-name {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+    flex: 1;
 }
 
 /* ============================================= */
@@ -522,11 +616,30 @@ main.container.publish-wizard {
 /* Estilos específicos para la galería en publicar.html */
 #gallery-preview-container {
     min-height: 160px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0fffe 100%);
+    border-radius: 12px;
+    border: 2px dashed #e0e0e0;
 }
 
 #gallery-preview-container .preview-image-wrapper {
-    width: 120px !important;
-    height: 120px !important;
+    width: 100% !important;
+    height: 140px !important;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#gallery-preview-container .preview-image-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 191, 174, 0.2);
 }
 
 #gallery-preview-container .preview-image {
@@ -769,19 +882,38 @@ main.container.publish-wizard {
     font-family: "Poppins", "Segoe UI", sans-serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #1f3c88;
+    color: #2c3e50;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 28px;
+    border-bottom: 4px solid #00bfae;
+    padding-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: #00bfae;
+    font-size: 2.2rem;
 }
 
 .subsection-title {
     font-family: "Poppins", sans-serif;
     font-size: 1.1rem;
-    font-weight: 600;
-    color: #1f3c88;
+    font-weight: 700;
+    color: #2c3e50;
     margin-bottom: 18px;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 3px solid #00bfae;
     padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.subsection-title i {
+    color: #00bfae;
+    font-size: 1.2rem;
 }
 
 label {
@@ -895,14 +1027,20 @@ input, select, textarea {
 }
 
 .plan-limit-info {
-    margin-top: 15px;
+    margin-top: 16px;
     text-align: center;
+    background: linear-gradient(135deg, #f0fffe 0%, #e8faf8 100%);
     color: #2c3e50;
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 1.5rem;
+    line-height: 1.8;
+    padding: 14px;
+    border-radius: 10px;
+    border-left: 4px solid #00bfae;
+    font-weight: 600;
 }
+
 .plan-limit-info p {
-    margin: 4px 0;
+    margin: 6px 0;
 }
 #gallery-drop-area {
     margin-bottom: 10px;  /* espacio entre cuadro y texto */
@@ -910,14 +1048,12 @@ input, select, textarea {
 
 /* Estilos para el nuevo layout del Paso 4 */
 .details-layout {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 30px 40px;
-    background: #f8f9fa;
-    border-radius: 15px;
+    align-items: start;
 }
 
 .left-column {
@@ -1032,18 +1168,27 @@ input:focus, select:focus, textarea:focus {
 
 /* === Botón principal === */
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00bfae 0%, #008f88 100%);
     border: none;
     color: #fff !important;
-    border-radius: 10px;
-    padding: 14px 28px;
+    border-radius: 12px;
+    padding: 16px 32px;
     font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.3);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #008f88 0%, #007070 100%);
+    box-shadow: 0 8px 25px rgba(0, 191, 174, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0px);
+}
     transform: translateY(-3px);
 }
