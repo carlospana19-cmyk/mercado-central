@@ -82,6 +82,7 @@
 
 .hero-swiper .swiper-button-next,
 .hero-swiper .swiper-button-prev {
+  display: none;
   color: white;
   background: rgba(0,0,0,0.3);
   width: 50px;

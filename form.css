@@ -617,18 +617,19 @@ main.container.publish-wizard {
 #gallery-preview-container {
     min-height: 160px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
     margin-top: 20px;
     padding: 16px;
     background: linear-gradient(135deg, #f8f9fa 0%, #f0fffe 100%);
     border-radius: 12px;
     border: 2px dashed #e0e0e0;
+    max-width: 500px;
 }
 
 #gallery-preview-container .preview-image-wrapper {
     width: 100% !important;
-    height: 140px !important;
+    height: 100px !important;
     position: relative;
     border-radius: 10px;
     overflow: hidden;
@@ -940,9 +941,7 @@ input, select, textarea {
     word-spacing: 1px;
 }
 
-#gallery-preview-container {
-    min-height: 200px;
-}
+/* ⚠️ ESTILOS ANTIGUOS REEMPLAZADOS - Ver línea 617 para estilos actualizados */
 
 .plan-top-feature,
 .plan-destacado-feature {
@@ -999,21 +998,6 @@ input, select, textarea {
 
 #gallery-drop-area:hover {
     background: #eef1ff;
-}
-
-#gallery-preview-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-}
-
-#gallery-preview-container img {
-    width: 180px;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .plan-info {

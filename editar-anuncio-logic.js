@@ -174,7 +174,11 @@ function showDynamicFields() {
     businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
     communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
 
-    if (selectedMainCategory.toLowerCase().includes('vehículo') || selectedMainCategory.toLowerCase().includes('auto') || selectedMainCategory.toLowerCase().includes('carro')) {
+    console.log('🔍 showDynamicFields - Categoría actual:', selectedMainCategory);
+    const catLower = selectedMainCategory.toLowerCase();
+    console.log('🔍 Categoría en minúsculas:', catLower);
+
+    if (catLower.includes('vehículo') || catLower.includes('auto') || catLower.includes('carro')) {
         vehicleDetails.style.display = 'block';
         realestateDetails.style.display = 'none';
         electronicsDetails.style.display = 'none';
@@ -1383,18 +1387,32 @@ if (Array.isArray(categories) && categories.length) {
   const adCat = normalize(ad.categoria);
   const adSub = normalize(ad.subcategoria);
 
-  // Buscar coincidencias por nombre (no por ID)
-  const foundMainCat = categories.find(
-    (c) => !c.parent_id && normalize(c.nombre) === adCat
+  // Primero intenta búsqueda exacta (sin normalizar)
+  let foundMainCat = categories.find(
+    (c) => !c.parent_id && c.nombre === ad.categoria
   );
-  const foundSubCat = categories.find(
-    (c) => c.parent_id && normalize(c.nombre) === adSub
+  let foundSubCat = categories.find(
+    (c) => c.parent_id && c.nombre === ad.subcategoria
   );
 
+  // Si no encuentra, intenta con normalización
+  if (!foundMainCat && ad.categoria) {
+    foundMainCat = categories.find(
+      (c) => !c.parent_id && normalize(c.nombre) === adCat
+    );
+  }
+
+  if (!foundSubCat && ad.subcategoria) {
+    foundSubCat = categories.find(
+      (c) => c.parent_id && normalize(c.nombre) === adSub
+    );
+  }
+
   if (foundMainCat) {
-    // Asignar categoría principal
-    categorySelect.value = foundMainCat.nombre;
+    // Asignar categoría principal usando el ID
+    categorySelect.value = foundMainCat.id;
     selectedMainCategory = foundMainCat.nombre;
+    console.log('✅ Categoría asignada:', foundMainCat.nombre, 'con ID:', foundMainCat.id);
 
     // Poblar subcategorías de esa categoría
     const subcats = categories.filter((c) => c.parent_id === foundMainCat.id);
@@ -1442,6 +1460,9 @@ if (Array.isArray(categories) && categories.length) {
 
   // Mostrar los campos dinámicos basados en la categoría/subcategoría actual
   showDynamicFields();
+  
+  // Disparar el evento change para que se actualice el select de subcategorías
+  categorySelect.dispatchEvent(new Event('change'));
 } else {
   // Fallback si no hay categorías cargadas
   console.warn(
@@ -1463,6 +1484,30 @@ if (Array.isArray(categories) && categories.length) {
                 `;
                 galleryPreviewContainer.appendChild(wrapper);
             });
+        }
+
+        // 6. RELLENAR CAMPOS DINÁMICOS DE ATRIBUTOS
+        if (ad.atributos_clave) {
+            try {
+                let atributos = ad.atributos_clave;
+                // Si es string, parsear JSON
+                if (typeof atributos === 'string') {
+                    atributos = JSON.parse(atributos);
+                }
+                
+                // Mapear cada atributo a su campo correspondiente en el formulario
+                Object.entries(atributos).forEach(([key, value]) => {
+                    // Buscar campos con name o id que coincidan con el atributo
+                    let field = document.querySelector(`[name="${key}"]`) || 
+                                document.querySelector(`#attr-${key}`);
+                    if (field) {
+                        field.value = value;
+                        console.log(`✅ Campo dinámico rellenado: ${key} = ${value}`);
+                    }
+                });
+            } catch (e) {
+                console.warn('No se pudieron parsear los atributos:', e);
+            }
         }
 
     }
@@ -1491,15 +1536,16 @@ if (Array.isArray(categories) && categories.length) {
             titulo: formData.get('titulo'),
             descripcion: formData.get('descripcion'),
             precio: parseFloat(formData.get('precio')),
-            categoria: formData.get('categoria'),
+            categoria: selectedMainCategory,
             provincia: formData.get('provincia'),
             distrito: formData.get('distrito'),
             direccion_especifica: formData.get('direccion_especifica'),
             contact_name: formData.get('contact_name'),
             contact_phone: formData.get('contact_phone'),
-            contact_email: formData.get('contact_email') // Added this line
+            contact_email: formData.get('contact_email')
         };
 
+        // ⚠️ IMPORTANTE: subcategoria va DENTRO de atributos_clave, no como columna
         adData.atributos_clave = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
 
         // --- MANEJAR ACTUALIZACIÓN DE IMAGEN DE PORTADA ---
@@ -1610,20 +1656,8 @@ if (Array.isArray(categories) && categories.length) {
         });
 
         // ✅ Al final de loadAllCategories()
-        const urlParams = new URLSearchParams(window.location.search);
-        const adId = urlParams.get('id');
-
-        if (adId) {
-            // Estamos en modo edición, colocar la categoría real si ya fue guardada temporalmente
-            const storedCategory = window.sessionStorage.getItem('editAdCategory');
-            const storedSubcategory = window.sessionStorage.getItem('editAdSubcategory');
-            const categorySelect = document.getElementById('category');
-            const subcategorySelect = document.getElementById('subcategory');
-
-            if (storedCategory) categorySelect.value = storedCategory;
-            if (storedSubcategory) subcategorySelect.value = storedSubcategory;
-        }
-
+        // No hacer nada aquí - dejar que loadAdData() maneje la precarga
+        
         return allCategories; // Devolvemos los datos para usarlos después
     }
 
@@ -1652,6 +1686,7 @@ if (Array.isArray(categories) && categories.length) {
     categorySelect.addEventListener('change', () => {
         const parentId = parseInt(categorySelect.value, 10);
         selectedMainCategory = allCategories.find(c => c.id === parentId)?.nombre || '';
+        console.log('🔄 Category changed via event. Selected:', selectedMainCategory, 'ID:', parentId);
         const subcategories = allCategories.filter(c => c.parent_id === parentId);
         if (subcategories.length > 0) {
             subcategoryGroup.style.display = 'block';
@@ -1864,192 +1899,48 @@ if (Array.isArray(categories) && categories.length) {
             json.subcategoria = subcategory;
         }
         
-        // --- VEHÍCULOS ---
-        if (mainCategory.toLowerCase().includes('vehículo') || 
-            mainCategory.toLowerCase().includes('auto') || 
-            mainCategory.toLowerCase().includes('carro')) {
-            
-            const vehicleFields = ['marca', 'anio', 'kilometraje', 'transmision', 'combustible'];
-            vehicleFields.forEach(field => {
-                const value = formData.get(field);
-                if (value) {
-                    json[field] = (field === 'anio' || field === 'kilometraje') 
-                        ? parseInt(value) 
-                        : value;
-                }
-            });
-        }
+        // CAPTURAR AUTOMÁTICAMENTE TODOS LOS CAMPOS DINÁMICOS VISIBLES
+        // Buscar todos los inputs/selects dentro de contenedores con display visibles
         
-        // --- INMUEBLES ---
-        if (mainCategory.toLowerCase().includes('inmueble') || 
-            mainCategory.toLowerCase().includes('casa') || 
-            mainCategory.toLowerCase().includes('apartamento')) {
-            
-            const realEstateFields = ['m2', 'habitaciones', 'baños'];
-            realEstateFields.forEach(field => {
-                const value = formData.get(field);
-                if (value) {
-                    json[field] = parseInt(value);
-                }
-            });
-        }
+        const dynamicContainers = [
+            'vehicle-details',
+            'realestate-details', 
+            'electronics-details',
+            'home-furniture-details',
+            'fashion-details',
+            'sports-details',
+            'pets-details',
+            'services-details',
+            'business-details',
+            'community-details'
+        ];
         
-        // --- ELECTRÓNICA ---
-        if (mainCategory.toLowerCase().includes('electrónica')) {
-            const fields = electronicsSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
+        dynamicContainers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container && container.style.display !== 'none') {
+                // Buscar todos los inputs y selects dentro de este contenedor
+                const inputs = container.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    const fieldName = input.name;
+                    const fieldValue = input.value;
+                    
+                    if (fieldName && fieldValue && fieldValue.trim() !== '') {
+                        // Convertir a número si es posible (para campos numéricos)
+                        if (input.type === 'number' && fieldValue) {
+                            json[fieldName] = parseInt(fieldValue);
+                        } else {
+                            json[fieldName] = fieldValue;
+                        }
                     }
                 });
             }
-        }
-        
-        // --- HOGAR Y MUEBLES ---
-        if (mainCategory.toLowerCase().includes('hogar') || 
-            mainCategory.toLowerCase().includes('mueble')) {
-            const fields = homeFurnitureSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-        }
-        
-        // --- MODA Y BELLEZA ---
-        if (mainCategory.toLowerCase().includes('moda') || 
-            mainCategory.toLowerCase().includes('belleza') || 
-            mainCategory.toLowerCase().includes('ropa')) {
-            const fields = fashionSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-        }
-
-        // --- DEPORTES Y HOBBIES ---
-        if (mainCategory.toLowerCase().includes('deportes') || 
-            mainCategory.toLowerCase().includes('hobbies')) {
-            const fields = sportsSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-        }
-
-        // --- MASCOTAS ---
-        if (mainCategory.toLowerCase().includes('mascota')) {
-            const fields = petsSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-        }
-
-        // --- SERVICIOS ---
-        if (mainCategory.toLowerCase().includes('servicio')) {
-            const fields = servicesSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-            }
-
-        // --- NEGOCIOS ---
-        if (mainCategory.toLowerCase().includes('negocio')) {
-            const fields = businessSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-        }
-
-        // --- COMUNIDAD ---
-        if (mainCategory.toLowerCase().includes('comunidad')) {
-            const fields = communitySubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
-                    if (value) {
-                        json[field] = value;
-                    }
-                });
-            }
-        }
+        });
         
         console.log('🟢 JSON UNIFICADO CONSTRUIDO:', json);
         return Object.keys(json).length > 0 ? json : null;
     }
 
     // ✅ FUNCIÓN UNIFICADA PARA RELLENAR CAMPOS DE ATRIBUTOS
-    function fillUnifiedAttributesJSON(atributos, mainCategory, subcategory) {
-        if (!atributos) return;
-
-        let fieldsToFill = [];
-
-        if (mainCategory.toLowerCase().includes('vehículo') || 
-            mainCategory.toLowerCase().includes('auto') || 
-            mainCategory.toLowerCase().includes('carro')) {
-            fieldsToFill = ['marca', 'anio', 'kilometraje', 'transmision', 'combustible'];
-        } else if (mainCategory.toLowerCase().includes('inmueble') || 
-                   mainCategory.toLowerCase().includes('casa') || 
-                   mainCategory.toLowerCase().includes('apartamento')) {
-            fieldsToFill = ['m2', 'habitaciones', 'baños'];
-        } else if (mainCategory.toLowerCase().includes('electrónica')) {
-            fieldsToFill = electronicsSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('hogar') || 
-                   mainCategory.toLowerCase().includes('mueble')) {
-            fieldsToFill = homeFurnitureSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('moda') || 
-                   mainCategory.toLowerCase().includes('belleza') || 
-                   mainCategory.toLowerCase().includes('ropa')) {
-            fieldsToFill = fashionSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('deportes') || 
-                   mainCategory.toLowerCase().includes('hobbies')) {
-            fieldsToFill = sportsSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('mascota')) {
-            fieldsToFill = petsSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('servicio')) {
-            fieldsToFill = servicesSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('negocio')) {
-            fieldsToFill = businessSubcategories[subcategory] || [];
-        } else if (mainCategory.toLowerCase().includes('comunidad')) {
-            fieldsToFill = communitySubcategories[subcategory] || [];
-        }
-
-        fieldsToFill.forEach(field => {
-            const element = document.getElementById(`attr-${field}`);
-            if (element && atributos[field] !== undefined && atributos[field] !== null) {
-                element.value = atributos[field];
-            }
-        });
-    }
-
     // --- FUNCIÓN DE NAVEGACIÓN (COMPLETA) ---
     const navigateToStep = (stepNumber) => {
         allSteps.forEach(step => step.style.display = 'none');
