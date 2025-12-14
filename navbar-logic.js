@@ -7,6 +7,7 @@ export async function initializeNavbar() {
     const btnLogin = document.getElementById('btn-login');
     const btnPublish = document.getElementById('btn-publish-logged-in');
     const btnDashboard = document.getElementById('btn-dashboard');
+    const btnProfile = document.getElementById('btn-profile');
     const btnLogout = document.getElementById('btn-logout');
 
     // Verificación de seguridad: si algún botón no existe, no continuar.
@@ -52,6 +53,7 @@ export async function initializeNavbar() {
         // Mostrar botones de usuario
         btnPublish.style.display = 'inline-block';
         btnDashboard.style.display = 'inline-block';
+        if (btnProfile) btnProfile.style.display = 'inline-block';
         btnLogout.style.display = 'inline-block';
     }
 
@@ -61,6 +63,7 @@ export async function initializeNavbar() {
         // Ocultar botones de usuario
         btnPublish.style.display = 'none';
         btnDashboard.style.display = 'none';
+        if (btnProfile) btnProfile.style.display = 'none';
         btnLogout.style.display = 'none';
     }
 }

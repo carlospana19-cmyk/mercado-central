@@ -1,13 +1,12 @@
-// main.js - VERSIÓN FINAL Y COMPLETA DEL CONTROLADOR
+// main.js - VERSIÓN OPTIMIZADA CON LAZY LOADING
 
 import { supabase } from './supabase-client.js';
 import { initializeNavbar } from './navbar-logic.js';
-import { initializeHomePage } from './home-logic.js';
-import { loadSearchCategories, initializeSearchButton } from './home-search.js';
-import { initializePublishPage } from './publish-logic.js';
-import { initializeEditPage } from './editar-anuncio-logic.js';
-import { initializeAuthPages, checkUserLoggedIn } from './auth-logic.js';
-import { initializeDashboardPage } from './dashboard-logic.js';
+
+// Lazy loading: importar módulos SOLO cuando se necesiten
+async function loadModuleWhenNeeded(modulePath) {
+    return import(modulePath);
+}
 
 // --- FUNCIÓN CENTRAL DE AUTENTICACIÓN ---
 function updateUIBasedOnAuthState() {
@@ -17,6 +16,7 @@ function updateUIBasedOnAuthState() {
         // --- BOTONES DEL NAVBAR ---
         const btnPublish = document.getElementById('btn-publish-logged-in');
         const btnDashboard = document.getElementById('btn-dashboard');
+        const btnProfile = document.getElementById('btn-profile');
         const btnLogout = document.getElementById('btn-logout');
         const btnLogin = document.getElementById('btn-login');
 
@@ -24,6 +24,7 @@ function updateUIBasedOnAuthState() {
             // --- USUARIO CONECTADO ---
             if (btnPublish) btnPublish.style.display = 'inline-block';
             if (btnDashboard) btnDashboard.style.display = 'inline-block';
+            if (btnProfile) btnProfile.style.display = 'inline-block';
             if (btnLogout) btnLogout.style.display = 'inline-block';
             if (btnLogin) btnLogin.style.display = 'none';
 
@@ -40,30 +41,40 @@ function updateUIBasedOnAuthState() {
             // --- USUARIO INVITADO ---
             if (btnPublish) btnPublish.style.display = 'none';
             if (btnDashboard) btnDashboard.style.display = 'none';
+            if (btnProfile) btnProfile.style.display = 'none';
             if (btnLogout) btnLogout.style.display = 'none';
             if (btnLogin) btnLogin.style.display = 'inline-block';
         }
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initializeNavbar();
     updateUIBasedOnAuthState(); // <-- LLAMADA A LA FUNCIÓN DE AUTH
 
     const path = window.location.pathname;
 
     if (path.endsWith('/') || path.endsWith('index.html')) {
-        initializeHomePage();
-        loadSearchCategories();
-        initializeSearchButton();
+        const homeModule = await loadModuleWhenNeeded('./home-logic.js');
+        const searchModule = await loadModuleWhenNeeded('./home-search.js');
+        homeModule.initializeHomePage();
+        await searchModule.loadSearchCategories();
+        searchModule.initializeSearchButton();
     } else if (path.endsWith('publicar.html')) {
-        initializePublishPage();
+        const publishModule = await loadModuleWhenNeeded('./publish-logic.js');
+        publishModule.initializePublishPage();
     } else if (path.endsWith('editar-anuncio.html')) {
-        initializeEditPage();
+        const editModule = await loadModuleWhenNeeded('./editar-anuncio-logic.js');
+        editModule.initializeEditPage();
+    } else if (path.endsWith('perfil.html')) {
+        const perfilModule = await loadModuleWhenNeeded('./perfil-logic.js');
+        perfilModule.loadUserProfile();
     } else if (path.endsWith('login.html') || path.endsWith('registro.html') || path.endsWith('forgot-password.html') || path.endsWith('reset-password.html')) {
-        initializeAuthPages(); // <-- ESTA ES LA LÍNEA QUE REPARA EL LOGIN
+        const authModule = await loadModuleWhenNeeded('./auth-logic.js');
+        authModule.initializeAuthPages(); // <-- ESTA ES LA LÍNEA QUE REPARA EL LOGIN
     } else if (path.endsWith('dashboard.html')) {
-        initializeDashboardPage();
+        const dashboardModule = await loadModuleWhenNeeded('./dashboard-logic.js');
+        dashboardModule.initializeDashboardPage();
     }
 
     // Verificar autenticación solo si NO estamos en login, registro, forgot-password o reset-password

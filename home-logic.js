@@ -21,12 +21,26 @@ export function initializeHomePage() {
         try {
             const { data: ads, error } = await supabase
                 .from('anuncios')
-                .select('*')
+                .select(`
+                    *,
+                    perfiles (
+                        url_foto_perfil,
+                        nombre_negocio
+                    )
+                `)
                 .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                 .order('fecha_publicacion', { ascending: false })
                 .limit(15); // Aumentamos el límite para tener suficientes anuncios
 
             if (error) throw error;
+            
+            // Aplanar los datos del perfil en el objeto del anuncio
+            ads.forEach(ad => {
+                if (ad.perfiles) {
+                    ad.url_foto_perfil = ad.perfiles.url_foto_perfil;
+                    ad.nombre_negocio = ad.perfiles.nombre_negocio;
+                }
+            });
 
             console.log("SENSOR 3: Datos recibidos de Supabase:", ads);
 
@@ -105,6 +119,19 @@ if (ad.featured_plan === "top") {
                     urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
                 }
 
+                // Foto de perfil del usuario (si existe)
+                let profilePhotoHTML = '';
+                if (ad.url_foto_perfil) {
+                    profilePhotoHTML = `
+                        <div class="card-seller-info">
+                            <img src="${ad.url_foto_perfil}" alt="Foto de vendedor" class="seller-photo">
+                            <div class="seller-details">
+                                <p class="seller-name">${ad.nombre_negocio || 'Vendedor'}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="${cardClass} card ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
                        ${badgeHTML}
@@ -124,6 +151,7 @@ if (ad.featured_plan === "top") {
                             <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
                             <div class="description">${ad.descripcion || ''}</div> <!-- Descripción detallada -->
                             ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
+                            ${profilePhotoHTML}
                             <a href="#" class="btn-contact">Contactar</a>
                         </div>
                     </div>`;

@@ -434,6 +434,29 @@ body {
   transform: translateY(-2px);
 }
 
+/* --- BOTÓN PERFIL CON ICONO --- */
+.nav-profile-btn {
+  width: 50px !important;
+  height: 50px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--color-primario) !important;
+  color: var(--color-blanco) !important;
+}
+
+.nav-profile-btn:hover {
+  background: var(--color-secundario) !important;
+  color: var(--color-blanco) !important;
+}
+
+.profile-icon {
+  width: 24px;
+  height: 24px;
+}
+
 /* --- 3. SECCIÓN HERO (PORTADA) --- */
 /* Esta sección estaba completamente ausente en tu CSS actual */
 .hero-search {
