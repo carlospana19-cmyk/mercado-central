@@ -19,28 +19,27 @@ export function initializeHomePage() {
         }
 
         try {
-            const { data: ads, error } = await supabase
+            let { data: ads, error } = await supabase
                 .from('anuncios')
-                .select(`
-                    *,
-                    perfiles (
-                        url_foto_perfil,
-                        nombre_negocio
-                    )
-                `)
+                .select('*')
                 .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                 .order('fecha_publicacion', { ascending: false })
-                .limit(15); // Aumentamos el límite para tener suficientes anuncios
+                .limit(15);
+
+            // ✅ Si la columna is_sold no existe, intentar sin el filtro
+            if (error && error.code === '42703') {
+                console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios.');
+                const { data: adsWithoutFilter, error: error2 } = await supabase
+                    .from('anuncios')
+                    .select('*')
+                    .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
+                    .order('fecha_publicacion', { ascending: false })
+                    .limit(15);
+                ads = adsWithoutFilter;
+                error = error2;
+            }
 
             if (error) throw error;
-            
-            // Aplanar los datos del perfil en el objeto del anuncio
-            ads.forEach(ad => {
-                if (ad.perfiles) {
-                    ad.url_foto_perfil = ad.perfiles.url_foto_perfil;
-                    ad.nombre_negocio = ad.perfiles.nombre_negocio;
-                }
-            });
 
             console.log("SENSOR 3: Datos recibidos de Supabase:", ads);
 
@@ -132,11 +131,16 @@ if (ad.featured_plan === "top") {
                     `;
                 }
 
+                // ✅ BADGE VENDIDO EN TARJETAS DEL HOME
+                const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
+                const soldClass = ad.is_sold ? 'card-sold' : '';
+
                 return `
-                    <div class="${cardClass} card ${cardExtraClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
                        ${badgeHTML}
                          ${urgentBadge}
-                         <div class="image-container">
+                         ${soldBadgeHome}
+                         <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
                             <div class="swiper product-swiper">
                                 <div class="swiper-wrapper">
                                     ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
@@ -145,7 +149,7 @@ if (ad.featured_plan === "top") {
                                 <div class="swiper-button-next"></div>
                             </div>
                         </div>
-                        <div class="content">
+                        <div class="content ${ad.is_sold ? 'content-sold' : ''}">
                             <div class="price">${priceFormatted}</div>
                             <h3>${ad.titulo}</h3>
                             <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
@@ -196,6 +200,11 @@ if (ad.featured_plan === "top") {
                         nextEl: swiperEl.querySelector('.swiper-button-next'),
                         prevEl: swiperEl.querySelector('.swiper-button-prev'),
                     },
+                    slidesPerView: 1,
+                    spaceBetween: 0,
+                    speed: 300,
+                    preloadImages: true,
+                    updateOnImagesReady: true,
                 });
             });
             console.log("SENSOR 6: Swipers inicializados.");

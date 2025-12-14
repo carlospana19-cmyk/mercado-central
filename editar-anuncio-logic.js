@@ -43,6 +43,7 @@ export function initializeEditPage() {
     let allCategories = [];
     let selectedMainCategory = '';
     let selectedSubcategory = '';
+    let isLoadingAdData = false; // Flag para evitar reinicializar durante carga
 
     // --- Mapeo de categorías principales a placeholders ---
     const placeholderMap = {
@@ -1323,6 +1324,8 @@ function showBusinessFields() {
 
     // --- LÓGICA DE CARGA DE DATOS (VERSIÓN CORREGIDA) ---
     async function loadAdData(categories) {
+        isLoadingAdData = true; // ✅ Activar flag para evitar disparar eventos change
+        
         const urlParams = new URLSearchParams(window.location.search);
         const adId = urlParams.get('id');
         if (!adId) {
@@ -1373,6 +1376,20 @@ function showBusinessFields() {
         }
         if (ad.direccion_especifica) {
             document.getElementById('address').value = ad.direccion_especifica;
+        }
+
+        // ✅ Rellenar campos de contacto (datos del usuario que publicó)
+        if (ad.contact_name) {
+            const contactNameField = document.getElementById('contact-name');
+            if (contactNameField) contactNameField.value = ad.contact_name;
+        }
+        if (ad.contact_phone) {
+            const contactPhoneField = document.getElementById('contact-phone');
+            if (contactPhoneField) contactPhoneField.value = ad.contact_phone;
+        }
+        if (ad.contact_email) {
+            const contactEmailField = document.getElementById('contact-email');
+            if (contactEmailField) contactEmailField.value = ad.contact_email;
         }
 
 // 5. RELLENAR CATEGORÍAS — versión completa estable final
@@ -1486,6 +1503,17 @@ if (Array.isArray(categories) && categories.length) {
             });
         }
 
+        // ✅ MOSTRAR IMAGEN DE PORTADA ACTUAL (si existe)
+        if (ad.url_portada) {
+            const currentCoverWrapper = document.getElementById('current-cover-image');
+            const coverPreviewImg = document.getElementById('cover-image-preview');
+            if (currentCoverWrapper && coverPreviewImg) {
+                coverPreviewImg.src = ad.url_portada;
+                currentCoverWrapper.style.display = 'block';
+                console.log('✅ Portada actual cargada');
+            }
+        }
+
         // 6. RELLENAR CAMPOS DINÁMICOS DE ATRIBUTOS
         if (ad.atributos_clave) {
             try {
@@ -1510,6 +1538,7 @@ if (Array.isArray(categories) && categories.length) {
             }
         }
 
+        isLoadingAdData = false; // ✅ Desactivar flag - carga completada
     }
 
     // --- FUNCIÓN PARA GUARDAR CAMBIOS DEL ANUNCIO ---
@@ -1684,6 +1713,12 @@ if (Array.isArray(categories) && categories.length) {
     const titleInput = document.getElementById('title');
 
     categorySelect.addEventListener('change', () => {
+        // ✅ NO reinicializar si estamos cargando datos
+        if (isLoadingAdData) {
+            console.log('ℹ️ Ignorando change event durante carga de datos');
+            return;
+        }
+
         const parentId = parseInt(categorySelect.value, 10);
         selectedMainCategory = allCategories.find(c => c.id === parentId)?.nombre || '';
         console.log('🔄 Category changed via event. Selected:', selectedMainCategory, 'ID:', parentId);

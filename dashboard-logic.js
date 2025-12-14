@@ -53,10 +53,14 @@ export async function initializeDashboardPage() {
             `;
         }
 
+        // ✅ BADGE VENDIDO - mostrar si is_sold es true
+        const soldBadge = ad.is_sold ? `<div class="badge-sold">VENDIDO</div>` : '';
+
         // 3. INTEGRAMOS LOS DETALLES EN LA TARJETA
         return `
-            <div class="dashboard-card" data-ad-id="${ad.id}">
-                <img src="${ad.url_portada || 'images/placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image">
+            <div class="dashboard-card ${ad.is_sold ? 'card-sold' : ''}" data-ad-id="${ad.id}">
+                ${soldBadge}
+                <img src="${ad.url_portada || 'images/placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image ${ad.is_sold ? 'image-sold' : ''}">
                 <div class="dashboard-ad-info">
             
                     <div class="dashboard-ad-title">
@@ -69,7 +73,8 @@ export async function initializeDashboardPage() {
                 </div>
             <div class="dashboard-ad-actions">
                 <a href="editar-anuncio.html?id=${ad.id}" class="btn-edit">Editar</a>
-                    <button class="btn-delete delete-btn" data-ad-id="${ad.id}">Eliminar</button>
+                <button class="btn-sold toggle-sold-btn" data-ad-id="${ad.id}">${ad.is_sold ? 'Reactivar' : 'Marcar Vendido'}</button>
+                <button class="btn-delete delete-btn" data-ad-id="${ad.id}">Eliminar</button>
                 </div>
             </div>
         `;
@@ -127,9 +132,99 @@ document.addEventListener('click', function(e) {
             
         }
     }
+
+    // ✅ LISTENER PARA MARCAR COMO VENDIDO
+    const toggleSoldButton = e.target.closest('.toggle-sold-btn');
+    if (toggleSoldButton) {
+        const adId = toggleSoldButton.dataset.adId;
+        if (adId) {
+            toggleSoldStatus(adId);
+        }
+    }
 });
 
 // --- FIN: LISTENER DE ELIMINACIÓN CORREGIDO ---
+
+// ✅ FUNCIÓN PARA MARCAR/DESMARCAR COMO VENDIDO
+async function toggleSoldStatus(adId) {
+    try {
+        // 1. OBTENER ESTADO ACTUAL DEL ANUNCIO
+        const { data: ad, error: fetchError } = await supabase
+            .from('anuncios')
+            .select('is_sold')
+            .eq('id', adId)
+            .single();
+
+        if (fetchError) {
+            // Si el error es porque la columna no existe, mostrar instrucciones
+            if (fetchError.code === '42703') {
+                alert('⚠️ Columna is_sold no existe.\n\n1. Ve a https://app.supabase.com\n2. En tu proyecto, ve a SQL Editor\n3. Ejecuta esta consulta:\n\nALTER TABLE anuncios ADD COLUMN is_sold BOOLEAN DEFAULT FALSE;\n\n4. Recarga esta página');
+                return;
+            }
+            console.error('Error al obtener estado:', fetchError);
+            alert('Error al obtener el estado del anuncio');
+            return;
+        }
+
+        // 2. ACTUALIZAR EL ESTADO OPUESTO
+        const newStatus = !ad.is_sold;
+        const { error: updateError } = await supabase
+            .from('anuncios')
+            .update({ is_sold: newStatus })
+            .eq('id', adId);
+
+        if (updateError) {
+            console.error('Error al actualizar:', updateError);
+            alert('Error al actualizar el estado del anuncio');
+            return;
+        }
+
+        // 3. ACTUALIZAR LA INTERFAZ
+        const cardElement = document.querySelector(`[data-ad-id="${adId}"]`);
+        const button = cardElement.querySelector('.toggle-sold-btn');
+        
+        if (newStatus) {
+            // Marcar como vendido
+            cardElement.classList.add('card-sold');
+            cardElement.classList.remove('card-active');
+            button.textContent = 'Reactivar';
+            button.classList.add('btn-reactivate');
+            
+            // Agregar badge si no existe
+            if (!cardElement.querySelector('.badge-sold')) {
+                const badge = document.createElement('div');
+                badge.className = 'badge-sold';
+                badge.textContent = 'VENDIDO';
+                cardElement.insertBefore(badge, cardElement.firstChild);
+            }
+            
+            // Agregar filtro a la imagen
+            const img = cardElement.querySelector('.dashboard-ad-image');
+            if (img) img.classList.add('image-sold');
+            
+            console.log('✅ Anuncio marcado como vendido');
+        } else {
+            // Reactivar anuncio
+            cardElement.classList.remove('card-sold');
+            cardElement.classList.add('card-active');
+            button.textContent = 'Marcar Vendido';
+            button.classList.remove('btn-reactivate');
+            
+            // Remover badge
+            const badge = cardElement.querySelector('.badge-sold');
+            if (badge) badge.remove();
+            
+            // Remover filtro de la imagen
+            const img = cardElement.querySelector('.dashboard-ad-image');
+            if (img) img.classList.remove('image-sold');
+            
+            console.log('✅ Anuncio reactivado');
+        }
+    } catch (error) {
+        console.error('Error inesperado:', error);
+        alert('Error al procesar la solicitud');
+    }
+}
 }
 
 async function logout() {

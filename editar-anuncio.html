@@ -493,8 +493,12 @@
 
                             <div class="form-group">
                                 <label for="cover-image-input">Imagen de Portada</label>
+                                <div id="current-cover-image" class="current-cover-wrapper" style="display: none; margin-bottom: 15px;">
+                                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">Imagen actual:</p>
+                                    <img id="cover-image-preview" style="max-width: 200px; height: auto; border-radius: 8px; border: 1px solid #ddd;">
+                                </div>
                                 <div class="file-input-wrapper">
-                                    <input type="file" id="cover-image-input" name="cover_image" accept="image/*" required style="display: none;">
+                                    <input type="file" id="cover-image-input" name="cover_image" accept="image/*" style="display: none;">
                                     <button type="button" class="btn-file-upload" onclick="document.getElementById('cover-image-input').click();">
                                         <i class="fas fa-upload"></i> Elegir archivo
                                     </button>
