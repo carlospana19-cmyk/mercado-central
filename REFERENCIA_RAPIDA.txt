@@ -1,0 +1,185 @@
+🚀 REFERENCIA RÁPIDA - PANEL UNIFICADO
+
+═══════════════════════════════════════════════════════════════════
+
+📍 UBICACIÓN
+└─ URL: /panel-unificado.html
+└─ Archivos: panel-unificado.html, panel-unificado-logic.js, panel-unificado.css
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 ACCESO RÁPIDO
+
+MIS ANUNCIOS
+├─ Filtros: [Todos] [Activos] [Vendidos]
+├─ Acciones por anuncio:
+│  ├─ ✏️ Editar → editar-anuncio.html
+│  ├─ ✓ Vendido/Reactivar → Cambio instantáneo
+│  └─ 🗑️ Eliminar → Requiere confirmación
+└─ Estadísticas en tiempo real
+
+MI PERFIL
+├─ Información Personal
+├─ Información de Negocio
+├─ Ubicación
+├─ Foto de Perfil (cambiar en header)
+└─ Botón: Guardar Cambios
+
+═══════════════════════════════════════════════════════════════════
+
+⚡ ACCIONES COMUNES
+
+CAMBIAR FOTO:
+  1. Haz clic en tu foto en el header
+  2. Selecciona archivo (PNG, JPG, GIF)
+  3. Máximo 5MB
+  4. Se actualiza automáticamente
+
+MARCAR COMO VENDIDO:
+  1. Abre tab "Mis Anuncios"
+  2. Haz clic en botón "Marcar Vendido"
+  3. El cambio es instantáneo
+  4. Se muestra badge "VENDIDO"
+
+EDITAR ANUNCIO:
+  1. Abre tab "Mis Anuncios"
+  2. Haz clic en botón "Editar"
+  3. Se abre formulario completo
+  4. Guarda los cambios
+
+ELIMINAR ANUNCIO:
+  1. Abre tab "Mis Anuncios"
+  2. Haz clic en botón "Eliminar"
+  3. Confirma la acción
+  4. Se elimina permanentemente
+
+GUARDAR PERFIL:
+  1. Abre tab "Mi Perfil"
+  2. Edita los campos deseados
+  3. Haz clic en "Guardar Cambios"
+  4. Aparecerá confirmación
+
+═══════════════════════════════════════════════════════════════════
+
+📊 ESTADÍSTICAS
+
+Visible en el header:
+  [📊 Total]     → Total de anuncios creados
+  [📊 Activos]   → Anuncios disponibles
+  [📊 Vendidos]  → Anuncios marcados como vendidos
+
+Se actualizan al instante cuando cambias estados
+
+═══════════════════════════════════════════════════════════════════
+
+🎨 DISEÑO
+
+Colores principales:
+  🟢 Verde Teal (#00bfae)   → Elementos activos
+  🟡 Amarillo/Naranja       → Botón "Vendido"
+  🔴 Rojo                   → Botón "Eliminar"
+  ⚪ Blanco                 → Fondo principal
+
+Responsive:
+  💻 Desktop: 3 columnas
+  📱 Tablet: 2 columnas
+  📱 Móvil: 1 columna
+
+═══════════════════════════════════════════════════════════════════
+
+📁 DOCUMENTACIÓN
+
+Referencia completa:
+  └─ PANEL_UNIFICADO_DOCS.md (Documentación técnica)
+
+Guía para usuarios:
+  └─ GUIA_PANEL_UNIFICADO.md (Paso a paso)
+
+Cambios realizados:
+  └─ CAMBIOS_PANEL_UNIFICADO.md (Lista de cambios)
+
+Resumen visual:
+  └─ PANEL_UNIFICADO_VISUAL.txt (Diagrama ASCII)
+
+Resumen ejecutivo:
+  └─ RESUMEN_EJECUTIVO.txt (Proyecto completo)
+
+Inicio rápido:
+  └─ INICIO_PANEL_UNIFICADO.txt (Este archivo)
+
+═══════════════════════════════════════════════════════════════════
+
+💡 CONSEJOS
+
+✓ Los datos se cargan automáticamente
+✓ No es necesario recargar para cambios
+✓ Confirma antes de eliminar
+✓ Las fotos deben ser menores a 5MB
+✓ Los nombres tienen máximo de caracteres
+✓ Usa filtros para encontrar rápido
+✓ Los cambios se guardan en Supabase
+
+═══════════════════════════════════════════════════════════════════
+
+❌ PROBLEMAS COMUNES
+
+Problema: Página no carga
+Solución: Recarga (F5) o limpia caché (Ctrl+Shift+Del)
+
+Problema: No veo mis anuncios
+Solución: Verifica que estés autenticado y actualiza
+
+Problema: No puedo cambiar foto
+Solución: Verifica peso (<5MB) y formato (JPG, PNG, GIF)
+
+Problema: Los cambios no se guardan
+Solución: Haz clic en "Guardar Cambios" para el perfil
+
+═══════════════════════════════════════════════════════════════════
+
+📞 SOPORTE RÁPIDO
+
+Error 404: Página no encontrada
+  └─ Verifica URL: /panel-unificado.html
+
+Error 403: No autorizado
+  └─ Inicia sesión primero
+
+Error de imagen:
+  └─ Verifica formato y tamaño
+
+Error de conexión:
+  └─ Verifica conexión a internet
+
+═══════════════════════════════════════════════════════════════════
+
+🔐 SEGURIDAD
+
+Requisitos:
+  ✓ Debes estar autenticado
+  ✓ Solo ves tus propios anuncios
+  ✓ Solo editas tu perfil
+  ✓ Confirmación antes de eliminar
+
+═══════════════════════════════════════════════════════════════════
+
+✨ CARACTERÍSTICAS ÚNICAS
+
+✓ Una sola página en lugar de dos
+✓ Tabs sin recargar página
+✓ Cambios instantáneos
+✓ Estadísticas en tiempo real
+✓ Foto de perfil editable
+✓ Filtros dinámicos
+✓ Diseño moderno y responsivo
+✓ Completamente documentado
+
+═══════════════════════════════════════════════════════════════════
+
+🎉 ¡LISTO PARA USAR!
+
+Accede en: http://localhost:5500/panel-unificado.html
+
+═══════════════════════════════════════════════════════════════════
+
+Última actualización: 13 de diciembre de 2025

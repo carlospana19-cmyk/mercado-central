@@ -307,7 +307,7 @@ async function saveProfile(e) {
 
         // Redirigir al dashboard después de 1 segundo
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'panel-unificado.html';
         }, 1000);
 
     } catch (err) {

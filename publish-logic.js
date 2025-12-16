@@ -2222,7 +2222,7 @@ form.addEventListener('submit', async (e) => {
             if (adInsertError) throw adInsertError;
 
             alert('¡Anuncio publicado con éxito!');
-            window.location.href = 'dashboard.html';
+            window.location.href = 'panel-unificado.html';
 
         } catch (error) {
             console.error('Error al publicar el anuncio:', error);

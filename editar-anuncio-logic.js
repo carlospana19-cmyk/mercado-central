@@ -1330,7 +1330,7 @@ function showBusinessFields() {
         const adId = urlParams.get('id');
         if (!adId) {
             alert("ID de anuncio no encontrado. Volviendo al panel.");
-            window.location.href = 'dashboard.html';
+            window.location.href = 'panel-unificado.html';
             return;
         }
 
@@ -1666,7 +1666,7 @@ if (Array.isArray(categories) && categories.length) {
         }
 
         alert('¡Anuncio actualizado correctamente!');
-        window.location.href = `dashboard.html`;
+        window.location.href = `panel-unificado.html`;
     }
 
     // --- LÓGICA DE CATEGORÍAS ---

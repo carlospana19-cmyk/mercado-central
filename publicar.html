@@ -24,19 +24,21 @@
     <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
     <div class="buttons-nav">
         <!-- Este botón se mostrará solo si el usuario está conectado -->
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">Publicar anuncio</button>
-
-        <!-- Botones de Panel, Perfil y Logout (solo para usuarios conectados) -->
-        <button id="btn-dashboard" class="nav-btn-user" style="display: none;" onclick="window.location.href='dashboard.html'">Mi Panel</button>
-        <button id="btn-profile" class="nav-btn-user nav-profile-btn" style="display: none;" onclick="window.location.href='perfil.html'" title="Mi Perfil">
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='profile-icon'>
-                <path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/>
-            </svg>
+        <!-- Botones de Panel, Publicar y Logout (solo para usuarios conectados) -->
+        <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
+            <i class="fas fa-user"></i>
         </button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">Cerrar Sesión</button>
+        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
+            <i class="fas fa-plus"></i> Publicar anuncio
+        </button>
+        <button id="btn-logout" class="nav-btn-user" style="display: none;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
 
         <!-- Botón de Iniciar Sesión (solo para invitados) -->
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">Iniciar sesión</button>
+        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
+            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+        </button>
     </div>
   </nav>
 

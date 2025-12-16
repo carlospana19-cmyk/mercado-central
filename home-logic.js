@@ -31,7 +31,7 @@ export function initializeHomePage() {
                 console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios.');
                 const { data: adsWithoutFilter, error: error2 } = await supabase
                     .from('anuncios')
-                    .select('*')
+                    .select('*, perfiles(nombre_negocio, url_foto_perfil)')
                     .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                     .order('fecha_publicacion', { ascending: false })
                     .limit(15);
@@ -134,12 +134,21 @@ if (ad.featured_plan === "top") {
                 // ✅ BADGE VENDIDO EN TARJETAS DEL HOME
                 const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
                 const soldClass = ad.is_sold ? 'card-sold' : '';
+                // ✅ Si está vendido, el onclick muestra alerta. Si no, va a detalles
+                const onclickHandler = ad.is_sold ? `alert('Este anuncio ya ha sido vendido')` : `window.location.href='detalle-producto.html?id=${ad.id}'`;
+                
+                // ✅ Avatar del vendedor - A IMPLEMENTAR DESPUÉS
+                // const vendorProfile = ad.perfiles ? ad.perfiles[0] : null;
+                // const vendorPhoto = vendorProfile?.url_foto_perfil || '...';
+                // const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
+                // const vendorAvatar = `<div class="vendor-avatar" title="${vendorName}">...`;
 
                 return `
-                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" onclick="${onclickHandler}" style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
                        ${badgeHTML}
                          ${urgentBadge}
                          ${soldBadgeHome}
+                         ${vendorAvatar}
                          <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
                             <div class="swiper product-swiper">
                                 <div class="swiper-wrapper">
@@ -192,10 +201,16 @@ if (ad.featured_plan === "top") {
             container.innerHTML = adsHTML;
             console.log("SENSOR 5: HTML de anuncios insertado en el DOM.");
 
+            // ✅ FIJAR: Destruir Swipers previos antes de crear nuevos
+            const existingSwipers = window.activeSwipers || [];
+            existingSwipers.forEach(swiper => swiper.destroy());
+            window.activeSwipers = [];
+
             // Inicializar Swiper para cada tarjeta
             document.querySelectorAll('.product-swiper').forEach(swiperEl => {
-                new Swiper(swiperEl, {
-                    loop: swiperEl.querySelectorAll('.swiper-slide').length > 1, // Activar loop solo si hay más de 1 imagen
+                const slides = swiperEl.querySelectorAll('.swiper-slide').length;
+                const swiper = new Swiper(swiperEl, {
+                    loop: slides > 1,
                     navigation: {
                         nextEl: swiperEl.querySelector('.swiper-button-next'),
                         prevEl: swiperEl.querySelector('.swiper-button-prev'),
@@ -206,15 +221,23 @@ if (ad.featured_plan === "top") {
                     preloadImages: true,
                     updateOnImagesReady: true,
                 });
+                window.activeSwipers.push(swiper);
             });
             console.log("SENSOR 6: Swipers inicializados.");
 
-            // Desactivar la acción de abrir detalle cuando el clic proviene del carrusel de imágenes
-            document.querySelectorAll('.box .image-container, .tarjeta-auto .image-container').forEach(imgContainer => {
-                imgContainer.addEventListener('click', e => {
-                    e.stopPropagation(); // Evita que el clic llegue al onclick del padre
-                });
-            });
+            // ✅ FIJAR: Usar event delegation en lugar de agregar listeners a cada elemento
+            // Remover listeners anteriores si existen
+            if (container._imageContainerListener) {
+                container.removeEventListener('click', container._imageContainerListener);
+            }
+            
+            // Usar delegación de eventos
+            container._imageContainerListener = (e) => {
+                if (e.target.closest('.image-container')) {
+                    e.stopPropagation();
+                }
+            };
+            container.addEventListener('click', container._imageContainerListener);
 
         } catch (e) {
             console.error("FALLO CRÍTICO DURANTE LA CARGA:", e);

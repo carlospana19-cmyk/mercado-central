@@ -8,9 +8,12 @@ async function loadModuleWhenNeeded(modulePath) {
     return import(modulePath);
 }
 
-// --- FUNCIÓN CENTRAL DE AUTENTICACIÓN ---
+// --- FUNCIÓN CENTRAL DE AUTENTICACIÓN (OPTIMIZADA) ---
 function updateUIBasedOnAuthState() {
-    supabase.auth.onAuthStateChange((event, session) => {
+    // ✅ FIJAR: Guardar la suscripción para poder desuscribirse después
+    let unsubscribe = null;
+    
+    unsubscribe = supabase.auth.onAuthStateChange((event, session) => {
         const isLoggedIn = session && session.user;
 
         // --- BOTONES DEL NAVBAR ---
@@ -28,14 +31,15 @@ function updateUIBasedOnAuthState() {
             if (btnLogout) btnLogout.style.display = 'inline-block';
             if (btnLogin) btnLogin.style.display = 'none';
 
-            // Agregar listener al botón de logout
-            if (btnLogout) {
+            // Agregar listener al botón de logout (solo una vez)
+            if (btnLogout && !btnLogout.dataset.logoutListenerAdded) {
                 btnLogout.addEventListener('click', async () => {
                     console.log("🚪 Cerrando sesión...");
                     await supabase.auth.signOut();
                     console.log("✅ Sesión cerrada");
                     window.location.href = 'login.html';
                 });
+                btnLogout.dataset.logoutListenerAdded = 'true';
             }
         } else {
             // --- USUARIO INVITADO ---
@@ -46,6 +50,9 @@ function updateUIBasedOnAuthState() {
             if (btnLogin) btnLogin.style.display = 'inline-block';
         }
     });
+    
+    // ✅ FIJAR: Retornar función para desuscribirse si es necesario
+    return unsubscribe;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -69,6 +76,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (path.endsWith('perfil.html')) {
         const perfilModule = await loadModuleWhenNeeded('./perfil-logic.js');
         perfilModule.loadUserProfile();
+    } else if (path.endsWith('panel-unificado.html')) {
+        // El panel unificado carga su propio módulo
+        console.log('Panel unificado cargado');
     } else if (path.endsWith('login.html') || path.endsWith('registro.html') || path.endsWith('forgot-password.html') || path.endsWith('reset-password.html')) {
         const authModule = await loadModuleWhenNeeded('./auth-logic.js');
         authModule.initializeAuthPages(); // <-- ESTA ES LA LÍNEA QUE REPARA EL LOGIN
