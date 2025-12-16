@@ -698,21 +698,13 @@ if (ad.featured_plan === "top") {
         const soldClass = ad.is_sold ? 'card-sold' : '';
         const soldBadgeResults = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
         
-        // ✅ Avatar del vendedor
-        const vendorProfile = ad.perfiles ? ad.perfiles[0] : null;
-        const vendorPhoto = vendorProfile?.url_foto_perfil || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ccc"%3E%3Cpath d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/%3E%3C/svg%3E';
-        const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
-        const vendorAvatar = `<div class="vendor-avatar" title="${vendorName}">
-            <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-            <span class="vendor-name-tooltip">${vendorName}</span>
-        </div>`;
+        // Avatar del vendedor - A IMPLEMENTAR DESPUÉS CUANDO SUPABASE TENGA RELACIONES CONFIGURADAS
 
 return `
     <div class="property-card card ${cardExtraClass} ${soldClass}" onclick="${onclickHandler}" style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
         ${badgeHTML}
         ${urgentBadge}
         ${soldBadgeResults}
-        ${vendorAvatar}
         <div class="property-image">
             ${['premium','destacado','top'].includes(ad.featured_plan)
               ? `

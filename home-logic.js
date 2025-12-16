@@ -31,7 +31,7 @@ export function initializeHomePage() {
                 console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios.');
                 const { data: adsWithoutFilter, error: error2 } = await supabase
                     .from('anuncios')
-                    .select('*, perfiles(nombre_negocio, url_foto_perfil)')
+                    .select('*')
                     .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                     .order('fecha_publicacion', { ascending: false })
                     .limit(15);
@@ -148,7 +148,6 @@ if (ad.featured_plan === "top") {
                        ${badgeHTML}
                          ${urgentBadge}
                          ${soldBadgeHome}
-                         ${vendorAvatar}
                          <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
                             <div class="swiper product-swiper">
                                 <div class="swiper-wrapper">
