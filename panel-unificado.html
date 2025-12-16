@@ -235,7 +235,10 @@
         </div>
     </footer>
 
-    <script src="supabase-client.js"></script>
-    <script type="module" src="panel-unificado-logic.js"></script>
+    <script type="module">
+        import { supabase } from './supabase-client.js';
+        import { setupPanelUnificado } from './panel-unificado-logic.js';
+        setupPanelUnificado();
+    </script>
 </body>
 </html>

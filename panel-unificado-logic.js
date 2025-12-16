@@ -171,8 +171,6 @@ function renderAds(ads) {
     }).join('');
 
     // ✅ FIJAR: Usar event delegation en lugar de listeners duplicados
-    const container = document.getElementById('ads-container');
-    
     if (container._adButtonListener) {
         container.removeEventListener('click', container._adButtonListener);
     }
@@ -493,4 +491,9 @@ function switchTab(tabName) {
         content.classList.remove('active');
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+// Exportar función para inicializar desde HTML
+export function setupPanelUnificado() {
+    // El DOMContentLoaded ya se encarga de todo
 }
