@@ -289,20 +289,23 @@ async function handlePhotoUpload(e) {
             .from('imagenes_anuncios')
             .getPublicUrl(fileName);
 
+        // Actualizar URL en la base de datos
         const { error: dbError } = await supabase
             .from('perfiles')
-            .upsert({
-                user_id: currentUserId,
-                url_foto_perfil: publicUrl
-            });
+            .update({
+                url_foto_perfil: publicUrl,
+                fecha_actualizacion: new Date().toISOString()
+            })
+            .eq('user_id', currentUserId);
 
         if (dbError) throw dbError;
 
         document.getElementById('profile-photo-header').src = publicUrl;
         uploadBtn.disabled = false;
+        console.log('✅ Foto de perfil actualizada correctamente');
     } catch (err) {
-        console.error('Error en handlePhotoUpload:', err);
-        alert('Error al procesar la foto');
+        console.error('❌ Error en handlePhotoUpload:', err);
+        alert('Error al procesar la foto: ' + err.message);
     }
 }
 
@@ -314,7 +317,6 @@ async function saveProfile(e) {
 
     try {
         const profileData = {
-            user_id: currentUserId,
             nombre_completo: document.getElementById('full-name').value,
             telefono: document.getElementById('phone').value,
             whatsapp: document.getElementById('whatsapp').value,
@@ -323,20 +325,36 @@ async function saveProfile(e) {
             descripcion: document.getElementById('description').value,
             provincia: document.getElementById('location-province').value,
             distrito: document.getElementById('location-district').value,
-            direccion: document.getElementById('location-address').value
+            direccion: document.getElementById('location-address').value,
+            fecha_actualizacion: new Date().toISOString()
         };
 
-        const { error } = await supabase
+        // Intentar UPDATE primero (para perfiles existentes)
+        const { error: updateError } = await supabase
             .from('perfiles')
-            .upsert(profileData);
+            .update(profileData)
+            .eq('user_id', currentUserId);
 
-        if (error) throw error;
+        // Si no existe, crear nuevo perfil con INSERT
+        if (updateError && updateError.code === 'PGRST116') {
+            const { error: insertError } = await supabase
+                .from('perfiles')
+                .insert({
+                    user_id: currentUserId,
+                    ...profileData
+                });
 
+            if (insertError) throw insertError;
+        } else if (updateError) {
+            throw updateError;
+        }
+
+        console.log('✅ Perfil guardado correctamente');
         alert('¡Perfil guardado correctamente!');
         await loadUserProfile();
     } catch (err) {
-        console.error('Error al guardar perfil:', err);
-        alert('Error al guardar los cambios');
+        console.error('❌ Error al guardar perfil:', err);
+        alert('Error al guardar los cambios: ' + err.message);
     }
 }
 
