@@ -11,7 +11,7 @@ const PLAN_LIMITS = {
     'free': { maxFotos: 3, hasVideo: false, hasCarousel: false, priority: 0 },
     'basico': { maxFotos: 5, hasVideo: false, hasCarousel: false, priority: 1 },
     'premium': { maxFotos: 10, hasVideo: false, hasCarousel: true, priority: 2 },
-    'destacado': { maxFotos: 15, hasVideo: false, hasCarousel: true, priority: 3 },
+    'destacado': { maxFotos: 15, hasVideo: true, hasCarousel: true, priority: 3 },
     'top': { maxFotos: 20, hasVideo: true, hasCarousel: true, priority: 4 }
 };
 
@@ -2266,15 +2266,16 @@ form.addEventListener('submit', async (e) => {
     const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free';
     const videoUrl = document.getElementById('video-url')?.value || '';
 
-    if (videoUrl && selectedPlan !== 'top') {
-        alert('Solo el plan TOP permite agregar videos. Por favor, selecciona el plan TOP.');
+    // Permitir video solo en planes Destacado y Top
+    if (videoUrl && selectedPlan !== 'destacado' && selectedPlan !== 'top') {
+        alert('Los planes Destacado y TOP permiten agregar videos. Por favor, selecciona uno de estos planes.');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
 
     // ✅ VALIDAR URL DE VIDEO (YouTube o Vimeo)
-    if (videoUrl && selectedPlan === 'top') {
+    if (videoUrl && (selectedPlan === 'destacado' || selectedPlan === 'top')) {
         const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)\//;
         const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\//;
         
@@ -2320,7 +2321,7 @@ form.addEventListener('submit', async (e) => {
                 user_id: user.id,
                 url_portada: coverPublicUrl,
                 url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
-                url_video: selectedPlan === 'top' ? formData.get('video_url') : null,
+                url_video: (selectedPlan === 'destacado' || selectedPlan === 'top') ? formData.get('video_url') : null,
                 publicar_redes: selectedPlan === 'top' ? (formData.get('publicar_redes') ? true : false) : false,
                 fecha_publicacion: new Date().toISOString()
             };
@@ -2732,7 +2733,23 @@ const updatePlanRestrictions = (selectedPlan) => {
     const planValue = selectedPlan.toLowerCase();
     console.log('🔍 DEBUG: planValue (lowercase):', planValue);
 
-    // 1. RESTRICCIÓN PARA CAMPOS TOP (Video y Redes Sociales)
+    // 1. RESTRICCIÓN PARA CAMPOS DE VIDEO (Destacado y Top)
+    const videoFields = document.querySelectorAll('.plan-video-feature');
+    console.log('🔍 DEBUG: Found videoFields:', videoFields.length);
+
+    const enableVideo = (planValue === 'destacado' || planValue === 'top');
+    const disableVideo = !enableVideo;
+    console.log('🔍 DEBUG: enableVideo:', enableVideo, 'disableVideo:', disableVideo);
+
+    videoFields.forEach(div => {
+        div.style.opacity = disableVideo ? '0.4' : '1';
+        div.style.pointerEvents = disableVideo ? 'none' : 'auto';
+
+        const input = div.querySelector('input, select, textarea');
+        if (input) input.disabled = disableVideo;
+    });
+
+    // 2. RESTRICCIÓN PARA CAMPOS TOP (Publicación en Redes Sociales)
     const topFields = document.querySelectorAll('.plan-top-feature');
     console.log('🔍 DEBUG: Found topFields:', topFields.length);
 
@@ -2747,7 +2764,7 @@ const updatePlanRestrictions = (selectedPlan) => {
         if (input) input.disabled = disableTop;
     });
 
-    // 2. RESTRICCIÓN PARA EL BADGE DESTACADO
+    // 3. RESTRICCIÓN PARA EL BADGE DESTACADO
     const destacadoFields = document.querySelectorAll('.plan-destacado-feature');
     console.log('🔍 DEBUG: Found destacadoFields:', destacadoFields.length);
 
