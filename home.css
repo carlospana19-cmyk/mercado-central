@@ -613,6 +613,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     .ads-row {
         grid-template-columns: 1fr;
         gap: 20px;
+        margin-bottom: 1.5rem;
     }
     /* Asegura que la tarjeta use todo el ancho en móviles */
     .box {
@@ -625,5 +626,59 @@ main, section.hero-search, section.categories-showcase, section.products {
         height: 50px;
         bottom: 10px;
         right: 10px;
+    }
+
+    .box-container {
+        padding: 0 0.5rem;
+    }
+
+    .hero-search {
+        padding: 4rem 1rem 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .ads-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .box {
+        width: 100%;
+    }
+
+    .box .content {
+        padding: 0.8rem;
+    }
+
+    .vendor-avatar {
+        width: 40px;
+        height: 40px;
+        bottom: 8px;
+        right: 8px;
+    }
+
+    .box-container {
+        padding: 0;
+    }
+
+    .hero-search {
+        padding: 2rem 0.5rem 1rem;
+        min-height: 60vh;
+    }
+
+    .slide-title {
+        font-size: 1.8rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 }

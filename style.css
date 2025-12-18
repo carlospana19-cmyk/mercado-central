@@ -2553,3 +2553,204 @@ body#pagina-login {
         font-size: 24px;
     }
 }
+
+/* ===== OPTIMIZACIÓN COMPLETA PARA MÓVILES ===== */
+@media (max-width: 768px) {
+    /* Tarjetas responsivas */
+    .box, .property-card {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .box .image-container,
+    .property-image {
+        height: 180px;
+    }
+
+    .box .content, .property-details {
+        padding: 1rem;
+    }
+
+    .box h3, .property-title {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .box .price, .property-price {
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .box .location, .property-location {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .box .description, .property-description {
+        font-size: 1rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Botones más grandes para móvil */
+    .btn-contact, .btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        border-radius: 6px;
+    }
+
+    /* Swiper con flechas más visibles */
+    .swiper-button-next, .swiper-button-prev {
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+    }
+
+    .swiper-button-next::after, .swiper-button-prev::after {
+        font-size: 20px;
+    }
+
+    /* Tarjeta de atributos más compactos */
+    .vehicle-details, .real-estate-details, .electronics-details,
+    .home-furniture-details, .fashion-details, .sports-details,
+    .pets-details, .services-details, .business-details, .community-details {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .vehicle-details span, .real-estate-details span, .electronics-details span,
+    .home-furniture-details span, .fashion-details span, .sports-details span,
+    .pets-details span, .services-details span, .business-details span, .community-details span {
+        font-size: 1rem;
+    }
+
+    .vehicle-details i, .real-estate-details i, .electronics-details i,
+    .home-furniture-details i, .fashion-details i, .sports-details i,
+    .pets-details i, .services-details i, .business-details i, .community-details i {
+        font-size: 1.3rem;
+    }
+
+    /* Badge más pequeño */
+    .simple-badge-svg {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Avatar del vendedor */
+    .vendor-avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .vendor-avatar-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Navbar en móvil */
+    .navbar-moderno {
+        padding: 0.8rem 1rem;
+    }
+
+    .logo-text {
+        font-size: 1.2rem;
+    }
+
+    .nav-btn-user, .nav-btn-guest {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    /* Spacing mejorando */
+    main.container {
+        padding: 1rem;
+    }
+
+    /* Tarjetas de resultado más compactas */
+    .results-container-flex {
+        gap: 1rem;
+    }
+
+    .property-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ultra responsive para screens muy pequeños */
+    .box .image-container,
+    .property-image {
+        height: 150px;
+    }
+
+    .box h3, .property-title {
+        font-size: 1.2rem;
+    }
+
+    .box .price, .property-price {
+        font-size: 1.4rem;
+    }
+
+    .box .content, .property-details {
+        padding: 0.8rem;
+    }
+
+    .btn-contact, .btn {
+        width: 100%;
+        padding: 0.7rem 1rem;
+    }
+
+    .vehicle-details, .real-estate-details, .electronics-details,
+    .home-furniture-details, .fashion-details, .sports-details,
+    .pets-details, .services-details, .business-details, .community-details {
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Badge más discreto */
+    .simple-badge-svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Esconder detalles menos importantes en muy pequeño */
+    .vendor-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .vendor-avatar-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Navegación más compacta */
+    .navbar-moderno {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .nav-btn-user, .nav-btn-guest {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    main.container {
+        padding: 0.8rem;
+    }
+
+    /* Galería swiper más pequeña */
+    .swiper-button-next, .swiper-button-prev {
+        width: 35px;
+        height: 35px;
+    }
+
+    .swiper-button-next::after, .swiper-button-prev::after {
+        font-size: 18px;
+    }
+}
