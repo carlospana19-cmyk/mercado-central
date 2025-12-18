@@ -110,8 +110,26 @@ async function handleRegister(e) {
         }
 
         console.log('✅ Registro exitoso');
-        alert('¡Registro exitoso! Revisa tu correo para confirmar.');
-        window.location.href = 'login.html';
+
+        // Obtener plan seleccionado de sessionStorage o URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedPlan = urlParams.get('plan') || sessionStorage.getItem('selectedPlan');
+
+        if (selectedPlan === 'gratis') {
+            // Plan gratis: redirigir a publicar con plan preseleccionado
+            sessionStorage.setItem('selectedPlan', 'gratis');
+            sessionStorage.setItem('afterRegisterAction', 'continuePlan');
+            alert('¡Registro exitoso! Redirigiendo a la publicación de anuncio...');
+            window.location.href = 'publicar.html';
+        } else if (selectedPlan) {
+            // Plan de pago: redirigir a pago nuevamente
+            alert('¡Registro exitoso! Completando el pago...');
+            window.location.href = `/payment.html?plan=${selectedPlan}`;
+        } else {
+            // Sin plan: ir a home
+            alert('¡Registro exitoso! Revisa tu correo para confirmar.');
+            window.location.href = 'index.html';
+        }
     } catch (err) {
         console.error('❌ Error:', err);
         alert('Error: ' + (err.message || 'Desconocido'));

@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadUserProfile() {
     try {
         const { data: profile, error } = await supabase
-            .from('perfiles')
+            .from('profiles')
             .select('*')
-            .eq('user_id', currentUserId)
+            .eq('id', currentUserId)
             .single();
 
         if (error && error.code !== 'PGRST116') {
@@ -86,7 +86,7 @@ async function loadUserAds() {
     try {
         const { data: ads, error } = await supabase
             .from('anuncios')
-            .select('*, imagenes(url_imagen)')
+            .select('*, imagenes(url_imagen), profiles(url_foto_perfil, nombre_negocio)')
             .eq('user_id', currentUserId);
 
         if (error) {
@@ -171,11 +171,13 @@ function renderAds(ads) {
     }).join('');
 
     // ✅ FIJAR: Usar event delegation en lugar de listeners duplicados
-    if (container._adButtonListener) {
-        container.removeEventListener('click', container._adButtonListener);
+    const adsContainer = document.getElementById('my-ads-container');
+    
+    if (adsContainer._adButtonListener) {
+        adsContainer.removeEventListener('click', adsContainer._adButtonListener);
     }
     
-    container._adButtonListener = (e) => {
+    adsContainer._adButtonListener = (e) => {
         const toggleBtn = e.target.closest('.toggle-sold-btn');
         const deleteBtn = e.target.closest('.delete-btn');
         
@@ -186,7 +188,7 @@ function renderAds(ads) {
         }
     };
     
-    container.addEventListener('click', container._adButtonListener);
+    adsContainer.addEventListener('click', adsContainer._adButtonListener);
 }
 
 // ========================================
@@ -289,23 +291,20 @@ async function handlePhotoUpload(e) {
             .from('imagenes_anuncios')
             .getPublicUrl(fileName);
 
-        // Actualizar URL en la base de datos
         const { error: dbError } = await supabase
-            .from('perfiles')
-            .update({
-                url_foto_perfil: publicUrl,
-                fecha_actualizacion: new Date().toISOString()
-            })
-            .eq('user_id', currentUserId);
+            .from('profiles')
+            .upsert({
+                id: currentUserId,
+                url_foto_perfil: publicUrl
+            });
 
         if (dbError) throw dbError;
 
         document.getElementById('profile-photo-header').src = publicUrl;
         uploadBtn.disabled = false;
-        console.log('✅ Foto de perfil actualizada correctamente');
     } catch (err) {
-        console.error('❌ Error en handlePhotoUpload:', err);
-        alert('Error al procesar la foto: ' + err.message);
+        console.error('Error en handlePhotoUpload:', err);
+        alert('Error al procesar la foto');
     }
 }
 
@@ -317,6 +316,7 @@ async function saveProfile(e) {
 
     try {
         const profileData = {
+            id: currentUserId,
             nombre_completo: document.getElementById('full-name').value,
             telefono: document.getElementById('phone').value,
             whatsapp: document.getElementById('whatsapp').value,
@@ -325,36 +325,20 @@ async function saveProfile(e) {
             descripcion: document.getElementById('description').value,
             provincia: document.getElementById('location-province').value,
             distrito: document.getElementById('location-district').value,
-            direccion: document.getElementById('location-address').value,
-            fecha_actualizacion: new Date().toISOString()
+            direccion: document.getElementById('location-address').value
         };
 
-        // Intentar UPDATE primero (para perfiles existentes)
-        const { error: updateError } = await supabase
-            .from('perfiles')
-            .update(profileData)
-            .eq('user_id', currentUserId);
+        const { error } = await supabase
+            .from('profiles')
+            .upsert(profileData);
 
-        // Si no existe, crear nuevo perfil con INSERT
-        if (updateError && updateError.code === 'PGRST116') {
-            const { error: insertError } = await supabase
-                .from('perfiles')
-                .insert({
-                    user_id: currentUserId,
-                    ...profileData
-                });
+        if (error) throw error;
 
-            if (insertError) throw insertError;
-        } else if (updateError) {
-            throw updateError;
-        }
-
-        console.log('✅ Perfil guardado correctamente');
         alert('¡Perfil guardado correctamente!');
         await loadUserProfile();
     } catch (err) {
-        console.error('❌ Error al guardar perfil:', err);
-        alert('Error al guardar los cambios: ' + err.message);
+        console.error('Error al guardar perfil:', err);
+        alert('Error al guardar los cambios');
     }
 }
 
@@ -509,9 +493,4 @@ function switchTab(tabName) {
         content.classList.remove('active');
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
-}
-
-// Exportar función para inicializar desde HTML
-export function setupPanelUnificado() {
-    // El DOMContentLoaded ya se encarga de todo
 }

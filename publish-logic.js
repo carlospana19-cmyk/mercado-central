@@ -1,9 +1,10 @@
 // publish-logic.js - VERSIÓN FINAL CON SINCRONIZACIÓN COMPLETA
 
 import { supabase } from './supabase-client.js';
-import { checkUserLoggedIn } from './auth-logic.js';
+import { districtsByProvince } from './config-locations.js';
+import { DEFAULT_CATEGORIES } from './config-categories.js';
 
-checkUserLoggedIn();
+// ✅ Permitir acceso sin autenticación - verificar estado más adelante
 
 // CONFIGURACIÓN DE PLANES
 const PLAN_LIMITS = {
@@ -99,19 +100,7 @@ export function initializePublishPage() {
         });
     }
 
-    // --- DATOS DE DISTRITOS POR PROVINCIA (EJEMPLO ESTÁTICO) ---
-    const districtsByProvince = {
-        'Panamá': ['Panamá', 'San Miguelito', 'Arraiján', 'Capira', 'Chame', 'La Chorrera', 'Cerro Punta'],
-        'Panamá Oeste': ['La Chorrera', 'Capira', 'Chame', 'Arraiján', 'San Carlos'],
-        'Colón': ['Colón', 'Portobelo', 'Chagres', 'Donoso', 'Gatún', 'Margarita', 'Santa Isabel'],
-        'Chiriquí': ['David', 'Bugaba', 'Renacimiento', 'Barú', 'Boquete', 'Alanje', 'Tierras Altas'],
-        'Veraguas': ['Santiago', 'Atalaya', 'Mariato', 'Montijo', 'La Mesa', 'San Francisco', 'Soná'],
-        'Coclé': ['Penonomé', 'Aguadulce', 'Natá', 'Olá', 'Antón', 'La Pintada'],
-        'Los Santos': ['Las Tablas', 'Los Santos', 'Guararé', 'Macaracas', 'Pedasí', 'Pocrí', 'Tonosí'],
-        'Herrera': ['Chitré', 'Las Minas', 'Los Pozos', 'Ocú', 'Parita', 'Pesé', 'Santa María'],
-        'Darién': ['La Palma', 'Chepigana', 'Pinogana', 'Santa Fe', 'Garachiné', 'Wargandí'],
-        'Bocas del Toro': ['Bocas del Toro', 'Changuinola', 'Almirante', 'Chiriquí Grande']
-    };
+    // ✅ districtsByProvince importada desde config-locations.js
 
     // --- CONFIGURACIÓN GENÉRICA DE CAMPOS POR CATEGORÍA ---
     const categoryFieldConfigs = {
@@ -1657,6 +1646,138 @@ function showBusinessFields() {
         }
     }
 
+    // --- FUNCIÓN PARA MOSTRAR MODAL DE PLANES ---
+    const showPlanSelectionModal = () => {
+        const modalHTML = `
+            <div class="modal-overlay" id="planSelectionModal">
+                <div class="modal-content plan-modal">
+                    <div class="modal-header">
+                        <h2>Selecciona tu Plan</h2>
+                        <p class="modal-subtitle">Elige el plan que mejor se adapte a tus necesidades</p>
+                    </div>
+                    <div class="plans-container">
+                        <div class="plan-option plan-free" data-plan="gratis">
+                            <h3>Gratis</h3>
+                            <p class="plan-price">$0</p>
+                            <ul class="plan-features">
+                                <li>✓ 2 fotos</li>
+                                <li>✓ 1 anuncio activo</li>
+                                <li>✓ 30 días de vigencia</li>
+                                <li>✗ Sin galería de fotos</li>
+                                <li>✗ Sin videos</li>
+                            </ul>
+                            <button class="btn-plan btn-plan-free" data-plan="gratis">
+                                Crear Cuenta Gratis
+                            </button>
+                        </div>
+
+                        <div class="plan-option plan-basico" data-plan="basico">
+                            <div class="plan-badge">Popular</div>
+                            <h3>Básico</h3>
+                            <p class="plan-price">$5.99<span>/mes</span></p>
+                            <ul class="plan-features">
+                                <li>✓ 5 fotos</li>
+                                <li>✓ 3 anuncios activos</li>
+                                <li>✓ 60 días de vigencia</li>
+                                <li>✓ Galería de fotos básica</li>
+                                <li>✗ Sin videos</li>
+                            </ul>
+                            <button class="btn-plan btn-plan-paid" data-plan="basico">
+                                Comprar Plan
+                            </button>
+                        </div>
+
+                        <div class="plan-option plan-premium" data-plan="premium">
+                            <h3>Premium</h3>
+                            <p class="plan-price">$9.99<span>/mes</span></p>
+                            <ul class="plan-features">
+                                <li>✓ 10 fotos</li>
+                                <li>✓ 5 anuncios activos</li>
+                                <li>✓ 90 días de vigencia</li>
+                                <li>✓ Galería completa</li>
+                                <li>✓ Videos incluidos</li>
+                            </ul>
+                            <button class="btn-plan btn-plan-paid" data-plan="premium">
+                                Comprar Plan
+                            </button>
+                        </div>
+
+                        <div class="plan-option plan-destacado" data-plan="destacado">
+                            <h3>Destacado</h3>
+                            <p class="plan-price">$14.99<span>/mes</span></p>
+                            <ul class="plan-features">
+                                <li>✓ 15 fotos</li>
+                                <li>✓ 10 anuncios activos</li>
+                                <li>✓ 180 días de vigencia</li>
+                                <li>✓ Galería + Carrusel</li>
+                                <li>✓ Videos + Vivo</li>
+                            </ul>
+                            <button class="btn-plan btn-plan-paid" data-plan="destacado">
+                                Comprar Plan
+                            </button>
+                        </div>
+
+                        <div class="plan-option plan-top" data-plan="top">
+                            <div class="plan-badge">Premium</div>
+                            <h3>Top</h3>
+                            <p class="plan-price">$19.99<span>/mes</span></p>
+                            <ul class="plan-features">
+                                <li>✓ 20 fotos</li>
+                                <li>✓ 15 anuncios activos</li>
+                                <li>✓ 365 días de vigencia</li>
+                                <li>✓ Todas las características</li>
+                                <li>✓ Soporte prioritario</li>
+                            </ul>
+                            <button class="btn-plan btn-plan-paid" data-plan="top">
+                                Comprar Plan
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn-close-modal" id="closePlanModal">✕</button>
+                </div>
+            </div>
+        `;
+
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        const modal = document.getElementById('planSelectionModal');
+        
+        // Cerrar modal
+        document.getElementById('closePlanModal').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Manejar selección de plan
+        document.querySelectorAll('.btn-plan').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const selectedPlan = e.target.dataset.plan;
+                const isPaidPlan = e.target.classList.contains('btn-plan-paid');
+
+                // Guardar plan seleccionado en sessionStorage
+                sessionStorage.setItem('selectedPlan', selectedPlan);
+
+                if (isPaidPlan) {
+                    // Redirigir a página de pago
+                    window.location.href = `/payment.html?plan=${selectedPlan}`;
+                } else {
+                    // Plan gratis: redirigir a registro
+                    window.location.href = '/registro.html?plan=gratis';
+                }
+            });
+        });
+
+        // Mostrar modal con animación
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    };
+
     // --- FUNCIÓN DE NAVEGACIÓN (ROBUSTA) ---
     const navigateToStep = (stepNumber) => {
         // Ocultar todos los pasos
@@ -1721,16 +1842,19 @@ function showBusinessFields() {
     
     // --- LÓGICA DE CATEGORÍAS ---
     async function loadAllCategories() {
-        console.log('Fetching all categories from Supabase...');
-        const { data, error } = await supabase.from('categorias').select('id, nombre, parent_id').order('nombre');
-        if (error) {
-            console.error("SUPABASE FETCH FAILED:", error);
+        console.log('Loading categories...');
+        console.log('categorySelect:', categorySelect);
+        
+        if (!categorySelect) {
+            console.error('❌ categorySelect element not found!');
             return;
         }
-        console.log('Data received from Supabase:', data);
-
-        allCategories = data;
+        
+        // Usar DEFAULT_CATEGORIES directamente
+        allCategories = DEFAULT_CATEGORIES;
+        
         const mainCategories = allCategories.filter(c => c.parent_id === null);
+        console.log('Main categories loaded:', mainCategories.map(c => c.nombre));
 
         categorySelect.innerHTML = '<option value="" disabled selected>Selecciona una categoría principal</option>';
         mainCategories.forEach(group => {
@@ -1739,6 +1863,8 @@ function showBusinessFields() {
             option.textContent = group.nombre;
             categorySelect.appendChild(option);
         });
+        
+        console.log('✅ Categories loaded successfully');
     }
 
     categorySelect.addEventListener('change', function() {
@@ -2028,7 +2154,7 @@ function showBusinessFields() {
 
     // --- EVENT LISTENERS PARA BOTONES DE NAVEGACIÓN ---
     nextBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const currentStep = btn.closest('.form-section');
             const currentStepNumber = parseInt(currentStep.id.split('-')[1], 10);
             
@@ -2045,6 +2171,16 @@ function showBusinessFields() {
                     navigateToStep(currentStepNumber + 1);
                 } else {
                     alert('Por favor, selecciona una provincia y un distrito.');
+                }
+            } else if (currentStepNumber === 3) {
+                // Verificar si el usuario está autenticado antes de ir al paso 4 (planes)
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    // Si no está autenticado, mostrar modal de planes con opción de registro
+                    showPlanSelectionModal();
+                } else {
+                    // Si está autenticado, continuar normalmente
+                    navigateToStep(currentStepNumber + 1);
                 }
             } else {
                  // Aquí añadiremos validación para futuros pasos
@@ -2125,6 +2261,31 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
+    // ✅ VALIDAR VIDEOS SEGÚN PLAN
+    const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
+    const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free';
+    const videoUrl = document.getElementById('video-url')?.value || '';
+
+    if (videoUrl && selectedPlan !== 'top') {
+        alert('Solo el plan TOP permite agregar videos. Por favor, selecciona el plan TOP.');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    }
+
+    // ✅ VALIDAR URL DE VIDEO (YouTube o Vimeo)
+    if (videoUrl && selectedPlan === 'top') {
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)\//;
+        const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\//;
+        
+        if (!youtubeRegex.test(videoUrl) && !vimeoRegex.test(videoUrl)) {
+            alert('Por favor, ingresa una URL válida de YouTube o Vimeo.');
+            publishButton.disabled = false;
+            publishButton.textContent = 'Publicar Anuncio';
+            return;
+        }
+    }
+
     // Obtener nombres de categoría y subcategoría
     const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
     const subcategoryName = subcategorySelect.value; // Ya es el nombre
@@ -2159,6 +2320,8 @@ form.addEventListener('submit', async (e) => {
                 user_id: user.id,
                 url_portada: coverPublicUrl,
                 url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
+                url_video: selectedPlan === 'top' ? formData.get('video_url') : null,
+                publicar_redes: selectedPlan === 'top' ? (formData.get('publicar_redes') ? true : false) : false,
                 fecha_publicacion: new Date().toISOString()
             };
 
@@ -2173,9 +2336,8 @@ form.addEventListener('submit', async (e) => {
             // === INICIO: LÓGICA PARA PLANES Y MEJORAS ===
             // ==================================================================
 
-            // 1. Obtener el plan seleccionado
-            const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
-            const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'gratis';
+            // 1. Ya obtuvimos el plan seleccionado en validaciones previas
+            // (no necesita re-lectura, ya lo tenemos en selectedPlan)
 
             // 2. Calcular la fecha de expiración del plan
             const VIGENCIA_GRATIS_DIAS = 30;
@@ -2459,6 +2621,30 @@ form.addEventListener('submit', async (e) => {
     loadAllCategories();
     getUserInfo();
 
+    // --- VERIFICAR PLAN PRESELECCIONADO (DESPUÉS DEL REGISTRO) ---
+    const selectedPlanFromSession = sessionStorage.getItem('selectedPlan');
+    const afterRegisterAction = sessionStorage.getItem('afterRegisterAction');
+    
+    if (selectedPlanFromSession === 'gratis' && afterRegisterAction === 'continuePlan') {
+        console.log("✅ Plan gratis preseleccionado después del registro");
+        
+        // Desplazar a la sección de planes automáticamente después de cargar
+        setTimeout(() => {
+            // Navegar automáticamente a la sección de planes (Step 4)
+            navigateToStep(4);
+            
+            // Preseleccionar el plan gratis
+            const freePlanCard = document.querySelector('.plan-card-h[data-plan="gratis"]');
+            if (freePlanCard) {
+                freePlanCard.classList.add('selected');
+                console.log("✅ Plan gratis preseleccionado visualmente");
+            }
+            
+            // Limpiar sessionStorage
+            sessionStorage.removeItem('afterRegisterAction');
+        }, 500);
+    }
+
 // --- INICIO: NAVEGACIÓN AUTOMÁTICA DE PLANES v2 (AGENTE 11) ---
 
 console.log("Agente 11: Ejecutando script de navegación v2 (por clic en tarjeta).");
@@ -2473,14 +2659,12 @@ const PLAN_LIMITS_V2 = {
 };
 
 // 2. Seleccionamos TODOS los contenedores de las tarjetas de plan.
-const planCards = document.querySelectorAll('.plan-card');
+const planCards = document.querySelectorAll('.plan-card-h');
 console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
 
-// 3. Añadimos un listener de 'click' a CADA tarjeta.
+// ✅ PLAN_LIMITS_V2 removida - usar PLAN_LIMITS centralizado
 planCards.forEach(card => {
     card.addEventListener('click', function() {
-
-        // 4. Encuentra el radio button DENTRO de esta tarjeta y márcalo.
         const radio = this.querySelector('input[type="radio"]');
         if (!radio) {
             console.error("Error: No se encontró un radio button dentro de la tarjeta clickeada.");
@@ -2519,7 +2703,7 @@ planCards.forEach(card => {
         }
 
         const maxFiles = limits.maxFotos;
-        const fileInput = document.getElementById('gallery-images-input');
+        const fileInput = documenttElementById('gallery-images-input');
         if (fileInput) {
             fileInput.setAttribute('data-max-files', maxFiles);
 

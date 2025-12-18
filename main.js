@@ -2,6 +2,7 @@
 
 import { supabase } from './supabase-client.js';
 import { initializeNavbar } from './navbar-logic.js';
+import { checkUserLoggedIn } from './auth-logic.js';
 
 // Lazy loading: importar módulos SOLO cuando se necesiten
 async function loadModuleWhenNeeded(modulePath) {

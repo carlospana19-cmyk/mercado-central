@@ -173,11 +173,6 @@ async function displayProductDetails(ad) {
 
         const slidesCount = document.querySelectorAll('.product-gallery-swiper .swiper-slide').length;
 
-        // ✅ FIJAR: Destruir Swiper previo si existe
-        if (window.detailSwiper) {
-            window.detailSwiper.destroy();
-        }
-
         window.detailSwiper = new Swiper('.product-gallery-swiper', {
             loop: slidesCount > 1,      // loop solo si hay más de una imagen (ahora mínimo 2)
             slidesPerView: 1,
@@ -218,11 +213,6 @@ async function displayProductDetails(ad) {
         }
 
         const slidesCount = document.querySelectorAll('.product-gallery-swiper .swiper-slide').length;
-
-        // ✅ FIJAR: Destruir Swiper previo si existe
-        if (window.detailSwiper) {
-            window.detailSwiper.destroy();
-        }
 
         window.detailSwiper = new Swiper('.product-gallery-swiper', {
             loop: slidesCount > 1,

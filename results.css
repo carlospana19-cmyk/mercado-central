@@ -1,3 +1,7 @@
+.card {
+  position: relative;
+}
+
 .mini-hero {
   width: 100%;
   max-width: 420px;
@@ -16,5 +20,5 @@
   color: white;
   --swiper-navigation-size: 22px;
   text-shadow: 0 0 5px rgba(0,0,0,0.7);
-  display: none;
+  display: block;
 }

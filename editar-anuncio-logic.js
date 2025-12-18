@@ -1,6 +1,7 @@
 // editar-anuncio-logic.js - VERSIÓN FINAL CON CAMPOS DE VEHÍCULO
 
 import { supabase } from './supabase-client.js';
+import { districtsByProvince } from './config-locations.js';
 
 export function initializeEditPage() {
     const form = document.getElementById('edit-ad-form');
@@ -61,18 +62,7 @@ export function initializeEditPage() {
     };
 
     // --- DATOS DE DISTRITOS POR PROVINCIA ---
-    const districtsByProvince = {
-        'Panamá': ['Panamá', 'San Miguelito', 'Arraiján', 'Capira', 'Chame', 'La Chorrera', 'Cerro Punta'],
-        'Panamá Oeste': ['La Chorrera', 'Capira', 'Chame', 'Arraiján', 'San Carlos'],
-        'Colón': ['Colón', 'Portobelo', 'Chagres', 'Donoso', 'Gatún', 'Margarita', 'Santa Isabel'],
-        'Chiriquí': ['David', 'Bugaba', 'Renacimiento', 'Barú', 'Boquete', 'Alanje', 'Tierras Altas'],
-        'Veraguas': ['Santiago', 'Atalaya', 'Mariato', 'Montijo', 'La Mesa', 'San Francisco', 'Soná'],
-        'Coclé': ['Penonomé', 'Aguadulce', 'Natá', 'Olá', 'Antón', 'La Pintada'],
-        'Los Santos': ['Las Tablas', 'Los Santos', 'Macaracas', 'Pedasí', 'Pocrí', 'Tonosí'],
-        'Herrera': ['Chitré', 'Las Minas', 'Los Pozos', 'Ocú', 'Parita', 'Pesé', 'Santa María'],
-        'Darién': ['La Palma', 'Chepigana', 'Pinogana', 'Santa Fe', 'Garachiné', 'Wargandí'],
-        'Bocas del Toro': ['Bocas del Toro', 'Changuinola', 'Almirante', 'Chiriquí Grande']
-    };
+    // ✅ districtsByProvince importada desde config-locations.js
 
     let galleryFiles = [];
 

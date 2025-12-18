@@ -1,4 +1,5 @@
 import { supabase } from './supabase-client.js';
+import { generateAttributesHTML } from './utils-attributes.js';
 
 // --- CARRUSEL DE CATEGORÍA ---
 function initializeCategoryHero() {
@@ -244,7 +245,7 @@ async function loadAndFilterResults() {
 
     let queryBuilder = supabase
       .from('anuncios')
-      .select('*', { count: 'exact' })
+      .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)', { count: 'exact' })
       // Prioridad: premium y destacados activos primero
       .order('featured_plan', { ascending: false })
       .order('featured_until', { ascending: false, nullsFirst: false })
@@ -694,14 +695,20 @@ if (ad.featured_plan === "top") {
         console.log('Anuncio:', ad.featured_plan, ad.url_portada, ad.url_galeria);
 
         // ✅ Si está vendido, no permite ir a detalles
-        const onclickHandler = ad.is_sold ? `alert('Este anuncio ya ha sido vendido')` : `window.location.href='detalle-producto.html?id=${ad.id}'`;
         const soldClass = ad.is_sold ? 'card-sold' : '';
         const soldBadgeResults = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
         
-        // Avatar del vendedor - A IMPLEMENTAR DESPUÉS CUANDO SUPABASE TENGA RELACIONES CONFIGURADAS
+        // ✅ Avatar del vendedor - Solo mostrar si tiene foto
+        const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
+        const vendorPhoto = vendorProfile?.url_foto_perfil;
+        const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
+        const vendorAvatar = vendorPhoto ? `<div class="vendor-avatar" title="${vendorName}">
+            <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
+            <span class="vendor-name-tooltip">${vendorName}</span>
+        </div>` : '';
 
 return `
-    <div class="property-card card ${cardExtraClass} ${soldClass}" onclick="${onclickHandler}" style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+    <div class="property-card card ${cardExtraClass} ${soldClass}" style="${ad.is_sold ? 'cursor: default;' : 'cursor: pointer;'}">
         ${badgeHTML}
         ${urgentBadge}
         ${soldBadgeResults}
@@ -737,7 +744,10 @@ return `
                     ${ad.provincia || 'Panamá'}, ${ad.distrito || ad.ubicacion || 'N/A'}
                 </div>
                 <h2 class="property-title">${ad.titulo}</h2>
-                <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
+                <div class="description-with-avatar">
+                    <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
+                    ${vendorAvatar}
+                </div>
             </div>
             
             <div class="property-attributes">
@@ -753,9 +763,9 @@ return `
                 ${communityDetailsHTML.replace(/<div class="community-details">|<\/div>/g, '')}
             </div>
             
-            <a href="detalle-producto.html?id=${ad.id}" class="btn-contact-card" onclick="contactar(${ad.id}, '${ad.contact_phone || ''}');">
+            <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
                 Contactar ahora
-            </a>
+            </button>
         </div>
     </div>
 `;
@@ -795,6 +805,36 @@ return `
       }
     };
     container.addEventListener('click', container._propertyImageListener);
+    
+    // ✅ Evento delegado SOLO para botón Contactar
+    container.addEventListener('click', (e) => {
+      const contactLink = e.target.closest('.btn-contact-card');
+      if (!contactLink) return;
+      
+      e.preventDefault();
+      const contactId = contactLink.dataset.contactId;
+      
+      if (contactId) {
+        window.location.href = `detalle-producto.html?id=${contactId}`;
+      }
+    });
+}
+
+// ✅ FUNCIÓN DE CONTACTO - Abre WhatsApp o muestra diálogo
+function contactar(adId, contactPhone) {
+    if (!contactPhone) {
+        alert('No hay número de teléfono disponible para contactar.');
+        return;
+    }
+    
+    // Limpiar números (solo dígitos y +)
+    const cleanPhone = contactPhone.replace(/\D/g, '');
+    
+    if (cleanPhone) {
+        // Abrir WhatsApp Web con mensaje predeterminado
+        const message = encodeURIComponent('Hola, estoy interesado en tu anuncio. ¿Podrías brindarme más información?');
+        window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+    }
 }
 
 function updateSummary(query, category, count) {

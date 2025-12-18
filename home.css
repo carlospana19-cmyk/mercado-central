@@ -2,6 +2,10 @@
 /* === ESTILOS ESPECÍFICOS PARA HOME.CSS (index.html) === */
 /* ================================================= */
 
+.card {
+  position: relative;
+}
+
 /* --- HERO SECTION --- */
 .hero-search {
   position: relative;
@@ -483,8 +487,8 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* 5. Estilos del campo de descripción */
 .box .content .description {
-    height: auto; /* Allow height to be flexible */
-    min-height: 20px; /* Ensure it takes up space even if empty */
+    height: 65px;
+    min-height: 65px;
     font-size: 1.3rem;
     color: var(--color-texto);
     overflow: hidden;
@@ -495,6 +499,13 @@ main, section.hero-search, section.categories-showcase, section.products {
     margin-bottom: 15px; /* Add some margin below the description */
     flex-grow: 1; /* Allow description to grow and fill space */
     flex-shrink: 1; /* Allow description to shrink if needed */
+}
+
+.box .content .description-with-avatar {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 15px;
 }
 
 /* 6. Estilos del Botón de Contacto: Ancho completo y color Turquesa */
@@ -551,9 +562,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* --- AVATAR DEL VENDEDOR EN TARJETA --- */
 .vendor-avatar {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
+    position: relative;
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -564,6 +573,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .vendor-avatar:hover {
