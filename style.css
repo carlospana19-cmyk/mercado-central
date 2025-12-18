@@ -518,8 +518,7 @@ body {
   }
 
   .logo-text {
-    font-size: 0.95rem;
-    white-space: nowrap;
+    display: none;
   }
 
   .buttons-nav {
@@ -579,7 +578,7 @@ body {
   }
 
   .logo-text {
-    font-size: 0.85rem;
+    display: none;
   }
 
   .buttons-nav {
