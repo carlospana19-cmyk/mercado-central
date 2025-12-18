@@ -337,7 +337,29 @@ function displayFilteredProducts(ads) {
     summary.innerHTML = `<p><strong>Encontrados ${ads.length} anuncios</strong></p>`;
     container.className = 'results-container-flex';
 
+    // Función para convertir URL de YouTube/Vimeo a embed
+    const getVideoEmbedUrl = (videoUrl) => {
+        if (!videoUrl) return null;
+        
+        // YouTube
+        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const youtubeMatch = videoUrl.match(youtubeRegex);
+        if (youtubeMatch) {
+            return `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`;
+        }
+        
+        // Vimeo
+        const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/;
+        const vimeoMatch = videoUrl.match(vimeoRegex);
+        if (vimeoMatch) {
+            return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+        }
+        
+        return null;
+    };
+
     const adsHTML = ads.map(ad => {
+        const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
         const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
         const categoria = ad.categoria ? ad.categoria.toLowerCase() : '';
@@ -718,6 +740,7 @@ return `
               <div class="tarjeta-auto">
               <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
                 <div class="swiper-wrapper">
+                  ${videoEmbedUrl ? `<div class="swiper-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
                   ${Array.isArray(ad.url_galeria) && ad.url_galeria.length
                     ? ad.url_galeria.map(img =>
                         `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`

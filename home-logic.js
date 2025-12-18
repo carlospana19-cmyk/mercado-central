@@ -61,9 +61,31 @@ export function initializeHomePage() {
             let adsHTML = '';
             let processedAds = 0;
 
+            // Función para convertir URL de YouTube/Vimeo a embed
+            const getVideoEmbedUrl = (videoUrl) => {
+                if (!videoUrl) return null;
+                
+                // YouTube
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                const youtubeMatch = videoUrl.match(youtubeRegex);
+                if (youtubeMatch) {
+                    return `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`;
+                }
+                
+                // Vimeo
+                const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/;
+                const vimeoMatch = videoUrl.match(vimeoRegex);
+                if (vimeoMatch) {
+                    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+                }
+                
+                return null;
+            };
+
             const generateCardHTML = (ad) => {
                 const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
                 const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+                const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
                 
                 const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
 // BADGE ESTELAR METÁLICO – versión SVG simple
@@ -155,6 +177,7 @@ if (ad.featured_plan === "top") {
                          <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
                             <div class="swiper product-swiper">
                                 <div class="swiper-wrapper">
+                                    ${videoEmbedUrl ? `<div class="swiper-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
                                     ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
                                 </div>
                                 <div class="swiper-button-prev"></div>
