@@ -392,10 +392,11 @@ body {
   z-index: 1000;
   flex-wrap: wrap;
   gap: 1rem;
-  overflow: visible;
+  overflow: visible !important;
   min-height: auto;
   width: 100%;
   box-sizing: border-box;
+  border-bottom: none;
 }
 
 .logo-link {
@@ -500,6 +501,8 @@ body {
     padding: 0.6rem 1%;
     gap: 0.3rem;
     justify-content: flex-start;
+    overflow: visible !important;
+    min-height: auto;
   }
 
   .logo-container {
@@ -524,6 +527,7 @@ body {
     flex-wrap: nowrap;
     margin-left: auto;
     justify-content: flex-end;
+    overflow: visible !important;
   }
 
   .buttons-nav button {
@@ -534,6 +538,7 @@ body {
     white-space: nowrap;
     min-width: 40px;
     height: 36px;
+    overflow: visible !important;
   }
 
   .buttons-nav button span {
@@ -553,6 +558,10 @@ body {
   .nav-icon-btn {
     padding: 0.4rem;
   }
+
+  nav {
+    overflow: visible !important;
+  }
 }
 
 /* Ultra pequeño para pantallas de 400px o menos */
@@ -560,6 +569,8 @@ body {
   .navbar-moderno {
     padding: 0.5rem 0.5%;
     gap: 0.2rem;
+    min-height: auto;
+    height: auto;
   }
 
   .logo-img {
@@ -573,6 +584,7 @@ body {
 
   .buttons-nav {
     gap: 0.1rem;
+    overflow: visible !important;
   }
 
   .buttons-nav button {
@@ -580,10 +592,16 @@ body {
     font-size: 0.65rem;
     min-width: 35px;
     height: 32px;
+    overflow: visible !important;
   }
 
   .buttons-nav button i {
     font-size: 0.9rem;
+  }
+
+  /* Asegurar que nada se corte */
+  nav {
+    overflow: visible !important;
   }
 }
 
