@@ -2671,7 +2671,10 @@ console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
 
 // ✅ PLAN_LIMITS_V2 removida - usar PLAN_LIMITS centralizado
 planCards.forEach(card => {
-    card.addEventListener('click', async function() {
+    card.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const radio = this.querySelector('input[type="radio"]');
         if (!radio) {
             console.error("Error: No se encontró un radio button dentro de la tarjeta clickeada.");
@@ -2695,6 +2698,10 @@ planCards.forEach(card => {
             // Si no está autenticado, guardar plan y redirigir a registro/pago
             console.log("🔐 Usuario no autenticado. Redirigiendo a login...");
             sessionStorage.setItem('selectedPlan', selectedPlan);
+            
+            // Deshabilitar el card para evitar múltiples clics
+            card.style.pointerEvents = 'none';
+            card.style.opacity = '0.6';
             
             if (selectedPlan === 'gratis') {
                 window.location.href = 'registro.html?plan=gratis';
