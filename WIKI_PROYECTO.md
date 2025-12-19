@@ -522,6 +522,36 @@ WHERE user_id NOT IN (SELECT id FROM profiles);
 - Necesitan estar en esquina inferior derecha sin cortarse
 - Solución: Reposicionar fuera del `.image-container` o ajustar `.image-container` a `position: relative` con `z-index` correcto
 
+### 🗺️ Mapa de Ubicación (PRÓXIMA SESIÓN)
+
+**Estado**: No implementado
+
+**Requerimientos:**
+- Mostrar mapa en detalle de anuncio (detalle-producto.html)
+- Mostrar mapa en panel de anuncios (panel-unificado.html)
+- Marcar ubicación exacta del vendedor/producto
+- Integración con Google Maps o Leaflet
+- Permitir al usuario ver ubicación antes de comprar
+
+**Opciones de implementación:**
+1. **Google Maps API** (requiere API key)
+   - Más preciso
+   - Requiere billing
+   - Mejor UX
+   
+2. **Leaflet + OpenStreetMap** (gratuito)
+   - Open source
+   - Sin API key
+   - Buena alternativa
+
+**To-Do:**
+- [ ] Elegir librería (Google Maps vs Leaflet)
+- [ ] Agregar provincia/distrito al mapa
+- [ ] Mostrar marker en ubicación
+- [ ] Responsive en móviles
+- [ ] Integrar en detalle-producto.html
+- [ ] Integrar en panel-unificado.html
+
 ### ⚙️ OAuth Google y Facebook (PRÓXIMA SESIÓN)
 
 **Estado**: Login botones implementados | Proveedores deshabilitados en Supabase
@@ -640,6 +670,132 @@ WHERE user_id NOT IN (SELECT id FROM profiles);
 
 - `currentUserId` - ID del usuario autenticado (se obtiene de auth.getUser())
 - `currentFilter` - Filtro actual en panel (todos/activos/vendidos)
+
+---
+
+## ✅ CHECKLIST DE FUNCIONALIDADES (Auditoría Completa)
+
+### 🏠 Homepage (index.html)
+- [x] Mostrar tarjetas de anuncios (gratis, basico, premium, destacado, top)
+- [x] Carrusel de imágenes por anuncio
+- [x] Video como primer slide (YouTube/Vimeo)
+- [x] Filtrar por categorías
+- [x] Buscar por texto
+- [x] Responsive (móvil, tablet, desktop)
+- [x] Avatares de vendedor
+- [x] Precio y ubicación visible
+- [ ] Wishlist/Favoritos
+- [ ] Contador de visitas
+- [ ] Anuncios destacados en el top
+
+### 🔍 Resultados (resultados.html)
+- [x] Mostrar resultados de búsqueda
+- [x] Filtros avanzados (precio, ubicación, fecha)
+- [x] Ordenar por relevancia/fecha/precio
+- [x] Paginación
+- [x] Video en tarjetas
+- [ ] Filtros por atributos (marca, modelo, etc)
+- [ ] Guardar búsquedas frecuentes
+- [ ] Alertas de nuevos anuncios
+
+### 📋 Publicar Anuncio (publicar.html)
+- [x] Step 1: Categoría y subcategoría
+- [x] Step 2: Ubicación (provincia/distrito)
+- [x] Step 3: Seleccionar plan
+- [x] Step 4: Llenar datos (título, descripción, precio)
+- [x] Step 5: Subir fotos
+- [x] Step 6: Video (YouTube/Vimeo)
+- [x] Atributos dinámicos por categoría
+- [x] Términos y condiciones
+- [x] Modal de login (Google/Facebook/Email) al publicar sin sesión
+- [ ] Previsualizar antes de publicar
+- [ ] Programar publicación
+- [ ] Renovación automática de anuncios
+
+### 💰 Planes y Pagos (payment.html)
+- [x] Mostrar resumen del plan
+- [x] Calcular impuestos (16%)
+- [x] Formulario de tarjeta de crédito
+- [x] Opción PayPal
+- [ ] Integración Stripe real
+- [ ] Reembolsos/devoluciones
+- [ ] Historial de pagos
+
+### 👤 Perfil de Usuario (perfil.html)
+- [x] Mostrar datos del usuario
+- [x] Editar foto de perfil
+- [x] Editar información personal
+- [x] Ver anuncios publicados
+- [x] Estadísticas de ventas
+- [ ] Calificaciones y reseñas
+- [ ] Historial de compras
+- [ ] Método de pago guardado
+
+### 📦 Detalles de Anuncio (detalle-producto.html)
+- [x] HTML estructura lista
+- [ ] Mostrar galería completa de fotos
+- [ ] Reproducir video
+- [ ] Información del vendedor
+- [ ] Botón contacto/compra
+- [ ] Mapa de ubicación
+- [ ] Opiniones/comentarios
+- [ ] Productos relacionados
+- [ ] Compartir en redes sociales
+
+### 💬 Mensajería (No implementado)
+- [ ] Lista de conversaciones
+- [ ] Enviar/recibir mensajes
+- [ ] Notificaciones en tiempo real
+- [ ] Historial de mensajes
+- [ ] Bloquear usuarios
+
+### 🛍️ Panel Unificado (panel-unificado.html)
+- [x] Ver todos los anuncios del usuario
+- [x] Filtrar por estado (activos/vendidos)
+- [x] Editar anuncio
+- [x] Eliminar anuncio
+- [x] Ver estadísticas
+- [ ] Duplicar anuncio
+- [ ] Exportar anuncios
+- [ ] Programación de anuncios
+
+### 🔐 Autenticación
+- [x] Registro con email
+- [x] Login con email
+- [x] Recuperación de contraseña
+- [x] Botones Google/Facebook (interfaz lista, falta OAuth setup)
+- [ ] Verificación de email
+- [ ] Autenticación de 2 factores
+- [ ] Cambiar contraseña
+
+### 📍 Ubicación y Mapa
+- [ ] Mapa interactivo en detalles
+- [ ] Mapa en panel de anuncios
+- [ ] Geolocalización automática
+- [ ] Buscar por radio de distancia
+
+### 📱 Responsive y Mobile
+- [x] Navbar optimizado para móviles
+- [x] Tarjetas responsivas
+- [x] Formularios touch-friendly
+- [x] Imágenes optimizadas
+- [x] Viewport configurado
+- [ ] App mobile (PWA)
+- [ ] Notificaciones push
+
+### ⚡ Performance
+- [x] Lazy loading de imágenes
+- [x] Minificación CSS/JS
+- [ ] Caché de datos
+- [ ] Compresión de imágenes
+- [ ] CDN para medios
+
+### 🔔 Notificaciones
+- [ ] Email de confirmación
+- [ ] Alertas de nuevas ofertas
+- [ ] Recordatorios de anuncios a vencer
+- [ ] Mensajes de mensajería
+- [ ] Push notifications
 
 ---
 
