@@ -2177,7 +2177,14 @@ function showBusinessFields() {
             } else if (currentStepNumber === 3) {
                 // Verificar si el usuario está autenticado antes de ir al paso 4 (planes)
                 console.log("🔍 Paso 3: Verificando autenticación...");
-                const { data: { user } } = await supabase.auth.getUser();
+                let user = null;
+                try {
+                    const { data: { user: sessionUser } } = await supabase.auth.getUser();
+                    user = sessionUser;
+                } catch (err) {
+                    console.log("⚠️ Error al verificar sesión (normal si está cerrada):", err.message);
+                    user = null;
+                }
                 console.log("👤 Usuario:", user ? user.email : "No autenticado");
                 if (!user) {
                     // Si no está autenticado, mostrar modal de planes con opción de registro
@@ -2693,7 +2700,15 @@ planCards.forEach(card => {
         console.log(`Agente 11: Clic detectado en tarjeta. Plan seleccionado: ${selectedPlan}.`);
 
         // ✅ VERIFICAR AUTENTICACIÓN ANTES DE CONTINUAR
-        const { data: { user } } = await supabase.auth.getUser();
+        let user = null;
+        try {
+            const { data: { user: sessionUser } } = await supabase.auth.getUser();
+            user = sessionUser;
+        } catch (err) {
+            console.log("⚠️ Error al verificar sesión (normal si está cerrada):", err.message);
+            user = null;
+        }
+        
         if (!user) {
             // Si no está autenticado, guardar plan y redirigir a registro/pago
             console.log("🔐 Usuario no autenticado. Redirigiendo a login...");
