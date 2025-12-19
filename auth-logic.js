@@ -139,13 +139,25 @@ async function handleRegister(e) {
 export async function checkUserLoggedIn() {
     try {
         const currentPath = window.location.pathname;
+        
+        // ✅ PÁGINAS PÚBLICAS (sin protección de autenticación)
+        const publicPages = ['index.html', 'resultados.html', 'detalle-producto.html', 'payment.html'];
+        const isPublicPage = publicPages.some(page => currentPath.includes(page));
+        
+        // ✅ Si es página pública, permitir acceso sin login
+        if (isPublicPage) {
+            return;
+        }
+        
+        // ✅ Si es página de autenticación, no redirigir
         if (currentPath.includes('login.html') || currentPath.includes('registro.html') || currentPath.includes('forgot-password.html') || currentPath.includes('reset-password.html')) {
             return;
         }
 
+        // ✅ Para páginas protegidas (publicar, editar, panel, dashboard), verificar sesión
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-            console.log("⚠️ Sin sesión, redirigiendo...");
+            console.log("⚠️ Sin sesión en página protegida, redirigiendo a login...");
             window.location.href = 'login.html';
         }
     } catch (err) {
