@@ -141,7 +141,7 @@ export async function checkUserLoggedIn() {
         const currentPath = window.location.pathname;
         
         // ✅ PÁGINAS PÚBLICAS (sin protección de autenticación)
-        const publicPages = ['index.html', 'resultados.html', 'detalle-producto.html', 'payment.html'];
+        const publicPages = ['index.html', 'resultados.html', 'detalle-producto.html', 'payment.html', 'publicar.html'];
         const isPublicPage = publicPages.some(page => currentPath.includes(page));
         
         // ✅ Si es página pública, permitir acceso sin login
