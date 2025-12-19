@@ -55,15 +55,19 @@ export async function initializeNavbar() {
         btnDashboard.style.display = 'inline-block';
         if (btnProfile) btnProfile.style.display = 'inline-block';
         btnLogout.style.display = 'inline-block';
+        // Botón de publicar redirige directamente a publicar.html
+        btnPublish.onclick = () => window.location.href = 'publicar.html';
     }
 
     function showGuestView() {
         // Mostrar botones de invitado
         btnLogin.style.display = 'inline-block';
-        // Ocultar botones de usuario
-        btnPublish.style.display = 'none';
+        // ✅ MOSTRAR BOTÓN DE PUBLICAR PARA INVITADOS (redirige a planes)
+        btnPublish.style.display = 'inline-block';
         btnDashboard.style.display = 'none';
         if (btnProfile) btnProfile.style.display = 'none';
         btnLogout.style.display = 'none';
+        // Botón de publicar redirige a planes para invitados
+        btnPublish.onclick = () => window.location.href = 'publicar.html';
     }
 }
