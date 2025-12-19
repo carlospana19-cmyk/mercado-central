@@ -1780,6 +1780,89 @@ function showBusinessFields() {
         }, 10);
     };
 
+    // --- FUNCIÓN PARA MOSTRAR MODAL DE LOGIN PARA PUBLICAR ---
+    const showLoginModalForPublishing = () => {
+        console.log("🔐 Mostrando modal de login para publicar...");
+        const modalHTML = `
+            <div class="modal-overlay" id="loginForPublishingModal">
+                <div class="modal-content login-modal" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2>Inicia sesión para publicar</h2>
+                        <p class="modal-subtitle">Elige tu método de inicio de sesión preferido</p>
+                    </div>
+                    <div class="login-options" style="display: flex; flex-direction: column; gap: 15px; margin: 30px 0;">
+                        <button class="btn-login-social google-login" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; font-size: 1rem; cursor: pointer; transition: all 0.3s;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path></svg>
+                            Continuar con Google
+                        </button>
+                        <button class="btn-login-social facebook-login" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border: 1px solid #1877F2; border-radius: 8px; background: #1877F2; color: white; font-size: 1rem; cursor: pointer; transition: all 0.3s;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5c-.563-.096-1.811-.143-2.967-.143-3.034 0-5.125 1.855-5.125 5.405V8z"></path></svg>
+                            Continuar con Facebook
+                        </button>
+                        <div style="text-align: center; margin: 20px 0; color: #999;">O</div>
+                        <button class="btn-login-email" style="padding: 12px; border: 1px solid #007bff; border-radius: 8px; background: #007bff; color: white; font-size: 1rem; cursor: pointer; transition: all 0.3s;">
+                            Iniciar sesión con email
+                        </button>
+                    </div>
+                    <button class="btn-close-modal" id="closeLoginModal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+                </div>
+            </div>
+        `;
+
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        const modal = document.getElementById('loginForPublishingModal');
+        console.log("✅ Modal de login agregado al DOM:", !!modal);
+        
+        // Cerrar modal
+        document.getElementById('closeLoginModal').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Manejar clics en opciones de login
+        const googleBtn = modal.querySelector('.google-login');
+        const facebookBtn = modal.querySelector('.facebook-login');
+        const emailBtn = modal.querySelector('.btn-login-email');
+
+        googleBtn.addEventListener('click', async () => {
+            console.log("🔐 Login con Google iniciado...");
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/publicar.html'
+                }
+            });
+            if (error) console.error("Error Google:", error);
+        });
+
+        facebookBtn.addEventListener('click', async () => {
+            console.log("🔐 Login con Facebook iniciado...");
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'facebook',
+                options: {
+                    redirectTo: window.location.origin + '/publicar.html'
+                }
+            });
+            if (error) console.error("Error Facebook:", error);
+        });
+
+        emailBtn.addEventListener('click', () => {
+            console.log("📧 Redirigiendo a login por email...");
+            window.location.href = 'login.html';
+        });
+
+        // Mostrar modal con animación
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    };
+
     // --- FUNCIÓN DE NAVEGACIÓN (ROBUSTA) ---
     const navigateToStep = (stepNumber) => {
         // Ocultar todos los pasos
@@ -2219,11 +2302,20 @@ form.addEventListener('submit', async (e) => {
     publishButton.disabled = true;
     publishButton.textContent = 'Publicando...';
 
-    const { data: { user } } = await supabase.auth.getUser();
+    let user = null;
+    try {
+        const { data: { user: sessionUser } } = await supabase.auth.getUser();
+        user = sessionUser;
+    } catch (err) {
+        console.log("⚠️ Error al verificar sesión:", err.message);
+        user = null;
+    }
+    
     if (!user) {
-        alert('Debes iniciar sesión para poder publicar.');
+        // Mostrar modal de login en lugar de alert
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
+        showLoginModalForPublishing();
         return;
     }
 
@@ -2678,55 +2770,21 @@ console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
 
 // ✅ PLAN_LIMITS_V2 removida - usar PLAN_LIMITS centralizado
 planCards.forEach(card => {
-    card.addEventListener('click', async function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
+    card.addEventListener('click', function(e) {
         const radio = this.querySelector('input[type="radio"]');
         if (!radio) {
             console.error("Error: No se encontró un radio button dentro de la tarjeta clickeada.");
             return;
         }
 
-        // Si ya estaba seleccionado, no hacemos nada para evitar múltiples ejecuciones.
-        if (radio.checked) {
-            // Opcional: Podríamos añadir un log para saber que no se hace nada.
-            // console.log("Agente 11: El plan ya estaba seleccionado.");
-            // return;
-        }
-
         radio.checked = true;
         const selectedPlan = radio.value;
         console.log(`Agente 11: Clic detectado en tarjeta. Plan seleccionado: ${selectedPlan}.`);
 
-        // ✅ VERIFICAR AUTENTICACIÓN ANTES DE CONTINUAR
-        let user = null;
-        try {
-            const { data: { user: sessionUser } } = await supabase.auth.getUser();
-            user = sessionUser;
-        } catch (err) {
-            console.log("⚠️ Error al verificar sesión (normal si está cerrada):", err.message);
-            user = null;
-        }
-        
-        if (!user) {
-            // Si no está autenticado, guardar plan y redirigir a registro/pago
-            console.log("🔐 Usuario no autenticado. Redirigiendo a login...");
-            sessionStorage.setItem('selectedPlan', selectedPlan);
-            
-            // Deshabilitar el card para evitar múltiples clics
-            card.style.pointerEvents = 'none';
-            card.style.opacity = '0.6';
-            
-            if (selectedPlan === 'gratis') {
-                window.location.href = 'registro.html?plan=gratis';
-            } else {
-                window.location.href = `payment.html?plan=${selectedPlan}`;
-            }
-            return;
-        }
+        // ✅ Guardar plan seleccionado en sessionStorage (para usuarios registrados)
+        sessionStorage.setItem('selectedPlan', selectedPlan);
 
-        // --- Lógica de navegación (solo para autenticados) ---
+        // --- Lógica de navegación (para todos los usuarios) ---
         setTimeout(() => {
             const step3 = document.getElementById('step-3');
             const step4 = document.getElementById('step-4');
