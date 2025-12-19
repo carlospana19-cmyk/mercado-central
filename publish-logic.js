@@ -1648,6 +1648,7 @@ function showBusinessFields() {
 
     // --- FUNCIÓN PARA MOSTRAR MODAL DE PLANES ---
     const showPlanSelectionModal = () => {
+        console.log("🎯 Iniciando showPlanSelectionModal...");
         const modalHTML = `
             <div class="modal-overlay" id="planSelectionModal">
                 <div class="modal-content plan-modal">
@@ -1741,6 +1742,7 @@ function showBusinessFields() {
         // Agregar modal al DOM
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         const modal = document.getElementById('planSelectionModal');
+        console.log("✅ Modal agregado al DOM:", !!modal);
         
         // Cerrar modal
         document.getElementById('closePlanModal').addEventListener('click', () => {
@@ -2174,12 +2176,16 @@ function showBusinessFields() {
                 }
             } else if (currentStepNumber === 3) {
                 // Verificar si el usuario está autenticado antes de ir al paso 4 (planes)
+                console.log("🔍 Paso 3: Verificando autenticación...");
                 const { data: { user } } = await supabase.auth.getUser();
+                console.log("👤 Usuario:", user ? user.email : "No autenticado");
                 if (!user) {
                     // Si no está autenticado, mostrar modal de planes con opción de registro
+                    console.log("📋 Mostrando modal de planes...");
                     showPlanSelectionModal();
                 } else {
                     // Si está autenticado, continuar normalmente
+                    console.log("✅ Usuario autenticado, yendo al paso 4...");
                     navigateToStep(currentStepNumber + 1);
                 }
             } else {
