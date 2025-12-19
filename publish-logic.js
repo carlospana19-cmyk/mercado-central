@@ -1764,10 +1764,10 @@ function showBusinessFields() {
 
                 if (isPaidPlan) {
                     // Redirigir a página de pago
-                    window.location.href = `/payment.html?plan=${selectedPlan}`;
+                    window.location.href = `payment.html?plan=${selectedPlan}`;
                 } else {
                     // Plan gratis: redirigir a registro
-                    window.location.href = '/registro.html?plan=gratis';
+                    window.location.href = `registro.html?plan=gratis`;
                 }
             });
         });
