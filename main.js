@@ -44,7 +44,8 @@ function updateUIBasedOnAuthState() {
             }
         } else {
             // --- USUARIO INVITADO ---
-            if (btnPublish) btnPublish.style.display = 'none';
+            // ✅ Mostrar botón de publicar para invitados (redirige a planes)
+            if (btnPublish) btnPublish.style.display = 'inline-block';
             if (btnDashboard) btnDashboard.style.display = 'none';
             if (btnProfile) btnProfile.style.display = 'none';
             if (btnLogout) btnLogout.style.display = 'none';
