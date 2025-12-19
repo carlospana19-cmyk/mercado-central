@@ -522,6 +522,67 @@ WHERE user_id NOT IN (SELECT id FROM profiles);
 - Necesitan estar en esquina inferior derecha sin cortarse
 - Solución: Reposicionar fuera del `.image-container` o ajustar `.image-container` a `position: relative` con `z-index` correcto
 
+### ⚙️ OAuth Google y Facebook (PRÓXIMA SESIÓN)
+
+**Estado**: Login botones implementados | Proveedores deshabilitados en Supabase
+
+**Lo hecho:**
+- ✅ Modal de login con Google + Facebook en `publish-logic.js` (línea ~1785)
+- ✅ Botones con estilos oficiales e iconos
+- ✅ Redirección a login.html para opción email
+- ✅ Implementación de `signInWithOAuth()` para ambos
+
+**Lo que falta:**
+- ❌ Habilitar Google OAuth en Supabase
+- ❌ Habilitar Facebook OAuth en Supabase
+
+**Pasos para habilitar Google OAuth:**
+
+1. **Google Cloud Console** (https://console.cloud.google.com)
+   - Crear nuevo proyecto o usar existente
+   - APIs y servicios → Credenciales
+   - Crear OAuth 2.0 (tipo Aplicación web)
+   - Orígenes autorizados:
+     ```
+     https://tinjpodtyydloleepbmb.supabase.co
+     https://mercado-central.vercel.app
+     ```
+   - URIs de redirección:
+     ```
+     https://tinjpodtyydloleepbmb.supabase.co/auth/v1/callback
+     ```
+   - Copiar **Client ID** y **Client Secret**
+
+2. **Supabase Dashboard** (https://app.supabase.com)
+   - Proyecto → Authentication → Providers
+   - Google → Enable
+   - Pegar Client ID y Client Secret
+   - Guardar
+
+**Pasos para habilitar Facebook OAuth:**
+
+1. **Facebook Developers** (https://developers.facebook.com)
+   - Crear nueva app
+   - Facebook Login → Configurar
+   - Settings → Basic → Copiar **App ID** y **App Secret**
+   - Valid OAuth Redirect URIs:
+     ```
+     https://tinjpodtyydloleepbmb.supabase.co/auth/v1/callback
+     ```
+   - App Domains:
+     ```
+     mercado-central.vercel.app
+     tinjpodtyydloleepbmb.supabase.co
+     ```
+
+2. **Supabase Dashboard**
+   - Proyecto → Authentication → Providers
+   - Facebook → Enable
+   - Pegar App ID y App Secret
+   - Guardar
+
+**Nota**: Una vez habilitados, el modal en `publicar.html` (al dar "Publicar anuncio" sin login) permitirá login con 1 click.
+
 ### Próximas Fases
 1. Detalles de anuncios (página individual)
 2. Sistema de contacto/mensajes
