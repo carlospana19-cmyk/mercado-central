@@ -2671,7 +2671,7 @@ console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
 
 // ✅ PLAN_LIMITS_V2 removida - usar PLAN_LIMITS centralizado
 planCards.forEach(card => {
-    card.addEventListener('click', function() {
+    card.addEventListener('click', async function() {
         const radio = this.querySelector('input[type="radio"]');
         if (!radio) {
             console.error("Error: No se encontró un radio button dentro de la tarjeta clickeada.");
@@ -2689,7 +2689,22 @@ planCards.forEach(card => {
         const selectedPlan = radio.value;
         console.log(`Agente 11: Clic detectado en tarjeta. Plan seleccionado: ${selectedPlan}.`);
 
-        // --- Lógica de navegación ---
+        // ✅ VERIFICAR AUTENTICACIÓN ANTES DE CONTINUAR
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            // Si no está autenticado, guardar plan y redirigir a registro/pago
+            console.log("🔐 Usuario no autenticado. Redirigiendo a login...");
+            sessionStorage.setItem('selectedPlan', selectedPlan);
+            
+            if (selectedPlan === 'gratis') {
+                window.location.href = 'registro.html?plan=gratis';
+            } else {
+                window.location.href = `payment.html?plan=${selectedPlan}`;
+            }
+            return;
+        }
+
+        // --- Lógica de navegación (solo para autenticados) ---
         setTimeout(() => {
             const step3 = document.getElementById('step-3');
             const step4 = document.getElementById('step-4');
@@ -2710,7 +2725,7 @@ planCards.forEach(card => {
         }
 
         const maxFiles = limits.maxFotos;
-        const fileInput = documenttElementById('gallery-images-input');
+        const fileInput = document.getElementById('gallery-images-input');
         if (fileInput) {
             fileInput.setAttribute('data-max-files', maxFiles);
 
