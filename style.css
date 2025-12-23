@@ -1530,18 +1530,23 @@ body {
 
 @media (max-width: 640px) {
   #results-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 1.5rem;
+  }
+  
+  .filters-sidebar {
+    display: none !important;
   }
 }
 
 @media (max-width: 480px) {
   #results-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 1rem;
   }
 }
 
+/* Force cache bust - v2 */
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
 .filters-sidebar h3 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 1rem; }
 .filter-group { margin-bottom: 2rem; }
