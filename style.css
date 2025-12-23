@@ -2881,6 +2881,7 @@ body#pagina-login {
 
     /* Tarjetas de resultado más compactas */
     .results-container-flex {
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 1rem;
     }
 
@@ -2890,7 +2891,12 @@ body#pagina-login {
 }
 
 @media (max-width: 480px) {
-    /* Ultra responsive para screens muy pequeños */
+    /* Ultra responsive - 1 columna en móvil */
+    .results-container-flex {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
     .box .image-container,
     .property-image {
         height: 150px;
