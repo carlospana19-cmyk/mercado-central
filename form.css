@@ -1179,6 +1179,34 @@ input:focus, select:focus, textarea:focus {
 
 /* ===== RESPONSIVE DESIGN PARA MÓVILES ===== */
 @media (max-width: 768px) {
+    main.container.publish-wizard {
+        padding: 15px;
+        margin: 1rem 0;
+        border-radius: 12px;
+    }
+
+    #ad-form {
+        max-width: 100%;
+    }
+
+    .left-column {
+        flex: 0 0 100%;
+        padding: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .right-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .section-block {
+        padding: 15px;
+        margin-bottom: 1rem;
+    }
+
     .progress-steps {
         gap: 1rem;
         flex-wrap: wrap;
@@ -1269,6 +1297,34 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (max-width: 480px) {
+    main.container.publish-wizard {
+        padding: 10px;
+        margin: 0.5rem 0;
+        border-radius: 8px;
+    }
+
+    #ad-form {
+        max-width: 100%;
+    }
+
+    .left-column {
+        flex: 0 0 100%;
+        padding: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .right-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .section-block {
+        padding: 12px;
+        margin-bottom: 1rem;
+    }
+
     .progress-steps {
         gap: 0.5rem;
     }

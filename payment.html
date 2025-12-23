@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Procesamiento de Pago - MercadoCentral</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="publish.css">
     <style>
@@ -240,12 +241,28 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="index.html" class="navbar-logo">
-                🛍️ MercadoCentral
+    <!-- NAVBAR MODERNO -->
+    <nav class="navbar-moderno">
+        <div class="logo-container">
+            <a href="index.html" class="logo-link">
+                <img src="gemini-3-pro-image-preview (nano-banana-pro)_b_quiero_crear_un_logo.png" alt="Mercado Central" class="logo-img">
+                <span class="logo-text">Mercado Central</span>
             </a>
+        </div>
+        
+        <div class="buttons-nav">
+            <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
+                <i class="fas fa-user"></i>
+            </button>
+            <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
+                <i class="fas fa-plus"></i> Publicar anuncio
+            </button>
+            <button id="btn-logout" class="nav-btn-user" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+            <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
+                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+            </button>
         </div>
     </nav>
 

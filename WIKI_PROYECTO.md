@@ -1,5 +1,40 @@
 # WIKI - Mercado Central
 
+## 🔄 PUNTO DE RESTAURACIÓN (23 Diciembre 2025)
+
+**Última tarea**: Arreglar tarjetas recortadas en móvil - resultados.html
+**Problema**: En celular, las tarjetas de búsqueda salen recortadas (ancho muy grande)
+**Solución**: Agregar media queries a `results.css` para móvil
+**Lo que falta hacer**:
+1. Agregar media queries en results.css para pantallas < 480px
+2. Reducir `.mini-hero` max-width en móvil
+3. Ajustar padding y márgenes en tarjetas
+4. Hacer commit y push
+
+### Lo que YA existe y funciona:
+- ✅ `detalle-producto.html` - HTML completo con estructura
+- ✅ `product-detail-logic.js` - Lógica JavaScript completa
+- ✅ Botones Login Google/Facebook (estilos profesionales, falta OAuth setup en Supabase)
+- ✅ Flujo completo para publicar sin login
+- ✅ `home-logic.js` línea 270-285 - Enlaces a detalle-producto
+- ✅ `results-logic.js` - Enlaces a detalle-producto
+- ✅ Galería de fotos con Swiper
+- ✅ Video reproduciéndose
+- ✅ Info del vendedor (avatar, nombre)
+
+### Qué hay que hacer NEXT:
+1. **Verificar en Vercel** que los enlaces clickeables funcionan
+2. **Verificar que cargan fotos** correctamente desde Supabase
+3. **Verificar que muestra vendedor** correctamente
+4. **Testing completo** del flujo: tarjeta → clic → detalle
+
+### Si me congelo:
+- Continúa desde aquí
+- Abre `product-detail-logic.js` y revisa líneas 1-50
+- Verifica en consola de browser si hay errores
+
+---
+
 ## Resumen Ejecutivo
 Plataforma de marketplace (compra/venta) con autenticación Supabase, gestión de anuncios, perfiles de usuario y búsqueda avanzada.
 

@@ -16,7 +16,7 @@
     flex-direction: column;
     width: 100%;
     max-width: none;
-    height: auto;
+    height: 100%;
     transition: all 0.4s;
     position: relative;
 }
@@ -37,7 +37,7 @@
 
 .property-image {
     width: 100%;
-    height: 240px;
+    height: 220px;
     position: relative;
     overflow: hidden;
     background: #f0f0f0;
@@ -159,18 +159,19 @@
 }
 
 .btn-contact-card {
-    background-color: var(--color-primario); /* Color turquesa original de la página */
+    background-color: var(--color-primario);
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 8px 20px; /* Más pequeño */
-    font-size: 14px; /* Ligeramente más pequeño */
-    font-weight: 500;
+    padding: 1rem 1.2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-decoration: none;
-    margin-top: auto; /* Empuja el botón al fondo */
-    align-self: flex-start; /* Alinea el botón a la izquierda si hay espacio */
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
 }
 
 .btn-contact-card:hover {
@@ -406,7 +407,8 @@ body {
 }
 
 .logo-img {
-  height: 4rem;
+  height: 5.5rem;
+  width: auto;
   margin-right: 1rem;
   border-radius: 6px;
 }
@@ -469,7 +471,7 @@ body {
   }
 
   .logo-img {
-    height: 3rem;
+    height: 4.2rem;
     margin-right: 0.8rem;
   }
 
@@ -512,7 +514,7 @@ body {
   }
 
   .logo-img {
-    height: 2rem;
+    height: 3.5rem;
     margin-right: 0.3rem;
     border-radius: 4px;
   }
@@ -574,7 +576,7 @@ body {
   }
 
   .logo-img {
-    height: 1.8rem;
+    height: 2.8rem;
     margin-right: 0.2rem;
   }
 
@@ -900,9 +902,10 @@ body {
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  /* display: flex; */ /* Comentado para evitar conflicto con nuevos estilos */
-  /* flex-direction: column; */ /* Comentado para evitar conflicto con nuevos estilos */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -944,14 +947,19 @@ body {
 
 /* Contenedor de la imagen (para ambas tarjetas) */
 .box .image-container,
+.box > img,
+.tarjeta-auto .image-container,
 .tarjeta-auto > img {
   width: 100%;
-    height: 220px; /* Altura fija para la imagen */
-    object-fit: cover; /* ¡LA PROPIEDAD CLAVE PARA EVITAR ESTIRAMIENTO! */
-    display: block;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
 }
+
 /* Si la imagen está dentro de un div, aplicamos la regla al <img> */
-.box .image-container img {
+.box .image-container img,
+.tarjeta-auto .image-container img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -961,9 +969,9 @@ body {
 /* --- Estilos para la tarjeta SIMPLE (.box) --- */
 .box .content {
     padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 .box .price {
     font-size: 2rem;
@@ -972,8 +980,8 @@ body {
 }
 .box h3 {
     font-size: 1.6rem;
-  margin-bottom: 1rem;
-    flex-grow: 1; /* Empuja el botón hacia abajo */
+    margin-bottom: 1rem;
+    flex-grow: 1;
 }
 .box .location {
     font-size: 1.3rem;
@@ -1204,18 +1212,26 @@ body {
 .box .btn-contact {
   display: block;
   text-align: center;
-    padding: 1.2rem;
-    background-color: var(--color-primario);
-    color: white;
+  padding: 1.2rem;
+  background-color: var(--color-primario);
+  color: white;
   text-decoration: none;
-    border-radius: 5px;
+  border-radius: 5px;
   font-weight: 600;
+  margin-top: auto;
+  cursor: pointer;
+  border: none;
 }
 
 /* --- Estilos para la tarjeta PREMIUM (.tarjeta-auto) --- */
 /* (Copia aquí los estilos para .tarjeta-auto que te di en el mensaje anterior,
    asegurándote de que no entren en conflicto con los de arriba) */
-.contenido-auto { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+.contenido-auto { 
+  padding: 20px; 
+  display: flex; 
+  flex-direction: column; 
+  flex-grow: 1;
+}
 .cabecera-auto { margin-bottom: 15px; }
 .cabecera-auto h2 { font-size: 1.8rem; font-weight: 600; margin: 0 0 5px 0; }
 .cabecera-auto .precio { font-size: 2.2rem; font-weight: bold; color: var(--color-secundario); margin: 0; }
@@ -1224,8 +1240,25 @@ body {
 .detalle-item i { font-size: 1.6rem; color: var(--color-gris); }
 .ubicacion { font-size: 1.3rem; color: #666; margin-top: auto; padding-top: 1rem; border-top: 1px solid #f0f0f0; display: flex; align-items: center; }
 .ubicacion i { margin-right: 5px; }
-.btn-ver-detalles { display: block; width: 100%; padding: 1.2rem; background: var(--color-primario); color: var(--color-blanco); text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.5rem; margin-top: 1rem; transition: background-color 0.2s ease; }
-.btn-ver-detalles:hover { background-color: var(--color-secundario); }
+.btn-ver-detalles { 
+  display: block; 
+  width: 100%; 
+  padding: 1.2rem; 
+  background: var(--color-primario); 
+  color: var(--color-blanco); 
+  text-align: center; 
+  border-radius: 8px; 
+  text-decoration: none; 
+  font-weight: 600; 
+  font-size: 1.5rem; 
+  margin-top: auto;
+  transition: background-color 0.2s ease; 
+  border: none;
+}
+
+.btn-ver-detalles:hover { 
+  background-color: var(--color-secundario); 
+}
 
 /* --- ESTILOS PARA DETALLES DE ELECTRÓNICA EN TARJETAS --- */
 .electronics-details-card {
@@ -1468,17 +1501,20 @@ body {
   top: 100px; /* Separado del navbar */
 }
 
-/* El contenedor del contenido ya no necesita flex: 1, el grid lo maneja */
 .results-content {
-  /* Ya no necesita width: 100% ni min-width: 0 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
-/* #results-container {
+#results-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
   width: 100%;
-} */
+  flex: 1;
+}
 
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
 .filters-sidebar h3 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 1rem; }
@@ -1588,44 +1624,45 @@ body {
 /* === RESPONSIVE PARA RESULTADOS === */
 @media (max-width: 1400px) {
   .results-inner-wrapper {
-    grid-template-columns: max-content 1fr; /* Keep sidebar content-based */
-    gap: 1.5rem; /* Further reduced gap */
-    padding: 2rem 1.5%; /* Adjusted padding */
+    grid-template-columns: max-content 1fr;
+    gap: 1.5rem;
+    padding: 2rem 1.5%;
   }
   
   #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Allow more cards in wider screens */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
   }
 }
 
 @media (max-width: 900px) {
   .results-inner-wrapper {
-    grid-template-columns: 1fr; /* Stack sidebar and content */
+    grid-template-columns: 1fr;
     gap: 1.5rem;
-    padding: 2rem 3%; /* Adjusted padding for smaller screens */
+    padding: 2rem 3%;
   }
   
   .filters-sidebar {
-    position: static; /* Remove sticky behavior when stacked */
+    position: static;
     width: 100%;
     max-width: 100%;
+    display: none;
   }
   
   #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjust card size for stacked layout */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
   }
 }
 
 @media (max-width: 640px) {
   .results-inner-wrapper {
-    padding: 1rem 2%; /* Even smaller padding on very small screens */
+    padding: 1rem 2%;
   }
   
   #results-container {
-    grid-template-columns: 1fr; /* Single column for cards */
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
   
   .box, .tarjeta-auto {
@@ -2719,6 +2756,23 @@ body#pagina-login {
         overflow: hidden;
     }
 
+    .results-inner-wrapper {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+    
+    .filters-sidebar {
+        display: none;
+    }
+
+    #results-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
     .box .image-container,
     .property-image {
         height: 180px;
@@ -2840,6 +2894,27 @@ body#pagina-login {
     .box .image-container,
     .property-image {
         height: 150px;
+    }
+
+    .results-page-container {
+        padding: 1rem 0;
+    }
+    
+    .results-inner-wrapper {
+        grid-template-columns: 1fr;
+        gap: 0;
+        padding: 0;
+    }
+    
+    .filters-sidebar {
+        display: none;
+    }
+
+    #results-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        width: 100%;
+        padding: 0 0.8rem;
     }
 
     .box h3, .property-title {
