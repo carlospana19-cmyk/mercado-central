@@ -335,7 +335,7 @@ function displayFilteredProducts(ads) {
     }
 
     summary.innerHTML = `<p><strong>Encontrados ${ads.length} anuncios</strong></p>`;
-    container.className = 'results-container-flex';
+    // NO cambiar la clase, mantener el ID #results-container para que los media queries funcionen
 
     // Función para convertir URL de YouTube/Vimeo a embed
     const getVideoEmbedUrl = (videoUrl) => {

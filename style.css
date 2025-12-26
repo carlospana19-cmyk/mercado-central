@@ -2849,52 +2849,9 @@ body#pagina-login {
     main.container {
         padding: 1rem;
     }
-
-    /* Tarjetas de resultado más compactas */
-    .results-container-flex {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1rem;
-    }
-
-    .property-card {
-        margin-bottom: 1rem;
-    }
-}
-
-@media (max-width: 640px) {
-  .results-inner-wrapper {
-    grid-template-columns: 1fr;
-    padding: 1rem 0;
-  }
-  
-  .filters-sidebar {
-    display: none;
-  }
-
-  #results-container {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    width: 100%;
-    padding: 0 1rem;
-    margin: 0 auto;
-  }
-  
-  .property-image {
-    height: 180px;
-  }
-  
-  .property-details {
-    padding: 1.2rem;
-  }
 }
 
 @media (max-width: 480px) {
-    /* Ultra responsive - 1 columna en móvil */
-    .results-container-flex {
-        grid-template-columns: 1fr !important;
-        gap: 1rem;
-    }
-
     .box .image-container,
     .property-image {
         height: 150px;
@@ -2912,13 +2869,6 @@ body#pagina-login {
     
     .filters-sidebar {
         display: none;
-    }
-
-    #results-container {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        width: 100%;
-        padding: 0 0.8rem;
     }
 
     .box h3, .property-title {
