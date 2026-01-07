@@ -20,12 +20,26 @@ export function initializeHomePage() {
         }
 
         try {
-            let { data: ads, error } = await supabase
+            // ✅ CARGAR ANUNCIOS TOP Y DESTACADO PRIMERO (para fila de 2 columnas)
+            let { data: premiumAds, error: premiumError } = await supabase
                 .from('anuncios')
                 .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)')
-                .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
+                .in('featured_plan', ['top', 'destacado'])
                 .order('fecha_publicacion', { ascending: false })
-                .limit(15);
+                .limit(10);
+
+            if (premiumError) throw premiumError;
+
+            // ✅ CARGAR RESTO DE ANUNCIOS (premium, basico) para otras filas
+            let { data: regularAds, error } = await supabase
+                .from('anuncios')
+                .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)')
+                .in('featured_plan', ['premium', 'basico'])
+                .order('fecha_publicacion', { ascending: false })
+                .limit(10);
+
+            // Combinar: primero TOP/Destacado, luego el resto
+            let ads = [...(premiumAds || []), ...(regularAds || [])];
 
             // ✅ Si la columna is_sold no existe, intentar sin el filtro
             if (error && error.code === '42703') {
@@ -175,13 +189,14 @@ if (ad.featured_plan === "top") {
                          ${urgentBadge}
                          ${soldBadgeHome}
                          <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
-                            <div class="swiper product-swiper">
+                            <div class="swiper product-swiper" id="swiper-${ad.id}">
                                 <div class="swiper-wrapper">
                                     ${videoEmbedUrl ? `<div class="swiper-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
                                     ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
                                 </div>
                                 <div class="swiper-button-prev"></div>
                                 <div class="swiper-button-next"></div>
+                                <div class="swiper-pagination"></div>
                             </div>
                         </div>
                         <div class="content ${ad.is_sold ? 'content-sold' : ''}">
@@ -244,11 +259,21 @@ if (ad.featured_plan === "top") {
                         nextEl: swiperEl.querySelector('.swiper-button-next'),
                         prevEl: swiperEl.querySelector('.swiper-button-prev'),
                     },
+                    pagination: {
+                        el: swiperEl.querySelector('.swiper-pagination'),
+                        clickable: true,
+                        dynamicBullets: true,
+                    },
                     slidesPerView: 1,
                     spaceBetween: 0,
-                    speed: 300,
+                    speed: 400,
                     preloadImages: true,
                     updateOnImagesReady: true,
+                    touchRatio: 1,
+                    touchAngle: 45,
+                    grabCursor: true,
+                    simulateTouch: true,
+                    resistanceRatio: 0.85,
                 });
                 window.activeSwipers.push(swiper);
                 
