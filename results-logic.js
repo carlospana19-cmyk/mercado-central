@@ -305,6 +305,7 @@ async function loadAndFilterResults() {
 
     // FUNCIÓN DE MEZCLA ALEATORIA (Fisher-Yates shuffle)
     const shuffle = (array) => {
+        if (!array || array.length === 0) return [];
         const arr = [...array];
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -323,7 +324,7 @@ async function loadAndFilterResults() {
     const gratisSorted = gratisAds.sort((a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion));
 
     // COMBINAR TODO EN ORDEN DE PRIORIDAD
-    products = [
+    const sortedProducts = [
         ...topShuffled,
         ...destacadoShuffled,
         ...premiumSorted,
@@ -331,7 +332,7 @@ async function loadAndFilterResults() {
         ...gratisSorted
     ];
 
-    displayFilteredProducts(products || []);
+    displayFilteredProducts(sortedProducts || []);
     updateSummary(query, mainCategory, count || 0);
     displayPaginationControls(count || 0); // Mostrar controles de paginación
 }
