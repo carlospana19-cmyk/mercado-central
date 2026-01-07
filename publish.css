@@ -790,15 +790,17 @@ textarea::placeholder {
 /* Responsive para primary-section */
 @media (max-width: 768px) {
     .primary-section .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 15px;
     }
 
     .flex-2 {
-        grid-column: span 1;
+        grid-column: span 1 !important;
     }
 
     .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 15px;
     }
 
     .price-input-wrapper {
@@ -857,6 +859,30 @@ textarea::placeholder {
 
 /* ===== RESPONSIVE PARA MÓVILES ===== */
 @media (max-width: 768px) {
+    /* FORZAR LAYOUT DE UNA COLUMNA EN PASO 4 */
+    .details-layout {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        width: 100% !important;
+    }
+
+    .left-column,
+    .right-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: none !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .section-block {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
     .pricing-table-container {
         grid-template-columns: 1fr;
         gap: 15px;
@@ -933,7 +959,7 @@ textarea::placeholder {
     }
 
     .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 1rem;
     }
 
@@ -1005,7 +1031,7 @@ textarea::placeholder {
     }
 
     .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 0.8rem;
     }
 }

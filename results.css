@@ -1,44 +1,101 @@
-.card {
-  position: relative;
+/* =============================================== */
+/* === ESTILOS PARA LA PÁGINA DE RESULTADOS === */
+/* =============================================== */
+
+/* Contenedor principal de los resultados */
+#results-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas en escritorio */
+  gap: 2rem;
+  padding: 2rem;
 }
 
-.mini-hero {
-  width: 100%;
-  max-width: 420px;
-  height: 240px;
+/* Estilos de la tarjeta de producto horizontal (.product-card-h) */
+.product-card-h {
+  display: flex;
+  background: #fff;
   border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
   overflow: hidden;
-  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.mini-hero img {
+
+.product-card-h:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.product-card-h .image-container {
+  width: 200px; /* Ancho fijo para la imagen */
+  flex-shrink: 0;
+}
+
+.product-card-h .image-container img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.swiper-button-next,
-.swiper-button-prev {
-  color: white;
-  --swiper-navigation-size: 22px;
-  text-shadow: 0 0 5px rgba(0,0,0,0.7);
-  display: block;
+
+.product-card-h .card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
 }
 
-/* ✅ RESPONSIVE PARA MÓVILES */
+.product-card-h .card-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.product-card-h .card-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  margin-bottom: 1rem;
+}
+
+.product-card-h .card-location,
+.product-card-h .card-seller {
+  font-size: 1.4rem;
+  color: #777;
+  margin-bottom: 0.5rem;
+}
+
+.product-card-h .btn-contact {
+  align-self: flex-start;
+  margin-top: 1rem;
+  padding: 1rem 2rem;
+}
+
+
+/* =============================================== */
+/* === ESTILOS RESPONSIVE PARA MÓVIL === */
+/* =============================================== */
+
+@media (max-width: 992px) {
+  /* 2 columnas en tablets */
+  #results-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .mini-hero {
-    max-width: 100%;
-    height: 250px;
+  /* 1 columna en móviles */
+  #results-container {
+    grid-template-columns: 1fr;
+    padding: 1rem;
   }
-}
 
-@media (max-width: 480px) {
-  .mini-hero {
-    max-width: 100%;
-    height: 280px;
+  /* Convertimos la tarjeta a formato vertical en móvil */
+  .product-card-h {
+    flex-direction: column;
   }
-  
-  .swiper-button-next,
-  .swiper-button-prev {
-    --swiper-navigation-size: 18px;
+
+  .product-card-h .image-container {
+    width: 100%;
+    height: 220px; /* Altura fija para la imagen en móvil */
   }
 }

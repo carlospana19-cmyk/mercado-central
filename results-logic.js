@@ -282,19 +282,54 @@ async function loadAndFilterResults() {
         return;
     }
 
-    // ORDENAMIENTO POR PRIORIDAD DE PLAN
-    products.sort((a, b) => {
-        // Primero por prioridad de plan
-        const priorityA = a.plan_priority || 0;
-        const priorityB = b.plan_priority || 0;
-        
-        if (priorityA !== priorityB) {
-            return priorityB - priorityA; // Mayor prioridad primero
+    // VALIDAR EXPIRACIÓN DE PLANES Y ORDENAR
+    const ahora = new Date();
+    products.forEach(ad => {
+        // Verificar si el plan expiró (más de 30 días)
+        if (ad.featured_until) {
+            const fechaExpiracion = new Date(ad.featured_until);
+            if (ahora > fechaExpiracion) {
+                // Plan expirado - tratarlo como gratis
+                ad.plan_priority = 0;
+                ad.featured_plan = 'free';
+            }
         }
-        
-        // Si mismo plan, por fecha
-        return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
     });
+
+    // SEPARAR ANUNCIOS POR PLAN
+    const topAds = products.filter(ad => ad.featured_plan === 'top');
+    const destacadoAds = products.filter(ad => ad.featured_plan === 'destacado');
+    const premiumAds = products.filter(ad => ad.featured_plan === 'premium');
+    const basicoAds = products.filter(ad => ad.featured_plan === 'basico');
+    const gratisAds = products.filter(ad => !ad.featured_plan || ad.featured_plan === 'free');
+
+    // FUNCIÓN DE MEZCLA ALEATORIA (Fisher-Yates shuffle)
+    const shuffle = (array) => {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    };
+
+    // ROTACIÓN ALEATORIA para TOP y Destacado (cada carga de página)
+    const topShuffled = shuffle(topAds);
+    const destacadoShuffled = shuffle(destacadoAds);
+
+    // ORDENAR POR FECHA para Premium, Básico y Gratis
+    const premiumSorted = premiumAds.sort((a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion));
+    const basicoSorted = basicoAds.sort((a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion));
+    const gratisSorted = gratisAds.sort((a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion));
+
+    // COMBINAR TODO EN ORDEN DE PRIORIDAD
+    products = [
+        ...topShuffled,
+        ...destacadoShuffled,
+        ...premiumSorted,
+        ...basicoSorted,
+        ...gratisSorted
+    ];
 
     displayFilteredProducts(products || []);
     updateSummary(query, mainCategory, count || 0);
@@ -319,6 +354,115 @@ function displaySubcategoryFilters(subcategoriesWithCounts) {
     `).join('');
 }
 
+// Función para renderizar una tarjeta individual
+function renderAdCard(ad, getVideoEmbedUrl) {
+    const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
+    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+    const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
+    const categoria = ad.categoria ? ad.categoria.toLowerCase() : '';
+    
+    // SISTEMA DE DESTACADOS: Badges con estrellas
+    let badgeHTML = '';
+    let cardExtraClass = '';
+
+    const badgeSVG = (colorClass) => `
+<svg class="simple-badge-svg ${colorClass}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 2 L63.5 18.5 L84.5 15.5 L87.5 36.5 L100 50 L87.5 63.5 L84.5 84.5 L63.5 81.5 L50 98 L36.5 81.5 L15.5 84.5 L12.5 63.5 L0 50 L12.5 36.5 L15.5 15.5 L36.5 18.5 Z" class="badge-star-bg"/>
+    <circle cx="50" cy="50" r="32" fill="white" stroke="white" stroke-width="1"/>
+    <polygon points="50,28 57,45 75,45 61,56 66,73 50,60 32,70 38,53 25,43 42,43" class="badge-center-star" fill="none" stroke-width="2.5" stroke="currentColor"/>
+</svg>`;
+
+    if (ad.featured_plan === "top") {
+        badgeHTML = badgeSVG("diamond-badge");
+        cardExtraClass = "card-top";
+    } else if (ad.featured_plan === "destacado") {
+        badgeHTML = badgeSVG("gold-badge");
+        cardExtraClass = "card-destacado";
+    } else if (ad.featured_plan === "premium") {
+        badgeHTML = badgeSVG("silver-badge");
+        cardExtraClass = "card-premium";
+    } else if (ad.featured_plan === "basico") {
+        badgeHTML = badgeSVG("bronze-badge");
+        cardExtraClass = "card-basico";
+    }
+    
+    // Badge de urgente con ícono de reloj
+    let urgentBadge = '';
+    if (ad.enhancements && ad.enhancements.is_urgent) {
+        urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
+    }
+
+    // Atributos (detalles de vehículos, inmuebles, etc.)
+    let vehicleDetailsHTML = '';
+    let realEstateDetailsHTML = '';
+    let electronicsDetailsHTML = '';
+    let homeFurnitureDetailsHTML = '';
+    let fashionDetailsHTML = '';
+    let sportsDetailsHTML = '';
+    let petsDetailsHTML = '';
+    let servicesDetailsHTML = '';
+    let businessDetailsHTML = '';
+    let communityDetailsHTML = '';
+
+    // Avatar y nombre del vendedor
+    const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
+    const vendorPhoto = vendorProfile?.url_foto_perfil;
+    const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
+    const vendorAvatar = vendorPhoto ? `<div class="vendor-avatar" title="${vendorName}">
+        <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
+        <span class="vendor-name-tooltip">${vendorName}</span>
+    </div>` : '';
+
+    // Badge de vendido
+    const soldClass = ad.is_sold ? 'card-sold' : '';
+    const soldBadgeResults = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
+
+    return `
+    <div class="property-card card ${cardExtraClass} ${soldClass}" style="${ad.is_sold ? 'cursor: default;' : 'cursor: pointer;'}">
+        ${badgeHTML}
+        ${urgentBadge}
+        ${soldBadgeResults}
+        <div class="property-image">
+            ${['premium','destacado','top'].includes(ad.featured_plan)
+              ? `<div class="tarjeta-auto">
+              <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
+                <div class="swiper-wrapper">
+                  ${videoEmbedUrl ? `<div class="swiper-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
+                  ${Array.isArray(ad.url_galeria) && ad.url_galeria.length
+                    ? ad.url_galeria.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('')
+                    : `<div class="swiper-slide"><img src="${ad.url_portada}" alt="${ad.titulo}" loading="lazy"></div>`}
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+              </div></div>`
+              : `<img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image" loading="lazy">`}
+        </div>
+        <div class="property-details">
+            <div class="property-header">
+                <div class="property-seller-name">${ad.contact_name || 'Usuario Verificado'}</div>
+                <div class="property-price-and-tag">
+                    <span class="property-price">${priceFormatted}</span>
+                    ${ad.enhancements && ad.enhancements.is_urgent ? '<span class="tag-oportunidad">Oportunidad</span>' : ''}
+                </div>
+                <div class="property-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${ad.provincia || 'Panamá'}, ${ad.distrito || ad.ubicacion || 'N/A'}
+                </div>
+                <h2 class="property-title">${ad.titulo}</h2>
+                <div class="description-with-avatar">
+                    <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
+                    ${vendorAvatar}
+                </div>
+            </div>
+            <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
+                Contactar ahora
+            </button>
+        </div>
+    </div>
+`;
+}
+
 function displayFilteredProducts(ads) {
     const container = document.getElementById('results-container');
     const summary = document.getElementById('results-summary');
@@ -335,7 +479,6 @@ function displayFilteredProducts(ads) {
     }
 
     summary.innerHTML = `<p><strong>Encontrados ${ads.length} anuncios</strong></p>`;
-    // NO cambiar la clase, mantener el ID #results-container para que los media queries funcionen
 
     // Función para convertir URL de YouTube/Vimeo a embed
     const getVideoEmbedUrl = (videoUrl) => {
@@ -794,6 +937,8 @@ return `
 `;
     }).join('');
 
+    // RENDERIZAR TODAS LAS TARJETAS
+    const adsHTML = ads.map(ad => renderAdCard(ad, getVideoEmbedUrl)).join('');
     container.innerHTML = adsHTML;
 
     // ✅ FIJAR: Destruir Swipers previos y guardar referencias
