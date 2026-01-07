@@ -740,7 +740,7 @@ return `
               <div class="tarjeta-auto">
               <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
                 <div class="swiper-wrapper">
-                  ${videoEmbedUrl ? `<div class="swiper-slide swiper-slide-video"><div class="iframe-overlay"></div><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
+                  ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe><div class="swiper-edge-left"></div><div class="swiper-edge-right"></div></div>` : ''}
                   ${Array.isArray(ad.url_galeria) && ad.url_galeria.length
                     ? ad.url_galeria.map(img =>
                         `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`

@@ -708,25 +708,40 @@ main, section.hero-search, section.categories-showcase, section.products {
     position: relative;
 }
 
-.iframe-overlay {
+/* Áreas táctiles en los bordes para deslizar sobre videos */
+.video-slide {
+    position: relative;
+}
+
+.swiper-edge-left,
+.swiper-edge-right {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
+    width: 25%;
     height: 100%;
     z-index: 10;
     background: transparent;
     cursor: grab;
 }
 
-.iframe-overlay:active {
+.swiper-edge-left {
+    left: 0;
+}
+
+.swiper-edge-right {
+    right: 0;
+}
+
+.swiper-edge-left:active,
+.swiper-edge-right:active {
     cursor: grabbing;
 }
 
-/* En desktop, ocultar overlay al hacer hover para permitir interacción con video */
+/* En desktop, reducir el ancho de las áreas táctiles */
 @media (min-width: 769px) {
-    .swiper-slide-video:hover .iframe-overlay {
-        display: none;
+    .swiper-edge-left,
+    .swiper-edge-right {
+        width: 15%;
     }
 }
 
