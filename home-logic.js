@@ -235,8 +235,6 @@ if (ad.featured_plan === "top") {
                 
                 adsHTML += `
                         </div>
-                        <div class="swiper-button-next featured-next"></div>
-                        <div class="swiper-button-prev featured-prev"></div>
                         <div class="swiper-pagination featured-pagination"></div>
                     </div>
                 </div>`;
@@ -521,10 +519,6 @@ function initializeFeaturedCarousel() {
         slidesPerView: 1,
         spaceBetween: 20,
         loop: false,
-        navigation: {
-            nextEl: '.featured-next',
-            prevEl: '.featured-prev',
-        },
         pagination: {
             el: '.featured-pagination',
             clickable: true,
