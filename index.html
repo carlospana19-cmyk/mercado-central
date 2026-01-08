@@ -17,6 +17,65 @@
     <!-- Carga de Estilos Modulares (IMPORTANTE) -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="home.css">
+    
+    <style>
+        /* Ocultar puntos de paginación del carrusel TOP */
+        .featured-pagination {
+            display: none !important;
+        }
+        
+        /* Estilos para las flechas del carrusel de paginación TOP */
+        .featured-carousel-wrapper {
+            padding: 0 80px !important;
+            position: relative !important;
+            margin-bottom: 4rem !important; /* Más espacio abajo */
+        }
+        
+        .featured-next,
+        .featured-prev {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: rgba(0, 191, 174, 0.2) !important;
+            width: 55px !important;
+            height: 55px !important;
+            border-radius: 14px !important;
+            box-shadow: 0 4px 20px rgba(0, 191, 174, 0.3) !important;
+            border: 2px solid rgba(0, 191, 174, 0.4) !important;
+            position: absolute !important;
+            top: 50% !important;
+            margin-top: -27.5px !important;
+            z-index: 10 !important;
+            cursor: pointer !important;
+        }
+        
+        .featured-prev {
+            left: -70px !important;
+        }
+        
+        .featured-next {
+            right: -70px !important;
+        }
+        
+        .featured-next::after,
+        .featured-prev::after {
+            color: #00bfae !important;
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        
+        .featured-next:hover,
+        .featured-prev:hover {
+            background: #00bfae !important;
+            box-shadow: 0 8px 30px rgba(0, 191, 174, 0.6) !important;
+            transform: scale(1.1) !important;
+        }
+        
+        .featured-next:hover::after,
+        .featured-prev:hover::after {
+            color: #ffffff !important;
+        }
+    </style>
 </head>
 <body id="index-page">
     <!-- NAVBAR -->

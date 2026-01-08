@@ -496,16 +496,22 @@ main, section.hero-search, section.categories-showcase, section.products {
     display: -webkit-box;
     -webkit-line-clamp: 2; /* Limitar a 2 líneas */
     -webkit-box-orient: vertical;
-    margin-bottom: 15px; /* Add some margin below the description */
+  margin-bottom: 0; /* Sin margen para no desalinear el avatar */
     flex-grow: 1; /* Allow description to grow and fill space */
     flex-shrink: 1; /* Allow description to shrink if needed */
 }
 
 .box .content .description-with-avatar {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 15px;
+  display: flex;
+  align-items: flex-start; /* Alinea avatar arriba para todas las tarjetas */
+  gap: 1rem;
+  margin-bottom: 15px;
+  min-height: 60px; /* Misma altura base */
+}
+
+.box .content .description-with-avatar .vendor-avatar {
+  margin-top: 0;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 /* 6. Estilos del Botón de Contacto: Ancho completo y color Turquesa */
