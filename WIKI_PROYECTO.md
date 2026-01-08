@@ -1,6 +1,232 @@
 # WIKI - Mercado Central
 
-## 🔄 PUNTO DE RESTAURACIÓN (23 Diciembre 2025)
+## 🔄 PUNTO DE RESTAURACIÓN (7 Enero 2026 - Actualización 2)
+
+**Última sesión**: Sistema de Cortesías para Planes TOP Gratis
+**Archivos creados/modificados**: 
+- `SETUP_ADMIN_CORTESIAS.sql` - Tablas y funciones en Supabase
+- `admin.html` - Panel de administrador
+- `admin-logic.js` - Lógica del panel admin
+- `auth-logic.js` - Validación de códigos en registro
+- `registro.html` - Campo para código de invitación
+- `GUIA_CORTESIAS.md` - Documentación completa
+
+### ✅ SISTEMA DE CORTESÍAS IMPLEMENTADO
+
+**Objetivo**: Control total para dar planes TOP gratis por tiempo limitado a vendedores seleccionados (ej: vendedores de vehículos).
+
+#### Funcionalidades Principales:
+
+1. **Generación de Códigos de Invitación**
+   - Ubicación: `admin.html` (Tab "Generar Códigos")
+   - Códigos únicos formato: TOP-ABC-1234
+   - Configuración: Plan, duración (días), categoría específica, expiración
+   - Ejemplo: TOP-VEH-2026 para vendedores de vehículos
+
+2. **Asignación Manual de Planes**
+   - Ubicación: `admin.html` (Tab "Asignar Manual")
+   - Dar plan gratis directamente a usuario registrado por email
+   - No requiere código, asignación inmediata
+
+3. **Validación Automática en Registro**
+   - Archivo: `registro.html` + `auth-logic.js`
+   - Campo opcional "Código de invitación"
+   - Valida código al registrarse
+   - Aplica plan gratis automáticamente si es válido
+
+4. **Monitoreo y Control**
+   - Tab "Tokens Activos": Ver todos los códigos (Disponible/Usado/Expirado)
+   - Tab "Cortesías Aplicadas": Historial de planes gratis asignados
+   - Estadísticas en tiempo real: Total códigos, Disponibles, Usados, Cortesías activas
+
+5. **Base de Datos (Supabase)**
+   - Tabla `plan_tokens`: Códigos de invitación
+   - Tabla `cortesias_aplicadas`: Historial de cortesías
+   - Función `validar_y_aplicar_token()`: Valida y aplica código
+   - RLS habilitado para seguridad
+
+#### Flujo Completo:
+
+```
+ADMIN → Genera código (TOP-VEH-2026)
+     ↓
+Comparte código con vendedor (WhatsApp/Email)
+     ↓
+VENDEDOR → Se registra en /registro.html
+         → Ingresa código TOP-VEH-2026
+         → Sistema valida y aplica plan TOP x 30 días
+     ↓
+VENDEDOR → Publica anuncios con plan TOP gratis
+         → 20 fotos, video, carrusel, redes sociales
+     ↓
+Después de 30 días → Plan expira, puede renovar pagando
+```
+
+#### Archivos SQL Creados:
+
+**SETUP_ADMIN_CORTESIAS.sql** (160 líneas):
+- Tabla `plan_tokens` (códigos)
+- Tabla `cortesias_aplicadas` (historial)
+- Función `validar_y_aplicar_token()`
+- Función `generar_codigo_token()`
+- Vistas para admins
+- RLS y políticas de seguridad
+- 3 códigos de ejemplo
+
+#### Panel de Administrador:
+
+**admin.html** (430 líneas):
+- 4 tabs: Generar Códigos, Tokens Activos, Cortesías Aplicadas, Asignar Manual
+- Estadísticas en tiempo real
+- Tablas interactivas con búsqueda
+- Acciones: Generar, Asignar, Desactivar, Cancelar
+
+**admin-logic.js** (600 líneas):
+- Generación de códigos únicos
+- Asignación manual de planes
+- Carga de tokens y cortesías
+- Desactivación de códigos/cortesías
+- Asignación rápida desde lista de usuarios
+
+### ⏳ Pendiente:
+
+1. **Ejecutar SQL en Supabase**
+   - Copiar contenido de SETUP_ADMIN_CORTESIAS.sql
+   - Pegar en SQL Editor de Supabase
+   - Ejecutar y verificar tablas creadas
+
+2. **Testing completo**
+   - Generar código en admin.html
+   - Registrar usuario con código
+   - Verificar plan aplicado
+   - Verificar expiración después de 30 días
+
+3. **Agregar campo is_admin en profiles**
+   - Para restringir acceso a /admin.html solo a admins
+   - Actualizar admin-logic.js con validación
+
+4. **Commit y deploy**
+   - Git add, commit, push
+   - Verificar Vercel deploy
+
+### Código Clave Implementado:
+
+```javascript
+// auth-logic.js - Validación de código en registro
+if (codigoInvitacion) {
+    const { data: resultado } = await supabase
+        .rpc('validar_y_aplicar_token', {
+            p_codigo: codigoInvitacion,
+            p_user_id: authData.user.id,
+            p_anuncio_id: null
+        });
+    
+    if (resultado?.success) {
+        alert(`✅ Plan ${resultado.plan} gratis por ${resultado.dias} días`);
+    }
+}
+```
+
+```sql
+-- Función de validación en Supabase
+CREATE OR REPLACE FUNCTION validar_y_aplicar_token(
+    p_codigo VARCHAR(20),
+    p_user_id UUID,
+    p_anuncio_id UUID DEFAULT NULL
+)
+RETURNS JSON
+-- Valida código, marca como usado, registra cortesía
+```
+
+### Si me congelo:
+- Continúa desde "Ejecutar SQL en Supabase"
+- Verifica que admin.html carga correctamente
+- Abre consola (F12) para ver errores
+- Revisa GUIA_CORTESIAS.md para troubleshooting
+
+---
+
+## 🔄 PUNTO DE RESTAURACIÓN ANTERIOR (7 Enero 2026 - Actualización 1)
+
+**Última sesión**: Implementación de carrusel horizontal para tarjetas TOP/Destacado
+**Archivos modificados**: 
+- `home-logic.js` - Carrusel de tarjetas premium
+- `home.css` - Estilos de navegación del carrusel
+
+### ✅ Lo que se completó en esta sesión:
+
+1. **Carrusel horizontal para tarjetas TOP/Destacado**
+   - Ubicación: `home-logic.js` líneas 217-244
+   - Implementación: Swiper con slides de 2 tarjetas cada uno
+   - Carga 20 anuncios TOP/Destacado (limit aumentado)
+   - Navegación: Flechas laterales + puntos de paginación
+   - Separación: TOP/Destacado en carrusel, resto en grids estáticos (3-col, 4-col)
+
+2. **Fix error "regularAds already declared"**
+   - Problema: Variable `regularAds` declarada 2 veces
+   - Solución: Renombrada a `filteredRegularAds` en línea 246
+   - Estado: ✅ Resuelto
+
+3. **Estilos profesionales para botones de navegación**
+   - Archivo: `home.css` líneas 740-830
+   - Estado normal: Fondo blanco, flecha gris suave (rgba(0,0,0,0.4))
+   - Estado hover: Fondo turquesa (#00bfae), flecha blanca
+   - Tamaño: 44px × 44px, border-radius 50%
+   - Responsive: 32px en móvil
+
+4. **Función de inicialización del carrusel**
+   - Ubicación: `home-logic.js` líneas 502-526
+   - Nombre: `initializeFeaturedCarousel()`
+   - Config Swiper: slidesPerView: 1, navegación, paginación
+   - Llamada: Después de inicializar carruseles de imágenes (línea 317)
+
+### ⏳ Pendiente:
+
+1. **Testing completo del carrusel**
+   - Verificar navegación con flechas
+   - Verificar puntos de paginación funcionan
+   - Verificar swipe en móvil
+   - Verificar que muestra correctamente 2 tarjetas por slide
+
+2. **Commit y deploy**
+   - Git add, commit con mensaje descriptivo
+   - Push a GitHub
+   - Verificar deploy automático en Vercel
+
+3. **Posibles mejoras futuras**
+   - Autoplay opcional
+   - Efecto loop si hay suficientes slides
+   - Lazy loading de imágenes en slides no visibles
+
+### Código clave implementado:
+
+```javascript
+// home-logic.js - Estructura del carrusel
+const topAds = premiumAds || [];
+if (topAds.length > 0) {
+    adsHTML += `<div class="featured-carousel-wrapper">
+        <div class="swiper featured-swiper">
+            <div class="swiper-wrapper">`;
+    
+    for (let i = 0; i < topAds.length; i += 2) {
+        const slideAds = topAds.slice(i, i + 2);
+        adsHTML += `<div class="swiper-slide">
+            <div class="ads-row row-2-cols">
+                ${slideAds.map(generateCardHTML).join('')}
+            </div>
+        </div>`;
+    }
+}
+```
+
+### Si me congelo:
+- Continúa desde testing del carrusel
+- Verifica consola del navegador
+- Revisa que `.featured-swiper` se inicializa correctamente
+
+---
+
+## 🔄 PUNTO DE RESTAURACIÓN ANTERIOR (23 Diciembre 2025)
 
 **Última tarea**: Arreglar tarjetas recortadas en móvil - resultados.html
 **Problema**: En celular, las tarjetas de búsqueda salen recortadas (ancho muy grande)

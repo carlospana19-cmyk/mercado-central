@@ -79,7 +79,22 @@ async function handleLogin(e) {
         }
 
         console.log('✅ Login exitoso:', data.user.email);
-        window.location.href = 'index.html';
+        
+        // Verificar si es admin para redirigir a panel de administrador
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', data.user.id)
+            .single();
+        
+        if (profile?.is_admin) {
+            // Admin: ir al panel de administrador
+            console.log('🔐 Admin detectado, redirigiendo a panel...');
+            window.location.href = 'admin.html';
+        } else {
+            // Usuario normal: ir a index
+            window.location.href = 'index.html';
+        }
     } catch (err) {
         console.error('❌ Error:', err);
         alert('Error: ' + (err.message || 'Desconocido'));
@@ -93,6 +108,7 @@ async function handleRegister(e) {
     try {
         const email = document.getElementById('email-register')?.value?.trim();
         const password = document.getElementById('password-register')?.value;
+        const codigoInvitacion = document.getElementById('codigo-invitacion')?.value?.trim().toUpperCase();
 
         if (!email || !password) {
             alert('Por favor ingresa email y contraseña');
@@ -101,7 +117,7 @@ async function handleRegister(e) {
 
         console.log("📧 Intentando registro con:", email);
 
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data: authData, error } = await supabase.auth.signUp({ email, password });
 
         if (error) {
             console.error('❌ Error de Supabase:', error.message);
@@ -111,24 +127,65 @@ async function handleRegister(e) {
 
         console.log('✅ Registro exitoso');
 
-        // Obtener plan seleccionado de sessionStorage o URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedPlan = urlParams.get('plan') || sessionStorage.getItem('selectedPlan');
+        // Variable para saber si aplicó código de cortesía
+        let codigoAplicado = false;
 
-        if (selectedPlan === 'gratis') {
-            // Plan gratis: redirigir a publicar con plan preseleccionado
-            sessionStorage.setItem('selectedPlan', 'gratis');
-            sessionStorage.setItem('afterRegisterAction', 'continuePlan');
-            alert('¡Registro exitoso! Redirigiendo a la publicación de anuncio...');
-            window.location.href = 'publicar.html';
-        } else if (selectedPlan) {
-            // Plan de pago: redirigir a pago nuevamente
-            alert('¡Registro exitoso! Completando el pago...');
-            window.location.href = `/payment.html?plan=${selectedPlan}`;
-        } else {
-            // Sin plan: ir a home
-            alert('¡Registro exitoso! Revisa tu correo para confirmar.');
-            window.location.href = 'index.html';
+        // Si hay código de invitación, validarlo y aplicar
+        if (codigoInvitacion) {
+            console.log('🎟️ Validando código de invitación:', codigoInvitacion);
+            
+            try {
+                const { data: resultado, error: tokenError } = await supabase
+                    .rpc('validar_y_aplicar_token', {
+                        p_codigo: codigoInvitacion,
+                        p_user_id: authData.user.id,
+                        p_anuncio_id: null
+                    });
+
+                if (tokenError) {
+                    console.error('Error validando código:', tokenError);
+                    alert('Código de invitación inválido. Continuando con registro normal.');
+                } else if (resultado && resultado.success) {
+                    codigoAplicado = true;
+                    alert(`✅ ¡Código aplicado! Tienes plan ${resultado.plan.toUpperCase()} gratis por ${resultado.dias} días. Redirigiendo...`);
+                    sessionStorage.setItem('hasFreePlan', resultado.plan);
+                    // Limpiar cualquier plan en sessionStorage
+                    sessionStorage.removeItem('selectedPlan');
+                    sessionStorage.removeItem('afterRegisterAction');
+                    // Redirigir directo a index (ya tiene plan gratis)
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                    return; // Importante: salir aquí para no continuar
+                } else {
+                    alert('Código inválido o ya usado. Continuando con registro normal.');
+                }
+            } catch (tokenErr) {
+                console.error('Error en validación de token:', tokenErr);
+            }
+        }
+
+        // Solo si NO aplicó código de cortesía, continuar con flujo normal
+        if (!codigoAplicado) {
+            // Obtener plan seleccionado de sessionStorage o URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedPlan = urlParams.get('plan') || sessionStorage.getItem('selectedPlan');
+
+            if (selectedPlan === 'gratis') {
+                // Plan gratis: redirigir a publicar con plan preseleccionado
+                sessionStorage.setItem('selectedPlan', 'gratis');
+                sessionStorage.setItem('afterRegisterAction', 'continuePlan');
+                alert('¡Registro exitoso! Redirigiendo a la publicación de anuncio...');
+                window.location.href = 'publicar.html';
+            } else if (selectedPlan) {
+                // Plan de pago: redirigir a pago nuevamente
+                alert('¡Registro exitoso! Completando el pago...');
+                window.location.href = `/payment.html?plan=${selectedPlan}`;
+            } else {
+                // Sin plan: ir a home
+                alert('¡Registro exitoso! Revisa tu correo para confirmar.');
+                window.location.href = 'index.html';
+            }
         }
     } catch (err) {
         console.error('❌ Error:', err);

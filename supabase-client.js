@@ -29,4 +29,9 @@ try {
     console.error('❌ Error al inicializar Supabase:', error);
 }
 
+// Hacer disponible globalmente para debugging
+if (typeof window !== 'undefined') {
+    window.supabase = supabase;
+}
+
 export { supabase };

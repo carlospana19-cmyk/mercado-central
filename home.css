@@ -748,6 +748,89 @@ main, section.hero-search, section.categories-showcase, section.products {
 .product-swiper .swiper-button-next,
 .product-swiper .swiper-button-prev {
     color: white;
+
+/* === CARRUSEL DE TARJETAS TOP/DESTACADO === */
+.featured-carousel-wrapper {
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.featured-swiper {
+    padding: 0 50px; /* Espacio para las flechas */
+}
+
+.featured-swiper .swiper-slide {
+    height: auto;
+}
+
+.featured-swiper .swiper-button-next,
+.featured-swiper .swiper-button-prev {
+    background-color: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.featured-swiper .swiper-button-next:after,
+.featured-swiper .swiper-button-prev:after {
+    font-size: 16px;
+    color: rgba(0,0,0,0.4);
+    font-weight: bold;
+}
+
+.featured-swiper .swiper-button-next:hover,
+.featured-swiper .swiper-button-prev:hover {
+    background-color: #00bfae;
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+    transform: scale(1.05);
+}
+
+.featured-swiper .swiper-button-next:hover:after,
+.featured-swiper .swiper-button-prev:hover:after {
+    color: #ffffff;
+}
+
+.featured-swiper .swiper-button-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.featured-pagination {
+    bottom: -30px !important;
+}
+
+.featured-pagination .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    opacity: 1;
+}
+
+.featured-pagination .swiper-pagination-bullet-active {
+    background: #007bff;
+}
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .featured-swiper {
+        padding: 0 35px;
+    }
+    
+    .featured-swiper .swiper-button-next,
+    .featured-swiper .swiper-button-prev {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .featured-swiper .swiper-button-next:after,
+    .featured-swiper .swiper-button-prev:after {
+        font-size: 14px;
+    }
+}
+
     background: rgba(0, 0, 0, 0.5);
     width: 40px;
     height: 40px;

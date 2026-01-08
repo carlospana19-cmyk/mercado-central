@@ -26,7 +26,7 @@ export function initializeHomePage() {
                 .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)')
                 .in('featured_plan', ['top', 'destacado'])
                 .order('fecha_publicacion', { ascending: false })
-                .limit(10);
+                .limit(20); // Aumentado para tener más tarjetas en el carrusel
 
             if (premiumError) throw premiumError;
 
@@ -214,31 +214,54 @@ if (ad.featured_plan === "top") {
                     </div>`;
             };
 
-            // Fila 1: 2 columnas
-            if (processedAds < ads.length) {
-                const rowAds = ads.slice(processedAds, processedAds + 2);
-                adsHTML += '<div class="ads-row row-2-cols">';
-                adsHTML += rowAds.map(generateCardHTML).join('');
-                adsHTML += '</div>';
-                processedAds += rowAds.length;
+            // === RENDERIZADO POR FILAS ===
+            // Fila 1: CARRUSEL de 2 columnas para TOP/Destacado
+            const topAds = premiumAds || [];
+            if (topAds.length > 0) {
+                adsHTML += `
+                <div class="featured-carousel-wrapper">
+                    <div class="swiper featured-swiper">
+                        <div class="swiper-wrapper">`;
+                
+                // Crear slides de 2 tarjetas cada uno
+                for (let i = 0; i < topAds.length; i += 2) {
+                    const slideAds = topAds.slice(i, i + 2);
+                    adsHTML += `<div class="swiper-slide">
+                        <div class="ads-row row-2-cols">
+                            ${slideAds.map(generateCardHTML).join('')}
+                        </div>
+                    </div>`;
+                }
+                
+                adsHTML += `
+                        </div>
+                        <div class="swiper-button-next featured-next"></div>
+                        <div class="swiper-button-prev featured-prev"></div>
+                        <div class="swiper-pagination featured-pagination"></div>
+                    </div>
+                </div>`;
             }
 
+            // Renderizar anuncios regulares (premium, basico) que ya están en el array combinado
+            const filteredRegularAds = ads.filter(ad => !['top', 'destacado'].includes(ad.featured_plan));
+            let regularIndex = 0;
+
             // Fila 2: 3 columnas
-            if (processedAds < ads.length) {
-                const rowAds = ads.slice(processedAds, processedAds + 3);
+            if (regularIndex < filteredRegularAds.length) {
+                const rowAds = filteredRegularAds.slice(regularIndex, regularIndex + 3);
                 adsHTML += '<div class="ads-row row-3-cols">';
                 adsHTML += rowAds.map(generateCardHTML).join('');
                 adsHTML += '</div>';
-                processedAds += rowAds.length;
+                regularIndex += rowAds.length;
             }
 
             // Filas restantes: 4 columnas
-            while (processedAds < ads.length) {
-                const rowAds = ads.slice(processedAds, processedAds + 4);
+            while (regularIndex < filteredRegularAds.length) {
+                const rowAds = filteredRegularAds.slice(regularIndex, regularIndex + 4);
                 adsHTML += '<div class="ads-row row-4-cols">';
                 adsHTML += rowAds.map(generateCardHTML).join('');
                 adsHTML += '</div>';
-                processedAds += rowAds.length;
+                regularIndex += rowAds.length;
             }
             // === FIN: Lógica de renderizado ===
 
@@ -289,6 +312,9 @@ if (ad.featured_plan === "top") {
                 if (prevBtn) prevBtn.addEventListener('click', (e) => e.stopPropagation());
             });
             console.log("SENSOR 6: Swipers inicializados.");
+
+            // Inicializar carrusel de tarjetas TOP/Destacado
+            initializeFeaturedCarousel();
 
             // ✅ Agregar listeners para clicks en tarjetas (delegación de eventos)
             if (container._cardClickListener) {
@@ -484,6 +510,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+}
+
+// Función para inicializar el carrusel de tarjetas TOP/Destacado
+function initializeFeaturedCarousel() {
+    const featuredSwiper = document.querySelector('.featured-swiper');
+    if (!featuredSwiper) return;
+    
+    new Swiper('.featured-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: false,
+        navigation: {
+            nextEl: '.featured-next',
+            prevEl: '.featured-prev',
+        },
+        pagination: {
+            el: '.featured-pagination',
+            clickable: true,
+        },
+        breakpoints: {
+            768: {
+                slidesPerView: 1,
+            }
+        }
+    });
+    
+    console.log("Carrusel de tarjetas TOP/Destacado inicializado");
 }
 
 // Función para actualizar el carrusel cuando se cambia de categoría
