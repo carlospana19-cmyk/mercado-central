@@ -1614,6 +1614,20 @@ body {
   transform: translateY(-50%) scale(1.15);
 }
 
+/* Ocultar flechas en móviles y dejar solo swipe táctil */
+@media (max-width: 900px) {
+  .tarjeta-auto .swiper-button-prev,
+  .tarjeta-auto .swiper-button-next,
+  .box .swiper-button-prev,
+  .box .swiper-button-next,
+  .featured-prev,
+  .featured-next,
+  .product-gallery-swiper .swiper-button-next,
+  .product-gallery-swiper .swiper-button-prev {
+    display: none !important;
+  }
+}
+
 /* 5. Asegurar que el contenido de la tarjeta se expanda correctamente */
 .tarjeta-auto .contenido-auto {
   flex-grow: 1;

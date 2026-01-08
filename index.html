@@ -75,6 +75,43 @@
         .featured-prev:hover::after {
             color: #ffffff !important;
         }
+
+        /* Ajustes móviles para que las imágenes ocupen todo el ancho */
+        @media (max-width: 768px) {
+            .featured-carousel-wrapper {
+                padding: 0 16px !important;
+                margin-bottom: 3rem !important;
+            }
+
+            .featured-next,
+            .featured-prev {
+                width: 42px !important;
+                height: 42px !important;
+                top: 45% !important;
+                margin-top: -21px !important;
+            }
+
+            .featured-prev { left: -6px !important; }
+            .featured-next { right: -6px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .featured-carousel-wrapper {
+                padding: 0 8px !important;
+                margin-bottom: 2.5rem !important;
+            }
+
+            .featured-next,
+            .featured-prev {
+                width: 38px !important;
+                height: 38px !important;
+                top: 44% !important;
+                margin-top: -19px !important;
+            }
+
+            .featured-prev { left: 2px !important; }
+            .featured-next { right: 2px !important; }
+        }
     </style>
 </head>
 <body id="index-page">
