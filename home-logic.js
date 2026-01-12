@@ -215,28 +215,22 @@ if (ad.featured_plan === "top") {
             };
 
             // === RENDERIZADO POR FILAS ===
-            // Fila 1: CARRUSEL de 2 columnas para TOP/Destacado
+            // Fila 1: GRID ESTÁTICO de 2 columnas para TOP/Destacado (cortesías) - SOLO 2 TARJETAS
             const topAds = premiumAds || [];
             if (topAds.length > 0) {
-                adsHTML += `
-                <div class="featured-carousel-wrapper">
-                    <div class="swiper featured-swiper">
-                        <div class="swiper-wrapper">`;
-                
-                // Crear slides de 2 tarjetas cada uno
-                for (let i = 0; i < topAds.length; i += 2) {
-                    const slideAds = topAds.slice(i, i + 2);
-                    adsHTML += `<div class="swiper-slide">
-                        <div class="ads-row row-2-cols">
-                            ${slideAds.map(generateCardHTML).join('')}
-                        </div>
-                    </div>`;
-                }
+                const firstRowAds = topAds.slice(0, 2); // Solo las primeras 2 tarjetas
                 
                 adsHTML += `
-                        </div>
-                        <div class="swiper-pagination featured-pagination"></div>
-                    </div>
+                <div class="featured-section-title">
+                    <span class="pill-top">Top selección</span>
+                </div>
+                <div class="ads-row row-2-cols">`;
+                
+                firstRowAds.forEach(ad => {
+                    adsHTML += generateCardHTML(ad);
+                });
+                
+                adsHTML += `
                 </div>`;
             }
 
@@ -244,26 +238,60 @@ if (ad.featured_plan === "top") {
             const filteredRegularAds = ads.filter(ad => !['top', 'destacado'].includes(ad.featured_plan));
             let regularIndex = 0;
 
-            // Fila 2: 3 columnas
+            // Fila 2: Carrusel de 3 columnas
             if (regularIndex < filteredRegularAds.length) {
-                const rowAds = filteredRegularAds.slice(regularIndex, regularIndex + 3);
-                adsHTML += '<div class="ads-row row-3-cols">';
-                adsHTML += rowAds.map(generateCardHTML).join('');
-                adsHTML += '</div>';
+                const rowAds = filteredRegularAds.slice(regularIndex, Math.min(regularIndex + 6, filteredRegularAds.length));
+                adsHTML += `
+                <div class="carousel-row-wrapper">
+                    <div class="swiper row-carousel row-3-swiper">
+                        <div class="swiper-wrapper">`;
+                rowAds.forEach(ad => {
+                    adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
+                });
+                adsHTML += `
+                        </div>
+                    </div>
+                    <button class="row-nav-prev row-nav-3" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button class="row-nav-next row-nav-3" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                </div>`;
                 regularIndex += rowAds.length;
             }
 
-            // Filas restantes: 4 columnas
+            // Filas restantes: Carruseles de 4 columnas
+            let rowCounter = 0;
             while (regularIndex < filteredRegularAds.length) {
-                const rowAds = filteredRegularAds.slice(regularIndex, regularIndex + 4);
-                adsHTML += '<div class="ads-row row-4-cols">';
-                adsHTML += rowAds.map(generateCardHTML).join('');
-                adsHTML += '</div>';
+                const rowAds = filteredRegularAds.slice(regularIndex, Math.min(regularIndex + 8, filteredRegularAds.length));
+                adsHTML += `
+                <div class="carousel-row-wrapper">
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-${rowCounter}">
+                        <div class="swiper-wrapper">`;
+                rowAds.forEach(ad => {
+                    adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
+                });
+                adsHTML += `
+                        </div>
+                    </div>
+                    <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                </div>`;
                 regularIndex += rowAds.length;
+                rowCounter++;
             }
             // === FIN: Lógica de renderizado ===
 
             container.innerHTML = adsHTML;
+            
+            // Limpiar cualquier elemento suelto de navegación que pueda haber quedado
+            const parentSection = container.closest('#products');
+            if (parentSection) {
+                const orphanButtons = parentSection.querySelectorAll('button:not(.featured-prev):not(.featured-next):not(.row-nav-prev):not(.row-nav-next):not(.btn-contact)');
+                orphanButtons.forEach(btn => {
+                    if (!btn.closest('.box-container')) {
+                        btn.remove();
+                    }
+                });
+            }
+            
             console.log("SENSOR 5: HTML de anuncios insertado en el DOM.");
 
             // ✅ FIJAR: Destruir Swipers previos antes de crear nuevos
@@ -311,8 +339,11 @@ if (ad.featured_plan === "top") {
             });
             console.log("SENSOR 6: Swipers inicializados.");
 
-            // Inicializar carrusel de tarjetas TOP/Destacado
-            initializeFeaturedCarousel();
+            // La primera fila ya no es carrusel, es grid estático
+            // initializeFeaturedCarousel();
+
+            // Inicializar carruseles de filas
+            initializeRowCarousels();
 
             // ✅ Agregar listeners para clicks en tarjetas (delegación de eventos)
             if (container._cardClickListener) {
@@ -515,22 +546,146 @@ function initializeFeaturedCarousel() {
     const featuredSwiper = document.querySelector('.featured-swiper');
     if (!featuredSwiper) return;
     
-    new Swiper('.featured-swiper', {
-        slidesPerView: 1,
-        spaceBetween: 20,
+    const swiperInstance = new Swiper('.featured-swiper', {
+        slidesPerView: 2,
+        slidesPerGroup: 2,
+        spaceBetween: 24,
         loop: false,
+        navigation: {
+            nextEl: '.featured-next',
+            prevEl: '.featured-prev',
+        },
         pagination: {
             el: '.featured-pagination',
             clickable: true,
         },
         breakpoints: {
-            768: {
+            0: {
                 slidesPerView: 1,
+                slidesPerGroup: 1,
+                spaceBetween: 16,
+            },
+            900: {
+                slidesPerView: 2,
+                slidesPerGroup: 2,
+                spaceBetween: 24,
+            }
+        },
+        on: {
+            init: function() {
+                updateArrowsVisibility(this);
+            },
+            slideChange: function() {
+                updateArrowsVisibility(this);
             }
         }
     });
     
+    function updateArrowsVisibility(swiper) {
+        const prevBtn = document.querySelector('.featured-prev');
+        const nextBtn = document.querySelector('.featured-next');
+        
+        // Si todas las slides caben en la vista, ocultar ambas flechas
+        const totalSlides = swiper.slides.length;
+        const slidesPerView = swiper.params.slidesPerView;
+        
+        if (totalSlides <= slidesPerView) {
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            return;
+        }
+        
+        if (prevBtn) {
+            if (swiper.isBeginning) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'flex';
+            }
+        }
+        
+        if (nextBtn) {
+            if (swiper.isEnd) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        }
+    }
+    
     console.log("Carrusel de tarjetas TOP/Destacado inicializado");
+}
+
+// Función para inicializar los carruseles de filas de tarjetas
+function initializeRowCarousels() {
+    // Inicializar carruseles de 3 columnas
+    document.querySelectorAll('.row-3-swiper').forEach((swiperEl, index) => {
+        const wrapper = swiperEl.closest('.carousel-row-wrapper');
+        const prevBtn = wrapper?.querySelector('.row-nav-prev');
+        const nextBtn = wrapper?.querySelector('.row-nav-next');
+        
+        const swiperInstance = new Swiper(swiperEl, {
+            slidesPerView: 3,
+            slidesPerGroup: 1,
+            spaceBetween: 24,
+            loop: false,
+            navigation: {
+                nextEl: nextBtn,
+                prevEl: prevBtn,
+            },
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+                    spaceBetween: 16,
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 24,
+                }
+            }
+        });
+    });
+    
+    // Inicializar carruseles de 4 columnas
+    document.querySelectorAll('.row-4-swiper').forEach((swiperEl, index) => {
+        const wrapper = swiperEl.closest('.carousel-row-wrapper');
+        const prevBtn = wrapper?.querySelector('.row-nav-prev');
+        const nextBtn = wrapper?.querySelector('.row-nav-next');
+        
+        const swiperInstance = new Swiper(swiperEl, {
+            slidesPerView: 4,
+            slidesPerGroup: 1,
+            spaceBetween: 24,
+            loop: false,
+            navigation: {
+                nextEl: nextBtn,
+                prevEl: prevBtn,
+            },
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+                    spaceBetween: 16,
+                },
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 24,
+                },
+                1280: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                }
+            }
+        });
+    });
+    
+    console.log("Carruseles de filas de tarjetas inicializados");
 }
 
 // Función para actualizar el carrusel cuando se cambia de categoría

@@ -374,7 +374,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     background: var(--color-blanco);
     border-radius: 1.6rem;
     box-shadow: var(--sombra-suave);
-    overflow: hidden;
+    overflow: hidden; /* Mantener hidden para el contenido de la tarjeta */
     display: flex;
     flex-direction: column;
     transition: all 0.4s;
@@ -389,8 +389,8 @@ main, section.hero-search, section.categories-showcase, section.products {
     height: 240px; /* Ajustada la altura para una imagen más grande */
     position: relative;
     background-color: #f5f5f5;
-    border-radius: 1.2rem;
-    overflow: hidden;
+    border-radius: 1.2rem 1.2rem 0 0; /* Solo esquinas superiores redondeadas */
+    overflow: visible; /* Permitir que las flechas salgan */
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -399,8 +399,8 @@ main, section.hero-search, section.categories-showcase, section.products {
 .box .swiper {
     width: 100%;
     height: 100%;
-    border-radius: 1.2rem;
-    overflow: hidden;
+    border-radius: 1.2rem 1.2rem 0 0;
+    overflow: hidden; /* Las imágenes se mantienen dentro */
 }
 .box .swiper-slide {
     display: flex;
@@ -542,16 +542,29 @@ main, section.hero-search, section.categories-showcase, section.products {
     box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35);
 }
 
-/* Estilos para botones del carrusel en tarjetas .box (igual que en resultados) */
+/* Estilos para botones del carrusel en tarjetas .box - Flechas pequeñas DENTRO de las imágenes */
 .box .swiper-button-prev,
 .box .swiper-button-next {
+    position: absolute;
     color: #ffffff !important;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
     width: 30px;
     height: 30px;
     border-radius: 50%;
+    top: 50%; /* Centrado verticalmente en la imagen */
     transform: translateY(-50%);
-    top: 50%;
+    z-index: 10;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Posicionar flechas DENTRO de la imagen */
+.box .swiper-button-prev {
+    left: 10px;
+}
+
+.box .swiper-button-next {
+    right: 10px;
 }
 
 .box .swiper-button-prev::after,
@@ -563,7 +576,24 @@ main, section.hero-search, section.categories-showcase, section.products {
 .box .swiper-button-prev:hover,
 .box .swiper-button-next:hover {
     background-color: var(--color-primario) !important;
-    color: white !important;
+}
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
+}
+
+/* Ocultar flechas en móvil para evitar problemas de espacio */
+@media (max-width: 768px) {
+    .box .swiper-button-prev,
+    .box .swiper-button-next {
+        width: 40px;
+        height: 40px;
+        left: 10px;
+    }
+    
+    .box .swiper-button-next {
+        right: 10px;
+        left: auto;
+    }
 }
 
 /* --- AVATAR DEL VENDEDOR EN TARJETA --- */
@@ -757,27 +787,60 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* === CARRUSEL DE TARJETAS TOP/DESTACADO === */
 .featured-carousel-wrapper {
-    margin-bottom: 3rem;
-    position: relative;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden; /* Ocultar tarjetas que no están en vista */
+  padding: 0 70px; /* Espacio para flechas */
+}
+
+/* Flechas posicionadas dentro del wrapper */
+.featured-prev,
+.featured-next {
+    background: linear-gradient(135deg, #00d084 0%, #00bf6f 100%);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 208, 132, 0.4);
+    transition: all 0.3s ease;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.featured-prev {
+  left: 10px;
+}
+
+.featured-next {
+  right: 10px;
+}
+
+.featured-prev:hover,
+.featured-next:hover {
+    background: linear-gradient(135deg, #00e090 0%, #00d080 100%);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
 }
 
 .featured-swiper {
-    padding: 0 50px; /* Espacio para las flechas */
+  padding: 0 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  margin: 0; /* Sin margen, las flechas quedan afuera */
 }
 
-.featured-swiper .swiper-slide {
-    height: auto;
-}
-
-.featured-swiper .swiper-button-next,
-.featured-swiper .swiper-button-prev {
-    background-color: #ffffff;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.05);
+.featured-swiper .swiper-wrapper {
+  width: 100% !important;
+  box-sizing: border-box;
 }
 
 .featured-swiper .swiper-button-next:after,
@@ -785,6 +848,46 @@ main, section.hero-search, section.categories-showcase, section.products {
     font-size: 16px;
     color: rgba(0,0,0,0.4);
     font-weight: bold;
+}
+
+.featured-swiper .swiper-slide {
+  height: auto;
+  overflow: visible;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.featured-prev:hover,
+.featured-next:hover {
+    background-color: #00bfae;
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Ocultar estado deshabilitado */
+.featured-prev:disabled,
+.featured-next:disabled {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Ocultar las flechas de los carruseles internos (product-swiper) dentro del carrusel destacado */
+.featured-swiper .product-swiper .swiper-button-prev,
+.featured-swiper .product-swiper .swiper-button-next {
+  display: none !important;
+}
+
+/* Ocultar la flecha deshabilitada */
+.featured-carousel-wrapper .swiper-button-disabled,
+.featured-prev.swiper-button-disabled,
+.featured-next.swiper-button-disabled {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+  visibility: hidden !important;
 }
 
 .featured-swiper .swiper-button-next:hover,
@@ -799,24 +902,32 @@ main, section.hero-search, section.categories-showcase, section.products {
     color: #ffffff;
 }
 
-.featured-swiper .swiper-button-disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
 .featured-pagination {
     bottom: -30px !important;
+    display: block !important;
+    position: relative !important;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .featured-pagination .swiper-pagination-bullet {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: #ccc;
     opacity: 1;
+    margin: 0 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.featured-pagination .swiper-pagination-bullet:hover {
+    background: #999;
+    transform: scale(1.2);
 }
 
 .featured-pagination .swiper-pagination-bullet-active {
-    background: #007bff;
+    background: #00bfae;
+    transform: scale(1.3);
 }
 
 /* Responsive para móvil */
@@ -894,5 +1005,98 @@ main, section.hero-search, section.categories-showcase, section.products {
     .tarjeta-auto:hover .swiper-button-next,
     .tarjeta-auto:hover .swiper-button-prev {
         opacity: 1;
+    }
+}
+
+/* ================================================= */
+/* === ESTILOS PARA CARRUSELES DE FILAS === */
+/* ================================================= */
+
+.carousel-row-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 0 60px; /* Espacio para las flechas verdes */
+    margin-bottom: 3rem;
+    overflow: hidden; /* Ocultar tarjetas que no están en vista */
+}
+
+.row-carousel {
+    width: 100%;
+    overflow: hidden; /* Ocultar overflow */
+}
+
+.row-carousel .swiper-wrapper {
+    display: flex;
+}
+
+.row-carousel .swiper-slide {
+    height: auto;
+    display: flex;
+}
+
+/* Flechas verdes grandes para navegación de filas */
+.row-nav-prev,
+.row-nav-next {
+    position: absolute;
+    background: linear-gradient(135deg, #00d084 0%, #00bf6f 100%);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 208, 132, 0.4);
+    cursor: pointer;
+    z-index: 50;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.row-nav-prev {
+    left: 0;
+}
+
+.row-nav-next {
+    right: 0;
+}
+
+.row-nav-prev:hover,
+.row-nav-next:hover {
+    background: linear-gradient(135deg, #00e090 0%, #00d080 100%);
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
+}
+
+.row-nav-prev i,
+.row-nav-next i {
+    font-size: 20px;
+}
+
+/* Responsive para carruseles de filas */
+@media (max-width: 1024px) {
+    .carousel-row-wrapper {
+        padding: 0 20px;
+    }
+    
+    /* Ocultar flechas en tablet y móvil */
+    .row-nav-prev,
+    .row-nav-next {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .carousel-row-wrapper {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-row-wrapper {
+        padding: 0 10px;
     }
 }
