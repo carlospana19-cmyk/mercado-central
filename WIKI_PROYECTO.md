@@ -1,6 +1,81 @@
 # WIKI - Mercado Central
 
-## 🔄 PUNTO DE RESTAURACIÓN (7 Enero 2026 - Actualización 2)
+## 🔄 PUNTO DE RESTAURACIÓN (11 Enero 2026)
+
+**Última sesión**: Implementación de Carruseles Horizontales con Navegación
+**Archivos modificados**: 
+- `home-logic.js` - Generación de carruseles por filas
+- `home.css` - Estilos de carruseles y flechas de navegación
+- `index.html` - Estructura de página principal
+
+### ✅ SISTEMA DE CARRUSELES HORIZONTALES IMPLEMENTADO
+
+**Objetivo**: Mejorar la experiencia de navegación permitiendo ver múltiples anuncios mediante carruseles horizontales con flechas verdes.
+
+#### Funcionalidades Principales:
+
+1. **Primera Fila Estática - Top Selección**
+   - Grid estático de 2 columnas
+   - Solo muestra las primeras 2 tarjetas TOP/Destacado
+   - Sin navegación (ideal para cortesías/anuncios fijos)
+   - Clase CSS: `.ads-row.row-2-cols`
+
+2. **Carruseles de Filas con Navegación**
+   - Segunda fila: Carrusel de 3 tarjetas por vista
+   - Filas siguientes: Carruseles de 4 tarjetas por vista
+   - Navegación mediante flechas verdes grandes
+   - Deslizamiento táctil en móvil/tablet
+
+3. **Flechas de Navegación Verde**
+   - Tamaño: 50x50px con border-radius de 12px
+   - Color: Gradiente verde (#00d084 a #00bf6f)
+   - Posición: A los lados de cada carrusel
+   - Efecto hover: Escala 1.1 con sombra verde
+   - Solo visibles en laptop/desktop (>1024px)
+
+4. **Sistema Responsive**
+   - Desktop: Flechas visibles, navegación con clic
+   - Tablet/Móvil: Flechas ocultas, navegación táctil
+   - Overflow hidden para ocultar tarjetas no visibles
+   - Adaptación automática de tarjetas por vista
+
+5. **Flechas de Imágenes (Independientes)**
+   - Pequeñas flechas circulares dentro de cada tarjeta
+   - Solo para navegar entre fotos de un producto
+   - Posicionadas a 10px del borde
+   - Tamaño: 30x30px, fondo negro semitransparente
+
+#### Estructura de Código:
+
+**JavaScript (`home-logic.js`)**:
+- `initializeRowCarousels()`: Inicializa carruseles de filas
+- Carruseles separados por clase: `.row-3-swiper`, `.row-4-swiper`
+- Cada carrusel con sus propias flechas de navegación
+
+**CSS (`home.css`)**:
+- `.carousel-row-wrapper`: Contenedor principal con padding para flechas
+- `.row-nav-prev`, `.row-nav-next`: Estilos de flechas verdes
+- Media queries para ocultar flechas en móvil (<1024px)
+
+**Configuración Swiper**:
+```javascript
+slidesPerView: 3 o 4 (según fila)
+spaceBetween: 24px
+loop: false
+navigation: Flechas personalizadas
+```
+
+#### Mejoras de UX:
+
+- ✅ Navegación intuitiva entre tarjetas
+- ✅ Flechas solo cuando son necesarias
+- ✅ Adaptación total a móvil sin flechas molestas
+- ✅ Separación clara entre navegación de tarjetas e imágenes
+- ✅ Primera fila estática para destacar cortesías
+
+---
+
+## 🔄 PUNTO DE RESTAURACIÓN ANTERIOR (7 Enero 2026 - Actualización 2)
 
 **Última sesión**: Sistema de Cortesías para Planes TOP Gratis
 **Archivos creados/modificados**: 
