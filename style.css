@@ -1,3 +1,12 @@
+/* Cuadros vacíos para alinear la última fila de atributos de inmueble */
+.spec-item-empty {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  pointer-events: none;
+  min-height: 90px;
+  height: 100%;
+}
 /* ================================================= */
 /* ========== NUEVAS TARJETAS HORIZONTALES PARA RESULTADOS ========== */
 .results-container {
@@ -107,19 +116,26 @@
 .property-attributes {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Reducido el espacio entre atributos */
-    margin: 10px 0; /* Reducido el margen */
-    font-size: 13px; /* Ligeramente más pequeño */
-    color: #666;
+    gap: 0.7rem 1.2rem;
+    margin: 0.5rem 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: #111;
     letter-spacing: normal !important;
     word-spacing: normal !important;
+    row-gap: 0.3rem;
 }
 
 .property-attributes span {
     display: flex;
     align-items: center;
-    gap: 5px;
-    white-space: nowrap;  /* Evita que el texto se separe */
+    gap: 0.4rem;
+    color: #111;
+    background: none;
+    border-radius: 4px;
+    padding: 0.1rem 0.5rem;
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
     letter-spacing: normal !important;
 }
 
@@ -994,7 +1010,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1005,7 +1021,7 @@ body {
 }
 
 .vehicle-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
@@ -1017,7 +1033,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1028,7 +1044,7 @@ body {
 }
 
 .sports-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
@@ -1040,7 +1056,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1051,7 +1067,7 @@ body {
 }
 
 .pets-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
@@ -1063,7 +1079,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1074,7 +1090,7 @@ body {
 }
 
 .services-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
@@ -1086,7 +1102,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1097,7 +1113,7 @@ body {
 }
 
 .business-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
@@ -1109,7 +1125,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1120,7 +1136,7 @@ body {
 }
 
 .community-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
@@ -1132,45 +1148,77 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
-.real-estate-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+/* --- INICIO AJUSTE ALINEACIÓN ATRIBUTOS INMUEBLE --- */
+.real-estate-specs-grid {
+  margin-bottom: 2rem;
 }
-
-.real-estate-details i {
-    color: var(--color-primario);
-    font-size: 1.6rem;
+.real-estate-specs-grid h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
 }
-
-/* Electrónica - Mismo estilo (preparado para uso futuro) */
-.electronics-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: var(--color-gris);
-    margin-bottom: 1rem;
+/* --- INICIO AJUSTE ALINEACIÓN PERFECTA ATRIBUTOS --- */
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
 }
-
-.electronics-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.spec-item {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.2rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 90px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: 100%;
 }
-
-.electronics-details i {
-    color: var(--color-primario);
-    font-size: 1.6rem;
+.specs-grid > .spec-item {
+  min-width: 0;
+  min-height: 90px;
+  height: 100%;
 }
-
-/* Hogar y Muebles - Mismo estilo */
-.home-furniture-details {
-    display: flex;
+@media (max-width: 900px) {
+  .specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* --- FIN AJUSTE ALINEACIÓN PERFECTA ATRIBUTOS --- */
+.spec-label {
+  font-size: 0.95rem;
+  color: #009688;
+  font-weight: 600;
+}
+.spec-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #222;
+}
+@media (max-width: 900px) {
+  .specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* --- FIN AJUSTE ALINEACIÓN ATRIBUTOS INMUEBLE --- */
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
@@ -1185,7 +1233,7 @@ body {
 }
 
 .home-furniture-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 } /* Cierre de .home-furniture-details i */
 
@@ -1195,7 +1243,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-bottom: 1rem;
 }
 
@@ -1206,7 +1254,7 @@ body {
 }
 
 .fashion-details i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 .box .btn-contact {
@@ -1266,7 +1314,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 1.4rem;
-    color: var(--color-gris);
+    color: #222;
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid #f0f0f0;
@@ -1279,7 +1327,7 @@ body {
 }
 
 .electronics-details-card .detail-item i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 1.6rem;
 }
 
