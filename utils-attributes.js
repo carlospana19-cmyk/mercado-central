@@ -20,31 +20,44 @@ export function generateAttributesHTML(attributes, category, subcategory) {
 
     // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
     if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
-        if (attributes.marca || attributes.anio || attributes.transmision || attributes.combustible || attributes.kilometraje) {
+        // Mostrar hasta 4 atributos relevantes
             let details = [];
             if (attributes.marca) details.push(`<span><i class="fas fa-car"></i> ${attributes.marca}</span>`);
+        if (attributes.modelo) details.push(`<span><i class="fas fa-car-side"></i> ${attributes.modelo}</span>`);
             if (attributes.anio) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attributes.anio}</span>`);
             if (attributes.kilometraje) details.push(`<span><i class="fas fa-tachometer-alt"></i> ${attributes.kilometraje.toLocaleString()} km</span>`);
+        if (attributes.motor) details.push(`<span><i class="fas fa-cogs"></i> Motor ${attributes.motor}</span>`);
             if (attributes.transmision) details.push(`<span><i class="fas fa-cogs"></i> ${attributes.transmision}</span>`);
             if (attributes.combustible) details.push(`<span><i class="fas fa-gas-pump"></i> ${attributes.combustible}</span>`);
-            
+        if (attributes.vidrios) details.push(`<span><i class="fas fa-window-restore"></i> Vidrios ${attributes.vidrios}</span>`);
+        if (attributes.rines) details.push(`<span><i class="fas fa-dot-circle"></i> Rines ${attributes.rines}</span>`);
             if (details.length > 0) {
-                detailsHTML += `<div class="vehicle-details">${details.slice(0, 3).join('')}</div>`;
-            }
+            detailsHTML += `<div class="vehicle-details">${details.slice(0, 4).join('')}</div>`;
         }
     }
     
     // --- DETALLES DE INMUEBLES (desde JSONB) ---
     if (categoria.includes('inmueble') || categoria.includes('casa') || categoria.includes('apartamento') || categoria.includes('propiedad')) {
-        if (attributes.m2 || attributes.habitaciones || attributes.baños) {
+        // Mostrar hasta 4 atributos relevantes
             let details = [];
             if (attributes.m2) details.push(`<span><i class="fas fa-ruler-combined"></i> ${attributes.m2} m²</span>`);
+        if (attributes.niveles) details.push(`<span><i class="fas fa-layer-group"></i> ${attributes.niveles} niv</span>`);
             if (attributes.habitaciones) details.push(`<span><i class="fas fa-bed"></i> ${attributes.habitaciones} hab</span>`);
-            if (attributes.baños) details.push(`<span><i class="fas fa-bath"></i> ${attributes.baños} baños</span>`);
-            
+        if (attributes.baños || attributes.banos) details.push(`<span><i class="fas fa-bath"></i> ${(attributes.baños || attributes.banos)} baños</span>`);
+        if (attributes.medios_banos) details.push(`<span><i class="fas fa-toilet"></i> ${attributes.medios_banos} 1/2 baño</span>`);
+        if (attributes.estacionamiento) details.push(`<span><i class="fas fa-parking"></i> ${attributes.estacionamiento} estac</span>`);
+        if (attributes.comedor) details.push(`<span><i class="fas fa-utensils"></i> Comedor</span>`);
+        if (attributes.cocina) details.push(`<span><i class="fas fa-blender"></i> Cocina</span>`);
+        if (attributes.sala_principal) details.push(`<span><i class="fas fa-couch"></i> Sala</span>`);
+        if (attributes.sala_tv) details.push(`<span><i class="fas fa-tv"></i> Sala TV</span>`);
+        if (attributes.patio_jardin) details.push(`<span><i class="fas fa-tree"></i> Patio/Jardín</span>`);
+        if (attributes.balcon_terraza) details.push(`<span><i class="fas fa-archway"></i> Balcón/Terraza</span>`);
+        if (attributes.bodega) details.push(`<span><i class="fas fa-warehouse"></i> Bodega</span>`);
+        if (attributes.area_lavado) details.push(`<span><i class="fas fa-soap"></i> Lavado</span>`);
+        if (attributes.estudio) details.push(`<span><i class="fas fa-user-graduate"></i> Estudio</span>`);
+        if (attributes.cuarto_servicio) details.push(`<span><i class="fas fa-broom"></i> Servicio</span>`);
             if (details.length > 0) {
-                detailsHTML += `<div class="real-estate-details">${details.join('')}</div>`;
-            }
+            detailsHTML += `<div class="real-estate-details">${details.slice(0, 4).join('')}</div>`;
         }
     }
 

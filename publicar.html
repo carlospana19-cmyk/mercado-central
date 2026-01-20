@@ -323,6 +323,10 @@
                                         <input type="text" id="attr-marca" name="marca" placeholder="Ej: Toyota">
                                     </div>
                                     <div class="form-group">
+                                        <label for="attr-modelo">Modelo</label>
+                                        <input type="text" id="attr-modelo" name="modelo" placeholder="Ej: Hilux 2.4 CD 4x4">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="attr-anio">Año</label>
                                         <input type="number" id="attr-anio" name="anio" placeholder="Ej: 2020">
                                     </div>
@@ -333,7 +337,11 @@
                                         <input type="number" id="attr-kilometraje" name="kilometraje" placeholder="Ej: 50000">
                                     </div>
                                     <div class="form-group">
-                                        <label for="attr-transmision">Transmision</label>
+                                        <label for="attr-motor">Motor (cilindraje)</label>
+                                        <input type="text" id="attr-motor" name="motor" placeholder="Ej: 2400">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-transmision">Transmisión</label>
                                         <select id="attr-transmision" name="transmision">
                                             <option value="">Selecciona</option>
                                             <option value="Automática">Automática</option>
@@ -522,6 +530,9 @@
     <!-- JS Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script type="module" src="main.js" defer></script>
+
+    <!-- Lógica de publicación y carga de categorías -->
+    <script type="module" src="publish-logic.js"></script>
 
     <!-- Definiciones SVG para badges metálicos -->
     <svg style="display: none;">

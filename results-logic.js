@@ -1,20 +1,322 @@
-// --- INICIO DEL ARCHIVO ---
-// (El contenido completo de results-logic-commit-grid2.js se ha copiado aquí para restaurar toda la lógica y renderizado del último commit funcional)
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML } from './utils-attributes.js';
 
 // --- CARRUSEL DE CATEGORÍA ---
 function initializeCategoryHero() {
-    // ...código completo del commit...
+    const categorySlidesContainer = document.getElementById('category-slides');
+    const categoryTitleEl = document.getElementById('category-title');
+    const categorySubtitleEl = document.getElementById('category-subtitle');
+
+    if (!categorySlidesContainer) return;
+
+    // Obtener parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const categoryParam = params.get('category') || 'all';
+    const searchQuery = params.get('q') || '';
+
+    // Configurar título y subtítulo según la categoría
+    let categoryTitle = 'Resultados de Búsqueda';
+    let categorySubtitle = 'Encuentra lo que buscas en nuestra plataforma';
+
+    if (searchQuery) {
+        categoryTitle = `Resultados para "${searchQuery}"`;
+        categorySubtitle = `Anuncios relacionados con tu búsqueda`;
+    } else if (categoryParam !== 'all') {
+        const categoryNames = {
+            'Bienes Raíces': 'Bienes Raíces',
+            'Vehículos': 'Vehículos',
+            'Electrónica': 'Electrónica',
+            'Hogar y Muebles': 'Hogar y Muebles',
+            'Moda y Belleza': 'Moda y Belleza',
+            'Servicios': 'Servicios',
+            'Empleos y Servicios': 'Empleos y Servicios',
+            'Mascotas': 'Mascotas',
+            'Negocios': 'Negocios',
+            'Comunidad': 'Comunidad'
+        };
+        categoryTitle = categoryNames[categoryParam] || 'Resultados de Búsqueda';
+        categorySubtitle = `Explora nuestra selección de ${categoryTitle.toLowerCase()}`;
+    }
+
+    if (categoryTitleEl) categoryTitleEl.textContent = categoryTitle;
+    if (categorySubtitleEl) categorySubtitleEl.textContent = categorySubtitle;
+
+    // Cargar imágenes según la categoría
+    loadCategoryImages(categoryParam);
+
+    function loadCategoryImages(category = 'all') {
+        let images = [];
+
+        switch(category) {
+            case 'Bienes Raíces':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&h=600&fit=crop',
+                        alt: 'Casa moderna con jardín',
+                        title: 'Casas y Apartamentos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=600&fit=crop',
+                        alt: 'Apartamento con vista a la ciudad',
+                        title: 'Propiedades Urbanas'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=600&fit=crop',
+                        alt: 'Terreno amplio',
+                        title: 'Terrenos Disponibles'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=1200&h=600&fit=crop',
+                        alt: 'Casa de lujo',
+                        title: 'Propiedades de Lujo'
+                    }
+                ];
+                break;
+
+            case 'Vehículos':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=600&fit=crop',
+                        alt: 'Auto deportivo rojo',
+                        title: 'Autos Deportivos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=600&fit=crop',
+                        alt: 'Camioneta familiar',
+                        title: 'Camionetas y SUVs'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=1200&h=600&fit=crop',
+                        alt: 'Motocicleta deportiva',
+                        title: 'Motocicletas'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=600&fit=crop',
+                        alt: 'Auto clásico',
+                        title: 'Autos Clásicos'
+                    }
+                ];
+                break;
+
+            case 'Electrónica':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200&h=600&fit=crop',
+                        alt: 'Laptop y dispositivos tecnológicos',
+                        title: 'Computadoras'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=600&fit=crop',
+                        alt: 'Smartphone moderno',
+                        title: 'Teléfonos Móviles'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=1200&h=600&fit=crop',
+                        alt: 'Drone volando',
+                        title: 'Drones y Gadgets'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200&h=600&fit=crop',
+                        alt: 'Consola de videojuegos',
+                        title: 'Videojuegos'
+                    }
+                ];
+                break;
+
+            case 'Hogar y Muebles':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop',
+                        alt: 'Sala moderna',
+                        title: 'Muebles para el Hogar'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=600&fit=crop',
+                        alt: 'Cocina equipada',
+                        title: 'Electrodomésticos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop',
+                        alt: 'Decoración del hogar',
+                        title: 'Decoración'
+                    }
+                ];
+                break;
+
+            case 'Moda y Belleza':
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=600&fit=crop',
+                        alt: 'Ropa moderna',
+                        title: 'Ropa y Accesorios'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&h=600&fit=crop',
+                        alt: 'Productos de belleza',
+                        title: 'Belleza y Cuidado'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1200&h=600&fit=crop',
+                        alt: 'Zapatos elegantes',
+                        title: 'Calzado'
+                    }
+                ];
+                break;
+
+            default:
+                images = [
+                    {
+                        src: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=600&fit=crop',
+                        alt: 'Productos diversos',
+                        title: 'Todos los Productos'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&h=600&fit=crop',
+                        alt: 'Servicios profesionales',
+                        title: 'Servicios Disponibles'
+                    },
+                    {
+                        src: 'https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?w=1200&h=600&fit=crop',
+                        alt: 'Empleos y oportunidades',
+                        title: 'Empleos'
+                    }
+                ];
+        }
+
+        // Generar HTML de los slides
+        const slidesHTML = images.map(image => `
+            <div class="swiper-slide">
+                <img src="${image.src}" alt="${image.alt}" loading="lazy">
+                <div class="slide-overlay">
+                    <h2 class="slide-title">${image.title}</h2>
+                </div>
+            </div>
+        `).join('');
+
+        categorySlidesContainer.innerHTML = slidesHTML;
+
+        // Inicializar Swiper
+        initializeCategorySwiper();
+    }
+
+    function initializeCategorySwiper() {
+        if (window.categorySwiper) {
+            window.categorySwiper.destroy();
+        }
+
+        window.categorySwiper = new Swiper('.category-swiper', {
+            loop: true,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            }
+        });
+    }
 }
 
-[import { supabase } from './supabase-client.js';
+// --- PAGINACIÓN ---
+const RESULTS_PER_PAGE = 12; // Número de resultados por página
+let currentPage = 1; // Página actual
 
-    // Permitir compatibilidad con class o id para el contenedor de resultados
-    let container = document.getElementById('results-container');
-    if (!container) {
-        container = document.querySelector('.results-container');
+// --- FUNCIÓN PRINCIPAL DE CARGA Y FILTRADO ---
+async function loadAndFilterResults() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q')?.toLowerCase() || '';
+    const mainCategory = params.get('category') || 'all';
+    const location = params.get('location')?.toLowerCase() || '';
+
+    const selectedSubcategories = Array.from(document.querySelectorAll('input[name="subcategory"]:checked')).map(cb => cb.value);
+    const priceMin = document.getElementById('price-min').value;
+    const priceMax = document.getElementById('price-max').value;
+
+    const now = new Date().toISOString();
+
+    let queryBuilder = supabase
+      .from('anuncios')
+      .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)', { count: 'exact' })
+      // Prioridad: premium y destacados activos primero
+      .order('featured_plan', { ascending: false })
+      .order('featured_until', { ascending: false, nullsFirst: false })
+      .order('fecha_publicacion', { ascending: false });
+
+    // Filtros existentes (mantener igual)
+    if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%`);
+    if (location) queryBuilder = queryBuilder.ilike('ubicacion', `%${location}%`);
+
+    if (selectedSubcategories.length > 0) {
+      queryBuilder = queryBuilder.in('categoria', selectedSubcategories);
+    } else if (mainCategory !== 'all') {
+      const { data: parentCategory } = await supabase.from('categorias').select('id').eq('nombre', mainCategory).single();
+      if (parentCategory) {
+        const { data: subcategories } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
+        const allCategoryNames = [mainCategory, ...subcategories.map(s => s.nombre)];
+        queryBuilder = queryBuilder.in('categoria', allCategoryNames);
+      }
     }
+
+    if (priceMin) queryBuilder = queryBuilder.gte('precio', priceMin);
+    if (priceMax) queryBuilder = queryBuilder.lte('precio', priceMax);
+
+    // Paginación
+    const from = (currentPage - 1) * RESULTS_PER_PAGE;
+    const to = from + RESULTS_PER_PAGE - 1;
+    queryBuilder = queryBuilder.limit(RESULTS_PER_PAGE).range(from, to);
+
+    const { data: products, error, count } = await queryBuilder;
+
+    if (error) {
+        console.error("Error al obtener los anuncios:", error, "Query:", queryBuilder.url);
+        displayError("Hubo un error al cargar los anuncios.");
+        return;
+    }
+
+    // ORDENAMIENTO POR PRIORIDAD DE PLAN
+    products.sort((a, b) => {
+        // Primero por prioridad de plan
+        const priorityA = a.plan_priority || 0;
+        const priorityB = b.plan_priority || 0;
+        
+        if (priorityA !== priorityB) {
+            return priorityB - priorityA; // Mayor prioridad primero
+        }
+        
+        // Si mismo plan, por fecha
+        return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
+    });
+
+    displayFilteredProducts(products || []);
+    updateSummary(query, mainCategory, count || 0);
+    displayPaginationControls(count || 0); // Mostrar controles de paginación
+}
+
+// --- FUNCIONES DE RENDERIZADO ---
+function displaySubcategoryFilters(subcategoriesWithCounts) {
+    const container = document.getElementById('subcategory-filter-container');
+    if (!container) return;
+    if (!subcategoriesWithCounts || subcategoriesWithCounts.length === 0) {
+        container.innerHTML = "<p>No hay subcategorías.</p>";
+        return;
+    }
+    container.innerHTML = subcategoriesWithCounts.map(sub => `
+        <label class="subcategory-label">
+            <input type="checkbox" name="subcategory" value="${sub.nombre}">
+            ${sub.nombre} ${sub.count !== undefined && sub.count !== null
+                ? `<span style="color:#7f8c8d; font-size:1.2rem;">(${sub.count})</span>`
+                : ''}
+        </label>
+    `).join('');
+    }
+
+function displayFilteredProducts(ads) {
+    const container = document.getElementById('results-container');
     const summary = document.getElementById('results-summary');
 
     if (!container || !summary) {
@@ -434,15 +736,13 @@ return `
                             <div class="tarjeta-auto">
                             <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
                                 <div class="swiper-wrapper">
-                                    ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe><div class="swiper-edge-left"></div><div class="swiper-edge-right"></div></div>` : ''}
+                                    ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
                                     ${Array.isArray(ad.url_galeria) && ad.url_galeria.length
                                         ? ad.url_galeria.map(img =>
                                                 `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`
                                             ).join('')
                                         : `<div class="swiper-slide"><img src="${ad.url_portada}" alt="${ad.titulo}" loading="lazy"></div>`}
                                 </div>
-                                <div class="swiper-button-next"></div>
-                                <div class="swiper-button-prev"></div>
                                 <div class="swiper-pagination"></div>
                                 </div>
                             </div>`
@@ -468,18 +768,21 @@ return `
                         </div>
             
                         <div class="property-attributes">
-                                ${vehicleDetailsHTML.replace(/<div class=\"vehicle-details\">|<\/div>/g, '')}
-                                ${realEstateDetailsHTML.replace(/<div class=\"real-estate-details\">|<\/div>/g, '')}
-                                ${electronicsDetailsHTML.replace(/<div class=\"electronics-details\">|<\/div>/g, '')}
-                                ${homeFurnitureDetailsHTML.replace(/<div class=\"home-furniture-details\">|<\/div>/g, '')}
-                                ${fashionDetailsHTML.replace(/<div class=\"fashion-details\">|<\/div>/g, '')}
-                                ${sportsDetailsHTML.replace(/<div class=\"sports-details\">|<\/div>/g, '')}
-                                ${petsDetailsHTML.replace(/<div class=\"pets-details\">|<\/div>/g, '')}
-                                ${servicesDetailsHTML.replace(/<div class=\"services-details\">|<\/div>/g, '')}
-                                ${businessDetailsHTML.replace(/<div class=\"business-details\">|<\/div>/g, '')}
-                                ${communityDetailsHTML.replace(/<div class=\"community-details\">|<\/div>/g, '')}
+                ${vehicleDetailsHTML.replace(/<div class="vehicle-details">|<\/div>/g, '')}
+                ${realEstateDetailsHTML.replace(/<div class="real-estate-details">|<\/div>/g, '')}
+                ${electronicsDetailsHTML.replace(/<div class="electronics-details">|<\/div>/g, '')}
+                ${homeFurnitureDetailsHTML.replace(/<div class="home-furniture-details">|<\/div>/g, '')}
+                ${fashionDetailsHTML.replace(/<div class="fashion-details">|<\/div>/g, '')}
+                ${sportsDetailsHTML.replace(/<div class="sports-details">|<\/div>/g, '')}
+                ${petsDetailsHTML.replace(/<div class="pets-details">|<\/div>/g, '')}
+                ${servicesDetailsHTML.replace(/<div class="services-details">|<\/div>/g, '')}
+                ${businessDetailsHTML.replace(/<div class="business-details">|<\/div>/g, '')}
+                ${communityDetailsHTML.replace(/<div class="community-details">|<\/div>/g, '')}
                         </div>
-                        <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">Contactar ahora</button>
+            
+            <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
+                Contactar ahora
+            </button>
                 </div>
         </div>
 `;
