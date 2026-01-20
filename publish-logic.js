@@ -552,52 +552,66 @@ function showDynamicFields() {
     }
 }
 
-function showElectronicsFields() {
-    // --- LÍNEAS DE CORRECCIÓN OBLIGATORIAS ---
-    const container = document.getElementById('electronics-fields');
-    const mainSection = document.getElementById('electronics-details'); // El contenedor padre
+// Función genérica para mostrar campos de cualquier categoría
+function showCategoryFields(categoryKey, containerId, sectionId) {
+    const container = document.getElementById(containerId);
+    const mainSection = document.getElementById(sectionId);
 
-        // Forzar visibilidad
-        if (mainSection) {
-            mainSection.style.display = 'block';
-            mainSection.style.visibility = 'visible';
-        }
-        if (container) {
-            container.innerHTML = ''; // Limpia el contenedor antes de añadir nuevos campos
+    if (!container || !mainSection) {
+        console.error('Contenedores HTML no encontrados');
+        return;
+    }
+
+    // Forzar visibilidad
+    mainSection.style.display = 'block';
+    container.innerHTML = '';
+
+    // Obtener configuración de campos para la subcategoría seleccionada
+    const subcategoryConfig = categoryFieldConfigs[categoryKey]?.[selectedSubcategory];
+    if (!subcategoryConfig) {
+        console.log('No fields config found for subcategory:', selectedSubcategory, 'in category:', categoryKey);
+        return;
+    }
+
+    // Añadir título
+    const titleDiv = document.createElement('div');
+    titleDiv.innerHTML = `<h4 style="color: var(--color-primario); margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+    container.appendChild(titleDiv);
+
+    // Crear campos dinámicos
+    Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'form-group';
+        fieldDiv.style.marginBottom = '15px';
+
+        // Crear label
+        const label = document.createElement('label');
+        label.textContent = fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        label.setAttribute('for', `attr-${fieldName}`);
+        fieldDiv.appendChild(label);
+
+        // Crear input/select según el tipo
+        let input;
+        if (fieldConfig.type === 'select') {
+            input = document.createElement('select');
+            input.innerHTML = `<option value="">Selecciona</option>` +
+                fieldConfig.options.map(option => `<option value="${option}">${option}</option>`).join('');
         } else {
-            console.error('¡ERROR CRÍTICO! Los contenedores HTML no se encontraron. Revisa los IDs.');
-            return; // Detiene la función si los divs no existen
-        }
-        // --- FIN DE LA CORRECCIÓN ---
-
-        const fields = electronicsSubcategories[selectedSubcategory];
-        if (!fields) {
-            console.log('No fields found for subcategory:', selectedSubcategory);
-            return;
+            input = document.createElement('input');
+            input.type = fieldConfig.type;
+            input.placeholder = fieldConfig.placeholder || '';
         }
 
-        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+        input.id = `attr-${fieldName}`;
+        input.name = fieldName;
+        fieldDiv.appendChild(input);
+        container.appendChild(fieldDiv);
+    });
+}
 
-        // PRIORIDAD #1: Asegurar visibilidad del contenedor principal
-        electronicsDetails.style.display = 'block';
-        electronicsDetails.style.border = null;
-        electronicsDetails.style.padding = null;
-        electronicsDetails.style.marginTop = null;
-        electronicsDetails.style.backgroundColor = null;
-
-        // PRIORIDAD #2: Limpiar el contenedor de campos
-        electronicsFields.innerHTML = '';
-
-        // PRIORIDAD #3: Añadir título descriptivo
-        const titleDiv = document.createElement('div');
-        
-        electronicsFields.appendChild(titleDiv);
-
-        fields.forEach(field => {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-group';
-            fieldDiv.style.marginBottom = '15px';
-            fieldDiv.style.padding = '10px';
+function showElectronicsFields() {
+    showCategoryFields('electrónica', 'electronics-fields', 'electronics-details');
+}
             fieldDiv.style.border = '1px solid #ddd';
             fieldDiv.style.borderRadius = '5px';
             fieldDiv.style.backgroundColor = 'white';
@@ -743,51 +757,8 @@ function showElectronicsFields() {
     }
 
     function showHomeFurnitureFields() {
-        const fields = homeFurnitureSubcategories[selectedSubcategory];
-        if (!fields) {
-            console.log('No fields found for subcategory:', selectedSubcategory);
-            return;
-        }
-
-        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
-
-        homeFurnitureDetails.style.display = 'block';
-        homeFurnitureFields.innerHTML = '';
-
-        const titleDiv = document.createElement('div');
-        homeFurnitureFields.appendChild(titleDiv);
-
-        fields.forEach(field => {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-group';
-
-            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            let inputType = 'text';
-            let placeholder = '';
-
-            if (field === 'tipo_mueble') {
-                labelText = 'Tipo de Mueble';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Sofá">Sofá</option>
-                    <option value="Mesa">Mesa</option>
-                    <option value="Silla">Silla</option>
-                    <option value="Estantería">Estantería</option>
-                    <option value="Cama">Cama</option>
-                    <option value="Cómoda">Cómoda</option>
-                    <option value="Armario">Armario</option>
-                    <option value="Otro">Otro</option>
-                `;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(select);
-            } else if (field === 'tipo_articulo') {
-                labelText = 'Tipo de Artículo';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
+        showCategoryFields('hogar y muebles', 'home-furniture-fields', 'home-furniture-details');
+    }
                 
                 // Opciones dinámicas según subcategoría
                 let options = '';
@@ -885,250 +856,28 @@ function showElectronicsFields() {
         });
     }
 function showFashionFields() {
-    const fields = fashionSubcategories[selectedSubcategory];
-    if (!fields) {
-        console.log('No fields found for subcategory:', selectedSubcategory);
-        return;
-    }
-
-    console.log('Showing fields for subcategory:', selectedSubcategory, fields);
-
-    fashionDetails.style.display = 'block';
-    fashionFields.innerHTML = '';
-
-    const titleDiv = document.createElement('div');
-
-
-    fields.forEach(field => {
-        const fieldDiv = document.createElement('div');
-        fieldDiv.className = 'form-group';
-
-        let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        let inputType = 'text';
-        let placeholder = '';
-
-        if (field === 'tipo_prenda') {
-            labelText = 'Tipo de Prenda';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Camisa">Camisa</option>
-                <option value="Pantalón">Pantalón</option>
-                <option value="Vestido">Vestido</option>
-                <option value="Falda">Falda</option>
-                <option value="Blusa">Blusa</option>
-                <option value="Chaqueta">Chaqueta</option>
-                <option value="Sudadera">Sudadera</option>
-                <option value="Short">Short</option>
-                <option value="Otro">Otro</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'tipo_calzado') {
-            labelText = 'Tipo de Calzado';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Tenis">Tenis</option>
-                <option value="Zapatos Formales">Zapatos Formales</option>
-                <option value="Sandalias">Sandalias</option>
-                <option value="Botas">Botas</option>
-                <option value="Tacones">Tacones</option>
-                <option value="Otro">Otro</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'tipo_bolso') {
-            labelText = 'Tipo de Bolso';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Bolso de Mano">Bolso de Mano</option>
-                <option value="Mochila">Mochila</option>
-                <option value="Cartera">Cartera</option>
-                <option value="Bolso de Viaje">Bolso de Viaje</option>
-                <option value="Otro">Otro</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'tipo_accesorio') {
-            labelText = 'Tipo de Accesorio';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Reloj">Reloj</option>
-                <option value="Gafas de Sol">Gafas de Sol</option>
-                <option value="Cinturón">Cinturón</option>
-                <option value="Bufanda">Bufanda</option>
-                <option value="Gorra">Gorra</option>
-                <option value="Otro">Otro</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'tipo_joya') {
-            labelText = 'Tipo de Joya';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Anillo">Anillo</option>
-                <option value="Collar">Collar</option>
-                <option value="Pulsera">Pulsera</option>
-                <option value="Aretes">Aretes</option>
-                <option value="Otro">Otro</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'tipo_producto') {
-            labelText = 'Tipo de Producto';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Maquillaje">Maquillaje</option>
-                <option value="Cuidado de la Piel">Cuidado de la Piel</option>
-                <option value="Perfume">Perfume</option>
-                <option value="Cuidado del Cabello">Cuidado del Cabello</option>
-                <option value="Productos de Baño">Productos de Baño</option>
-                <option value="Otro">Otro</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'talla') {
-            labelText = 'Talla';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="XS">XS</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-                <option value="XXL">XXL</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'edad') {
-            labelText = 'Edad';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="0-12 meses">0-12 meses</option>
-                <option value="1-2 años">1-2 años</option>
-                <option value="3-4 años">3-4 años</option>
-                <option value="5-6 años">5-6 años</option>
-                <option value="7-8 años">7-8 años</option>
-                <option value="9-10 años">9-10 años</option>
-                <option value="11-12 años">11-12 años</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else if (field === 'condicion') {
-            labelText = 'Condición';
-            const select = document.createElement('select');
-            select.id = `attr-${field}`;
-            select.name = field;
-            select.innerHTML = `
-                <option value="">Selecciona</option>
-                <option value="Nuevo con Etiqueta">Nuevo con Etiqueta</option>
-                <option value="Nuevo sin Etiqueta">Nuevo sin Etiqueta</option>
-                <option value="Poco Uso">Poco Uso</option>
-                <option value="Usado">Usado</option>
-                <option value="Excelente Estado">Excelente Estado</option>
-            `;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(select);
-        } else {
-            placeholder = `Ej: ${labelText}`;
-        }
-
-        if (field !== 'tipo_prenda' && field !== 'tipo_calzado' && field !== 'tipo_bolso' && field !== 'tipo_accesorio' && field !== 'tipo_joya' && field !== 'tipo_producto' && field !== 'talla' && field !== 'edad' && field !== 'condicion') {
-            const input = document.createElement('input');
-            input.type = inputType;
-            input.id = `attr-${field}`;
-            input.name = field;
-            input.placeholder = placeholder;
-            fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-            fieldDiv.appendChild(input);
-        }
-
-        fashionFields.appendChild(fieldDiv);
-    });
+    showCategoryFields('moda y belleza', 'fashion-fields', 'fashion-details');
 }
 
     function showSportsFields() {
-        const fields = sportsSubcategories[selectedSubcategory];
-        if (!fields) {
-            console.log('No fields found for subcategory:', selectedSubcategory);
-            return;
-        }
+        showCategoryFields('deportes y hobbies', 'sports-fields', 'sports-details');
+    }
 
-        console.log('Showing fields for subcategory:', selectedSubcategory, fields);
+    function showPetsFields() {
+        showCategoryFields('mascotas', 'pets-fields', 'pets-details');
+    }
 
-        sportsDetails.style.display = 'block';
-        sportsFields.innerHTML = '';
+    function showServicesFields() {
+        showCategoryFields('servicios', 'services-fields', 'services-details');
+    }
 
-        const titleDiv = document.createElement('div');
-        sportsFields.appendChild(titleDiv);
+    function showBusinessFields() {
+        showCategoryFields('negocios', 'business-fields', 'business-details');
+    }
 
-        fields.forEach(field => {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-group';
-
-            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            let inputType = 'text';
-            let placeholder = '';
-
-            const fieldConfigs = {
-                tipo_bicicleta: {
-                    label: 'Tipo de Bicicleta',
-                    type: 'select',
-                    options: ['Mountain Bike', 'Ruta', 'BMX', 'Eléctrica', 'Híbrida', 'Infantil']
-                },
-                tipo_articulo: selectedSubcategory === 'Deportes' ? {
-                    label: 'Tipo de Artículo',
-                    type: 'select',
-                    options: ['Ropa Deportiva', 'Calzado Deportivo', 'Balones', 'Raquetas', 'Guantes', 'Cascos', 'Pesas', 'Otros']
-                } : {
-                    label: 'Tipo de Artículo',
-                    type: 'text',
-                    placeholder: 'Ej: Álbum de estampas, Libro de cocina, etc.'
-                },
-                tipo_instrumento: {
-                    label: 'Tipo de Instrumento',
-                    type: 'select',
-                    options: ['Guitarra', 'Bajo', 'Batería', 'Piano/Teclado', 'Viento', 'Cuerdas', 'Otro']
-                },
-                marca: (() => {
-                    const placeholders = {
-                        'Bicicletas': 'Ej: Trek, Giant, Specialized, BMX, Rali',
-                        'Instrumentos Musicales': 'Ej: Yamaha, Fender, Gibson, Roland',
-                        'Deportes': 'Ej: Nike, Adidas, Puma, Reebok',
-                        'Coleccionables': 'Ej: Panini, Marvel, Hot Wheels, Lego',
-                        'Libros, Revistas y Comics': 'Ej: Editorial Planeta, Marvel Comics, DC',
-                        'Otros Hobbies': 'Ej: Marca del artículo'
-                    };
-                    return {
-                        label: 'Marca', 
-                        type: 'text',
-                        placeholder: placeholders[selectedSubcategory] || 'Ej: Marca del artículo'
-                    };
-                })(),
-                aro: {
+    function showCommunityFields() {
+        showCategoryFields('comunidad', 'community-fields', 'community-details');
+    }
                     label: 'Aro',
                     type: 'select',
                     options: ['12"', '16"', '20"', '24"', '26"', '27.5"', '29"']
