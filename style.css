@@ -1677,6 +1677,12 @@ body {
   .product-gallery-swiper .swiper-button-prev {
     display: none !important;
   }
+
+  /* Mantener visibles las flechas de mini-gallery en móviles */
+  .mini-gallery .swiper-button-next,
+  .mini-gallery .swiper-button-prev {
+    display: flex !important;
+  }
 }
 
 /* Sección TOP Selección (carrusel destacado 2 columnas) */

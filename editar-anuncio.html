@@ -171,17 +171,23 @@
                                         <input type="text" id="attr-marca" name="marca" placeholder="Ej: Toyota">
                                     </div>
                                     <div class="form-group">
-                                        <label for="attr-anio">Año</label>
-                                        <input type="number" id="attr-anio" name="anio" placeholder="Ej: 2020">
+                                        <label for="attr-modelo">Modelo</label>
+                                        <input type="text" id="attr-modelo" name="modelo" placeholder="Ej: Hilux 2.4 CD 4x4">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
+                                        <label for="attr-anio">Año</label>
+                                        <input type="number" id="attr-anio" name="anio" placeholder="Ej: 2020">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="attr-kilometraje">Kilometraje</label>
                                         <input type="number" id="attr-kilometraje" name="kilometraje" placeholder="Ej: 50000">
                                     </div>
+                                </div>
+                                <div class="form-row">
                                     <div class="form-group">
-                                        <label for="attr-transmision">Transmision</label>
+                                        <label for="attr-transmision">Transmisión</label>
                                         <select id="attr-transmision" name="transmision">
                                             <option value="">Selecciona</option>
                                             <option value="Automática">Automática</option>
@@ -199,6 +205,87 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-color">Color</label>
+                                        <input type="text" id="attr-color" name="color" placeholder="Ej: Blanco">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-puertas">Puertas</label>
+                                        <select id="attr-puertas" name="puertas">
+                                            <option value="">Selecciona</option>
+                                            <option value="2">2 puertas</option>
+                                            <option value="3">3 puertas</option>
+                                            <option value="4">4 puertas</option>
+                                            <option value="5">5 puertas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-vidrios">Vidrios</label>
+                                        <select id="attr-vidrios" name="vidrios">
+                                            <option value="">Selecciona</option>
+                                            <option value="Eléctricos">Eléctricos</option>
+                                            <option value="Manuales">Manuales</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-rines">Rines</label>
+                                        <input type="text" id="attr-rines" name="rines" placeholder="Ej: 16 pulgadas">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-tapiz">Tapiz</label>
+                                        <select id="attr-tapiz" name="tapiz">
+                                            <option value="">Selecciona</option>
+                                            <option value="Tela">Tela</option>
+                                            <option value="Cuero">Cuero</option>
+                                            <option value="Vinilo">Vinilo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-direccion">Dirección</label>
+                                        <select id="attr-direccion" name="direccion">
+                                            <option value="">Selecciona</option>
+                                            <option value="Asistida">Asistida</option>
+                                            <option value="Hidráulica">Hidráulica</option>
+                                            <option value="Eléctrica">Eléctrica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-frenos">Frenos</label>
+                                        <select id="attr-frenos" name="frenos">
+                                            <option value="">Selecciona</option>
+                                            <option value="ABS">ABS</option>
+                                            <option value="Discos">Discos</option>
+                                            <option value="Tambores">Tambores</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-airbags">Airbags</label>
+                                        <select id="attr-airbags" name="airbags">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-estado">Estado</label>
+                                        <select id="attr-estado" name="estado">
+                                            <option value="">Selecciona</option>
+                                            <option value="Excelente">Excelente</option>
+                                            <option value="Bueno">Bueno</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Necesita reparaciones">Necesita reparaciones</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -208,14 +295,8 @@
                             <div id="realestate-fields">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="attr-tipo-inmueble">Tipo</label>
-                                        <select id="attr-tipo-inmueble" name="tipo">
-                                            <option value="">Selecciona</option>
-                                            <option value="Casa">Casa</option>
-                                            <option value="Apartamento">Apartamento</option>
-                                            <option value="Terreno">Terreno</option>
-                                            <option value="Local">Local</option>
-                                        </select>
+                                        <label for="attr-m2">Metros Cuadrados (m²)</label>
+                                        <input type="number" id="attr-m2" name="m2" placeholder="Ej: 120">
                                     </div>
                                     <div class="form-group">
                                         <label for="attr-habitaciones">Habitaciones</label>
@@ -224,18 +305,146 @@
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="attr-banos">Baños</label>
-                                        <input type="number" id="attr-banos" name="banos" placeholder="Ej: 2">
+                                        <label for="attr-baños">Baños</label>
+                                        <input type="number" id="attr-baños" name="baños" placeholder="Ej: 2">
                                     </div>
                                     <div class="form-group">
-                                        <label for="attr-area">Área (m²)</label>
-                                        <input type="number" id="attr-area" name="area" placeholder="Ej: 150">
+                                        <label for="attr-piso">Piso</label>
+                                        <input type="number" id="attr-piso" name="piso" placeholder="Ej: 5">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="attr-caracteristicas">Características</label>
-                                        <input type="text" id="attr-caracteristicas" name="caracteristicas" placeholder="Ej: Garage, Piscina">
+                                        <label for="attr-estacionamiento">Estacionamientos</label>
+                                        <input type="number" id="attr-estacionamiento" name="estacionamiento" placeholder="Ej: 1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-amueblado">Amueblado</label>
+                                        <select id="attr-amueblado" name="amueblado">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="Parcialmente">Parcialmente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-ascensor">Ascensor</label>
+                                        <select id="attr-ascensor" name="ascensor">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-jardin">Jardín</label>
+                                        <select id="attr-jardin" name="jardin">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-piscina">Piscina</label>
+                                        <select id="attr-piscina" name="piscina">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-tipo_propiedad">Tipo de Propiedad</label>
+                                        <select id="attr-tipo_propiedad" name="tipo_propiedad">
+                                            <option value="">Selecciona</option>
+                                            <option value="Casa">Casa</option>
+                                            <option value="Apartamento">Apartamento</option>
+                                            <option value="Local comercial">Local comercial</option>
+                                            <option value="Oficina">Oficina</option>
+                                            <option value="Terreno">Terreno</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-anio_construccion">Año de Construcción</label>
+                                        <input type="number" id="attr-anio_construccion" name="anio_construccion" placeholder="Ej: 2020">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-estado_conservacion">Estado de Conservación</label>
+                                        <select id="attr-estado_conservacion" name="estado_conservacion">
+                                            <option value="">Selecciona</option>
+                                            <option value="Excelente">Excelente</option>
+                                            <option value="Bueno">Bueno</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Necesita reparaciones">Necesita reparaciones</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-calefaccion">Calefacción</label>
+                                        <select id="attr-calefaccion" name="calefaccion">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="Eléctrica">Eléctrica</option>
+                                            <option value="Gas">Gas</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-aire_acondicionado">Aire Acondicionado</label>
+                                        <select id="attr-aire_acondicionado" name="aire_acondicionado">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="Central">Central</option>
+                                            <option value="Split">Split</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-seguridad">Seguridad</label>
+                                        <select id="attr-seguridad" name="seguridad">
+                                            <option value="">Selecciona</option>
+                                            <option value="Portero">Portero</option>
+                                            <option value="Cámaras">Cámaras</option>
+                                            <option value="Alarmas">Alarmas</option>
+                                            <option value="Conserje">Conserje</option>
+                                            <option value="Básica">Básica</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-orientacion">Orientación</label>
+                                        <select id="attr-orientacion" name="orientacion">
+                                            <option value="">Selecciona</option>
+                                            <option value="Norte">Norte</option>
+                                            <option value="Sur">Sur</option>
+                                            <option value="Este">Este</option>
+                                            <option value="Oeste">Oeste</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="attr-mascotas">Mascotas Permitidas</label>
+                                        <select id="attr-mascotas" name="mascotas">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                            <option value="Pequeñas">Solo pequeñas</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attr-gimnasio">Gimnasio</label>
+                                        <select id="attr-gimnasio" name="gimnasio">
+                                            <option value="">Selecciona</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

@@ -2649,6 +2649,16 @@ form.addEventListener('submit', async (e) => {
                     json[field] = value;
                 }
             });
+            // Campos adicionales de texto
+            const textFields = [
+                'area' // Para compatibilidad con versiones anteriores
+            ];
+            textFields.forEach(field => {
+                const value = formData.get(field);
+                if (value) {
+                    json[field] = value;
+                }
+            });
         }
         
         // --- ELECTRÓNICA ---

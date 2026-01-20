@@ -234,7 +234,7 @@ async function loadAndFilterResults() {
     const mainCategory = params.get('category') || 'all';
     const location = params.get('location')?.toLowerCase() || '';
 
-    const selectedSubcategories = Array.from(document.querySelectorAll('input[name="subcategory"]:checked')).map(cb => cb.value);
+    const selectedCategories = Array.from(document.querySelectorAll('input[name="subcategory"]:checked')).map(cb => cb.value);
     const priceMin = document.getElementById('price-min').value;
     const priceMax = document.getElementById('price-max').value;
 
@@ -252,12 +252,19 @@ async function loadAndFilterResults() {
     if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%`);
     if (location) queryBuilder = queryBuilder.ilike('ubicacion', `%${location}%`);
 
+    // Category filtering logic
     if (mainCategory !== 'all') {
+      // Specific category from URL
       queryBuilder = queryBuilder.eq('categoria', mainCategory);
-    }
-
-    if (selectedSubcategories.length > 0) {
-      queryBuilder = queryBuilder.in('subcategoria', selectedSubcategories);
+      // Additional subcategory filtering if selected
+      if (selectedCategories.length > 0) {
+        queryBuilder = queryBuilder.in('subcategoria', selectedCategories);
+      }
+    } else {
+      // No specific category from URL, use selected categories from filter
+      if (selectedCategories.length > 0) {
+        queryBuilder = queryBuilder.in('categoria', selectedCategories);
+      }
     }
 
     if (priceMin) queryBuilder = queryBuilder.gte('precio', priceMin);
@@ -293,6 +300,7 @@ async function loadAndFilterResults() {
     // Load subcategories with counts for filtering
     let subcategoriesWithCounts = [];
     if (mainCategory !== 'all') {
+        // When a specific category is selected, show its subcategories
         const parentCategory = DEFAULT_CATEGORIES.find(cat => cat.nombre === mainCategory && cat.parent_id === null);
         if (parentCategory) {
             const subcats = DEFAULT_CATEGORIES.filter(cat => cat.parent_id === parentCategory.id);
@@ -309,6 +317,17 @@ async function loadAndFilterResults() {
                 subcategoriesWithCounts = await Promise.all(countsPromises);
             }
         }
+    } else {
+        // When showing all results, show main categories for filtering
+        const mainCategories = DEFAULT_CATEGORIES.filter(cat => cat.parent_id === null);
+        const countsPromises = mainCategories.map(async (cat) => {
+            const { count } = await supabase
+                .from('anuncios')
+                .select('*', { count: 'exact', head: true })
+                .eq('categoria', cat.nombre);
+            return { nombre: cat.nombre, count: count || 0 };
+        });
+        subcategoriesWithCounts = await Promise.all(countsPromises);
     }
 
     displayFilteredProducts(products || []);
@@ -320,16 +339,29 @@ async function loadAndFilterResults() {
 // --- FUNCIONES DE RENDERIZADO ---
 function displaySubcategoryFilters(subcategoriesWithCounts) {
     const container = document.getElementById('subcategory-filter-container');
+    const labelEl = document.getElementById('category-filter-label');
     if (!container) return;
+
     if (!subcategoriesWithCounts || subcategoriesWithCounts.length === 0) {
-        container.innerHTML = "<p>No hay subcategorías.</p>";
+        container.innerHTML = "<p>No hay categorías disponibles.</p>";
+        if (labelEl) labelEl.textContent = "Categoría";
         return;
     }
-    container.innerHTML = subcategoriesWithCounts.map(sub => `
+
+    // Determine if these are main categories or subcategories
+    const params = new URLSearchParams(window.location.search);
+    const mainCategory = params.get('category') || 'all';
+    const isMainCategories = mainCategory === 'all';
+
+    if (labelEl) {
+        labelEl.textContent = isMainCategories ? "Categorías" : "Subcategorías";
+    }
+
+    container.innerHTML = subcategoriesWithCounts.map(item => `
         <label class="subcategory-label">
-            <input type="checkbox" name="subcategory" value="${sub.nombre}">
-            ${sub.nombre} ${sub.count !== undefined && sub.count !== null
-                ? `<span style="color:#7f8c8d; font-size:1.2rem;">(${sub.count})</span>`
+            <input type="checkbox" name="subcategory" value="${item.nombre}">
+            ${item.nombre} ${item.count !== undefined && item.count !== null
+                ? `<span style="color:#7f8c8d; font-size:1.2rem;">(${item.count})</span>`
                 : ''}
         </label>
     `).join('');
@@ -752,20 +784,26 @@ return `
                 ${soldBadgeResults}
                 <div class="property-image">
                         ${['premium','destacado','top'].includes(ad.featured_plan)
-                            ? `
-                            <div class="tarjeta-auto">
-                            <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
-                                <div class="swiper-wrapper">
-                                    ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
-                                    ${Array.isArray(ad.url_galeria) && ad.url_galeria.length
-                                        ? ad.url_galeria.map(img =>
+                                    ? (() => {
+                                        const galleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length ? ad.url_galeria : [ad.url_portada];
+                                        const hasMultipleImages = galleryImages.length > 1 || videoEmbedUrl;
+                                        return `
+                                    <div class="tarjeta-auto">
+                                    <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
+                                        <div class="swiper-wrapper">
+                                            ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
+                                            ${galleryImages.map(img =>
                                                 `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`
-                                            ).join('')
-                                        : `<div class="swiper-slide"><img src="${ad.url_portada}" alt="${ad.titulo}" loading="lazy"></div>`}
-                                </div>
-                                <div class="swiper-pagination"></div>
-                                </div>
-                            </div>`
+                                            ).join('')}
+                                        </div>
+                                        <div class="swiper-pagination"></div>
+                                        ${hasMultipleImages ? `
+                                        <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
+                                        ` : ''}
+                                        </div>
+                                    </div>`;
+                                    })()
                             : `<img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image" loading="lazy">`}
                 </div>
         
@@ -809,16 +847,29 @@ return `
     // Inicializar Swiper para cada tarjeta .mini-gallery
     document.querySelectorAll('.mini-gallery').forEach(el => {
       const slides = el.querySelectorAll('.swiper-slide').length;
-      const swiper = new Swiper(el, {
-        loop: slides > 1,
-        pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
-        navigation: {
-          nextEl: el.querySelector('.swiper-button-next'),
-          prevEl: el.querySelector('.swiper-button-prev'),
+      const hasMultipleSlides = slides > 1;
+      const nextEl = el.querySelector('.swiper-button-next');
+      const prevEl = el.querySelector('.swiper-button-prev');
+
+      const swiperConfig = {
+        loop: hasMultipleSlides,
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true
         },
         slidesPerView: 1,
         autoplay: false,
-      });
+      };
+
+      // Solo agregar navegación si hay múltiples slides y los elementos existen
+      if (hasMultipleSlides && nextEl && prevEl) {
+        swiperConfig.navigation = {
+          nextEl: nextEl,
+          prevEl: prevEl,
+        };
+      }
+
+      const swiper = new Swiper(el, swiperConfig);
       window.activeGallerySwipers.push(swiper);
     });
 
@@ -929,54 +980,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const mainCategoryName = params.get('category');
 
-    if (mainCategoryName && mainCategoryName !== 'all') {
-        const { data: parentCategory } = await supabase.from('categorias').select('id').eq('nombre', mainCategoryName).single();
-
-        if (parentCategory) {
-            const { data: subcategories, error: subcatError } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
-            if(subcatError) { console.error(subcatError); return; }
-
-            // Calcular la cantidad de anuncios por subcategoría
-            const subcategoriesWithCounts = await Promise.all(
-              subcategories.map(async sub => {
-                const { data, count, error: countError } = await supabase
-                  .from('anuncios')
-                  .select('id', { count: 'exact' })
-                  .eq('categoria', sub.nombre);
-
-                if (countError) console.error('Error al contar', sub.nombre, countError);
-                return { ...sub, count: count || 0 };
-              })
-            );
-
-            // Mostrar el resultado completo
-            displaySubcategoryFilters(subcategoriesWithCounts);
-        } else {
-            // Si no hay categoría padre, mostrar mensaje de no subcategorías
-            displaySubcategoryFilters([]);
-        }
-    } else {
-        // Si no hay categoría específica, cargar todas las categorías disponibles con conteos
-        const { data: allCategories, error: catError } = await supabase.from('categorias').select('nombre');
-        if (catError) {
-            console.error(catError);
-            displaySubcategoryFilters([]);
-            return;
-        }
-
-        // Bloque de conteo de categorías eliminado para optimización.
-        const allCategoriesWithCounts = await Promise.all(
-          allCategories.map(async cat => {
-            const { data, count, error: countError } = await supabase
-              .from('anuncios')
-              .select('id', { count: 'exact' })
-              .eq('categoria', cat.nombre);
-            if (countError) console.error('Error al contar', cat.nombre, countError);
-            return { ...cat, count: count || 0 };
-          })
-        );
-        displaySubcategoryFilters(allCategoriesWithCounts); // Mostrar todas las categorías
-    }
+    // No precargar subcategorías en la inicialización - se hará en loadAndFilterResults
+    // Esto evita errores cuando no hay categoría específica seleccionada
+    displaySubcategoryFilters([]);
 
     await loadAndFilterResults();
 
@@ -987,4 +993,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadAndFilterResults();
         });
     }
+
+    // Limpiar filtros cuando se cambia la URL (navegación del navegador)
+    window.addEventListener('popstate', () => {
+        // Limpiar checkboxes de filtros
+        document.querySelectorAll('input[name="subcategory"]').forEach(cb => cb.checked = false);
+        // Limpiar campos de precio
+        document.getElementById('price-min').value = '';
+        document.getElementById('price-max').value = '';
+        currentPage = 1;
+        loadAndFilterResults();
+    });
 });
