@@ -2056,7 +2056,7 @@ function showBusinessFields() {
     // === BLOQUE DE GESTOR DE IMÁGENES (VERSIÓN FINAL) ===
     // =======================================================
 
-    var galleryFiles = [];
+    let galleryFiles = [];
     // const MAX_FILES = 10; // Ahora se define por el plan
 
     // 1. FUNCIÓN DE RENDERIZADO (CORREGIDA)
@@ -2066,7 +2066,9 @@ function showBusinessFields() {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const wrapper = document.createElement('div');
-                wrapper.className = 'gallery-preview-item image-preview';
+                // La clase que SÍ está en nuestro CSS
+                wrapper.className = 'gallery-preview-item image-preview'; // Usar la clase del CSS
+
                 wrapper.innerHTML = `
                     <img src="${e.target.result}" class="gallery-img" style="max-width: 100px; max-height: 100px; object-fit: cover; border-radius: 8px;">
                     <button type="button" class="delete-image-btn" data-index="${index}"><i class="fas fa-times-circle"></i></button>
@@ -2081,6 +2083,7 @@ function showBusinessFields() {
     const addFiles = (newFiles) => {
         // 1. OBTENER PLAN SELECCIONADO Y LÍMITES
         const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+
         const limits = {
             'free': 3,
             'basico': 5,
@@ -2089,21 +2092,36 @@ function showBusinessFields() {
             'top': 20
         };
         const maxAllowed = limits[selectedPlan];
-        const filesArray = Array.from(newFiles);
 
-        // Agregar todas las seleccionadas
-        filesArray.forEach(file => {
-            galleryFiles.push(file);
-        });
-        // Filtrar duplicados por nombre, tamaño y tipo
-        galleryFiles = galleryFiles.filter((file, idx, arr) => {
-            return arr.findIndex(f => f.name === file.name && f.size === file.size && f.type === file.type) === idx;
-        });
-        // Recortar el array a las primeras N permitidas
-        if (galleryFiles.length > maxAllowed) {
-            galleryFiles = galleryFiles.slice(0, maxAllowed);
-            alert(`⚠️ Solo se agregaron las primeras ${maxAllowed} fotos para el plan ${selectedPlan.toUpperCase()}.`);
+        const filesArray = Array.from(newFiles);
+        const currentImagesCount = galleryFiles.length; // Usar el array REAL
+        const totalImagesAfterAdd = currentImagesCount + filesArray.length;
+
+        // 2. VALIDACIÓN DEL LOTE COMPLETO
+        if (totalImagesAfterAdd > maxAllowed) {
+            // Calcular cuántas fotos se pueden añadir realmente
+            const availableSlots = maxAllowed - currentImagesCount;
+
+            alert(`⚠️ LÍMITE EXCEDIDO\n\nPlan ${selectedPlan.toUpperCase()}: máximo ${maxAllowed} fotos\nYa tienes: ${currentImagesCount}\nIntentas agregar: ${filesArray.length}\n\nSolo se añadirán las primeras ${availableSlots} fotos, si hay espacio.`);
+
+            // Si no hay slots disponibles, simplemente salir
+            if (availableSlots <= 0) return;
+
+            // Si hay slots, truncar la matriz de archivos a añadir
+            const filesToProcess = filesArray.slice(0, availableSlots);
+
+            // Procesar solo los archivos que caben
+            filesToProcess.forEach(file => {
+                galleryFiles.push(file);
+            });
+
+        } else {
+            // Si el lote completo cabe, añadir todos
+            filesArray.forEach(file => {
+                galleryFiles.push(file);
+            });
         }
+
         renderPreviews();
     };
 
@@ -2298,9 +2316,9 @@ function showBusinessFields() {
 
 
 
-
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const publishButton = document.getElementById('publish-ad-btn');
     publishButton.disabled = true;
     publishButton.textContent = 'Publicando...';
@@ -2313,8 +2331,9 @@ form.addEventListener('submit', async (e) => {
         console.log("⚠️ Error al verificar sesión:", err.message);
         user = null;
     }
-
+    
     if (!user) {
+        // Mostrar modal de login en lugar de alert
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         showLoginModalForPublishing();
@@ -2332,30 +2351,35 @@ form.addEventListener('submit', async (e) => {
     const coverImageFile = coverImageInput.files[0];
     const termsAgreement = document.getElementById('terms-agreement');
 
+    // Validaciones mejoradas
     if (!title || title.length < 10) {
         alert('El título debe tener al menos 10 caracteres.');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
+
     if (!description || description.length < 30) {
         alert('La descripción debe tener al menos 30 caracteres para mejor visibilidad.');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
+
     if (!price || parseFloat(price) < 1) {
         alert('Por favor, ingresa un precio válido.');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
+
     if (!category || !province || !district || !coverImageFile) {
         alert('Por favor, completa todos los campos obligatorios (Categoría, Ubicación e Imagen de Portada).');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
+
     if (!termsAgreement || !termsAgreement.checked) {
         alert('Debes aceptar los Términos y Condiciones para continuar.');
         publishButton.disabled = false;
@@ -2363,7 +2387,7 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    // VALIDAR PLAN Y FLUJO DE PAGO
+    // ✅ VALIDAR VIDEOS SEGÚN PLAN
     const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
     const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free';
     const videoUrl = document.getElementById('video-url')?.value || '';
@@ -2376,10 +2400,11 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    // VALIDAR URL DE VIDEO (YouTube o Vimeo)
+    // ✅ VALIDAR URL DE VIDEO (YouTube o Vimeo)
     if (videoUrl && (selectedPlan === 'destacado' || selectedPlan === 'top')) {
         const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)\//;
         const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\//;
+        
         if (!youtubeRegex.test(videoUrl) && !vimeoRegex.test(videoUrl)) {
             alert('Por favor, ingresa una URL válida de YouTube o Vimeo.');
             publishButton.disabled = false;
@@ -2388,97 +2413,112 @@ form.addEventListener('submit', async (e) => {
         }
     }
 
-    // Si el plan es de pago, guardar datos en sessionStorage y redirigir a payment.html
-    if (["basico","premium","destacado","top"].includes(selectedPlan)) {
-        // Guardar datos del anuncio temporalmente en sessionStorage
-        const formData = new FormData(form);
-        const adDraft = {};
-        formData.forEach((value, key) => {
-            adDraft[key] = value;
-        });
-        adDraft.selectedPlan = selectedPlan;
-        adDraft.videoUrl = videoUrl;
-        // Guardar imágenes en sessionStorage NO es viable, pero sí los nombres
-        // Se recomienda guardar solo los datos básicos y pedir re-subida tras pago
-        sessionStorage.setItem('adDraft', JSON.stringify(adDraft));
-        // Redirigir a pago
-        window.location.href = `payment.html?plan=${selectedPlan}`;
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    }
-
-    // Si es plan gratis, publicar directamente
     // Obtener nombres de categoría y subcategoría
     const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
-    const subcategoryName = subcategorySelect.value;
+    const subcategoryName = subcategorySelect.value; // Ya es el nombre
 
     try {
         if (!coverImageFile) throw new Error("La imagen de portada es obligatoria.");
 
-        const coverFileName = `${user.id}/cover-${Date.now()}-${coverImageFile.name}`;
-        let { error: coverUploadError } = await supabase.storage.from('imagenes_anuncios').upload(coverFileName, coverImageFile);
-        if (coverUploadError) throw coverUploadError;
+            const coverFileName = `${user.id}/cover-${Date.now()}-${coverImageFile.name}`;
+            let { error: coverUploadError } = await supabase.storage.from('imagenes_anuncios').upload(coverFileName, coverImageFile);
+            if (coverUploadError) throw coverUploadError;
+            
+            const { data: { publicUrl: coverPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(coverFileName);
 
-        const { data: { publicUrl: coverPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(coverFileName);
+            // Subir imágenes de galería
+            const uploadedGalleryUrls = [];
+            for (const file of galleryFiles) {
+                const galleryFileName = `${user.id}/gallery-${Date.now()}-${file.name}`;
+                const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
+                if (galleryUploadError) throw galleryUploadError;
+                const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
+                uploadedGalleryUrls.push(galleryPublicUrl);
+            }
 
-        // Subir imágenes de galería
-        const uploadedGalleryUrls = [];
-        for (const file of galleryFiles) {
-            const galleryFileName = `${user.id}/gallery-${Date.now()}-${file.name}`;
-            const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
-            if (galleryUploadError) throw galleryUploadError;
-            const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
-            uploadedGalleryUrls.push(galleryPublicUrl);
-        }
+            const formData = new FormData(form);
+            const adData = {
+                titulo: document.getElementById('title').value,
+                descripcion: formData.get('descripcion'),
+                precio: parseFloat(formData.get('precio')),
+                categoria: categoryName,
+                provincia: formData.get('provincia'),
+                distrito: formData.get('distrito'),
+                user_id: user.id,
+                url_portada: coverPublicUrl,
+                url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
+                url_video: (selectedPlan === 'destacado' || selectedPlan === 'top') ? formData.get('video_url') : null,
+                publicar_redes: selectedPlan === 'top' ? (formData.get('publicar_redes') ? true : false) : false,
+                fecha_publicacion: new Date().toISOString()
+            };
 
-        const formData = new FormData(form);
-        const adData = {
-            titulo: document.getElementById('title').value,
-            descripcion: formData.get('descripcion'),
-            precio: parseFloat(formData.get('precio')),
-            categoria: categoryName,
-            provincia: formData.get('provincia'),
-            distrito: formData.get('distrito'),
-            user_id: user.id,
-            url_portada: coverPublicUrl,
-            url_galeria: uploadedGalleryUrls,
-            url_video: (selectedPlan === 'destacado' || selectedPlan === 'top') ? formData.get('video_url') : null,
-            publicar_redes: selectedPlan === 'top' ? (formData.get('publicar_redes') ? true : false) : false,
-            fecha_publicacion: new Date().toISOString()
-        };
+            // --- ATRIBUTOS UNIFICADOS (TODAS las categorías van a JSONB) ---
+            adData.atributos_clave = buildUnifiedAttributesJSON(formData, categoryName, subcategoryName);
 
-        adData.atributos_clave = buildUnifiedAttributesJSON(formData, categoryName, subcategoryName);
-        window.atributos_clave = adData.atributos_clave;
-        console.log('🌐 Variable global window.atributos_clave asignada:', window.atributos_clave);
+            // DIAGNÓSTICO: Hacer global para debugging
+            window.atributos_clave = adData.atributos_clave;
+            console.log('🌐 Variable global window.atributos_clave asignada:', window.atributos_clave);
 
-        // Lógica de planes gratis
-        const VIGENCIA_GRATIS_DIAS = 30;
-        let diasDeVigencia = VIGENCIA_GRATIS_DIAS;
-        const fechaExpiracion = new Date();
-        fechaExpiracion.setDate(fechaExpiracion.getDate() + diasDeVigencia);
-        adData.featured_plan = selectedPlan;
-        adData.featured_until = fechaExpiracion.toISOString();
-        adData.plan_priority = PLAN_LIMITS[selectedPlan].priority;
-        adData.max_images = PLAN_LIMITS[selectedPlan].maxFotos;
+            // ==================================================================
+            // === INICIO: LÓGICA PARA PLANES Y MEJORAS ===
+            // ==================================================================
 
-        const { data: newAd, error: adInsertError } = await supabase
-            .from('anuncios')
-            .insert(adData)
-            .select()
+            // 1. Ya obtuvimos el plan seleccionado en validaciones previas
+            // (no necesita re-lectura, ya lo tenemos en selectedPlan)
+
+            // 2. Calcular la fecha de expiración del plan
+            const VIGENCIA_GRATIS_DIAS = 30;
+            const VIGENCIA_BASICO_DIAS = 30;
+            const VIGENCIA_PREMIUM_DIAS = 30;
+            const VIGENCIA_DESTACADO_DIAS = 30;
+            const VIGENCIA_TOP_DIAS = 30;
+
+            let diasDeVigencia = 30; // Todos los planes 30 días
+
+            // ELIMINAR o COMENTAR cualquier lógica que cambie los días según el plan
+            // if (selectedPlan === 'basico') {
+            //     diasDeVigencia = VIGENCIA_BASICO_DIAS;
+            // } else if (selectedPlan === 'premium') {
+            //     diasDeVigencia = VIGENCIA_PREMIUM_DIAS;
+            // } else if (selectedPlan === 'destacado') {
+            //     diasDeVigencia = VIGENCIA_DESTACADO_DIAS;
+            // } else if (selectedPlan === 'top') {
+            //     diasDeVigencia = VIGENCIA_TOP_DIAS;
+            // }
+
+            const fechaExpiracion = new Date();
+            fechaExpiracion.setDate(fechaExpiracion.getDate() + diasDeVigencia);
+
+            // 3. Los "enhancements" (add-ons opcionales) han sido eliminados.
+
+            // 4. Añadir los datos del plan al objeto principal del anuncio
+            adData.featured_plan = selectedPlan;
+            adData.featured_until = fechaExpiracion.toISOString();
+            adData.plan_priority = PLAN_LIMITS[selectedPlan].priority; // AGREGAR
+            adData.max_images = PLAN_LIMITS[selectedPlan].maxFotos; // AGREGAR
+            // adData.enhancements = enhancements; // Eliminado: ya no hay enhancements
+
+            // ==================================================================
+            // === FIN: LÓGICA PARA PLANES Y MEJORAS ===
+            // ==================================================================
+        
+            const { data: newAd, error: adInsertError } = await supabase
+                .from('anuncios')
+                .insert(adData)
+                .select()
             .single();
 
-        if (adInsertError) throw adInsertError;
+            if (adInsertError) throw adInsertError;
 
-        alert('¡Anuncio publicado con éxito!');
-        window.location.href = 'panel-unificado.html';
+            alert('¡Anuncio publicado con éxito!');
+            window.location.href = 'panel-unificado.html';
 
-    } catch (error) {
-        console.error('Error al publicar el anuncio:', error);
-        alert(`Error: ${error.message}`);
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-    }
+        } catch (error) {
+            console.error('Error al publicar el anuncio:', error);
+            alert(`Error: ${error.message}`);
+            publishButton.disabled = false;
+            publishButton.textContent = 'Publicar Anuncio';
+        }
 });
 
     // --- FUNCIÓN PARA CONSTRUIR JSON DE ELECTRÓNICA ---
@@ -2576,18 +2616,27 @@ form.addEventListener('submit', async (e) => {
         if (mainCategory.toLowerCase().includes('inmueble') || 
             mainCategory.toLowerCase().includes('casa') || 
             mainCategory.toLowerCase().includes('apartamento')) {
-            
-            // ✅ LOGS DENTRO DEL IF (AGREGAR ESTAS LÍNEAS)
             console.log('🟢 ENTRÓ AL BLOQUE DE INMUEBLES');
-            
-            const realEstateFields = ['m2', 'habitaciones', 'baños'];
+            // Campos numéricos
+            const realEstateFields = [
+                'm2', 'niveles', 'habitaciones', 'banos', 'medios_banos', 'estacionamiento'
+            ];
             realEstateFields.forEach(field => {
                 const value = formData.get(field);
-                console.log(`🟢 Campo "${field}":`, value);
-                if (value) {
+                if (value !== null && value !== undefined && value !== "") {
                     json[field] = parseInt(value);
                 }
             });
+            // Campos booleanos (checkbox)
+            const booleanFields = [
+                'sala_principal', 'sala_tv', 'estudio', 'cuarto_servicio', 'area_lavado', 'bodega', 'patio_jardin', 'balcon_terraza'
+            ];
+            booleanFields.forEach(field => {
+                json[field] = formData.get(field) ? true : false;
+            });
+            // Campos select
+            json['comedor'] = formData.get('comedor') || null;
+            json['cocina'] = formData.get('cocina') || null;
         }
         
         // --- ELECTRÓNICA ---
