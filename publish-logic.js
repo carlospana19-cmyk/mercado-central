@@ -612,292 +612,34 @@ function showCategoryFields(categoryKey, containerId, sectionId) {
 function showElectronicsFields() {
     showCategoryFields('electrónica', 'electronics-fields', 'electronics-details');
 }
-            fieldDiv.style.border = '1px solid #ddd';
-            fieldDiv.style.borderRadius = '5px';
-            fieldDiv.style.backgroundColor = 'white';
-            // Removed debugging styles
 
-            let labelText = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            let inputType = 'text';
-            let placeholder = '';
+function showHomeFurnitureFields() {
+    showCategoryFields('hogar y muebles', 'home-furniture-fields', 'home-furniture-details');
+}
 
-            if (field === 'tipo_computadora') {
-                labelText = 'Tipo de Computadora';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
-                select.className = 'form-control';
-                select.style.width = '100%';
-                select.style.padding = '8px';
-                select.style.border = '1px solid #ccc';
-                select.style.borderRadius = '4px';
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Laptop">Laptop</option>
-                    <option value="Escritorio">Escritorio</option>
-                `;
-                const label = document.createElement('label');
-                label.textContent = labelText;
-                label.style.display = 'block';
-                label.style.marginBottom = '5px';
-                label.style.fontWeight = 'bold';
-                fieldDiv.appendChild(label);
-                fieldDiv.appendChild(select);
-            } else if (field === 'plataforma') {
-                labelText = 'Plataforma';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = `electronics_${field}`;
-                select.className = 'form-control';
-                select.style.width = '100%';
-                select.style.padding = '8px';
-                select.style.border = '1px solid #ccc';
-                select.style.borderRadius = '4px';
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="PlayStation">PlayStation</option>
-                    <option value="Xbox">Xbox</option>
-                    <option value="Nintendo">Nintendo</option>
-                    <option value="PC">PC</option>
-                    <option value="Otra">Otra</option>
-                `;
-                const label = document.createElement('label');
-                label.textContent = labelText;
-                label.style.display = 'block';
-                label.style.marginBottom = '5px';
-                label.style.fontWeight = 'bold';
-                fieldDiv.appendChild(label);
-                fieldDiv.appendChild(select);
-            } else if (field === 'tipo_equipo') {
-                labelText = 'Tipo de Equipo Fotográfico';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Cámara Digital">Cámara Digital</option>
-                    <option value="Cámara Réflex">Cámara Réflex</option>
-                    <option value="Cámara Mirrorless">Cámara Mirrorless</option>
-                    <option value="Lente">Lente</option>
-                    <option value="Flash">Flash</option>
-                    <option value="Trípode">Trípode</option>
-                    <option value="Estabilizador">Estabilizador</option>
-                    <option value="Drone">Drone con Cámara</option>
-                    <option value="Accesorios">Accesorios</option>
-                    <option value="Otro">Otro</option>
-                `;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(select);
-            } else if (field === 'condicion') {
-                labelText = 'Condición';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = `electronics_${field}`;
-                select.className = 'form-control';
-                select.style.width = '100%';
-                select.style.padding = '8px';
-                select.style.border = '1px solid #ccc';
-                select.style.borderRadius = '4px';
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Nuevo">Nuevo</option>
-                    <option value="Usado - Como Nuevo">Usado - Como Nuevo</option>
-                    <option value="Usado - Bueno">Usado - Bueno</option>
-                    <option value="Usado - Aceptable">Usado - Aceptable</option>
-                    <option value="Para Repuestos">Para Repuestos</option>
-                `;
-                const label = document.createElement('label');
-                label.textContent = labelText;
-                label.style.display = 'block';
-                label.style.marginBottom = '5px';
-                label.style.fontWeight = 'bold';
-                fieldDiv.appendChild(label);
-                fieldDiv.appendChild(select);
-            } else if (field === 'memoria_ram') {
-                inputType = 'number';
-                placeholder = 'Ej: 8';
-                labelText = 'Memoria RAM (GB)';
-            } else if (field === 'almacenamiento') {
-                inputType = 'number';
-                placeholder = 'Ej: 256';
-                labelText = 'Almacenamiento (GB)';
-            } else if (field === 'tamano_pantalla') {
-                inputType = 'number';
-                placeholder = 'Ej: 15.6';
-                labelText = 'Tamaño de Pantalla (pulgadas)';
-            } else {
-                placeholder = `Ej: ${labelText}`;
-            }
-
-            if (field !== 'tipo_computadora' && field !== 'plataforma' && field !== 'tipo_equipo' && field !== 'condicion') {
-                const input = document.createElement('input');
-                input.type = inputType;
-                input.id = `attr-${field}`;
-                input.name = field;
-                input.placeholder = placeholder;
-                input.className = 'form-control';
-                input.style.width = '100%';
-                input.style.padding = '8px';
-                input.style.border = '1px solid #ccc';
-                input.style.borderRadius = '4px';
-                input.style.boxSizing = 'border-box';
-                const label = document.createElement('label');
-                label.textContent = labelText;
-                label.style.display = 'block';
-                label.style.marginBottom = '5px';
-                label.style.fontWeight = 'bold';
-                fieldDiv.appendChild(label);
-                fieldDiv.appendChild(input);
-            }
-
-            electronicsFields.appendChild(fieldDiv);
-            console.log('Added field:', field, 'to electronicsFields');
-        });
-        console.log('Total fields added:', fields.length);
-    }
-
-    function showHomeFurnitureFields() {
-        showCategoryFields('hogar y muebles', 'home-furniture-fields', 'home-furniture-details');
-    }
-                
-                // Opciones dinámicas según subcategoría
-                let options = '';
-                if (selectedSubcategory === 'Artículos de Cocina') {
-                    options = `
-                        <option value="">Selecciona</option>
-                        <option value="Utensilios">Utensilios</option>
-                        <option value="Vajilla">Vajilla</option>
-                        <option value="Ollas y Sartenes">Ollas y Sartenes</option>
-                        <option value="Cuchillería">Cuchillería</option>
-                        <option value="Otro">Otro</option>
-                    `;
-                } else if (selectedSubcategory === 'Jardín y Exterior') {
-                    options = `
-                        <option value="">Selecciona</option>
-                        <option value="Herramientas de Jardín">Herramientas de Jardones</option>
-                        <option value="Muebles de Jardín">Muebles de Jardín</option>
-                        <option value="Plantas y Macetas">Plantas y Macetas</option>
-                        <option value="Parrillas">Parrillas</option>
-                        <option value="Iluminación Exterior">Iluminación Exterior</option>
-                        <option value="Otro">Otro</option>
-                    `;
-                } else {
-                    options = `<option value="">Selecciona</option><option value="Otro">Otro</option>`;
-                }
-                
-                select.innerHTML = options;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(select);
-            } else if (field === 'tipo_electrodomestico') {
-                labelText = 'Tipo de Electrodoméstico';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Refrigerador">Refrigerador</option>
-                    <option value="Lavadora">Lavadora</option>
-                    <option value="Microondas">Microondas</option>
-                    <option value="Estufa">Estufa</option>
-                    <option value="Licuadora">Licuadora</option>
-                    <option value="Aspiradora">Aspiradora</option>
-                    <option value="Otro">Otro</option>
-                `;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(select);
-            } else if (field === 'tipo_decoracion') {
-                labelText = 'Tipo de Decoración';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Cuadro">Cuadro</option>
-                    <option value="Espejo">Espejo</option>
-                    <option value="Lámpara">Lámpara</option>
-                    <option value="Alfombra">Alfombra</option>
-                    <option value="Cortina">Cortina</option>
-                    <option value="Otro">Otro</option>
-                `;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(select);
-            } else if (field === 'condicion') {
-                labelText = 'Condición';
-                const select = document.createElement('select');
-                select.id = `attr-${field}`;
-                select.name = field;
-                select.innerHTML = `
-                    <option value="">Selecciona</option>
-                    <option value="Nuevo">Nuevo</option>
-                    <option value="Usado - Excelente">Usado - Excelente</option>
-                    <option value="Usado - Bueno">Usado - Bueno</option>
-                    <option value="Para Restaurar">Para Restaurar</option>
-                `;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(select);
-            } else if (field === 'dimensiones') {
-                placeholder = 'Ej: 120x80x75 cm';
-                labelText = 'Dimensiones';
-            } else {
-                placeholder = `Ej: ${labelText}`;
-            }
-
-            if (field !== 'tipo_mueble' && field !== 'tipo_articulo' && field !== 'tipo_electrodomestico' && field !== 'tipo_decoracion' && field !== 'condicion') {
-                const input = document.createElement('input');
-                input.type = inputType;
-                input.id = `attr-${field}`;
-                input.name = field;
-                input.placeholder = placeholder;
-                fieldDiv.appendChild(document.createElement('label')).textContent = labelText;
-                fieldDiv.appendChild(input);
-            }
-
-            homeFurnitureFields.appendChild(fieldDiv);
-        });
-    }
 function showFashionFields() {
     showCategoryFields('moda y belleza', 'fashion-fields', 'fashion-details');
 }
 
-    function showSportsFields() {
-        showCategoryFields('deportes y hobbies', 'sports-fields', 'sports-details');
-    }
+function showSportsFields() {
+    showCategoryFields('deportes y hobbies', 'sports-fields', 'sports-details');
+}
 
-    function showPetsFields() {
-        showCategoryFields('mascotas', 'pets-fields', 'pets-details');
-    }
+function showPetsFields() {
+    showCategoryFields('mascotas', 'pets-fields', 'pets-details');
+}
 
-    function showServicesFields() {
-        showCategoryFields('servicios', 'services-fields', 'services-details');
-    }
+function showServicesFields() {
+    showCategoryFields('servicios', 'services-fields', 'services-details');
+}
 
-    function showBusinessFields() {
-        showCategoryFields('negocios', 'business-fields', 'business-details');
-    }
+function showBusinessFields() {
+    showCategoryFields('negocios', 'business-fields', 'business-details');
+}
 
-    function showCommunityFields() {
-        showCategoryFields('comunidad', 'community-fields', 'community-details');
-    }
-                    label: 'Aro',
-                    type: 'select',
-                    options: ['12"', '16"', '20"', '24"', '26"', '27.5"', '29"']
-                },
-                talla: { 
-                    label: 'Talla', 
-                    type: 'text',
-                    placeholder: 'Ej: S, M, L, XL, 42'
-                },
-                autor_fabricante: { 
-                    label: 'Autor/Fabricante', 
-                    type: 'text',
-                    placeholder: 'Ej: Gabriel García Márquez'
-                },
-                condicion: {
-                    label: 'Condición',
-                    type: 'select',
-                    options: ['Nueva', 'Usada', 'Como Nueva']
-                }
-            };
+function showCommunityFields() {
+    showCategoryFields('comunidad', 'community-fields', 'community-details');
+}
 
             const config = fieldConfigs[field];
 
