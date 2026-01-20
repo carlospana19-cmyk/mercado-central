@@ -1,5 +1,6 @@
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML } from './utils-attributes.js';
+import { DEFAULT_CATEGORIES } from './config-categories.js';
 
 // --- CARRUSEL DE CATEGORÍA ---
 function initializeCategoryHero() {
@@ -251,15 +252,12 @@ async function loadAndFilterResults() {
     if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%`);
     if (location) queryBuilder = queryBuilder.ilike('ubicacion', `%${location}%`);
 
+    if (mainCategory !== 'all') {
+      queryBuilder = queryBuilder.eq('categoria', mainCategory);
+    }
+
     if (selectedSubcategories.length > 0) {
-      queryBuilder = queryBuilder.in('categoria', selectedSubcategories);
-    } else if (mainCategory !== 'all') {
-      const { data: parentCategory } = await supabase.from('categorias').select('id').eq('nombre', mainCategory).single();
-      if (parentCategory) {
-        const { data: subcategories } = await supabase.from('categorias').select('nombre').eq('parent_id', parentCategory.id);
-        const allCategoryNames = [mainCategory, ...subcategories.map(s => s.nombre)];
-        queryBuilder = queryBuilder.in('categoria', allCategoryNames);
-      }
+      queryBuilder = queryBuilder.in('subcategoria', selectedSubcategories);
     }
 
     if (priceMin) queryBuilder = queryBuilder.gte('precio', priceMin);
@@ -292,7 +290,29 @@ async function loadAndFilterResults() {
         return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
     });
 
+    // Load subcategories with counts for filtering
+    let subcategoriesWithCounts = [];
+    if (mainCategory !== 'all') {
+        const parentCategory = DEFAULT_CATEGORIES.find(cat => cat.nombre === mainCategory && cat.parent_id === null);
+        if (parentCategory) {
+            const subcats = DEFAULT_CATEGORIES.filter(cat => cat.parent_id === parentCategory.id);
+            if (subcats && subcats.length > 0) {
+                // Get counts for each subcategory
+                const countsPromises = subcats.map(async (subcat) => {
+                    const { count } = await supabase
+                        .from('anuncios')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('categoria', mainCategory)
+                        .eq('subcategoria', subcat.nombre);
+                    return { nombre: subcat.nombre, count: count || 0 };
+                });
+                subcategoriesWithCounts = await Promise.all(countsPromises);
+            }
+        }
+    }
+
     displayFilteredProducts(products || []);
+    displaySubcategoryFilters(subcategoriesWithCounts);
     updateSummary(query, mainCategory, count || 0);
     displayPaginationControls(count || 0); // Mostrar controles de paginación
 }
@@ -768,16 +788,7 @@ return `
                         </div>
             
                         <div class="property-attributes">
-                ${vehicleDetailsHTML.replace(/<div class="vehicle-details">|<\/div>/g, '')}
-                ${realEstateDetailsHTML.replace(/<div class="real-estate-details">|<\/div>/g, '')}
-                ${electronicsDetailsHTML.replace(/<div class="electronics-details">|<\/div>/g, '')}
-                ${homeFurnitureDetailsHTML.replace(/<div class="home-furniture-details">|<\/div>/g, '')}
-                ${fashionDetailsHTML.replace(/<div class="fashion-details">|<\/div>/g, '')}
-                ${sportsDetailsHTML.replace(/<div class="sports-details">|<\/div>/g, '')}
-                ${petsDetailsHTML.replace(/<div class="pets-details">|<\/div>/g, '')}
-                ${servicesDetailsHTML.replace(/<div class="services-details">|<\/div>/g, '')}
-                ${businessDetailsHTML.replace(/<div class="business-details">|<\/div>/g, '')}
-                ${communityDetailsHTML.replace(/<div class="community-details">|<\/div>/g, '')}
+                ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
                         </div>
             
             <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">

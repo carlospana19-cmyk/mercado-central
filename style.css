@@ -115,18 +115,20 @@
 
 .property-attributes {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem 1.2rem;
+    flex-wrap: nowrap;
+    gap: 0.5rem 0.8rem;
     margin: 0.5rem 0 0.5rem 0;
     font-size: 1.1rem;
     color: #111;
     letter-spacing: normal !important;
     word-spacing: normal !important;
-    row-gap: 0.3rem;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
 }
 
 .property-attributes span {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     color: #111;
@@ -137,10 +139,11 @@
     margin-bottom: 0.2rem;
     white-space: nowrap;
     letter-spacing: normal !important;
+    vertical-align: middle;
 }
 
 .property-attributes i {
-    color: var(--color-primario);
+    color: #222;
     font-size: 16px;
 }
 
@@ -1967,6 +1970,38 @@ body {
     overflow: hidden !important;
 }
 
+/* Flechas del carrusel en tarjetas de resultados */
+.mini-gallery {
+    position: relative !important;
+}
+
+.mini-gallery .swiper-button-next,
+.mini-gallery .swiper-button-prev {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #fff !important;
+    background: rgba(0,0,0,0.5) !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    margin-top: -15px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10 !important;
+}
+
+.mini-gallery .swiper-button-next::after,
+.mini-gallery .swiper-button-prev::after {
+    font-size: 14px !important;
+    color: #fff !important;
+}
+
+.mini-gallery .swiper-button-next:hover,
+.mini-gallery .swiper-button-prev:hover {
+    background: var(--color-primario) !important;
+}
+
 .product-gallery-swiper .swiper-wrapper {
     width: 100% !important;
     height: 100% !important;
@@ -1993,6 +2028,22 @@ body {
 /* Paginación del carrusel */
 .product-gallery-swiper .swiper-pagination {
     bottom: 20px !important;
+}
+
+/* Atributos del producto junto a la galería */
+.attributes-sidebar {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.attributes-sidebar h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.4rem;
+    color: #333;
+    font-weight: 600;
 }
 
 .product-gallery-swiper .swiper-pagination-bullet {

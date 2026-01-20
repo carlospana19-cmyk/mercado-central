@@ -120,6 +120,7 @@ async function displayProductDetails(ad) {
         document.getElementById('product-date').textContent = "Fecha no disponible";
     }
 
+
     // Agregar información detallada del vehículo si existe
     addVehicleDetails(ad);
 
@@ -911,7 +912,7 @@ function addVehicleDetails(ad) {
         if (vehicleDetailsContainer) vehicleDetailsContainer.style.display = 'none';
         return;
     }
-    const hasVehicleInfo = attr.marca || attr.modelo || attr.anio || attr.kilometraje || attr.motor || attr.transmision || attr.combustible || attr.vidrios || attr.rines || attr.extras;
+    const hasVehicleInfo = attr.marca || attr.modelo || attr.anio || attr.kilometraje || attr.transmision || attr.combustible || attr.color || attr.puertas || attr.vidrios || attr.rines || attr.tapiz || attr.direccion || attr.frenos || attr.airbags || attr.estado;
 
     if (hasVehicleInfo) {
         // --- GRID DE ATRIBUTOS PRINCIPALES ---
@@ -920,22 +921,21 @@ function addVehicleDetails(ad) {
         if (attr.modelo) grid1.push(`<div class="spec-item"><i class="fas fa-car-side"></i><div class="spec-content"><span class="spec-label">Modelo</span><span class="spec-value">${attr.modelo}</span></div></div>`);
         if (attr.anio) grid1.push(`<div class="spec-item"><i class="fas fa-calendar-alt"></i><div class="spec-content"><span class="spec-label">Año</span><span class="spec-value">${attr.anio}</span></div></div>`);
         if (attr.kilometraje) grid1.push(`<div class="spec-item"><i class="fas fa-tachometer-alt"></i><div class="spec-content"><span class="spec-label">Kilometraje</span><span class="spec-value">${attr.kilometraje.toLocaleString('es-PA')} km</span></div></div>`);
-        if (attr.motor) grid1.push(`<div class="spec-item"><i class="fas fa-cogs"></i><div class="spec-content"><span class="spec-label">Motor</span><span class="spec-value">${attr.motor}</span></div></div>`);
         if (attr.transmision) grid1.push(`<div class="spec-item"><i class="fas fa-cogs"></i><div class="spec-content"><span class="spec-label">Transmisión</span><span class="spec-value">${attr.transmision}</span></div></div>`);
         if (attr.combustible) grid1.push(`<div class="spec-item"><i class="fas fa-gas-pump"></i><div class="spec-content"><span class="spec-label">Combustible</span><span class="spec-value">${attr.combustible}</span></div></div>`);
+        if (attr.color) grid1.push(`<div class="spec-item"><i class="fas fa-palette"></i><div class="spec-content"><span class="spec-label">Color</span><span class="spec-value">${attr.color}</span></div></div>`);
+        if (attr.puertas) grid1.push(`<div class="spec-item"><i class="fas fa-door-open"></i><div class="spec-content"><span class="spec-label">Puertas</span><span class="spec-value">${attr.puertas}</span></div></div>`);
         if (attr.vidrios) grid1.push(`<div class="spec-item"><i class="fas fa-window-restore"></i><div class="spec-content"><span class="spec-label">Vidrios</span><span class="spec-value">${attr.vidrios}</span></div></div>`);
         if (attr.rines) grid1.push(`<div class="spec-item"><i class="fas fa-dot-circle"></i><div class="spec-content"><span class="spec-label">Rines</span><span class="spec-value">${attr.rines}</span></div></div>`);
+        if (attr.tapiz) grid1.push(`<div class="spec-item"><i class="fas fa-chair"></i><div class="spec-content"><span class="spec-label">Tapiz</span><span class="spec-value">${attr.tapiz}</span></div></div>`);
+        if (attr.direccion) grid1.push(`<div class="spec-item"><i class="fas fa-steering-wheel"></i><div class="spec-content"><span class="spec-label">Dirección</span><span class="spec-value">${attr.direccion}</span></div></div>`);
+        if (attr.frenos) grid1.push(`<div class="spec-item"><i class="fas fa-stop-circle"></i><div class="spec-content"><span class="spec-label">Frenos</span><span class="spec-value">${attr.frenos}</span></div></div>`);
+        if (attr.airbags) grid1.push(`<div class="spec-item"><i class="fas fa-shield-alt"></i><div class="spec-content"><span class="spec-label">Airbags</span><span class="spec-value">${attr.airbags}</span></div></div>`);
+        if (attr.estado) grid1.push(`<div class="spec-item"><i class="fas fa-star"></i><div class="spec-content"><span class="spec-label">Estado</span><span class="spec-value">${attr.estado}</span></div></div>`);
 
         // Rellenar la última fila de la grid1
         while (grid1.length % 3 !== 0) {
             grid1.push('<div class="spec-item spec-item-empty"></div>');
-        }
-
-        // --- GRID DE EXTRAS ---
-        const grid2 = [];
-        if (attr.extras) grid2.push(`<div class="spec-item"><i class="fas fa-star"></i><div class="spec-content"><span class="spec-label">Extras</span><span class="spec-value">${attr.extras}</span></div></div>`);
-        while (grid2.length % 3 !== 0) {
-            grid2.push('<div class="spec-item spec-item-empty"></div>');
         }
 
         vehicleDetailsContainer.innerHTML = `
@@ -943,8 +943,7 @@ function addVehicleDetails(ad) {
                 <h2>Especificaciones del Vehículo</h2>
                 <div class="specs-grid">
                     ${grid1.join('')}
-                            </div>
-                ${grid2.length > 0 ? `<div class="specs-grid">${grid2.join('')}</div>` : ''}
+                </div>
             </div>
         `;
     } else {
@@ -968,38 +967,33 @@ function addRealEstateDetails(ad) {
 
     // LEER DESDE JSONB
     const attr = ad.atributos_clave || {};
-    const hasRealEstateInfo = attr.m2 || attr.niveles || attr.habitaciones || attr.banos || attr.medios_banos || attr.sala_principal || attr.sala_tv || attr.comedor || attr.cocina || attr.estudio || attr.cuarto_servicio || attr.area_lavado || attr.bodega || attr.patio_jardin || attr.balcon_terraza || attr.estacionamiento;
+    const hasRealEstateInfo = attr.m2 || attr.habitaciones || attr.baños || attr.piso || attr.estacionamiento || attr.amueblado || attr.ascensor || attr.jardin || attr.piscina || attr.tipo_propiedad || attr.anio_construccion || attr.estado_conservacion || attr.calefaccion || attr.aire_acondicionado || attr.seguridad || attr.orientacion || attr.mascotas || attr.gimnasio;
 
     if (hasRealEstateInfo) {
         // --- PRIMERA GRID ---
         const grid1 = [];
         if (attr.m2) grid1.push(`<div class="spec-item"><i class="fas fa-ruler-combined"></i><div class="spec-content"><span class="spec-label">Metros Cuadrados</span><span class="spec-value">${attr.m2} m²</span></div></div>`);
-        if (attr.niveles) grid1.push(`<div class="spec-item"><i class="fas fa-layer-group"></i><div class="spec-content"><span class="spec-label">Niveles/Pisos</span><span class="spec-value">${attr.niveles}</span></div></div>`);
         if (attr.habitaciones) grid1.push(`<div class="spec-item"><i class="fas fa-bed"></i><div class="spec-content"><span class="spec-label">Habitaciones</span><span class="spec-value">${attr.habitaciones}</span></div></div>`);
-        if (attr.banos) grid1.push(`<div class="spec-item"><i class="fas fa-bath"></i><div class="spec-content"><span class="spec-label">Baños Completos</span><span class="spec-value">${attr.banos}</span></div></div>`);
-        if (attr.medios_banos) grid1.push(`<div class="spec-item"><i class="fas fa-toilet"></i><div class="spec-content"><span class="spec-label">Medios Baños</span><span class="spec-value">${attr.medios_banos}</span></div></div>`);
+        if (attr.baños) grid1.push(`<div class="spec-item"><i class="fas fa-bath"></i><div class="spec-content"><span class="spec-label">Baños</span><span class="spec-value">${attr.baños}</span></div></div>`);
+        if (attr.piso) grid1.push(`<div class="spec-item"><i class="fas fa-building"></i><div class="spec-content"><span class="spec-label">Piso</span><span class="spec-value">${attr.piso}</span></div></div>`);
         if (attr.estacionamiento) grid1.push(`<div class="spec-item"><i class="fas fa-parking"></i><div class="spec-content"><span class="spec-label">Estacionamiento</span><span class="spec-value">${attr.estacionamiento}</span></div></div>`);
+        if (attr.amueblado) grid1.push(`<div class="spec-item"><i class="fas fa-couch"></i><div class="spec-content"><span class="spec-label">Amueblado</span><span class="spec-value">${attr.amueblado}</span></div></div>`);
+        if (attr.ascensor) grid1.push(`<div class="spec-item"><i class="fas fa-elevator"></i><div class="spec-content"><span class="spec-label">Ascensor</span><span class="spec-value">${attr.ascensor}</span></div></div>`);
+        if (attr.jardin) grid1.push(`<div class="spec-item"><i class="fas fa-leaf"></i><div class="spec-content"><span class="spec-label">Jardín</span><span class="spec-value">${attr.jardin}</span></div></div>`);
+        if (attr.piscina) grid1.push(`<div class="spec-item"><i class="fas fa-swimmer"></i><div class="spec-content"><span class="spec-label">Piscina</span><span class="spec-value">${attr.piscina}</span></div></div>`);
+        if (attr.tipo_propiedad) grid1.push(`<div class="spec-item"><i class="fas fa-home"></i><div class="spec-content"><span class="spec-label">Tipo</span><span class="spec-value">${attr.tipo_propiedad}</span></div></div>`);
+        if (attr.anio_construccion) grid1.push(`<div class="spec-item"><i class="fas fa-calendar"></i><div class="spec-content"><span class="spec-label">Año Construcción</span><span class="spec-value">${attr.anio_construccion}</span></div></div>`);
+        if (attr.estado_conservacion) grid1.push(`<div class="spec-item"><i class="fas fa-tools"></i><div class="spec-content"><span class="spec-label">Estado</span><span class="spec-value">${attr.estado_conservacion}</span></div></div>`);
+        if (attr.calefaccion && attr.calefaccion !== 'No') grid1.push(`<div class="spec-item"><i class="fas fa-fire"></i><div class="spec-content"><span class="spec-label">Calefacción</span><span class="spec-value">${attr.calefaccion}</span></div></div>`);
+        if (attr.aire_acondicionado && attr.aire_acondicionado !== 'No') grid1.push(`<div class="spec-item"><i class="fas fa-snowflake"></i><div class="spec-content"><span class="spec-label">Aire Acondicionado</span><span class="spec-value">${attr.aire_acondicionado}</span></div></div>`);
+        if (attr.seguridad) grid1.push(`<div class="spec-item"><i class="fas fa-shield-alt"></i><div class="spec-content"><span class="spec-label">Seguridad</span><span class="spec-value">${attr.seguridad}</span></div></div>`);
+        if (attr.orientacion) grid1.push(`<div class="spec-item"><i class="fas fa-compass"></i><div class="spec-content"><span class="spec-label">Orientación</span><span class="spec-value">${attr.orientacion}</span></div></div>`);
+        if (attr.mascotas) grid1.push(`<div class="spec-item"><i class="fas fa-paw"></i><div class="spec-content"><span class="spec-label">Mascotas</span><span class="spec-value">${attr.mascotas}</span></div></div>`);
+        if (attr.gimnasio) grid1.push(`<div class="spec-item"><i class="fas fa-dumbbell"></i><div class="spec-content"><span class="spec-label">Gimnasio</span><span class="spec-value">${attr.gimnasio}</span></div></div>`);
 
         // Rellenar la última fila de la grid1
         while (grid1.length % 3 !== 0) {
             grid1.push('<div class="spec-item spec-item-empty"></div>');
-        }
-
-        // --- SEGUNDA GRID ---
-        const grid2 = [];
-        if (attr.sala_principal) grid2.push(`<div class="spec-item"><i class="fas fa-couch"></i><div class="spec-content"><span class="spec-label">Sala principal</span></div></div>`);
-        if (attr.sala_tv) grid2.push(`<div class="spec-item"><i class="fas fa-tv"></i><div class="spec-content"><span class="spec-label">Sala de TV/familiar</span></div></div>`);
-        if (attr.comedor) grid2.push(`<div class="spec-item"><i class="fas fa-utensils"></i><div class="spec-content"><span class="spec-label">Comedor</span><span class="spec-value">${attr.comedor.charAt(0).toUpperCase() + attr.comedor.slice(1)}</span></div></div>`);
-        if (attr.cocina) grid2.push(`<div class="spec-item"><i class="fas fa-blender"></i><div class="spec-content"><span class="spec-label">Cocina</span><span class="spec-value">${attr.cocina.charAt(0).toUpperCase() + attr.cocina.slice(1)}</span></div></div>`);
-        if (attr.estudio) grid2.push(`<div class="spec-item"><i class="fas fa-user-graduate"></i><div class="spec-content"><span class="spec-label">Estudio/Oficina</span></div></div>`);
-        if (attr.cuarto_servicio) grid2.push(`<div class="spec-item"><i class="fas fa-broom"></i><div class="spec-content"><span class="spec-label">Cuarto de servicio</span></div></div>`);
-        if (attr.area_lavado) grid2.push(`<div class="spec-item"><i class="fas fa-soap"></i><div class="spec-content"><span class="spec-label">Área de lavado</span></div></div>`);
-        if (attr.bodega) grid2.push(`<div class="spec-item"><i class="fas fa-warehouse"></i><div class="spec-content"><span class="spec-label">Bodega</span></div></div>`);
-        if (attr.patio_jardin) grid2.push(`<div class="spec-item"><i class="fas fa-tree"></i><div class="spec-content"><span class="spec-label">Patio/Jardín</span></div></div>`);
-        if (attr.balcon_terraza) grid2.push(`<div class="spec-item"><i class="fas fa-archway"></i><div class="spec-content"><span class="spec-label">Balcón/Terraza</span></div></div>`);
-
-        while (grid2.length % 3 !== 0) {
-            grid2.push('<div class="spec-item spec-item-empty"></div>');
         }
 
         realEstateDetailsContainer.innerHTML = `
@@ -1007,9 +1001,6 @@ function addRealEstateDetails(ad) {
                 <h2>Detalles del Inmueble</h2>
                 <div class="specs-grid">
                     ${grid1.join('')}
-                            </div>
-                <div class="specs-grid">
-                    ${grid2.join('')}
                 </div>
             </div>
         `;

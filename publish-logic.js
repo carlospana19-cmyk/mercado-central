@@ -1950,15 +1950,22 @@ function showBusinessFields() {
     async function loadAllCategories() {
         console.log('Loading categories...');
         console.log('categorySelect:', categorySelect);
-        
+
         if (!categorySelect) {
             console.error('❌ categorySelect element not found!');
             return;
         }
-        
-        // Usar DEFAULT_CATEGORIES directamente
-        allCategories = DEFAULT_CATEGORIES;
-        
+
+        // Cargar desde la base de datos como en editar
+        const { data, error } = await supabase.from('categorias').select('id, nombre, parent_id');
+        if (error) {
+            console.error("Error al cargar categorías:", error);
+            // Fallback a DEFAULT_CATEGORIES
+            allCategories = DEFAULT_CATEGORIES;
+        } else {
+            allCategories = data;
+        }
+
         const mainCategories = allCategories.filter(c => c.parent_id === null);
         console.log('Main categories loaded:', mainCategories.map(c => c.nombre));
 
@@ -1969,7 +1976,7 @@ function showBusinessFields() {
             option.textContent = group.nombre;
             categorySelect.appendChild(option);
         });
-        
+
         console.log('✅ Categories loaded successfully');
     }
 
@@ -2597,29 +2604,32 @@ form.addEventListener('submit', async (e) => {
         }
         
         // --- VEHÍCULOS ---
-        if (mainCategory.toLowerCase().includes('vehículo') || 
-            mainCategory.toLowerCase().includes('auto') || 
+        if (mainCategory.toLowerCase().includes('vehículo') ||
+            mainCategory.toLowerCase().includes('auto') ||
             mainCategory.toLowerCase().includes('carro')) {
-            
-            const vehicleFields = ['marca', 'anio', 'kilometraje', 'transmision', 'combustible'];
+
+            const vehicleFields = [
+                'marca', 'modelo', 'anio', 'kilometraje', 'transmision', 'combustible',
+                'color', 'puertas', 'vidrios', 'rines', 'tapiz', 'direccion', 'frenos', 'airbags', 'estado'
+            ];
             vehicleFields.forEach(field => {
                 const value = formData.get(field);
                 if (value) {
-                    json[field] = (field === 'anio' || field === 'kilometraje') 
-                        ? parseInt(value) 
+                    json[field] = (field === 'anio' || field === 'kilometraje' || field === 'puertas')
+                        ? parseInt(value)
                         : value;
                 }
             });
         }
         
         // --- INMUEBLES ---
-        if (mainCategory.toLowerCase().includes('inmueble') || 
-            mainCategory.toLowerCase().includes('casa') || 
+        if (mainCategory.toLowerCase().includes('inmueble') ||
+            mainCategory.toLowerCase().includes('casa') ||
             mainCategory.toLowerCase().includes('apartamento')) {
             console.log('🟢 ENTRÓ AL BLOQUE DE INMUEBLES');
             // Campos numéricos
             const realEstateFields = [
-                'm2', 'niveles', 'habitaciones', 'banos', 'medios_banos', 'estacionamiento'
+                'm2', 'habitaciones', 'baños', 'piso', 'estacionamiento', 'anio_construccion'
             ];
             realEstateFields.forEach(field => {
                 const value = formData.get(field);
@@ -2627,16 +2637,18 @@ form.addEventListener('submit', async (e) => {
                     json[field] = parseInt(value);
                 }
             });
-            // Campos booleanos (checkbox)
-            const booleanFields = [
-                'sala_principal', 'sala_tv', 'estudio', 'cuarto_servicio', 'area_lavado', 'bodega', 'patio_jardin', 'balcon_terraza'
-            ];
-            booleanFields.forEach(field => {
-                json[field] = formData.get(field) ? true : false;
-            });
             // Campos select
-            json['comedor'] = formData.get('comedor') || null;
-            json['cocina'] = formData.get('cocina') || null;
+            const selectFields = [
+                'amueblado', 'ascensor', 'jardin', 'piscina', 'tipo_propiedad',
+                'estado_conservacion', 'calefaccion', 'aire_acondicionado',
+                'seguridad', 'orientacion', 'mascotas', 'gimnasio'
+            ];
+            selectFields.forEach(field => {
+                const value = formData.get(field);
+                if (value) {
+                    json[field] = value;
+                }
+            });
         }
         
         // --- ELECTRÓNICA ---
