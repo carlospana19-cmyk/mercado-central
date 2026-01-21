@@ -1693,56 +1693,56 @@ form.addEventListener('submit', async (e) => {
         
         // --- ELECTRÓNICA ---
         if (mainCategory.toLowerCase().includes('electrónica')) {
-            const fields = electronicsSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['electrónica']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
         }
         
         // --- HOGAR Y MUEBLES ---
-        if (mainCategory.toLowerCase().includes('hogar') || 
+        if (mainCategory.toLowerCase().includes('hogar') ||
             mainCategory.toLowerCase().includes('mueble')) {
-            const fields = homeFurnitureSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['hogar y muebles']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
         }
-        
+
         // --- MODA Y BELLEZA ---
-        if (mainCategory.toLowerCase().includes('moda') || 
-            mainCategory.toLowerCase().includes('belleza') || 
+        if (mainCategory.toLowerCase().includes('moda') ||
+            mainCategory.toLowerCase().includes('belleza') ||
             mainCategory.toLowerCase().includes('ropa')) {
-            const fields = fashionSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['moda y belleza']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
         }
-        
+
         console.log(' JSON FINAL:', json);
         // --- DEPORTES Y HOBBIES ---
         if (mainCategory.toLowerCase().includes('deporte') ||
             mainCategory.toLowerCase().includes('hobbies')) {
-            const fields = sportsSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['deportes y hobbies']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
@@ -1750,12 +1750,12 @@ form.addEventListener('submit', async (e) => {
 
         // --- MASCOTAS ---
         if (mainCategory.toLowerCase().includes('mascota')) {
-            const fields = petsSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['mascotas']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
@@ -1763,12 +1763,12 @@ form.addEventListener('submit', async (e) => {
 
         // --- SERVICIOS ---
         if (mainCategory.toLowerCase().includes('servicio')) {
-            const fields = servicesSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['servicios']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
@@ -1776,12 +1776,12 @@ form.addEventListener('submit', async (e) => {
 
         // --- NEGOCIOS ---
         if (mainCategory.toLowerCase().includes('negocio')) {
-            const fields = businessSubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['negocios']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = (field === 'anio') ? parseInt(value) : value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
@@ -1789,12 +1789,12 @@ form.addEventListener('submit', async (e) => {
 
         // --- COMUNIDAD ---
         if (mainCategory.toLowerCase().includes('comunidad')) {
-            const fields = communitySubcategories[subcategory];
-            if (fields) {
-                fields.forEach(field => {
-                    const value = formData.get(field);
+            const subcategoryConfig = categoryFieldConfigs['comunidad']?.[subcategory];
+            if (subcategoryConfig) {
+                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
+                    const value = formData.get(fieldName);
                     if (value) {
-                        json[field] = value;
+                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
                     }
                 });
             }
