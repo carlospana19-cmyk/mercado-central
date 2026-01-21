@@ -214,53 +214,67 @@ if (ad.featured_plan === "top") {
                     </div>`;
             };
 
-            // === RENDERIZADO POR FILAS ===
-            // Fila 1: GRID ESTÁTICO de 2 columnas para TOP/Destacado (cortesías) - SOLO 2 TARJETAS
-            const topAds = premiumAds || [];
-            if (topAds.length > 0) {
-                const firstRowAds = topAds.slice(0, 2); // Solo las primeras 2 tarjetas
-                
+            // === RENDERIZADO POR FILAS REORGANIZADO ===
+
+            // Separar anuncios por tipo
+            const topDestacadoAds = ads.filter(ad => ['top', 'destacado'].includes(ad.featured_plan));
+            const premiumAdsFiltered = ads.filter(ad => ad.featured_plan === 'premium');
+            const basicoAds = ads.filter(ad => ad.featured_plan === 'basico');
+
+            let adIndex = 0;
+
+            // Fila 1: Anuncio TOP/Destacado más reciente (sin grid si es solo 1)
+            if (topDestacadoAds.length > 0) {
                 adsHTML += `
                 <div class="featured-section-title">
                     <span class="pill-top">Top selección</span>
                 </div>
-                <div class="ads-row row-2-cols">`;
-                
-                firstRowAds.forEach(ad => {
-                    adsHTML += generateCardHTML(ad);
-                });
-                
-                adsHTML += `
+                <div class="ads-row single-card-row">
+                    ${generateCardHTML(topDestacadoAds[0])}
                 </div>`;
+                adIndex = 1; // Ya usamos el primer anuncio
             }
 
-            // Renderizar anuncios regulares (premium, basico) que ya están en el array combinado
-            const filteredRegularAds = ads.filter(ad => !['top', 'destacado'].includes(ad.featured_plan));
-            let regularIndex = 0;
+            // Fila 2: Siguiente anuncio TOP/Destacado (sin grid si es solo 1)
+            if (adIndex < topDestacadoAds.length) {
+                adsHTML += `
+                <div class="ads-row single-card-row">
+                    ${generateCardHTML(topDestacadoAds[adIndex])}
+                </div>`;
+                adIndex++;
+            }
 
-            // Fila 2: Carrusel de 3 columnas
-            if (regularIndex < filteredRegularAds.length) {
-                const rowAds = filteredRegularAds.slice(regularIndex, Math.min(regularIndex + 6, filteredRegularAds.length));
+            // Fila 3: Carrusel de 4 columnas para anuncios TOP/Destacado restantes + Premium
+            const remainingTopDestacado = topDestacadoAds.slice(adIndex);
+            const combinedAdsForRow3 = [...remainingTopDestacado, ...premiumAdsFiltered];
+
+            if (combinedAdsForRow3.length > 0) {
+                const row3Ads = combinedAdsForRow3.slice(0, Math.min(8, combinedAdsForRow3.length));
                 adsHTML += `
                 <div class="carousel-row-wrapper">
-                    <div class="swiper row-carousel row-3-swiper">
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-3">
                         <div class="swiper-wrapper">`;
-                rowAds.forEach(ad => {
+                row3Ads.forEach(ad => {
                     adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
                 });
                 adsHTML += `
                         </div>
                     </div>
-                    <button class="row-nav-prev row-nav-3" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
-                    <button class="row-nav-next row-nav-3" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                    <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
                 </div>`;
-                regularIndex += rowAds.length;
             }
 
-            // Filas restantes: Carruseles de 4 columnas
-            let rowCounter = 0;
-            while (regularIndex < filteredRegularAds.length) {
-                const rowAds = filteredRegularAds.slice(regularIndex, Math.min(regularIndex + 8, filteredRegularAds.length));
+            // Fila 4+: Carruseles de 4 columnas para anuncios restantes (basico)
+            let remainingBasicoAds = basicoAds;
+            if (combinedAdsForRow3.length > 8) {
+                remainingBasicoAds = [...combinedAdsForRow3.slice(8), ...basicoAds];
+            }
+
+            let rowCounter = 4;
+            let basicoIndex = 0;
+            while (basicoIndex < remainingBasicoAds.length) {
+                const rowAds = remainingBasicoAds.slice(basicoIndex, Math.min(basicoIndex + 8, remainingBasicoAds.length));
                 adsHTML += `
                 <div class="carousel-row-wrapper">
                     <div class="swiper row-carousel row-4-swiper" id="row-carousel-${rowCounter}">
@@ -274,7 +288,7 @@ if (ad.featured_plan === "top") {
                     <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
                     <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
                 </div>`;
-                regularIndex += rowAds.length;
+                basicoIndex += rowAds.length;
                 rowCounter++;
             }
             // === FIN: Lógica de renderizado ===
