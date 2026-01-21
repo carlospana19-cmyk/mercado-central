@@ -2366,6 +2366,15 @@ body {
   max-width: 350px;
   width: 100%;
 }
+
+/* Grid rows should fill available space */
+.ads-row.row-2-cols .box,
+.ads-row.row-2-cols .tarjeta-auto,
+.ads-row.row-3-cols .box,
+.ads-row.row-3-cols .tarjeta-auto {
+  max-width: none;
+  width: 100%;
+}
 /* ========== SISTEMA DE DESTACADOS ========== */
 
 /* Tarjetas Premium - Borde diamante */

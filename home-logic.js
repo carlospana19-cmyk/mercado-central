@@ -223,25 +223,27 @@ if (ad.featured_plan === "top") {
 
             let adIndex = 0;
 
-            // Fila 1: Anuncio TOP/Destacado más reciente (sin grid si es solo 1)
+            // Fila 1: Grid de 2 columnas para los primeros 2 anuncios TOP/Destacado
             if (topDestacadoAds.length > 0) {
+                const row1Ads = topDestacadoAds.slice(0, 2);
                 adsHTML += `
                 <div class="featured-section-title">
                     <span class="pill-top">Top selección</span>
                 </div>
-                <div class="ads-row single-card-row">
-                    ${generateCardHTML(topDestacadoAds[0])}
+                <div class="ads-row row-2-cols">
+                    ${row1Ads.map(ad => generateCardHTML(ad)).join('')}
                 </div>`;
-                adIndex = 1; // Ya usamos el primer anuncio
+                adIndex = row1Ads.length;
             }
 
-            // Fila 2: Siguiente anuncio TOP/Destacado (sin grid si es solo 1)
+            // Fila 2: Grid de 3 columnas para los siguientes 3 anuncios TOP/Destacado
             if (adIndex < topDestacadoAds.length) {
+                const row2Ads = topDestacadoAds.slice(adIndex, adIndex + 3);
                 adsHTML += `
-                <div class="ads-row single-card-row">
-                    ${generateCardHTML(topDestacadoAds[adIndex])}
+                <div class="ads-row row-3-cols">
+                    ${row2Ads.map(ad => generateCardHTML(ad)).join('')}
                 </div>`;
-                adIndex++;
+                adIndex += row2Ads.length;
             }
 
             // Fila 3: Carrusel de 4 columnas para anuncios TOP/Destacado restantes + Premium
