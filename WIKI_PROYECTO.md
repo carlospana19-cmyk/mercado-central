@@ -339,7 +339,14 @@ if (topAds.length > 0) {
 ## Resumen Ejecutivo
 Plataforma de marketplace (compra/venta) con autenticación Supabase, gestión de anuncios, perfiles de usuario y búsqueda avanzada.
 
-**Estado General**: ✅ Core funcional | ⏳ Pagos pendientes (Stripe)
+**Estado General**: ✅ Core funcional con layout optimizado | ⏳ Pagos pendientes (Stripe)
+
+**Últimas Mejoras Implementadas**:
+- ✅ Layout jerárquico con grids múltiples (2 cols → 3 cols → carrusel)
+- ✅ Sistema de rotación para anuncios TOP pagados
+- ✅ Limpieza completa del proyecto (8 archivos backup eliminados)
+- ✅ Corrección de errores CSS y optimización de código
+- ✅ Documentación actualizada y completa
 
 ---
 
@@ -1013,16 +1020,18 @@ WHERE user_id NOT IN (SELECT id FROM profiles);
 
 ### 🏠 Homepage (index.html)
 - [x] Mostrar tarjetas de anuncios (gratis, basico, premium, destacado, top)
+- [x] Layout jerárquico: Grid 2 cols → Grid 3 cols → Carrusel 4 cols
 - [x] Carrusel de imágenes por anuncio
 - [x] Video como primer slide (YouTube/Vimeo)
+- [x] Sistema de rotación para anuncios TOP pagados
 - [x] Filtrar por categorías
 - [x] Buscar por texto
 - [x] Responsive (móvil, tablet, desktop)
 - [x] Avatares de vendedor
 - [x] Precio y ubicación visible
+- [x] Anuncios TOP siempre visibles en primeras filas
 - [ ] Wishlist/Favoritos
 - [ ] Contador de visitas
-- [ ] Anuncios destacados en el top
 
 ### 🔍 Resultados (resultados.html)
 - [x] Mostrar resultados de búsqueda
@@ -1150,4 +1159,88 @@ WHERE user_id NOT IN (SELECT id FROM profiles);
 ---
 
 ## 📞 Última Actualización
-**16 de Diciembre 2025** - Panel unificado y avatares en tarjetas
+**21 de Enero 2026** - Layout de grids múltiples, limpieza de proyecto y optimización
+
+---
+
+## 🔄 PUNTO DE RESTAURACIÓN (21 Enero 2026 - Layout Optimizado)
+
+**Última sesión**: Implementación de layout con grids múltiples y limpieza del proyecto
+**Archivos modificados**:
+- `home-logic.js` - Layout de filas con grids de 2 y 3 columnas
+- `style.css` - Corrección de errores CSS y estilos para grids
+- Eliminación de archivos backup innecesarios
+
+### ✅ LAYOUT OPTIMIZADO IMPLEMENTADO
+
+**Objetivo**: Mejorar la presentación de anuncios TOP/Destacado con layout jerárquico y limpieza del código.
+
+#### Funcionalidades Principales:
+
+1. **Fila 1: Grid de 2 Columnas - TOP/Destacado Recientes**
+   - Primeros 2 anuncios TOP/Destacado más recientes
+   - Grid estático sin navegación
+   - Destaca los anuncios premium más nuevos
+   - Clase CSS: `.ads-row.row-2-cols`
+
+2. **Fila 2: Grid de 3 Columnas - TOP/Destacado Siguientes**
+   - Siguientes 3 anuncios TOP/Destacado
+   - Grid estático de 3 columnas
+   - Mantiene jerarquía por fecha de publicación
+   - Clase CSS: `.ads-row.row-3-cols`
+
+3. **Fila 3+: Carruseles de 4 Columnas - Resto de Anuncios**
+   - Carrusel horizontal con 4 tarjetas por vista
+   - Navegación con flechas verdes
+   - Incluye anuncios premium y básicos restantes
+   - Deslizamiento táctil en móvil
+
+4. **Sistema de Rotación de Anuncios TOP**
+   - Los anuncios TOP pagados siempre visibles en pantalla
+   - Rotan de fila 1 → fila 2 → carrusel conforme entran nuevos
+   - Los más recientes tienen prioridad visual
+   - Ideal para cortesías y anuncios premium
+
+#### Estructura de Código:
+
+**JavaScript (`home-logic.js`)**:
+```javascript
+// Fila 1: Grid de 2 columnas para primeros 2 TOP/Destacado
+const row1Ads = topDestacadoAds.slice(0, 2);
+adsHTML += `<div class="ads-row row-2-cols">${row1Ads.map(generateCardHTML).join('')}</div>`;
+
+// Fila 2: Grid de 3 columnas para siguientes 3 TOP/Destacado
+const row2Ads = topDestacadoAds.slice(2, 5);
+adsHTML += `<div class="ads-row row-3-cols">${row2Ads.map(generateCardHTML).join('')}</div>`;
+```
+
+**CSS (`style.css`)**:
+- `.ads-row.row-2-cols` - Grid de 2 columnas
+- `.ads-row.row-3-cols` - Grid de 3 columnas
+- `.single-card-row` - Tarjetas individuales centradas (max-width: 350px)
+- Corrección de errores de sintaxis en selectores CSS
+
+#### Mejoras de UX:
+
+- ✅ Jerarquía visual clara por importancia de anuncios
+- ✅ Anuncios TOP siempre visibles en primeras filas
+- ✅ Layout responsive que se adapta a móvil
+- ✅ Código limpio sin archivos backup innecesarios
+- ✅ Mejor separación entre anuncios pagados y gratuitos
+
+#### Archivos Eliminados (Limpieza):
+
+- ❌ `results-logic-01901b7.js`
+- ❌ `results-logic-backup.js`
+- ❌ `results-logic-commit-anterior.js`
+- ❌ `results-logic-commit-grid.js`
+- ❌ `results-logic-commit-grid2.js`
+- ❌ `style_commit_anterior.css`
+- ❌ `style_commit_grid.css`
+- ❌ `style_commit_grid2.css`
+
+**Resultado**: Proyecto optimizado con 13,330 líneas menos de código innecesario, layout jerárquico funcional y mejor experiencia de usuario.
+
+---
+
+## 🔄 PUNTO DE RESTAURACIÓN ANTERIOR (11 Enero 2026)
