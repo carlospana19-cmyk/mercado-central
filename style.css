@@ -1155,6 +1155,27 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Electrónica - Mismo estilo que otras categorías */
+.electronics-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 1.4rem;
+    color: #222;
+    margin-bottom: 1rem;
+}
+
+.electronics-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.electronics-details i {
+    color: #222;
+    font-size: 1.4rem;
+}
+
 /* --- INICIO AJUSTE ALINEACIÓN ATRIBUTOS INMUEBLE --- */
 .real-estate-specs-grid {
   margin-bottom: 2rem;
