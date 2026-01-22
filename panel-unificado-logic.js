@@ -1,5 +1,12 @@
 import { supabase } from './supabase-client.js';
 import { checkUserLoggedIn } from './auth-logic.js';
+import {
+    getSellerReviews,
+    getSellerReviewStats,
+    generateReviewStatsHTML,
+    generateReviewHTML,
+    ReviewModal
+} from './reviews-logic.js';
 
 let currentUserId = null;
 let currentFilter = 'todos';
@@ -476,6 +483,134 @@ function initializeEventListeners() {
         await supabase.auth.signOut();
         window.location.href = 'login.html';
     });
+
+    // Reviews subtabs
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchSubtab(btn.dataset.subtab));
+    });
+}
+
+// ========================================
+// FUNCIONES DE RESEÑAS
+// ========================================
+
+// Cargar reseñas cuando se abre el tab de reseñas
+async function loadReviewsTab() {
+    await loadReceivedReviews();
+    await loadGivenReviews();
+}
+
+// Cargar reseñas recibidas (como vendedor)
+async function loadReceivedReviews() {
+    try {
+        const statsContainer = document.getElementById('seller-stats');
+        const reviewsContainer = document.getElementById('received-reviews-list');
+
+        // Cargar estadísticas del vendedor
+        const stats = await getSellerReviewStats(currentUserId);
+        statsContainer.innerHTML = generateReviewStatsHTML(stats);
+
+        // Cargar reseñas recibidas
+        const reviews = await getSellerReviews(currentUserId);
+
+        if (reviews.length === 0) {
+            reviewsContainer.innerHTML = `
+                <div class="empty-message">
+                    <i class="fas fa-star-half-alt"></i>
+                    <p>Aún no has recibido reseñas.</p>
+                    <p>¡Cuando vendas productos, tus compradores podrán dejarte reseñas!</p>
+                </div>
+            `;
+        } else {
+            reviewsContainer.innerHTML = `
+                <div class="reviews-list">
+                    ${reviews.map(review => generateReviewHTML(review)).join('')}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error cargando reseñas recibidas:', error);
+        document.getElementById('received-reviews-list').innerHTML =
+            '<p class="error-message">Error al cargar las reseñas. Intenta recargar la página.</p>';
+    }
+}
+
+// Cargar reseñas dadas (como comprador)
+async function loadGivenReviews() {
+    try {
+        const reviewsContainer = document.getElementById('given-reviews-list');
+
+        // Obtener reseñas que el usuario ha dado
+        const { data: reviews, error } = await supabase
+            .from('reviews')
+            .select(`
+                *,
+                seller:seller_id (
+                    id,
+                    nombre_negocio
+                )
+            `)
+            .eq('reviewer_id', currentUserId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (reviews.length === 0) {
+            reviewsContainer.innerHTML = `
+                <div class="empty-message">
+                    <i class="fas fa-paper-plane"></i>
+                    <p>Aún no has dado reseñas.</p>
+                    <p>¡Cuando compres productos, podrás calificar a los vendedores!</p>
+                </div>
+            `;
+        } else {
+            // Adaptar el formato para mostrar reseñas dadas
+            const formattedReviews = reviews.map(review => ({
+                ...review,
+                reviewer: {
+                    nombre_negocio: 'Tú', // El usuario actual
+                    url_foto_perfil: null
+                }
+            }));
+
+            reviewsContainer.innerHTML = `
+                <div class="reviews-list">
+                    ${formattedReviews.map(review => `
+                        <div class="review-item" data-review-id="${review.id}">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="reviewer-details">
+                                        <div class="reviewer-name">Tú</div>
+                                        <div class="review-date">${new Date(review.created_at).toLocaleDateString('es-ES', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}</div>
+                                    </div>
+                                </div>
+                                <div class="review-rating">
+                                    ${Array.from({ length: 5 }, (_, i) =>
+                                        `<i class="${i < review.rating ? 'fas' : 'far'} fa-star"></i>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <div class="review-to-info" style="margin-bottom: 10px; font-size: 0.9em; color: #666;">
+                                <i class="fas fa-arrow-right"></i> Para: ${review.seller?.nombre_negocio || 'Vendedor'}
+                            </div>
+                            ${review.comment ? `<div class="review-comment">${review.comment}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error cargando reseñas dadas:', error);
+        document.getElementById('given-reviews-list').innerHTML =
+            '<p class="error-message">Error al cargar las reseñas. Intenta recargar la página.</p>';
+    }
 }
 
 // ========================================
@@ -493,4 +628,26 @@ function switchTab(tabName) {
         content.classList.remove('active');
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
+
+    // Cargar contenido específico del tab
+    if (tabName === 'reviews') {
+        loadReviewsTab();
+    }
+}
+
+// ========================================
+// SWITCH ENTRE SUBTABS (RESEÑAS)
+// ========================================
+function switchSubtab(subtabName) {
+    // Actualizar botones activos
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-subtab="${subtabName}"]`).classList.add('active');
+
+    // Actualizar contenido
+    document.querySelectorAll('.subtab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(`${subtabName}-reviews`).classList.add('active');
 }

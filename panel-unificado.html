@@ -80,6 +80,9 @@
             <button class="tab-btn" data-tab="perfil">
                 <i class="fas fa-user"></i> Mi Perfil
             </button>
+            <button class="tab-btn" data-tab="reviews">
+                <i class="fas fa-star"></i> Reseñas
+            </button>
         </div>
 
         <!-- CONTENIDO DE ANUNCIOS -->
@@ -200,6 +203,47 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE RESEÑAS -->
+        <section class="tab-content" id="reviews-tab">
+            <div class="reviews-content">
+                <h2>Mis Reseñas</h2>
+
+                <!-- SUBTABS PARA RESEÑAS RECIBIDAS Y DADAS -->
+                <div class="reviews-subtabs">
+                    <button class="subtab-btn active" data-subtab="received">
+                        <i class="fas fa-inbox"></i> Reseñas Recibidas
+                    </button>
+                    <button class="subtab-btn" data-subtab="given">
+                        <i class="fas fa-paper-plane"></i> Reseñas Dadas
+                    </button>
+                </div>
+
+                <!-- CONTENIDO DE RESEÑAS RECIBIDAS -->
+                <div class="subtab-content active" id="received-reviews">
+                    <div class="reviews-header">
+                        <h3>Reseñas de mis compradores</h3>
+                        <div id="seller-stats" class="seller-stats">
+                            <!-- Las estadísticas se cargarán aquí -->
+                        </div>
+                    </div>
+                    <div id="received-reviews-list" class="reviews-list">
+                        <p class="loading-message">Cargando reseñas...</p>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO DE RESEÑAS DADAS -->
+                <div class="subtab-content" id="given-reviews">
+                    <div class="reviews-header">
+                        <h3>Reseñas que he dado</h3>
+                        <p class="reviews-subtitle">Aquí puedes ver todas las reseñas que has dejado a otros vendedores</p>
+                    </div>
+                    <div id="given-reviews-list" class="reviews-list">
+                        <p class="loading-message">Cargando reseñas...</p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
