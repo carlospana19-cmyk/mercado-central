@@ -155,9 +155,32 @@ async function displayProductDetails(ad) {
     addCommunityDetails(ad);
 
     // Construir la galería usando url_galeria o url_portada
-    const galleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length
+    // Convertir rutas de imágenes a URLs completas de Supabase Storage
+    const convertToFullUrl = (imagePath) => {
+        if (!imagePath) return null;
+        // Si ya es una URL completa (http/https), devolverla tal cual
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+            return imagePath;
+        }
+        // Si es una ruta relativa, convertirla a URL completa de Supabase
+        try {
+            const { data: { publicUrl } } = supabase.storage
+                .from('imagenes_anuncios')
+                .getPublicUrl(imagePath);
+            return publicUrl;
+        } catch (error) {
+            console.warn('Error convirtiendo imagen:', imagePath, error);
+            return imagePath; // Devolver la ruta original como fallback
+        }
+    };
+
+    const rawGalleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length
         ? ad.url_galeria
         : [ad.url_portada];
+
+    const galleryImages = rawGalleryImages
+        .map(convertToFullUrl)
+        .filter(img => img); // Filtrar imágenes nulas/inválidas
 
     console.log('Imágenes válidas para mostrar:', galleryImages);
 
