@@ -44,6 +44,9 @@
         <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
             <i class="fas fa-user"></i>
         </button>
+        <button id="btn-reviews" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html?tab=reviews'" title="Mis Reseñas">
+            <i class="fas fa-star"></i>
+        </button>
         <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
             <i class="fas fa-plus"></i> Publicar anuncio
         </button>
@@ -107,6 +110,14 @@
                 </div>
                 <div class="contact-seller-box">
                     <h3><i class="fas fa-comments"></i> Contactar al Vendedor</h3>
+
+                    <!-- Botón de reseñas -->
+                    <div class="review-seller-section">
+                        <button id="leave-review-btn" class="btn btn-review-seller" style="display: none; width: 100%; margin-bottom: 15px;">
+                            <i class="fas fa-star"></i> Dejar una reseña al vendedor
+                        </button>
+                    </div>
+
                     <div class="contact-options">
                         <button class="btn btn-whatsapp" id="whatsapp-link" style="display: none; margin-bottom: 10px;">
                             <i class="fab fa-whatsapp"></i> WhatsApp

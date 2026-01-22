@@ -1,4 +1,5 @@
 import { supabase } from './supabase-client.js';
+import { ReviewModal, hasUserReviewedSeller } from './reviews-logic.js';
 
 // product-detail-logic.js (VERSIÓN CON GALERÍA Y MEJOR MANEJO DE ERRORES)
 
@@ -94,6 +95,9 @@ async function displayProductDetails(ad) {
 
     // Mostrar información de contacto del vendedor
     loadSellerContactInfo(ad);
+
+    // Configurar botón de reseñas
+    setupReviewButton(ad);
 
     // Calcular y mostrar fecha de publicación
     if (ad.fecha_publicacion) {
