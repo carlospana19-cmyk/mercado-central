@@ -1117,6 +1117,67 @@ async function loadSellerContactInfo(ad) {
     }
 }
 
+async function setupReviewButton(ad) {
+    const reviewBtn = document.getElementById('leave-review-btn');
+
+    if (!reviewBtn) return;
+
+    try {
+        // Verificar si el usuario está autenticado
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            // Usuario no autenticado - ocultar botón
+            reviewBtn.style.display = 'none';
+            return;
+        }
+
+        // Verificar si el usuario actual es el propietario del anuncio
+        if (user.id === ad.user_id) {
+            // Es el propietario - ocultar botón
+            reviewBtn.style.display = 'none';
+            return;
+        }
+
+        // Verificar si el usuario ya reseñó a este vendedor
+        const alreadyReviewed = await hasUserReviewedSeller(ad.user_id);
+
+        if (alreadyReviewed) {
+            // Ya reseñó - mostrar mensaje y ocultar botón
+            reviewBtn.style.display = 'none';
+            const reviewSection = document.querySelector('.review-seller-section p');
+            if (reviewSection) {
+                reviewSection.textContent = 'Ya has calificado a este vendedor.';
+            }
+            return;
+        }
+
+        // Usuario puede reseñar - mostrar botón
+        reviewBtn.style.display = 'block';
+
+        // Configurar evento click
+        reviewBtn.addEventListener('click', () => {
+            // Obtener nombre del vendedor
+            const sellerName = ad.profiles?.nombre_negocio || 'este vendedor';
+
+            // Crear modal de reseña
+            const reviewModal = new ReviewModal(ad.user_id, sellerName, (newReview) => {
+                // Callback cuando se envía la reseña
+                console.log('Reseña enviada:', newReview);
+                // Recargar la página o actualizar la UI
+                window.location.reload();
+            });
+
+            // Mostrar modal
+            reviewModal.show();
+        });
+
+    } catch (error) {
+        console.error('Error configurando botón de reseñas:', error);
+        reviewBtn.style.display = 'none';
+    }
+}
+
 function displayError(message) {
     console.error('Mostrando error:', message);
 
