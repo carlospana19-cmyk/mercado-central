@@ -1157,10 +1157,19 @@ async function setupReviewButton(ad) {
 
         // Configurar evento click (solo una vez)
         if (!reviewBtn.dataset.reviewListenerAdded) {
-            reviewBtn.addEventListener('click', () => {
+            reviewBtn.addEventListener('click', async () => {
+                console.log('Click en botón de reseña detectado');
                 try {
+                    // Verificar si ya existe un modal
+                    const existingModal = document.getElementById('review-modal');
+                    if (existingModal) {
+                        console.log('Removiendo modal existente');
+                        existingModal.remove();
+                    }
+
                     // Obtener nombre del vendedor
                     const sellerName = ad.profiles?.nombre_negocio || 'este vendedor';
+                    console.log('Creando modal para:', sellerName, ad.user_id);
 
                     // Crear modal de reseña
                     const reviewModal = new ReviewModal(ad.user_id, sellerName, (newReview) => {
@@ -1170,11 +1179,14 @@ async function setupReviewButton(ad) {
                         window.location.reload();
                     });
 
+                    console.log('Modal creado, mostrando...');
                     // Mostrar modal
                     reviewModal.show();
+                    console.log('Modal mostrado exitosamente');
+
                 } catch (error) {
                     console.error('Error al abrir modal de reseña:', error);
-                    alert('Error al abrir el modal de reseña. Inténtalo de nuevo.');
+                    alert('Error al abrir el modal de reseña: ' + error.message);
                 }
             });
             reviewBtn.dataset.reviewListenerAdded = 'true';
