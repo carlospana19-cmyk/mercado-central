@@ -1155,22 +1155,30 @@ async function setupReviewButton(ad) {
         // Usuario puede reseñar - mostrar botón
         reviewBtn.style.display = 'block';
 
-        // Configurar evento click
-        reviewBtn.addEventListener('click', () => {
-            // Obtener nombre del vendedor
-            const sellerName = ad.profiles?.nombre_negocio || 'este vendedor';
+        // Configurar evento click (solo una vez)
+        if (!reviewBtn.dataset.reviewListenerAdded) {
+            reviewBtn.addEventListener('click', () => {
+                try {
+                    // Obtener nombre del vendedor
+                    const sellerName = ad.profiles?.nombre_negocio || 'este vendedor';
 
-            // Crear modal de reseña
-            const reviewModal = new ReviewModal(ad.user_id, sellerName, (newReview) => {
-                // Callback cuando se envía la reseña
-                console.log('Reseña enviada:', newReview);
-                // Recargar la página o actualizar la UI
-                window.location.reload();
+                    // Crear modal de reseña
+                    const reviewModal = new ReviewModal(ad.user_id, sellerName, (newReview) => {
+                        // Callback cuando se envía la reseña
+                        console.log('Reseña enviada:', newReview);
+                        // Recargar la página o actualizar la UI
+                        window.location.reload();
+                    });
+
+                    // Mostrar modal
+                    reviewModal.show();
+                } catch (error) {
+                    console.error('Error al abrir modal de reseña:', error);
+                    alert('Error al abrir el modal de reseña. Inténtalo de nuevo.');
+                }
             });
-
-            // Mostrar modal
-            reviewModal.show();
-        });
+            reviewBtn.dataset.reviewListenerAdded = 'true';
+        }
 
     } catch (error) {
         console.error('Error configurando botón de reseñas:', error);
