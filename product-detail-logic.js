@@ -1140,7 +1140,14 @@ async function setupReviewButton(ad) {
         }
 
         // Verificar si el usuario ya reseñó a este vendedor
-        const alreadyReviewed = await hasUserReviewedSeller(ad.user_id);
+        let alreadyReviewed = false;
+        try {
+            alreadyReviewed = await hasUserReviewedSeller(ad.user_id);
+        } catch (error) {
+            console.warn('Función has_user_reviewed_seller no disponible, asumiendo que no ha reseñado:', error.message);
+            // Si la función no existe, asumimos que no ha reseñado para permitir el flujo
+            alreadyReviewed = false;
+        }
 
         if (alreadyReviewed) {
             // Ya reseñó - mostrar mensaje y ocultar botón
