@@ -1,6 +1,7 @@
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML } from './utils-attributes.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
+import { generateLikeButtonHTML, initializeAllCardLikes, setupLikesObserver } from './likes-logic.js';
 
 // --- CARRUSEL DE CATEGORÍA ---
 function initializeCategoryHero() {
@@ -782,6 +783,12 @@ return `
                 ${badgeHTML}
                 ${urgentBadge}
                 ${soldBadgeResults}
+                <div class="card-actions">
+                    <button class="like-btn" data-anuncio-id="${ad.id}" data-liked="false" title="Dar me gusta">
+                        <i class="far fa-heart"></i>
+                        <span class="likes-count">0</span>
+                    </button>
+                </div>
                 <div class="property-image">
                         ${['premium','destacado','top'].includes(ad.featured_plan)
                                     ? (() => {
@@ -889,14 +896,17 @@ return `
     container.addEventListener('click', (e) => {
       const contactLink = e.target.closest('.btn-contact-card');
       if (!contactLink) return;
-      
+
       e.preventDefault();
       const contactId = contactLink.dataset.contactId;
-      
+
       if (contactId) {
         window.location.href = `detalle-producto.html?id=${contactId}`;
       }
     });
+
+    // Inicializar likes en todas las tarjetas
+    initializeAllCardLikes();
 }
 
 // ✅ FUNCIÓN DE CONTACTO - Abre WhatsApp o muestra diálogo

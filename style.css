@@ -3481,4 +3481,51 @@ body#pagina-login {
     .modal-header h3 {
         font-size: 1.6rem;
     }
+}/* ========== SISTEMA DE LIKES ========== */ 
+.card-actions { 
+    position: absolute; 
+    top: 12px; 
+    right: 12px; 
+    z-index: 10; 
+} 
+ 
+.like-btn { 
+    background: rgba(255, 255, 255, 0.9); 
+    border: none; 
+    border-radius: 20px; 
+    padding: 6px 12px; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    font-size: 14px; 
+} 
+ 
+.like-btn:hover { 
+    background: rgba(255, 255, 255, 1); 
+    transform: scale(1.05); 
+} 
+ 
+.like-btn.liked { 
+    background: rgba(231, 76, 60, 0.1); 
+    border: 1px solid rgba(231, 76, 60, 0.3); 
+} 
+ 
+.like-btn.liked i { 
+    color: #e74c3c; 
+} 
+ 
+.like-btn i { 
+    font-size: 16px; 
+    color: #666; 
+    transition: all 0.2s ease; 
+} 
+ 
+.likes-count { 
+    font-weight: 600; 
+    color: #333; 
+    min-width: 12px; 
+    text-align: center; 
 }
