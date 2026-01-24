@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS likes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    anuncio_id UUID NOT NULL REFERENCES anuncios(id) ON DELETE CASCADE,
+    anuncio_id BIGINT NOT NULL REFERENCES anuncios(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     -- Un usuario solo puede dar like una vez por anuncio
@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_likes_user_anuncio ON likes(user_id, anuncio_id);
 -- =================================================
 
 -- Función para verificar si un usuario dio like a un anuncio
-CREATE OR REPLACE FUNCTION has_user_liked_anuncio(user_uuid UUID, anuncio_uuid UUID)
+CREATE OR REPLACE FUNCTION has_user_liked_anuncio(user_uuid UUID, anuncio_id BIGINT)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -41,13 +41,13 @@ AS $$
 BEGIN
     RETURN EXISTS (
         SELECT 1 FROM likes
-        WHERE user_id = user_uuid AND anuncio_id = anuncio_uuid
+        WHERE user_id = user_uuid AND anuncio_id = anuncio_id
     );
 END;
 $$;
 
 -- Función para contar likes de un anuncio
-CREATE OR REPLACE FUNCTION get_anuncio_likes_count(anuncio_uuid UUID)
+CREATE OR REPLACE FUNCTION get_anuncio_likes_count(anuncio_id BIGINT)
 RETURNS INTEGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -57,14 +57,14 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO likes_count
     FROM likes
-    WHERE anuncio_id = anuncio_uuid;
+    WHERE anuncio_id = anuncio_id;
 
     RETURN likes_count;
 END;
 $$;
 
 -- Función para dar/quitar like (toggle)
-CREATE OR REPLACE FUNCTION toggle_like(user_uuid UUID, anuncio_uuid UUID)
+CREATE OR REPLACE FUNCTION toggle_like(user_uuid UUID, anuncio_id BIGINT)
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -77,18 +77,18 @@ BEGIN
     -- Verificar si ya existe el like
     SELECT EXISTS(
         SELECT 1 FROM likes
-        WHERE user_id = user_uuid AND anuncio_id = anuncio_uuid
+        WHERE user_id = user_uuid AND anuncio_id = anuncio_id
     ) INTO liked;
 
     IF liked THEN
         -- Quitar like
         DELETE FROM likes
-        WHERE user_id = user_uuid AND anuncio_id = anuncio_uuid;
+        WHERE user_id = user_uuid AND anuncio_id = anuncio_id;
 
         -- Contar likes restantes
         SELECT COUNT(*) INTO likes_count
         FROM likes
-        WHERE anuncio_id = anuncio_uuid;
+        WHERE anuncio_id = anuncio_id;
 
         result := json_build_object(
             'action', 'removed',
@@ -98,12 +98,12 @@ BEGIN
     ELSE
         -- Agregar like
         INSERT INTO likes (user_id, anuncio_id)
-        VALUES (user_uuid, anuncio_uuid);
+        VALUES (user_uuid, anuncio_id);
 
         -- Contar likes totales
         SELECT COUNT(*) INTO likes_count
         FROM likes
-        WHERE anuncio_id = anuncio_uuid;
+        WHERE anuncio_id = anuncio_id;
 
         result := json_build_object(
             'action', 'added',
@@ -165,6 +165,6 @@ GRANT USAGE ON SCHEMA public TO authenticated;
 COMMENT ON TABLE likes IS 'Tabla que almacena los likes de usuarios a anuncios';
 COMMENT ON COLUMN likes.user_id IS 'ID del usuario que dio like';
 COMMENT ON COLUMN likes.anuncio_id IS 'ID del anuncio que recibió like';
-COMMENT ON FUNCTION has_user_liked_anuncio(UUID, UUID) IS 'Verifica si un usuario dio like a un anuncio específico';
-COMMENT ON FUNCTION get_anuncio_likes_count(UUID) IS 'Retorna el número total de likes de un anuncio';
-COMMENT ON FUNCTION toggle_like(UUID, UUID) IS 'Agrega o quita un like, retornando el estado actualizado';
+COMMENT ON FUNCTION has_user_liked_anuncio(UUID, BIGINT) IS 'Verifica si un usuario dio like a un anuncio específico';
+COMMENT ON FUNCTION get_anuncio_likes_count(BIGINT) IS 'Retorna el número total de likes de un anuncio';
+COMMENT ON FUNCTION toggle_like(UUID, BIGINT) IS 'Agrega o quita un like, retornando el estado actualizado';
