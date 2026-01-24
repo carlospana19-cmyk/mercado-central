@@ -2,6 +2,7 @@
 
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML } from './utils-attributes.js';
+import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
 
 export function initializeHomePage() {
 
@@ -188,6 +189,9 @@ if (ad.featured_plan === "top") {
                        ${badgeHTML}
                          ${urgentBadge}
                          ${soldBadgeHome}
+                         <div class="card-actions">
+                            ${generateLikeButtonHTML(ad.id, 0, false)}
+                         </div>
                          <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
                             <div class="swiper product-swiper" id="swiper-${ad.id}">
                                 <div class="swiper-wrapper">
@@ -380,6 +384,15 @@ if (ad.featured_plan === "top") {
             };
             
             container.addEventListener('click', container._cardClickListener, false);
+
+            // Inicializar likes en todas las tarjetas
+            console.log('Inicializando likes en tarjetas del home...');
+            try {
+                initializeAllCardLikes();
+                console.log('Likes inicializados correctamente en home');
+            } catch (error) {
+                console.error('Error inicializando likes en home:', error);
+            }
 
         } catch (e) {
             console.error("FALLO CRÍTICO DURANTE LA CARGA:", e);
