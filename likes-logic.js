@@ -102,6 +102,50 @@ export async function initializeCardLikes(cardElement) {
 
     console.log(`Inicializando likes para anuncio ${anuncioId}`);
 
+    // Agregar event listener inmediatamente
+    if (!likeBtn.dataset.listenerAdded) {
+        console.log('Agregando event listener al botón de like');
+        likeBtn.addEventListener('click', async (e) => {
+            console.log('Click detectado en botón de like');
+            e.preventDefault();
+            e.stopPropagation();
+
+            try {
+                console.log('Ejecutando toggleLike...');
+                const result = await toggleLike(anuncioId);
+                console.log('Resultado del toggle:', result);
+                updateLikeButton(likeBtn, result.likes_count, result.liked);
+
+                // Animación de feedback
+                animateLikeButton(likeBtn, result.action);
+
+            } catch (error) {
+                console.error('Error al toggle like:', error);
+                // Mostrar notificación de error
+                showLikeError(likeBtn);
+            }
+        });
+
+        likeBtn.dataset.listenerAdded = 'true';
+        console.log('Event listener agregado correctamente');
+    } else {
+        console.log('Event listener ya estaba agregado');
+    }
+
+    // Intentar actualizar el estado inicial (sin bloquear si falla)
+    try {
+        console.log('Obteniendo estado inicial del like...');
+        const [userLiked, likesCount] = await Promise.all([
+            hasUserLikedAnuncio(anuncioId),
+            getAnuncioLikesCount(anuncioId)
+        ]);
+        console.log(`Estado inicial - liked: ${userLiked}, count: ${likesCount}`);
+        updateLikeButton(likeBtn, likesCount, userLiked);
+    } catch (error) {
+        console.warn('No se pudo obtener estado inicial del like:', error.message);
+        // Dejar el botón con valores por defecto
+    }
+
     try {
         // Obtener estado actual del like y conteo
         const [userLiked, likesCount] = await Promise.all([
