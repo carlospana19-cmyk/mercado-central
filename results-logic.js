@@ -906,7 +906,13 @@ return `
     });
 
     // Inicializar likes en todas las tarjetas
-    initializeAllCardLikes();
+    console.log('Inicializando likes en tarjetas...');
+    try {
+        initializeAllCardLikes();
+        console.log('Likes inicializados correctamente');
+    } catch (error) {
+        console.error('Error inicializando likes:', error);
+    }
 }
 
 // ✅ FUNCIÓN DE CONTACTO - Abre WhatsApp o muestra diálogo

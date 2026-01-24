@@ -87,11 +87,20 @@ export function generateLikeButtonHTML(anuncioId, likesCount, userLiked) {
 
 // Inicializar likes en una tarjeta específica
 export async function initializeCardLikes(cardElement) {
+    console.log('Inicializando likes en tarjeta específica...');
     const likeBtn = cardElement.querySelector('.like-btn');
-    if (!likeBtn) return;
+    if (!likeBtn) {
+        console.log('No se encontró botón de like en la tarjeta');
+        return;
+    }
 
     const anuncioId = likeBtn.dataset.anuncioId;
-    if (!anuncioId) return;
+    if (!anuncioId) {
+        console.log('No se encontró anuncioId en el botón de like');
+        return;
+    }
+
+    console.log(`Inicializando likes para anuncio ${anuncioId}`);
 
     try {
         // Obtener estado actual del like y conteo
@@ -194,8 +203,12 @@ function showLikeError(button) {
 
 // Inicializar likes en todas las tarjetas visibles
 export function initializeAllCardLikes() {
+    console.log('Buscando tarjetas para inicializar likes...');
     const cards = document.querySelectorAll('.property-card, .card');
-    cards.forEach(card => {
+    console.log(`Encontradas ${cards.length} tarjetas`);
+
+    cards.forEach((card, index) => {
+        console.log(`Inicializando likes en tarjeta ${index + 1}`);
         initializeCardLikes(card);
     });
 }
