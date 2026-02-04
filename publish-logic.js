@@ -8,11 +8,56 @@ import { DEFAULT_CATEGORIES } from './config-categories.js';
 
 // CONFIGURACIÓN DE PLANES
 const PLAN_LIMITS = {
-    'free': { maxFotos: 3, hasVideo: false, hasCarousel: false, priority: 0 },
-    'basico': { maxFotos: 5, hasVideo: false, hasCarousel: false, priority: 1 },
-    'premium': { maxFotos: 10, hasVideo: false, hasCarousel: true, priority: 2 },
-    'destacado': { maxFotos: 15, hasVideo: true, hasCarousel: true, priority: 3 },
-    'top': { maxFotos: 20, hasVideo: true, hasCarousel: true, priority: 4 }
+    'free': {
+        maxFotos: 3,
+        hasVideo: false,
+        hasCarousel: false,
+        priority: 0,
+        reposicionamiento: 'ninguno',
+        accesoBuyers: 500,
+        estadisticas: false,
+        soporte: false
+    },
+    'basico': {
+        maxFotos: 5,
+        hasVideo: false,
+        hasCarousel: false,
+        priority: 1,
+        reposicionamiento: 'diario',
+        accesoBuyers: 2000,
+        estadisticas: false,
+        soporte: false
+    },
+    'premium': {
+        maxFotos: 10,
+        hasVideo: false,
+        hasCarousel: true,
+        priority: 2,
+        reposicionamiento: '6 horas',
+        accesoBuyers: 5000,
+        estadisticas: 'básicas',
+        soporte: false
+    },
+    'destacado': {
+        maxFotos: 15,
+        hasVideo: true,
+        hasCarousel: true,
+        priority: 3,
+        reposicionamiento: '3 horas',
+        accesoBuyers: 10000,
+        estadisticas: 'detalladas',
+        soporte: false
+    },
+    'top': {
+        maxFotos: 20,
+        hasVideo: true,
+        hasCarousel: true,
+        priority: 4,
+        reposicionamiento: '1 hora',
+        accesoBuyers: 25000,
+        estadisticas: 'tiempo real',
+        soporte: '24/7'
+    }
 };
 
 // VALIDAR CANTIDAD DE FOTOS
@@ -1837,14 +1882,7 @@ form.addEventListener('submit', async (e) => {
 
 console.log("Agente 11: Ejecutando script de navegación v2 (por clic en tarjeta).");
 
-// 1. Definimos los límites de los planes (si no está ya definido globalmente).
-const PLAN_LIMITS_V2 = {
-    'free': { maxFotos: 3 },
-    'basico': { maxFotos: 5 },
-    'premium': { maxFotos: 10 },
-    'destacado': { maxFotos: 15 },
-    'top': { maxFotos: 20 }
-};
+// 1. Usamos el PLAN_LIMITS global ya definido
 
 // 2. Seleccionamos TODOS los contenedores de las tarjetas de plan.
 const planCards = document.querySelectorAll('.plan-card-h');
@@ -1880,7 +1918,7 @@ planCards.forEach(card => {
         }, 300); // Reducimos un poco el tiempo para una sensación más rápida.
 
         // --- Lógica para actualizar los límites de fotos ---
-        const limits = PLAN_LIMITS_V2[selectedPlan];
+        const limits = PLAN_LIMITS[selectedPlan];
         if (!limits) {
             console.error(`Error: No se encontraron límites para el plan "${selectedPlan}".`);
             return;
@@ -1912,66 +1950,99 @@ planCards.forEach(card => {
 const updatePlanRestrictions = (selectedPlan) => {
     console.log('🔍 DEBUG: updatePlanRestrictions called with plan:', selectedPlan);
 
-    // ESTANDARIZAR EL VALOR DEL PLAN A MINÚSCULAS para que coincida con 'destacado' y 'top'
     const planValue = selectedPlan.toLowerCase();
-    console.log('🔍 DEBUG: planValue (lowercase):', planValue);
+    const planConfig = PLAN_LIMITS[planValue];
 
-    // 1. RESTRICCIÓN PARA CAMPOS DE VIDEO (Destacado y Top)
+    if (!planConfig) {
+        console.error('Plan no encontrado:', planValue);
+        return;
+    }
+
+    // 1. Actualizar límite de fotos y mensaje
+    const galleryDropArea = document.querySelector('.drop-area');
+    if (galleryDropArea) {
+        const planLimitInfo = galleryDropArea.querySelector('.plan-limit-info') || document.createElement('div');
+        planLimitInfo.className = 'plan-limit-info';
+        planLimitInfo.textContent = `📸 Límite: ${planConfig.maxFotos} fotos`;
+        if (!galleryDropArea.querySelector('.plan-limit-info')) {
+            galleryDropArea.appendChild(planLimitInfo);
+        }
+    }
+
+    // 2. Gestionar características de video
     const videoFields = document.querySelectorAll('.plan-video-feature');
-    console.log('🔍 DEBUG: Found videoFields:', videoFields.length);
-
-    const enableVideo = (planValue === 'destacado' || planValue === 'top');
-    const disableVideo = !enableVideo;
-    console.log('🔍 DEBUG: enableVideo:', enableVideo, 'disableVideo:', disableVideo);
-
     videoFields.forEach(div => {
-        div.style.opacity = disableVideo ? '0.4' : '1';
-        div.style.pointerEvents = disableVideo ? 'none' : 'auto';
-
+        const shouldEnable = planConfig.hasVideo;
+        div.style.opacity = shouldEnable ? '1' : '0.4';
+        div.style.pointerEvents = shouldEnable ? 'auto' : 'none';
         const input = div.querySelector('input, select, textarea');
-        if (input) input.disabled = disableVideo;
+        if (input) input.disabled = !shouldEnable;
     });
 
-    // 2. RESTRICCIÓN PARA CAMPOS TOP (Publicación en Redes Sociales)
+    // 3. Gestionar características de carrusel
+    const carouselFields = document.querySelectorAll('.carousel-feature');
+    carouselFields.forEach(div => {
+        const shouldEnable = planConfig.hasCarousel;
+        div.style.opacity = shouldEnable ? '1' : '0.4';
+        div.style.pointerEvents = shouldEnable ? 'auto' : 'none';
+    });
+
+    // 4. Gestionar características TOP
     const topFields = document.querySelectorAll('.plan-top-feature');
-    console.log('🔍 DEBUG: Found topFields:', topFields.length);
-
-    const disableTop = planValue !== 'top'; // Solo se habilita si es el plan 'top'
-    console.log('🔍 DEBUG: disableTop (true if not top):', disableTop);
-
     topFields.forEach(div => {
-        div.style.opacity = disableTop ? '0.4' : '1';
-        div.style.pointerEvents = disableTop ? 'none' : 'auto';
-
+        const shouldEnable = planValue === 'top';
+        div.style.opacity = shouldEnable ? '1' : '0.4';
+        div.style.pointerEvents = shouldEnable ? 'auto' : 'none';
         const input = div.querySelector('input, select, textarea');
-        if (input) input.disabled = disableTop;
+        if (input) {
+            input.disabled = !shouldEnable;
+            if (!shouldEnable && input.type === 'checkbox') input.checked = false;
+        }
     });
 
-    // 3. RESTRICCIÓN PARA EL BADGE DESTACADO
+    // 5. Gestionar características de estadísticas
+    const statsFields = document.querySelectorAll('.stats-feature');
+    statsFields.forEach(div => {
+        const statsLevel = planConfig.estadisticas;
+        const shouldEnable = statsLevel !== false;
+        div.style.opacity = shouldEnable ? '1' : '0.4';
+        div.style.pointerEvents = shouldEnable ? 'auto' : 'none';
+        
+        // Actualizar el nivel de estadísticas mostrado
+        const statsLabel = div.querySelector('.stats-level');
+        if (statsLabel && statsLevel) {
+            statsLabel.textContent = `Estadísticas: ${statsLevel}`;
+        }
+    });
+
+    // 6. Actualizar información de reposicionamiento
+    const reposInfo = document.querySelector('.reposition-info');
+    if (reposInfo) {
+        reposInfo.textContent = `🔄 Reposicionamiento: ${planConfig.reposicionamiento}`;
+    }
+
+    // 7. Actualizar información de alcance
+    const reachInfo = document.querySelector('.reach-info');
+    if (reachInfo) {
+        reachInfo.textContent = `👥 Alcance: ${planConfig.accesoBuyers.toLocaleString()} compradores`;
+    }
+
+    // 8. Actualizar información de soporte
+    const supportInfo = document.querySelector('.support-info');
+    if (supportInfo) {
+        supportInfo.textContent = planConfig.soporte ? `🎯 Soporte ${planConfig.soporte}` : 'Soporte básico';
+    }
+
+    // 9. Gestionar badge destacado
     const destacadoFields = document.querySelectorAll('.plan-destacado-feature');
-    console.log('🔍 DEBUG: Found destacadoFields:', destacadoFields.length);
-
-    // Habilitado si el plan es 'destacado' O 'top'
     const enableDestacado = (planValue === 'destacado' || planValue === 'top');
-    const disableDestacado = !enableDestacado;
-    console.log('🔍 DEBUG: enableDestacado:', enableDestacado, 'disableDestacado:', disableDestacado);
-
     destacadoFields.forEach(div => {
-        console.log('🔍 DEBUG: Processing destacadoField:', div);
-        div.style.opacity = disableDestacado ? '0.4' : '1';
-        div.style.pointerEvents = disableDestacado ? 'none' : 'auto';
-
-        const input = div.querySelector('input, select, textarea');
-        console.log('🔍 DEBUG: Input found:', input);
+        div.style.opacity = enableDestacado ? '1' : '0.4';
+        div.style.pointerEvents = enableDestacado ? 'auto' : 'none';
+        const input = div.querySelector('input');
         if (input) {
-            input.disabled = disableDestacado;
-            console.log('🔍 DEBUG: Input disabled set to:', disableDestacado);
-
-            // Si se deshabilita (plan inferior), desmarca el checkbox
-            if (disableDestacado && input && input.type === 'checkbox') {
-                console.log('🔍 DEBUG: Unchecking checkbox');
-                input.checked = false;
-            }
+            input.disabled = !enableDestacado;
+            if (!enableDestacado && input.type === 'checkbox') input.checked = false;
         }
     });
 };

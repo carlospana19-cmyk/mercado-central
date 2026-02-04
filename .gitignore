@@ -1,1 +1,53 @@
+# Entorno
 *.env*
+.env
+.env.local
+
+# Node.js
+node_modules/
+
+# Gradle (Android)
+.gradle/
+android/.gradle/
+android/gradle/
+android/app/.cxx/
+android/app/build/
+android/build/
+android/.gradle/
+
+# iOS
+ios/
+
+# Build outputs
+dist/
+build/
+www/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Capacitor y móviles
+capacitor.config.json
+android/
+ios/
+build-mobile.bat
+start.bat
+server.js
+resources/
+publicar.js
+tu-archivo-publicar.js
+supabase-client-cdn.html
+login-anterior.html
+n
+`n
+
+# Node packages
+package-lock.json
+package.json
