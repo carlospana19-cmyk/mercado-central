@@ -21,7 +21,6 @@ ios/
 # Build outputs
 dist/
 build/
-www/
 
 # OS
 .DS_Store

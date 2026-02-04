@@ -1,0 +1,1038 @@
+/* ================================================= */
+/* === REDISEÑO DE TABLA DE PRECIOS FINAL: METALES Y ENCABEZADO DE COLOR === */
+/* ================================================= */
+
+/* Variables de Color Finales */
+:root {
+    --color-turquesa: #00bfae; /* Color principal de Mercado Central */
+    --color-text-dark: #2c3e50;
+    --color-shadow: rgba(0, 0, 0, 0.15);
+}
+
+/* ------------------------------------------------- */
+/* GRADIENTES METÁLICOS CON SOMBRA (Basado en la propuesta del usuario) */
+/* ------------------------------------------------- */
+
+.bronce-gradient {
+    background: linear-gradient(135deg, #CD7F32, #B87333);
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
+    color: #FFFFFF;
+}
+
+.plata-gradient {
+    background: linear-gradient(135deg, #E5E5E5, #C0C0C0);
+    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
+    color: var(--color-text-dark); /* Texto oscuro para mejor contraste */
+}
+
+.oro-gradient {
+    background: linear-gradient(135deg, #FFD700, #FFC107);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    color: var(--color-text-dark); /* Texto oscuro para mejor contraste */
+}
+
+.platino-gradient {
+    background: linear-gradient(135deg, #E5E4E2, #D3D3D3);
+    box-shadow: 0 4px 15px rgba(229, 228, 226, 0.4);
+    color: var(--color-text-dark); /* Texto oscuro para mejor contraste */
+}
+
+/* ------------------------------------------------- */
+/* Estilos Base de Layout y Tarjeta */
+/* ------------------------------------------------- */
+
+.pricing-table-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 20px; 
+    margin: 40px auto;
+    max-width: 1400px; 
+    padding: 0 15px;
+}
+
+.pricing-plan {
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--color-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.pricing-plan:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+}
+
+.pricing-plan input[type="radio"] {
+    display: none;
+}
+
+/* El Label actúa como la tarjeta cliqueable */
+.pricing-plan label { 
+    display: flex; 
+    flex-direction: column;
+    padding: 0;
+    border: 3px solid transparent; 
+    border-radius: 12px;
+    background-color: #ffffff;
+    cursor: pointer;
+    min-height: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Estilo al seleccionar el plan */
+.pricing-plan input[type="radio"]:checked + label {
+    border-color: var(--color-turquesa);
+    box-shadow: 0 0 20px rgba(0, 191, 174, 0.6);
+}
+
+/* Encabezado de Color (DONDE IRÁN LOS GRADIENTES) */
+.plan-header {
+    padding: 25px 0;
+    border-radius: 12px 12px 0 0;
+    position: relative;
+    /* La sombra se aplica aquí si se usa la clase .oro-gradient, etc. */
+}
+
+.plan-header h4 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    color: inherit; /* Hereda el color del texto de la clase gradiente */
+}
+
+.plan-header .price {
+    font-size: 3.8rem;
+    font-weight: 900;
+    margin: 5px 0 0;
+    color: inherit; /* Hereda el color del texto de la clase gradiente */
+}
+
+/* Contenido de la tarjeta (Beneficios) */
+.plan-content {
+    padding: 25px 20px;
+    flex-grow: 1;
+}
+
+/* Lista de Beneficios */
+.pricing-plan .plan-features {
+    /* ... (Estilos de lista y checks) ... */
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin: 0;
+    flex-grow: 1;
+}
+.pricing-plan .plan-features li {
+    margin-bottom: 12px;
+    font-size: 1.5rem;
+    color: #555;
+    display: flex;
+    align-items: flex-start;
+}
+.pricing-plan .plan-features li i {
+    color: var(--color-turquesa); /* Checkmarks con color de marca */
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+/* ------------------------------------------------- */
+/* APLICACIÓN DE ESTILOS POR PLAN (REQUIERE MODIFICAR EL HTML) */
+/* ------------------------------------------------- */
+
+/* 🆓 Plan GRATIS - TURQUESA */
+#plan-free .plan-header {
+    background-color: var(--color-turquesa);
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.4);
+    color: #fff;
+}
+
+/* 🥉 Plan BÁSICO - BRONCE (Aplicar clase .bronce-gradient) */
+/* #plan-basico requiere la clase `bronce-gradient` en su HTML */
+
+/* 🥈 Plan PREMIUM - PLATA (Aplicar clase .plata-gradient) */
+/* #plan-premium requiere la clase `plata-gradient` en su HTML */
+
+/* 🥇 Plan DESTACADO - ORO (Aplicar clase .oro-gradient) */
+/* #plan-destacado requiere la clase `oro-gradient` en su HTML */
+
+/* 💎 Plan TOP - PLATINO/DIAMANTE (Aplicar clase .platino-gradient) */
+/* #plan-top requiere la clase `platino-gradient` en su HTML */
+
+/* PREMIUM Plan Header - White Background */
+.plan-card.premium .plan-header {
+    background-color: #ffffff;
+    color: var(--color-text-dark);
+}
+
+/* PREMIUM Badge - White Background */
+.badge-premium {
+    background-color: #ffffff;
+    color: var(--color-text-dark);
+}
+
+
+/* Estilo de Badge (si existe en HTML) */
+.premium-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: inherit; /* Hereda el color del encabezado */
+    padding: 3px 8px;
+    font-size: 1rem;
+    font-weight: 800;
+    border-radius: 5px;
+    z-index: 2;
+}
+
+
+/* Responsive para que se apilen en móvil */
+@media (max-width: 768px) {
+    .pricing-table-container {
+        grid-template-columns: 1fr; 
+    }
+}
+
+/* Estilos para el layout de tres columnas en step-4 */
+.details-container {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+.detail-column {
+  flex: 1;
+  min-width: 300px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* === Bordes de color por plan === */
+.plan-premium { border: 3px solid #c0c0c0; /* plateado */ }
+.plan-destacado { border: 3px solid #ffd700; /* dorado */ }
+.plan-top { border: 3px solid #9b59b6; /* púrpura */ }
+
+/* ========================================== */
+/* NUEVOS ESTILOS: PLANS CONTAINER HORIZONTAL */
+/* ========================================== */
+
+.plans-container-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 30px 0;
+    padding: 0;
+}
+
+/* Tarjeta de plan horizontal */
+.plan-card-h {
+    display: grid;
+    grid-template-columns: 200px 1fr 150px;
+    gap: 20px;
+    align-items: center;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+}
+
+.plan-card-h:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-color: #ccc;
+}
+
+.plan-card-h.selected {
+    border-color: var(--color-primario);
+    background: linear-gradient(135deg, rgba(41, 128, 185, 0.05) 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(41, 128, 185, 0.2);
+}
+
+.plan-card-h.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background: var(--color-primario);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+/* Estilos específicos por plan */
+.gratis-plan {
+    border-color: #00bfae;
+    background: linear-gradient(135deg, #f0fffe 0%, #ffffff 100%);
+}
+
+.basico-plan {
+    border-color: #cd7f32;
+    background: linear-gradient(135deg, #fff8f3 0%, #ffffff 100%);
+}
+
+.premium-plan {
+    border-color: #c0c0c0;
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(192, 192, 192, 0.25);
+}
+
+.destacado-plan {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, #fffef0 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.25);
+}
+
+.top-plan {
+    border-color: #9b59b6;
+    background: linear-gradient(135deg, #faf7ff 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.25);
+}
+
+/* Sección superior (precio y nombre) */
+.plan-top-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.plan-badge-label {
+    position: static;
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    background: #e8e8e8;
+    color: #555;
+    width: fit-content;
+    line-height: 1;
+}
+
+.premium-badge {
+    background: #c0c0c0;
+    color: #fff;
+    margin-left: 40px;
+}
+
+.destacado-badge {
+    background: #ffd700;
+    color: #333;
+}
+
+.top-badge {
+    background: #9b59b6;
+    color: #fff;
+}
+
+.plan-title-h {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.plan-price-h {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #00bfae;
+    line-height: 1;
+    margin: 8px 0;
+}
+
+.plan-duration-h {
+    font-size: 0.85rem;
+    color: #999;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+/* Sección del medio (beneficios) */
+.plan-middle-section {
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 0;
+}
+
+.benefits-list-h {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+}
+
+.benefits-list-h li {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.benefits-list-h i {
+    color: #00bfae;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* Sección inferior (botón) */
+.plan-bottom-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.plan-select-h {
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+}
+
+.plan-select-h input[type="radio"] {
+    display: none;
+}
+
+.plan-button-h {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background: #00bfae;
+    color: white;
+    border: 2px solid #00bfae;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.plan-select-h input[type="radio"]:checked + .plan-button-h {
+    background: #fff;
+    color: #00bfae;
+    box-shadow: inset 0 0 0 2px #00bfae;
+}
+
+.plan-card-h:hover .plan-button-h {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .plan-card-h {
+        grid-template-columns: 150px 1fr 130px;
+        gap: 15px;
+        padding: 16px;
+    }
+
+    .plan-title-h {
+        font-size: 1.5rem;
+    }
+
+    .plan-price-h {
+        font-size: 1.8rem;
+    }
+
+    .benefits-list-h {
+        grid-template-columns: 1fr;
+        gap: 6px 12px;
+    }
+
+    .benefits-list-h li {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .plan-card-h {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .plan-top-section {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .plan-title-h {
+        font-size: 1.4rem;
+    }
+
+    .plan-price-h {
+        font-size: 1.6rem;
+    }
+
+    .benefits-list-h {
+        grid-template-columns: 1fr;
+        font-size: 0.8rem;
+    }
+
+    .plan-button-h {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .plan-card-h {
+        padding: 12px;
+    }
+
+    .plan-top-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .plan-title-h {
+        font-size: 1.2rem;
+    }
+
+    .plan-price-h {
+        font-size: 1.4rem;
+    }
+
+    .benefits-list-h {
+        grid-template-columns: 1fr;
+        gap: 4px 8px;
+    }
+
+    .benefits-list-h li {
+        font-size: 0.75rem;
+    }
+}
+
+/* ===== MEJORAS EN FORMULARIO PASO 4 ===== */
+
+/* Indicadores de campos requeridos */
+.required {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+/* Contador de caracteres */
+.char-count {
+    font-size: 1.2rem;
+    color: #00bfae;
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+/* Sección primaria con título y precio */
+.primary-section {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 2px solid #00bfae;
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
+    transition: all 0.3s ease;
+}
+
+.primary-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.15);
+}
+
+.primary-section label {
+    color: #2c3e50 !important;
+    font-weight: 700 !important;
+}
+
+.primary-section label .required,
+.primary-section label .char-count {
+    color: #00bfae !important;
+}
+
+.primary-section .form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.flex-2 {
+    grid-column: span 2;
+}
+
+.flex-1 {
+    grid-column: span 1;
+}
+
+/* Mejora general de inputs */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    padding: 16px 18px !important;
+    font-size: 1.8rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #00bfae !important;
+    box-shadow: 0 0 0 4px rgba(0, 191, 174, 0.15) !important;
+    background: #f0fffe;
+    transform: translateY(-1px);
+}
+
+/* Etiquetas mejoradas */
+label {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.8rem;
+    display: block;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.primary-section label {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Input de precio con símbolo de moneda */
+.price-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.price-input-wrapper:focus-within {
+    border-color: #00bfae;
+    box-shadow: 0 0 0 4px rgba(0, 191, 174, 0.15);
+    background: #f0fffe;
+}
+
+.currency-symbol {
+    padding: 0 14px;
+    background: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border-right: 2px solid #e0e0e0;
+}
+
+.price-input-wrapper input {
+    border: none;
+    padding: 12px 14px;
+    flex: 1;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: transparent;
+    color: #2c3e50;
+}
+
+.price-input-wrapper input::placeholder {
+    color: #bdc3c7;
+}
+
+.price-input-wrapper input:focus {
+    outline: none;
+}
+
+/* Texto de ayuda */
+.help-text {
+    display: block;
+    color: #7f8c8d;
+    font-size: 1.3rem;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+.primary-section .help-text {
+    color: #7f8c8d;
+}
+
+/* Sección de términos */
+.terms-agreement {
+    padding: 16px;
+    background: linear-gradient(135deg, #fff9e6 0%, #fffef5 100%);
+    border-left: 5px solid #f39c12;
+    border-radius: 10px;
+    margin-top: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.1);
+}
+
+.terms-agreement:hover {
+    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.2);
+}
+
+.terms-agreement label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.terms-agreement input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #f39c12;
+    transition: all 0.2s ease;
+}
+
+.terms-agreement input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+.terms-agreement a {
+    color: #00bfae;
+    text-decoration: none;
+    border-bottom: 2px solid #00bfae;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.terms-agreement a:hover {
+    color: #008f88;
+    border-bottom-color: #008f88;
+}
+
+/* Mejoras en textarea */
+textarea {
+    resize: vertical;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    min-height: 120px;
+}
+
+textarea:focus {
+    background: #f0fffe;
+}
+
+textarea::placeholder {
+    color: #bdc3c7;
+}
+
+/* Sección de detalles del artículo */
+.attribute-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border-left: 5px solid #00bfae;
+    transition: all 0.3s ease;
+}
+
+.attribute-section:hover {
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
+}
+
+.subsection-title {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 3px solid #00bfae;
+    padding-bottom: 8px;
+}
+
+.subsection-title i {
+    color: #00bfae;
+    font-size: 1.3rem;
+}
+
+/* Responsive para primary-section */
+@media (max-width: 768px) {
+    .primary-section .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .flex-2 {
+        grid-column: span 1 !important;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .price-input-wrapper {
+        width: 100%;
+    }
+}
+
+/* ===== SECTION BLOCKS - CONTENEDORES CON BORDE TURQUEZA ===== */
+
+.section-block {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 5px solid #00bfae;
+    transition: all 0.3s ease;
+}
+
+.section-block:hover {
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
+}
+
+.section-block .subsection-title {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 3px solid #00bfae;
+    padding-bottom: 8px;
+}
+
+.section-block .subsection-title i {
+    color: #00bfae;
+    font-size: 1.3rem;
+}
+
+.contact-block,
+.video-block,
+.images-block {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border-left: 5px solid #00bfae;
+    transition: all 0.3s ease;
+}
+
+.contact-block:hover,
+.video-block:hover,
+.images-block:hover {
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
+}
+
+/* ===== RESPONSIVE PARA MÓVILES ===== */
+@media (max-width: 768px) {
+    /* FORZAR LAYOUT DE UNA COLUMNA EN PASO 4 */
+    .details-layout {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        width: 100% !important;
+    }
+
+    .left-column,
+    .right-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: none !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .section-block {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .pricing-table-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin: 20px auto;
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .plan-header {
+        padding: 20px 0;
+    }
+
+    .plan-name {
+        font-size: 1.2rem;
+    }
+
+    .plan-price {
+        font-size: 1.5rem;
+    }
+
+    .plan-list {
+        font-size: 0.9rem;
+        padding: 15px;
+    }
+
+    .plan-list li {
+        padding: 0.4rem 0;
+    }
+
+    .plan-list li i {
+        margin-right: 0.5rem;
+    }
+
+    .plan-button {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+
+    .section-block,
+    .contact-block,
+    .video-block,
+    .images-block {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-left-width: 4px;
+    }
+
+    .section-block .subsection-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        gap: 5px;
+    }
+
+    .section-block .subsection-title i {
+        font-size: 1.1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    input, select, textarea {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    .two-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .left-column,
+    .right-column {
+        width: 100%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    .price-input-wrapper {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-table-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin: 15px auto;
+        padding: 0 5px;
+    }
+
+    .plan-header {
+        padding: 15px 0;
+    }
+
+    .plan-name {
+        font-size: 1rem;
+    }
+
+    .plan-price {
+        font-size: 1.2rem;
+    }
+
+    .plan-list {
+        font-size: 0.85rem;
+        padding: 12px;
+    }
+
+    .plan-list li {
+        padding: 0.3rem 0;
+    }
+
+    .plan-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+
+    .section-block,
+    .contact-block,
+    .video-block,
+    .images-block {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .section-block .subsection-title {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+
+    .section-block .subsection-title i {
+        font-size: 1rem;
+    }
+
+    input, select, textarea {
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    .left-column,
+    .right-column {
+        width: 100%;
+        padding: 0;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem;
+    }
+}
+

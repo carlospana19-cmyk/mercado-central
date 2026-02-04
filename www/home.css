@@ -1,0 +1,1102 @@
+/* ================================================= */
+/* === ESTILOS ESPECÍFICOS PARA HOME.CSS (index.html) === */
+/* ================================================= */
+
+.card {
+  position: relative;
+}
+
+/* --- HERO SECTION --- */
+.hero-search {
+  position: relative;
+  padding: 8rem 2rem 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--color-blanco);
+  min-height: 80vh;
+}
+
+/* Carrusel del Hero */
+.hero-carousel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-swiper .swiper-slide {
+  position: relative;
+}
+
+.hero-swiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4);
+}
+
+.slide-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+}
+
+.slide-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  margin: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  max-width: 1200px;
+  width: 100%;
+}
+
+/* Estilos para los controles del carrusel */
+.hero-swiper .swiper-pagination {
+  bottom: 30px;
+}
+
+.hero-swiper .swiper-pagination-bullet {
+  background: white;
+  opacity: 0.7;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+  background: var(--color-primario);
+  opacity: 1;
+}
+
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+  display: none;
+  color: white;
+  background: rgba(0,0,0,0.3);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-top: -25px;
+}
+
+.hero-swiper .swiper-button-next:hover,
+.hero-swiper .swiper-button-prev:hover {
+  background: var(--color-primario);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .slide-title {
+    font-size: 2rem;
+  }
+
+  .hero-swiper .swiper-button-next,
+  .hero-swiper .swiper-button-prev {
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+  }
+
+  .hero-swiper .swiper-button-next::after,
+  .hero-swiper .swiper-button-prev::after {
+    font-size: 16px;
+  }
+}
+
+.hero-title-animated {
+  font-size: 4.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  opacity: 0.95;
+  font-weight: 400;
+  max-width: 700px;
+}
+
+.search-form-container {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 5rem auto;
+}
+
+@media (min-width: 768px) {
+    .search-form-container {
+        grid-template-columns: 2fr 1.5fr 1.5fr auto;
+    }
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  background: var(--color-blanco);
+  border-radius: .5rem;
+  padding: 0 1.5rem;
+}
+
+.search-field i {
+  font-size: 1.8rem;
+  color: var(--color-gris);
+  margin-right: 1rem;
+}
+
+.search-field input, .search-field select {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 1.5rem 0;
+  font-size: 1.6rem;
+  color: var(--color-texto);
+}
+
+.btn-search-hero {
+  background: var(--color-acento);
+  color: var(--color-texto);
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: none;
+  border-radius: .5rem;
+  padding: 1.5rem 3rem;
+  font-size: 1.6rem;
+}
+
+.btn-search-hero:hover {
+  background: var(--color-acento-claro);
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 6rem;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-acento-claro);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.4rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- SECCIÓN DE CATEGORÍAS --- */
+.categories-showcase {
+  background: var(--color-blanco);
+  padding: 8rem 2rem;
+}
+
+.categories-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+}
+
+.category-card {
+  background: var(--color-blanco);
+  border-radius: 2rem;
+  padding: 4rem 3rem;
+  text-align: center;
+  box-shadow: var(--sombra-media);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.category-card:hover {
+  transform: translateY(-1rem);
+  box-shadow: 0 20px 40px rgba(0, 191, 174, 0.15);
+}
+
+.category-icon {
+  width: 8rem;
+  height: 8rem;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-icon i {
+  font-size: 3rem;
+  color: white;
+}
+
+.category-card h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.category-card p {
+  font-size: 1.5rem;
+  color: var(--color-gris);
+  margin-bottom: 1.5rem;
+}
+
+.category-count {
+  display: inline-block;
+  padding: .8rem 1.6rem;
+  background: rgba(0, 191, 174, 0.1);
+  color: var(--color-primario);
+  border-radius: 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* --- SECCIÓN DE PRODUCTOS --- */
+.products {
+  padding: 8rem 5%;
+  background: var(--color-fondo);
+}
+
+.heading {
+  text-align: center;
+  font-size: 3.5rem;
+  color: var(--color-texto);
+  margin-bottom: 5rem;
+}
+
+.heading span {
+  background: var(--color-primario);
+  color: #fff;
+  display: inline-block;
+  padding: .5rem 3rem;
+  clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%);
+}
+
+/* === CONTENEDOR PRINCIPAL DE TARJETAS === */
+.box-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos para las filas de anuncios personalizados */
+.ads-row {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 2rem; /* Espacio entre filas */
+  width: 100%;
+}
+
+.ads-row:last-child {
+  margin-bottom: 0;
+}
+
+.row-2-cols {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.row-3-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.row-4-cols {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Responsive para filas */
+@media (max-width: 1200px) {
+  .row-4-cols {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .row-2-cols,
+  .row-3-cols,
+  .row-4-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .row-2-cols,
+  .row-3-cols,
+  .row-4-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Additional home-specific styles from style.css */
+.section-title { text-align: center; font-size: 3.2rem; font-weight: 700; margin-bottom: 5rem; }
+.section-title span { color: var(--color-primario); }
+
+/* Esta regla hace que el contenido principal se estire y empuje el footer hacia abajo */
+main, section.hero-search, section.categories-showcase, section.products {
+    flex-grow: 1;
+}
+
+/* --- TARJETAS DE PRODUCTO (.box) --- */
+.box {
+    background: var(--color-blanco);
+    border-radius: 1.6rem;
+    box-shadow: var(--sombra-suave);
+    overflow: hidden; /* Mantener hidden para el contenido de la tarjeta */
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s;
+    position: relative;
+}
+.box:hover {
+    transform: translateY(-1rem);
+    box-shadow: var(--sombra-media);
+}
+.box .image-container {
+    width: 100%;
+    height: 240px; /* Ajustada la altura para una imagen más grande */
+    position: relative;
+    background-color: #f5f5f5;
+    border-radius: 1.2rem 1.2rem 0 0; /* Solo esquinas superiores redondeadas */
+    overflow: visible; /* Permitir que las flechas salgan */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.box .swiper {
+    width: 100%;
+    height: 100%;
+    border-radius: 1.2rem 1.2rem 0 0;
+    overflow: hidden; /* Las imágenes se mantienen dentro */
+}
+.box .swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+}
+.box .swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.box .content {
+    width: 100%;
+    /* CLAVE: Aumenta el padding a 25px para un espaciado generoso. */
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    box-sizing: border-box;
+}
+/* 1. Estilos del Precio: CLAVE para el diseño de Bienes Raíces. */
+.box .content .price {
+    height: auto;
+    /* Lo hacemos muy grande y muy negrita. */
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-texto);
+    /* Separación grande del título/nombre del producto. */
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+/* 2. Estilos del Título/Nombre del Producto (e.g., kia picanto) */
+.box .content h3 {
+    height: auto;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #444;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    /* Separación más pequeña con el siguiente elemento. */
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+/* 3. Estilos de Ubicación/Texto Secundario (e.g., Colón, tu oportunidad) */
+.box .content .location {
+    height: auto;
+    font-size: 1.4rem;
+    color: var(--color-gris);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* CLAVE: Gran espacio después de la ubicación. */
+    margin-bottom: 25px;
+    flex-shrink: 0;
+}
+
+/* 4. Estilos de Detalles Adicionales (Año, KM, M2, etc.) */
+.box .content .property-details {
+    height: auto;
+    /* CLAVE: Reducimos el tamaño de la fuente. */
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    color: var(--color-gris);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.box .content .property-details i {
+    font-size: 1.6rem;
+}
+
+/* 5. Estilos del campo de descripción */
+.box .content .description {
+    height: 65px;
+    min-height: 65px;
+    font-size: 1.3rem;
+    color: var(--color-texto);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limitar a 2 líneas */
+    -webkit-box-orient: vertical;
+  margin-bottom: 0; /* Sin margen para no desalinear el avatar */
+    flex-grow: 1; /* Allow description to grow and fill space */
+    flex-shrink: 1; /* Allow description to shrink if needed */
+}
+
+.box .content .description-with-avatar {
+  display: flex;
+  align-items: flex-start; /* Alinea avatar arriba para todas las tarjetas */
+  gap: 1rem;
+  margin-bottom: 15px;
+  min-height: 60px; /* Misma altura base */
+}
+
+.box .content .description-with-avatar .vendor-avatar {
+  margin-top: 0;
+  flex-shrink: 0; /* Evita que se comprima */
+}
+
+/* 6. Estilos del Botón de Contacto: Ancho completo y color Turquesa */
+.box .content .btn-contact {
+    width: 100%;
+    height: auto;
+    padding: 1.2rem 2rem;
+    border-radius: 6px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: var(--color-primario); /* Turquesa */
+    color: var(--color-blanco);
+    margin-top: auto;
+    align-self: stretch;
+    flex-shrink: 0;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.box .content .btn-contact:hover {
+    background: var(--color-secundario); /* Turquesa más oscuro */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35);
+}
+
+/* Estilos para botones del carrusel en tarjetas .box - Flechas pequeñas DENTRO de las imágenes */
+.box .swiper-button-prev,
+.box .swiper-button-next {
+    position: absolute;
+    color: #ffffff !important;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    top: 50%; /* Centrado verticalmente en la imagen */
+    transform: translateY(-50%);
+    z-index: 10;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Posicionar flechas DENTRO de la imagen */
+.box .swiper-button-prev {
+    left: 10px;
+}
+
+.box .swiper-button-next {
+    right: 10px;
+}
+
+.box .swiper-button-prev::after,
+.box .swiper-button-next::after {
+    font-size: 14px !important;
+    font-weight: bold;
+}
+
+.box .swiper-button-prev:hover,
+.box .swiper-button-next:hover {
+    background-color: var(--color-primario) !important;
+}
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
+}
+
+/* Ocultar flechas en móvil para evitar problemas de espacio */
+@media (max-width: 768px) {
+    .box .swiper-button-prev,
+    .box .swiper-button-next {
+        width: 40px;
+        height: 40px;
+        left: 10px;
+    }
+    
+    .box .swiper-button-next {
+        right: 10px;
+        left: auto;
+    }
+}
+
+/* --- AVATAR DEL VENDEDOR EN TARJETA --- */
+.vendor-avatar {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--color-primario);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.vendor-avatar:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.3);
+}
+
+.vendor-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.vendor-name-tooltip {
+    position: absolute;
+    bottom: -35px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.vendor-avatar:hover .vendor-name-tooltip {
+    opacity: 1;
+}
+
+/* --- MEDIA QUERY PARA MÓVILES --- */
+@media (max-width: 768px) {
+    /* La cuadrícula de anuncios cambia de 2 columnas a 1 columna */
+    .ads-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-bottom: 1.5rem;
+    }
+    /* Asegura que la tarjeta use todo el ancho en móviles */
+    .box {
+        width: 100%; 
+        margin: 0 auto; 
+    }
+    
+    .vendor-avatar {
+        width: 50px;
+        height: 50px;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .box-container {
+        padding: 0 0.5rem;
+    }
+
+    .hero-search {
+        padding: 4rem 1rem 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .ads-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .box {
+        width: 100%;
+    }
+
+    .box .content {
+        padding: 0.8rem;
+    }
+
+    .vendor-avatar {
+        width: 40px;
+        height: 40px;
+        bottom: 8px;
+        right: 8px;
+    }
+
+    .box-container {
+        padding: 0;
+    }
+
+    .hero-search {
+        padding: 2rem 0.5rem 1rem;
+        min-height: 60vh;
+    }
+
+    .slide-title {
+        font-size: 1.8rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* --- ESTILOS PARA CARRUSEL DE PRODUCTOS --- */
+.product-swiper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.product-swiper .swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+}
+
+.product-swiper .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Overlay para permitir deslizamiento sobre iframes de video */
+.swiper-slide-video {
+    position: relative;
+}
+
+/* Áreas táctiles en los bordes para deslizar sobre videos */
+.video-slide {
+    position: relative;
+}
+
+.swiper-edge-left,
+.swiper-edge-right {
+    position: absolute;
+    top: 0;
+    width: 25%;
+    height: 100%;
+    z-index: 10;
+    background: transparent;
+    cursor: grab;
+}
+
+.swiper-edge-left {
+    left: 0;
+}
+
+.swiper-edge-right {
+    right: 0;
+}
+
+.swiper-edge-left:active,
+.swiper-edge-right:active {
+    cursor: grabbing;
+}
+
+/* En desktop, reducir el ancho de las áreas táctiles */
+@media (min-width: 769px) {
+    .swiper-edge-left,
+    .swiper-edge-right {
+        width: 15%;
+    }
+}
+
+.product-swiper .swiper-button-next,
+.product-swiper .swiper-button-prev {
+    color: white;
+
+/* === CARRUSEL DE TARJETAS TOP/DESTACADO === */
+.featured-carousel-wrapper {
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden; /* Ocultar tarjetas que no están en vista */
+  padding: 0 70px; /* Espacio para flechas */
+}
+
+/* Flechas posicionadas dentro del wrapper */
+.featured-prev,
+.featured-next {
+    background: linear-gradient(135deg, #00d084 0%, #00bf6f 100%);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 208, 132, 0.4);
+    transition: all 0.3s ease;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.featured-prev {
+  left: 10px;
+}
+
+.featured-next {
+  right: 10px;
+}
+
+.featured-prev:hover,
+.featured-next:hover {
+    background: linear-gradient(135deg, #00e090 0%, #00d080 100%);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
+}
+
+.featured-swiper {
+  padding: 0 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  margin: 0; /* Sin margen, las flechas quedan afuera */
+}
+
+.featured-swiper .swiper-wrapper {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.featured-swiper .swiper-button-next:after,
+.featured-swiper .swiper-button-prev:after {
+    font-size: 16px;
+    color: rgba(0,0,0,0.4);
+    font-weight: bold;
+}
+
+.featured-swiper .swiper-slide {
+  height: auto;
+  overflow: visible;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.featured-prev:hover,
+.featured-next:hover {
+    background-color: #00bfae;
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Ocultar estado deshabilitado */
+.featured-prev:disabled,
+.featured-next:disabled {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Ocultar las flechas de los carruseles internos (product-swiper) dentro del carrusel destacado */
+.featured-swiper .product-swiper .swiper-button-prev,
+.featured-swiper .product-swiper .swiper-button-next {
+  display: none !important;
+}
+
+/* Ocultar la flecha deshabilitada */
+.featured-carousel-wrapper .swiper-button-disabled,
+.featured-prev.swiper-button-disabled,
+.featured-next.swiper-button-disabled {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.featured-swiper .swiper-button-next:hover,
+.featured-swiper .swiper-button-prev:hover {
+    background-color: #00bfae;
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+    transform: scale(1.05);
+}
+
+.featured-swiper .swiper-button-next:hover:after,
+.featured-swiper .swiper-button-prev:hover:after {
+    color: #ffffff;
+}
+
+.featured-pagination {
+    bottom: -30px !important;
+    display: block !important;
+    position: relative !important;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.featured-pagination .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background: #ccc;
+    opacity: 1;
+    margin: 0 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.featured-pagination .swiper-pagination-bullet:hover {
+    background: #999;
+    transform: scale(1.2);
+}
+
+.featured-pagination .swiper-pagination-bullet-active {
+    background: #00bfae;
+    transform: scale(1.3);
+}
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .featured-swiper {
+        padding: 0 35px;
+    }
+    
+    .featured-swiper .swiper-button-next,
+    .featured-swiper .swiper-button-prev {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .featured-swiper .swiper-button-next:after,
+    .featured-swiper .swiper-button-prev:after {
+        font-size: 14px;
+    }
+}
+
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.product-swiper .swiper-button-next::after,
+.product-swiper .swiper-button-prev::after {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product-swiper .swiper-button-next:hover,
+.product-swiper .swiper-button-prev:hover {
+    background: var(--color-primario);
+    transform: scale(1.1);
+}
+
+.product-swiper .swiper-pagination {
+    bottom: 10px;
+}
+
+.product-swiper .swiper-pagination-bullet {
+    background: white;
+    opacity: 0.7;
+    width: 8px;
+    height: 8px;
+}
+
+.product-swiper .swiper-pagination-bullet-active {
+    background: var(--color-primario);
+    opacity: 1;
+    width: 10px;
+    height: 10px;
+}
+
+/* Ocultar flechas en móvil, solo mostrar en hover en desktop */
+@media (max-width: 768px) {
+    .product-swiper .swiper-button-next,
+    .product-swiper .swiper-button-prev {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) {
+    .product-swiper .swiper-button-next,
+    .product-swiper .swiper-button-prev {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .box:hover .swiper-button-next,
+    .box:hover .swiper-button-prev,
+    .tarjeta-auto:hover .swiper-button-next,
+    .tarjeta-auto:hover .swiper-button-prev {
+        opacity: 1;
+    }
+}
+
+/* ================================================= */
+/* === ESTILOS PARA CARRUSELES DE FILAS === */
+/* ================================================= */
+
+.carousel-row-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 0 60px; /* Espacio para las flechas verdes */
+    margin-bottom: 3rem;
+    overflow: hidden; /* Ocultar tarjetas que no están en vista */
+}
+
+.row-carousel {
+    width: 100%;
+    overflow: hidden; /* Ocultar overflow */
+}
+
+.row-carousel .swiper-wrapper {
+    display: flex;
+}
+
+.row-carousel .swiper-slide {
+    height: auto;
+    display: flex;
+}
+
+/* Flechas verdes grandes para navegación de filas */
+.row-nav-prev,
+.row-nav-next {
+    position: absolute;
+    background: linear-gradient(135deg, #00d084 0%, #00bf6f 100%);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 208, 132, 0.4);
+    cursor: pointer;
+    z-index: 50;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.row-nav-prev {
+    left: 0;
+}
+
+.row-nav-next {
+    right: 0;
+}
+
+.row-nav-prev:hover,
+.row-nav-next:hover {
+    background: linear-gradient(135deg, #00e090 0%, #00d080 100%);
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
+}
+
+.row-nav-prev i,
+.row-nav-next i {
+    font-size: 20px;
+}
+
+/* Responsive para carruseles de filas */
+@media (max-width: 1024px) {
+    .carousel-row-wrapper {
+        padding: 0 20px;
+    }
+    
+    /* Ocultar flechas en tablet y móvil */
+    .row-nav-prev,
+    .row-nav-next {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .carousel-row-wrapper {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-row-wrapper {
+        padding: 0 10px;
+    }
+}

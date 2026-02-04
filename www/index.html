@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mercado Central - Plataforma de Anuncios</title>
+    
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Iconos y Swiper -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    
+    <!-- Carga de Estilos Modulares (IMPORTANTE) -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
+    
+    <style>
+        /* Ocultar puntos de paginación del carrusel TOP */
+        .featured-pagination {
+            display: none !important;
+        }
+        
+        /* Contenedor del carrusel TOP: más ancho y sin flechas */
+        .featured-carousel-wrapper {
+            padding: 0 24px !important;
+            position: relative !important;
+            margin-bottom: 4rem !important; /* Más espacio abajo */
+        }
+
+        /* Ajustes móviles para que las imágenes ocupen todo el ancho */
+        @media (max-width: 768px) {
+            .featured-carousel-wrapper {
+                padding: 0 12px !important;
+                margin-bottom: 3rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .featured-carousel-wrapper {
+                padding: 0 8px !important;
+                margin-bottom: 2.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body id="index-page">
+    <!-- NAVBAR -->
+  <nav class="navbar-moderno">
+    <div class="logo-container">
+      <a href="index.html" class="logo-link">
+                <img src="gemini-3-pro-image-preview (nano-banana-pro)_b_quiero_crear_un_logo.png" alt="Mercado Central" class="logo-img">
+        <span class="logo-text">Mercado Central</span>
+      </a>
+    </div>
+    <div class="buttons-nav">
+            <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
+                <i class="fas fa-user"></i>
+            </button>
+            <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
+                <i class="fas fa-plus"></i> Publicar anuncio
+            </button>
+            <button id="btn-logout" class="nav-btn-user" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+            <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
+                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+            </button>
+    </div>
+  </nav>
+
+    <!-- HERO MODERNO CON CARRUSEL -->
+<section class="hero-search">
+    <!-- Carrusel de imágenes dinámico -->
+    <div class="hero-carousel">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper" id="hero-slides">
+                <!-- Las imágenes se cargarán dinámicamente por JavaScript -->
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+
+    <div class="hero-content">
+            <h1 class="hero-title-animated">Tu comunidad, <span class="highlight-text">tu mercado</span></h1>
+            <p class="hero-subtitle">El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.</p>
+        <div class="search-form-container">
+            <div class="search-field">
+                <i class="fas fa-search"></i>
+                    <input type="text" id="mainSearchInput" placeholder="¿Qué estás buscando?">
+            </div>
+            <div class="search-field">
+                <i class="fas fa-tags"></i>
+                <select id="categorySelect">
+                    <option value="all">Todas las Categorías</option>
+                </select>
+            </div>
+            <div class="search-field">
+                <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="locationInput" placeholder="Ubicación (ej: Panamá)">
+            </div>
+                <button id="searchButton" class="btn btn-search-hero">
+                    <i class="fas fa-search"></i>
+                    <span>Buscar</span>
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Anuncios Activos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Usuarios Registrados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Satisfacción</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== BARRA DE CATEGORÍAS HORIZONTAL ========== -->
+    <section class="categories-section">
+        <div class="categories-horizontal-bar">
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-home"></i></div>
+                <h3>Bienes Raíces</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-car"></i></div>
+                <h3>Vehículos</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-laptop"></i></div>
+                <h3>Electrónica</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-couch"></i></div>
+                <h3>Hogar</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-tshirt"></i></div>
+                <h3>Moda</h3>
+            </a>
+            <a href="#" class="category-item">
+                <div class="category-icon"><i class="fas fa-briefcase"></i></div>
+                <h3>Servicios</h3>
+            </a>
+    </div>
+</section>
+
+    <!-- ANUNCIOS DESTACADOS -->
+<section class="products" id="products">
+    <div class="box-container">
+        <!-- Las tarjetas se cargarán dinámicamente con JavaScript -->
+    </div>
+  </section>
+
+    <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-contenedor">
+      <div class="footer-col">
+        <h4>Mercado Central</h4>
+        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Enlaces rápidos</h4>
+        <ul>
+          <li><a href="#">Quiénes somos</a></li>
+          <li><a href="#">Términos y Condiciones</a></li>
+          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="#">Contáctanos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i> Facebook</a>
+                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                    <a href="#"><i class="fab fa-twitter"></i> Twitter/X</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+    <script type="module" src="main.js" defer></script>
+
+    <!-- Definiciones SVG para badges metálicos -->
+    <svg style="display: none;">
+      <defs>
+        <radialGradient id="shine" cx="50%" cy="35%" r="75%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+          <stop offset="60%" stop-color="rgba(255,255,255,0.08)"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+        </radialGradient>
+        <linearGradient id="rimGloss" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.7)"/>
+          <stop offset="50%" stop-color="rgba(255,255,255,0.2)"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+        </linearGradient>
+        <path id="star" d="M0,-8 L2.4,-2.6 L8, -2.6 L3.2,0.9 L5.0,6.4 L0,3.2 L-5.0,6.4 L-3.2,0.9 L-8,-2.6 L-2.4,-2.6 Z"/>
+      </defs>
+    </svg>
+
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Mercado Central</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAVBAR MODERNO -->
+  <nav class="navbar-moderno">
+    <div class="logo-container">
+      <a href="index.html" class="logo-link" style="display: flex; align-items: center; text-decoration: none; color: #fff;">
+        <img src="gemini-3-pro-image-preview (nano-banana-pro)_b_quiero_crear_un_logo.png" alt="Logo Mercado Central" class="logo-img" style="height:36px; width:auto; margin-right:8px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.08); background:#fff;">
+        <span class="logo-text" style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; color: #fff;">Mercado Central</span>
+      </a>
+    </div>
+    
+    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
+    <div class="buttons-nav">
+        <!-- Este botón se mostrará solo si el usuario está conectado -->
+        <!-- Botones de Panel, Publicar y Logout (solo para usuarios conectados) -->
+        <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
+            <i class="fas fa-user"></i>
+        </button>
+        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
+            <i class="fas fa-plus"></i> Publicar anuncio
+        </button>
+        <button id="btn-logout" class="nav-btn-user" style="display: none;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+
+        <!-- Botón de Iniciar Sesión (solo para invitados) -->
+        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
+            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+        </button>
+    </div>
+  </nav>
+  <style>
+    body {
+      background: #e0f7fa;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar-moderno {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px 14px 28px;
+      background: #00bfae;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      position: relative;
+      z-index: 10;
+    }
+    .logo-container a {
+      color: #fff !important;
+    }
+    .logo-img {
+      height: 36px;
+      width: auto;
+      margin-right: 8px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: #fff;
+    }
+    .logo-text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+    .menu-nav {
+      display: flex;
+      gap: 18px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+    }
+    .menu-nav li {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .menu-nav li:hover {
+      color: #ffe082;
+      text-decoration: underline;
+    }
+    .buttons-nav {
+      display: flex;
+      gap: 8px;
+    }
+    .buttons-nav button {
+      background: #fff;
+      color: #00bfae;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      padding: 7px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s;
+    }
+    .buttons-nav button:hover {
+      background: #00bfae;
+      color: #fff;
+    }
+    .form-box {
+      border: 2px solid #00bfae;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 400px;
+      margin: 40px auto;
+      background: #e0f7fa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .form-box h2 {
+      font-family:'Poppins',sans-serif;
+      font-size:1.5rem;
+      font-weight:700;
+      color:#00bfae;
+      letter-spacing:1px;
+    }
+    .form-box button {
+      background: #00bfae !important;
+      color: #fff !important;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s;
+    }
+    .form-box button:hover {
+      background: #009688 !important;
+      color: #fff !important;
+    }
+    .footer {
+      background: #0a2342;
+      color: #fff;
+      padding: 40px 0 0 0;
+    }
+    .footer-bottom {
+      background: #0a2342;
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 0.95em;
+      border-top: none;
+    }
+    .footer-col h4 {
+      color: #00bfae;
+    }
+    .icon-social {
+      vertical-align: middle;
+      margin-right: 8px;
+      height: 24px;
+    }
+    .footer-col ul li a {
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover {
+      color: #ffe082;
+    }
+  </style>
+
+  <div class="form-box">
+    <h2>Crear una Cuenta</h2>
+    <form id="register-form">
+      <input type="email" id="email-register" name="email" placeholder="Correo electrónico" autocomplete="email" required>
+      <input type="password" id="password-register" name="password" placeholder="Contraseña" autocomplete="new-password" required>
+      
+      <!-- Campo opcional para código de invitación -->
+      <div style="margin: 1rem 0; padding: 1rem; background: #f0f9ff; border-left: 4px solid #00bfae; border-radius: 5px;">
+        <label for="codigo-invitacion" style="display: block; margin-bottom: 0.5rem; color: #0a2342; font-weight: 500;">
+          ¿Tienes un código de invitación? (Opcional)
+        </label>
+        <input type="text" id="codigo-invitacion" name="codigo" placeholder="TOP-XXX-YYYY" 
+               style="width: 100%; padding: 10px; border: 2px solid #00bfae; border-radius: 5px; font-family: 'Courier New', monospace; text-transform: uppercase;">
+        <small style="display: block; margin-top: 0.5rem; color: #666;">
+          Si tienes un código de cortesía para plan gratis, ingrésalo aquí
+        </small>
+      </div>
+      
+      <button type="submit">Registrarse</button>
+    </form>
+    <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a>.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-contenedor">
+      <!-- Columna 1 -->
+      <div class="footer-col">
+        <h4>Mercado Central</h4>
+        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
+      </div>
+
+      <!-- Columna 2 -->
+      <div class="footer-col">
+        <h4>Enlaces rápidos</h4>
+        <ul>
+          <li><a href="#">Quiénes somos</a></li>
+          <li><a href="#">Términos y Condiciones</a></li>
+          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="#">Contáctanos</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3 -->
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-links">
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="icon-social"> Facebook</a><br>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon-social"> Instagram</a><br>
+          <a href="imgx-logopng.jpeg" alt="Twitter/X" class="icon-social" style="height:24px;"> Twitter/X</a><br>
+  <style>
+    body {
+      background: #e0f7fa;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar-moderno {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px 14px 28px;
+      background: #00bfae;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      position: relative;
+      z-index: 10;
+    }
+    .logo-container a {
+      color: #fff !important;
+    }
+    .logo-img {
+      height: 36px;
+      width: auto;
+      margin-right: 8px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: #fff;
+    }
+    .logo-text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+    .menu-nav {
+      display: flex;
+      gap: 18px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+    }
+    .menu-nav li {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .menu-nav li:hover {
+      color: #ffe082;
+      text-decoration: underline;
+    }
+    .buttons-nav {
+      display: flex;
+      gap: 8px;
+    }
+    .buttons-nav button {
+      background: #fff;
+      color: #00bfae;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      padding: 7px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s;
+    }
+    .buttons-nav button:hover {
+      background: #00bfae;
+      color: #fff;
+    }
+    .form-box {
+      border: 2px solid #00bfae;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 400px;
+      margin: 40px auto;
+      background: #e0f7fa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .form-box h2 {
+      font-family:'Poppins',sans-serif;
+      font-size:1.5rem;
+      font-weight:700;
+      color:#00bfae;
+      letter-spacing:1px;
+    }
+    .footer {
+      background: #0a2342;
+      color: #fff;
+      padding: 40px 0 0 0;
+    }
+    .footer-bottom {
+      background: #0a2342;
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 0.95em;
+      border-top: none;
+    }
+    .footer-col h4 {
+      color: #00bfae;
+    }
+    .icon-social {
+      vertical-align: middle;
+      margin-right: 8px;
+      height: 24px;
+    }
+    .footer-col ul li a {
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover {
+      color: #ffe082;
+    }
+  </style>
+          <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="icon-social"> YouTube</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="footer-bottom">
+      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <!-- Carga la librería de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Scripts como módulos -->
+  <script type="module" src="supabase-client.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
