@@ -204,13 +204,13 @@ if (ad.featured_plan === "top") {
                             </div>
                         </div>
                         <div class="content ${ad.is_sold ? 'content-sold' : ''}">
-                            <div class="price">${priceFormatted}</div>
-                            <h3>${ad.titulo}</h3>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
-                            <div class="description-with-avatar">
-                                <div class="description">${ad.descripcion || ''}</div>
+                            <div class="price-row">
+                                <div class="price">${priceFormatted}</div>
                                 ${vendorAvatar}
                             </div>
+                            <h3>${ad.titulo}</h3>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
+                            <div class="description">${ad.descripcion || ''}</div>
                             ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
                             ${profilePhotoHTML}
                             <a href="#" class="btn-contact">Contactar</a>

@@ -16,7 +16,7 @@ export async function hasUserLikedAnuncio(anuncioId) {
         const { data, error } = await supabase
             .rpc('has_user_liked_anuncio', {
                 user_uuid: user.id,
-                anuncio_uuid: anuncioId
+                p_anuncio_id: anuncioId
             });
 
         if (error) throw error;
@@ -31,7 +31,7 @@ export async function hasUserLikedAnuncio(anuncioId) {
 export async function getAnuncioLikesCount(anuncioId) {
     try {
         const { data, error } = await supabase
-            .rpc('get_anuncio_likes_count', { anuncio_uuid: anuncioId });
+            .rpc('get_anuncio_likes_count', { p_anuncio_id: anuncioId });
 
         if (error) throw error;
         return data || 0;
@@ -49,8 +49,8 @@ export async function toggleLike(anuncioId) {
 
         const { data, error } = await supabase
             .rpc('toggle_like', {
-                user_uuid: user.id,
-                anuncio_uuid: anuncioId
+                p_anuncio_id: anuncioId,
+                user_uuid: user.id
             });
 
         if (error) throw error;

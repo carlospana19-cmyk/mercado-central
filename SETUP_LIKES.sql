@@ -33,42 +33,42 @@ CREATE INDEX IF NOT EXISTS idx_likes_user_anuncio ON likes(user_id, anuncio_id);
 -- =================================================
 
 -- Función para verificar si un usuario dio like a un anuncio
-CREATE OR REPLACE FUNCTION has_user_liked_anuncio(user_uuid UUID, anuncio_id BIGINT)
+CREATE OR REPLACE FUNCTION has_user_liked_anuncio(user_uuid UUID, p_anuncio_id BIGINT)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
-AS $$
+AS $
 BEGIN
     RETURN EXISTS (
         SELECT 1 FROM likes
-        WHERE user_id = user_uuid AND anuncio_id = anuncio_id
+        WHERE user_id = user_uuid AND likes.anuncio_id = p_anuncio_id
     );
 END;
-$$;
+$;
 
 -- Función para contar likes de un anuncio
-CREATE OR REPLACE FUNCTION get_anuncio_likes_count(anuncio_id BIGINT)
+CREATE OR REPLACE FUNCTION get_anuncio_likes_count(p_anuncio_id BIGINT)
 RETURNS INTEGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-AS $$
+AS $
 DECLARE
     likes_count INTEGER;
 BEGIN
     SELECT COUNT(*) INTO likes_count
     FROM likes
-    WHERE anuncio_id = anuncio_id;
+    WHERE likes.anuncio_id = p_anuncio_id;
 
     RETURN likes_count;
 END;
-$$;
+$;
 
 -- Función para dar/quitar like (toggle)
-CREATE OR REPLACE FUNCTION toggle_like(user_uuid UUID, anuncio_id BIGINT)
+CREATE OR REPLACE FUNCTION toggle_like(user_uuid UUID, p_anuncio_id BIGINT)
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
-AS $$
+AS $
 DECLARE
     result JSON;
     liked BOOLEAN;
@@ -77,18 +77,18 @@ BEGIN
     -- Verificar si ya existe el like
     SELECT EXISTS(
         SELECT 1 FROM likes
-        WHERE user_id = user_uuid AND anuncio_id = anuncio_id
+        WHERE user_id = user_uuid AND likes.anuncio_id = p_anuncio_id
     ) INTO liked;
 
     IF liked THEN
         -- Quitar like
         DELETE FROM likes
-        WHERE user_id = user_uuid AND anuncio_id = anuncio_id;
+        WHERE user_id = user_uuid AND likes.anuncio_id = p_anuncio_id;
 
         -- Contar likes restantes
         SELECT COUNT(*) INTO likes_count
         FROM likes
-        WHERE anuncio_id = anuncio_id;
+        WHERE likes.anuncio_id = p_anuncio_id;
 
         result := json_build_object(
             'action', 'removed',
@@ -98,12 +98,12 @@ BEGIN
     ELSE
         -- Agregar like
         INSERT INTO likes (user_id, anuncio_id)
-        VALUES (user_uuid, anuncio_id);
+        VALUES (user_uuid, p_anuncio_id);
 
         -- Contar likes totales
         SELECT COUNT(*) INTO likes_count
         FROM likes
-        WHERE anuncio_id = anuncio_id;
+        WHERE likes.anuncio_id = p_anuncio_id;
 
         result := json_build_object(
             'action', 'added',
@@ -114,7 +114,7 @@ BEGIN
 
     RETURN result;
 END;
-$$;
+$;
 
 -- =================================================
 -- POLÍTICAS RLS (Row Level Security)

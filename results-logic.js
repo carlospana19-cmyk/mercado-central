@@ -820,16 +820,14 @@ return `
                                 <div class="property-price-and-tag">
                                         <span class="property-price">${priceFormatted}</span>
                                         ${ad.enhancements && ad.enhancements.is_urgent ? '<span class="tag-oportunidad">Oportunidad</span>' : ''}
+                                        ${vendorAvatar}
                                 </div>
                                 <div class="property-location">
                                         <i class="fas fa-map-marker-alt"></i>
                                         ${ad.provincia || 'Panamá'}, ${ad.distrito || ad.ubicacion || 'N/A'}
                                 </div>
                                 <h2 class="property-title">${ad.titulo}</h2>
-                                <div class="description-with-avatar">
-                                        <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
-                                        ${vendorAvatar}
-                                </div>
+                                <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
                         </div>
             
                         <div class="property-attributes">

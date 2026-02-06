@@ -428,15 +428,21 @@ main, section.hero-search, section.categories-showcase, section.products {
     box-sizing: border-box;
 }
 /* 1. Estilos del Precio: CLAVE para el diseño de Bienes Raíces. */
-.box .content .price {
+.box .content .price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 8px;
+}
+
+.box .content .price-row .price {
     height: auto;
-    /* Lo hacemos muy grande y muy negrita. */
     font-size: 2.8rem;
     font-weight: 800;
     color: var(--color-texto);
-    /* Separación grande del título/nombre del producto. */
-    margin-bottom: 8px;
     flex-shrink: 0;
+    margin-bottom: 0;
 }
 
 /* 2. Estilos del Título/Nombre del Producto (e.g., kia picanto) */
@@ -501,17 +507,15 @@ main, section.hero-search, section.categories-showcase, section.products {
     flex-shrink: 1; /* Allow description to shrink if needed */
 }
 
-.box .content .description-with-avatar {
-  display: flex;
-  align-items: flex-start; /* Alinea avatar arriba para todas las tarjetas */
-  gap: 1rem;
-  margin-bottom: 15px;
-  min-height: 60px; /* Misma altura base */
+/* Estilos del Avatar alineado con precio */
+.box .content .price-row .vendor-avatar {
+    margin-top: 0;
+    flex-shrink: 0;
+    margin-left: auto; /* Empuja el avatar a la derecha */
 }
 
-.box .content .description-with-avatar .vendor-avatar {
-  margin-top: 0;
-  flex-shrink: 0; /* Evita que se comprima */
+.box .content .description {
+    margin-bottom: 20px;
 }
 
 /* 6. Estilos del Botón de Contacto: Ancho completo y color Turquesa */
@@ -576,9 +580,6 @@ main, section.hero-search, section.categories-showcase, section.products {
 .box .swiper-button-prev:hover,
 .box .swiper-button-next:hover {
     background-color: var(--color-primario) !important;
-}
-    transform: translateY(-50%) scale(1.15);
-    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
 }
 
 /* Ocultar flechas en móvil para evitar problemas de espacio */

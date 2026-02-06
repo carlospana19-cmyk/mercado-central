@@ -374,6 +374,9 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .container {
@@ -412,11 +415,16 @@ body {
   z-index: 1000;
   flex-wrap: wrap;
   gap: 1rem;
-  overflow: visible !important;
-  min-height: auto;
+  overflow-x: auto;
+  min-width: 0;
   width: 100%;
   box-sizing: border-box;
   border-bottom: none;
+}
+
+.navbar-moderno > * {
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .logo-link {
@@ -2417,12 +2425,18 @@ body {
 .property-price-and-tag {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     margin-bottom: 10px;
 }
 
+.property-price-and-tag .vendor-avatar {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
 .tag-oportunidad {
-    background-color: #8a2be2; /* Color morado de la competencia */
+    background-color: #8a2be2;
     color: white;
     font-size: 12px;
     font-weight: 500;
@@ -2436,10 +2450,6 @@ body {
     line-height: 1.5;
     margin-top: 5px;
     margin-bottom: 10px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limitar a 2 lÃ­neas */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 /* CORREGIR ESPACIADO DE TEXTO - Agregar/Modificar en style.css */
@@ -3281,13 +3291,13 @@ body#pagina-login {
     }
 } 
  
-/* ========== MODAL DE RESE¥AS ========== */ 
+/* ========== MODAL DE RESEï¿½AS ========== */ 
 .review-modal-overlay { 
     position: fixed; 
     top: 0; 
     left: 0; 
-    width: 100%%; 
-    height: 100%%; 
+    width: 100%; 
+    height: 100%; 
     background: rgba(0, 0, 0, 0.7); 
     display: flex; 
     justify-content: center; 
@@ -3305,7 +3315,7 @@ body#pagina-login {
 .review-modal { 
     background: white; 
     border-radius: 12px; 
-    width: 90%%; 
+    width: 90%; 
     max-width: 500px; 
     max-height: 90vh; 
     overflow-y: auto; 
@@ -3508,9 +3518,9 @@ body#pagina-login {
     transform: scale(1.05); 
 } 
  
-.like-btn.liked { 
-    background: rgba(231, 76, 60, 0.1); 
-    border: 1px solid rgba(231, 76, 60, 0.3); 
+.like-btn.liked {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(231, 76, 60, 0.5);
 } 
  
 .like-btn.liked i { 
