@@ -9,7 +9,7 @@
 /* --- HERO SECTION --- */
 .hero-search {
   position: relative;
-  padding: 8rem 2rem 4rem 2rem;
+  padding: 11rem 2rem 4rem 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -287,8 +287,11 @@
 
 /* --- SECCIÓN DE PRODUCTOS --- */
 .products {
-  padding: 8rem 5%;
+  padding: 4rem 2%;
   background: var(--color-fondo);
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
 }
 
 .heading {
@@ -309,8 +312,15 @@
 /* === CONTENEDOR PRINCIPAL DE TARJETAS === */
 .box-container {
     width: 100%;
+    max-width: 100% !important;
     margin: 0;
     padding: 0;
+}
+
+/* Asegurar que las tarjetas ocupen todo el ancho */
+.ads-row .box {
+    width: 100% !important;
+    max-width: none !important;
 }
 
 /* Estilos para las filas de anuncios personalizados */
@@ -420,8 +430,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 .box .content {
     width: 100%;
-    /* CLAVE: Aumenta el padding a 25px para un espaciado generoso. */
-    padding: 25px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -438,84 +447,97 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 .box .content .price-row .price {
     height: auto;
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: var(--color-texto);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #008080;
     flex-shrink: 0;
     margin-bottom: 0;
+    letter-spacing: -0.2px;
 }
 
 /* 2. Estilos del Título/Nombre del Producto (e.g., kia picanto) */
 .box .content h3 {
     height: auto;
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #444;
+    color: #2d2d2d;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-    /* Separación más pequeña con el siguiente elemento. */
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     flex-shrink: 0;
+    letter-spacing: -0.2px;
 }
 
 /* 3. Estilos de Ubicación/Texto Secundario (e.g., Colón, tu oportunidad) */
 .box .content .location {
     height: auto;
-    font-size: 1.4rem;
-    color: var(--color-gris);
+    font-size: 1.2rem;
+    color: #777;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    /* CLAVE: Gran espacio después de la ubicación. */
-    margin-bottom: 25px;
+    gap: 0.3rem;
+    margin-bottom: 6px;
     flex-shrink: 0;
+    font-weight: 400;
+}
+
+.box .content .location i {
+    font-size: 1rem;
+    color: #888;
 }
 
 /* 4. Estilos de Detalles Adicionales (Año, KM, M2, etc.) */
-.box .content .property-details {
-    height: auto;
-    /* CLAVE: Reducimos el tamaño de la fuente. */
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    color: var(--color-gris);
-    margin-bottom: 20px;
+.box .content .property-details,
+.box .content .vehicle-details,
+.box .content .real-estate-details,
+.box .content .electronics-details {
+    height: auto !important;
+    font-size: 1.3rem !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    color: #444 !important;
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 0 !important;
     flex-shrink: 0;
+    font-weight: 500 !important;
 }
 
-.box .content .property-details i {
-    font-size: 1.6rem;
+/* Mostrar solo 3 atributos principales */
+.box .content .property-details span:nth-child(n+4),
+.box .content .vehicle-details span:nth-child(n+4),
+.box .content .real-estate-details span:nth-child(n+4),
+.box .content .electronics-details span:nth-child(n+4) {
+    display: none !important;
 }
 
-/* 5. Estilos del campo de descripción */
+.box .content .property-details i,
+.box .content .vehicle-details i,
+.box .content .real-estate-details i,
+.box .content .electronics-details i {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+/* 5. OCULTAR DESCRIPCIÓN EN TARJETAS */
 .box .content .description {
-    height: 65px;
-    min-height: 65px;
-    font-size: 1.3rem;
-    color: var(--color-texto);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limitar a 2 líneas */
-    -webkit-box-orient: vertical;
-  margin-bottom: 0; /* Sin margen para no desalinear el avatar */
-    flex-grow: 1; /* Allow description to grow and fill space */
-    flex-shrink: 1; /* Allow description to shrink if needed */
+    display: none !important;
 }
 
 /* Estilos del Avatar alineado con precio */
 .box .content .price-row .vendor-avatar {
-    margin-top: 0;
+    margin-top: 0 !important;
     flex-shrink: 0;
-    margin-left: auto; /* Empuja el avatar a la derecha */
+    margin-left: auto;
 }
 
 .box .content .description {
-    margin-bottom: 20px;
+    margin-bottom: 5px !important;
 }
 
 /* 6. Estilos del Botón de Contacto: Ancho completo y color Turquesa */

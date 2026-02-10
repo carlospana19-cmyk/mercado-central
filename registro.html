@@ -5,9 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro - Mercado Central</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+  .password-container input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 50px;
+    margin: 0;
+  }
+  .password-container .toggle-password {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 1.1rem;
+    padding: 5px;
+    margin: 0;
+  }
+  .password-container .toggle-password:hover {
+    color: #00bfae;
+  }
+</style>
+<script>
+function togglePassword(inputId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(inputId + '-icon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+</script>
 </head>
 <body>
 
@@ -181,7 +225,9 @@
     <h2>Crear una Cuenta</h2>
     <form id="register-form">
       <input type="email" id="email-register" name="email" placeholder="Correo electrónico" autocomplete="email" required>
-      <input type="password" id="password-register" name="password" placeholder="Contraseña" autocomplete="new-password" required>
+      <div class="password-container">
+        <input type="password" id="password-register" name="password" placeholder="Contraseña" autocomplete="new-password" required>
+      </div>
       
       <!-- Campo opcional para código de invitación -->
       <div style="margin: 1rem 0; padding: 1rem; background: #f0f9ff; border-left: 4px solid #00bfae; border-radius: 5px;">

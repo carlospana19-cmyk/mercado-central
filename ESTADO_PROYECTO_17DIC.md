@@ -199,7 +199,7 @@ MAÑANA (18 DIC)
 
 DÍA 3+ (19+ DIC)
 └─ 🚀 Sistema de pagos
-   ├─ Setup Stripe
+   ├─ Setup paguelo facil 
    ├─ Crear tablas
    ├─ Implementar checkout
    └─ Testing pagos

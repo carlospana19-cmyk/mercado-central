@@ -20,64 +20,25 @@ export function generateAttributesHTML(attributes, category, subcategory) {
 
     // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
     if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
-        // Mostrar hasta 4 atributos relevantes
-            let details = [];
-            if (attributes.marca) details.push(`<span><i class="fas fa-car"></i> ${attributes.marca}</span>`);
-        if (attributes.modelo) details.push(`<span><i class="fas fa-car-side"></i> ${attributes.modelo}</span>`);
-            if (attributes.anio) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attributes.anio}</span>`);
-            if (attributes.kilometraje) details.push(`<span><i class="fas fa-tachometer-alt"></i> ${attributes.kilometraje.toLocaleString()} km</span>`);
-            if (attributes.transmision) details.push(`<span><i class="fas fa-cogs"></i> ${attributes.transmision}</span>`);
-            if (attributes.combustible) details.push(`<span><i class="fas fa-gas-pump"></i> ${attributes.combustible}</span>`);
-        if (attributes.color) details.push(`<span><i class="fas fa-palette"></i> ${attributes.color}</span>`);
-        if (attributes.puertas) details.push(`<span><i class="fas fa-door-open"></i> ${attributes.puertas} puertas</span>`);
-        if (attributes.vidrios) details.push(`<span><i class="fas fa-window-restore"></i> Vidrios ${attributes.vidrios}</span>`);
-        if (attributes.rines) details.push(`<span><i class="fas fa-dot-circle"></i> ${attributes.rines}</span>`);
-        if (attributes.tapiz) details.push(`<span><i class="fas fa-chair"></i> ${attributes.tapiz}</span>`);
-        if (attributes.direccion) details.push(`<span><i class="fas fa-steering-wheel"></i> Dir ${attributes.direccion}</span>`);
-        if (attributes.frenos) details.push(`<span><i class="fas fa-stop-circle"></i> ${attributes.frenos}</span>`);
-        if (attributes.airbags) details.push(`<span><i class="fas fa-shield-alt"></i> Airbags ${attributes.airbags}</span>`);
-        if (attributes.estado) details.push(`<span><i class="fas fa-star"></i> ${attributes.estado}</span>`);
-            if (details.length > 0) {
-            detailsHTML += `<div class="vehicle-details">${details.slice(0, 8).join('')}</div>`;
+        // Mostrar SOLO 3 atributos: Año, Combustible, Kilometraje
+        let details = [];
+        if (attributes.anio) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attributes.anio}</span>`);
+        if (attributes.combustible) details.push(`<span><i class="fas fa-gas-pump"></i> ${attributes.combustible}</span>`);
+        if (attributes.kilometraje) details.push(`<span><i class="fas fa-tachometer-alt"></i> ${attributes.kilometraje.toLocaleString()} km</span>`);
+        if (details.length > 0) {
+            detailsHTML += `<div class="vehicle-details">${details.join('')}</div>`;
         }
     }
     
     // --- DETALLES DE INMUEBLES (desde JSONB) ---
     if (categoria.includes('inmueble') || categoria.includes('casa') || categoria.includes('apartamento') || categoria.includes('propiedad')) {
-        // Mostrar hasta 4 atributos relevantes
+        // Mostrar SOLO 3 atributos: m², Habitaciones, Baños
             let details = [];
             if (attributes.m2) details.push(`<span><i class="fas fa-ruler-combined"></i> ${attributes.m2} m²</span>`);
-        if (attributes.niveles) details.push(`<span><i class="fas fa-layer-group"></i> ${attributes.niveles} niv</span>`);
             if (attributes.habitaciones) details.push(`<span><i class="fas fa-bed"></i> ${attributes.habitaciones} hab</span>`);
         if (attributes.baños || attributes.banos) details.push(`<span><i class="fas fa-bath"></i> ${(attributes.baños || attributes.banos)} baños</span>`);
-        if (attributes.medios_banos) details.push(`<span><i class="fas fa-toilet"></i> ${attributes.medios_banos} 1/2 baño</span>`);
-        if (attributes.estacionamiento) details.push(`<span><i class="fas fa-parking"></i> ${attributes.estacionamiento} estac</span>`);
-        if (attributes.piso) details.push(`<span><i class="fas fa-building"></i> Piso ${attributes.piso}</span>`);
-        if (attributes.amueblado) details.push(`<span><i class="fas fa-couch"></i> ${attributes.amueblado}</span>`);
-        if (attributes.ascensor) details.push(`<span><i class="fas fa-elevator"></i> Asc ${attributes.ascensor}</span>`);
-        if (attributes.jardin) details.push(`<span><i class="fas fa-leaf"></i> Jardín ${attributes.jardin}</span>`);
-        if (attributes.piscina) details.push(`<span><i class="fas fa-swimmer"></i> Piscina ${attributes.piscina}</span>`);
-        if (attributes.tipo_propiedad) details.push(`<span><i class="fas fa-home"></i> ${attributes.tipo_propiedad}</span>`);
-        if (attributes.anio_construccion) details.push(`<span><i class="fas fa-calendar"></i> ${attributes.anio_construccion}</span>`);
-        if (attributes.estado_conservacion) details.push(`<span><i class="fas fa-tools"></i> ${attributes.estado_conservacion}</span>`);
-        if (attributes.calefaccion && attributes.calefaccion !== 'No') details.push(`<span><i class="fas fa-fire"></i> Calef ${attributes.calefaccion}</span>`);
-        if (attributes.aire_acondicionado && attributes.aire_acondicionado !== 'No') details.push(`<span><i class="fas fa-snowflake"></i> AA ${attributes.aire_acondicionado}</span>`);
-        if (attributes.seguridad) details.push(`<span><i class="fas fa-shield-alt"></i> ${attributes.seguridad}</span>`);
-        if (attributes.orientacion) details.push(`<span><i class="fas fa-compass"></i> ${attributes.orientacion}</span>`);
-        if (attributes.mascotas) details.push(`<span><i class="fas fa-paw"></i> Masc ${attributes.mascotas}</span>`);
-        if (attributes.gimnasio) details.push(`<span><i class="fas fa-dumbbell"></i> Gim ${attributes.gimnasio}</span>`);
-        if (attributes.comedor) details.push(`<span><i class="fas fa-utensils"></i> Comedor</span>`);
-        if (attributes.cocina) details.push(`<span><i class="fas fa-blender"></i> Cocina</span>`);
-        if (attributes.sala_principal) details.push(`<span><i class="fas fa-couch"></i> Sala</span>`);
-        if (attributes.sala_tv) details.push(`<span><i class="fas fa-tv"></i> Sala TV</span>`);
-        if (attributes.patio_jardin) details.push(`<span><i class="fas fa-tree"></i> Patio/Jardín</span>`);
-        if (attributes.balcon_terraza) details.push(`<span><i class="fas fa-archway"></i> Balcón/Terraza</span>`);
-        if (attributes.bodega) details.push(`<span><i class="fas fa-warehouse"></i> Bodega</span>`);
-        if (attributes.area_lavado) details.push(`<span><i class="fas fa-soap"></i> Lavado</span>`);
-        if (attributes.estudio) details.push(`<span><i class="fas fa-user-graduate"></i> Estudio</span>`);
-        if (attributes.cuarto_servicio) details.push(`<span><i class="fas fa-broom"></i> Servicio</span>`);
             if (details.length > 0) {
-            detailsHTML += `<div class="real-estate-details">${details.slice(0, 8).join('')}</div>`;
+            detailsHTML += `<div class="real-estate-details">${details.join('')}</div>`;
         }
     }
 

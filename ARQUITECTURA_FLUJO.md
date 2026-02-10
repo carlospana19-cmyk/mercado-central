@@ -149,7 +149,7 @@ Cuando usuario hace clic en botón:
 │                                                 │
 │  Cuando usuario hace clic "PAGAR AHORA":       │
 │  1. Valida campos                              │
-│  2. Procesa pago (Stripe - pendiente)          │
+│  2. Procesa pago (paguelo facil - pendiente)          │
 │  3. Muestra "Pago procesado correctamente"     │
 │  4. sessionStorage.paymentConfirmed = true     │
 │  5. Redirige a /registro.html?plan=basico      │
@@ -339,7 +339,7 @@ if (!email || !password) {
 
 1. **Stripe Payment**
    - Reemplazar simulación en payment.html
-   - Conectar con Stripe API
+   - Conectar con paguelo facil API
    - Guardar transacciones en Supabase
 
 2. **Base de Datos**

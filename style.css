@@ -72,7 +72,7 @@
 
 .property-details {
     width: 100%;
-    padding: 25px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -85,27 +85,29 @@
 }
 
 .property-title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 26px;
+    font-weight: 700;
     color: #333;
-    margin-bottom: 5px; /* Ajustado para un espaciado más compacto */
-    line-height: 1.3;
-    letter-spacing: normal !important;  /* Corrige espaciado entre letras */
-    word-spacing: normal !important;    /* Corrige espaciado entre palabras */
+    margin-bottom: 5px;
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+    word-spacing: normal !important;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .property-location {
-    font-size: 14px; /* Ligeramente más pequeño */
-    color: #666;
+    font-size: 16px;
+    color: #555;
     display: flex;
     align-items: center;
-    margin-bottom: 8px; /* Ajustado para un espaciado más compacto */
+    margin-bottom: 8px;
     letter-spacing: normal !important;
     word-spacing: normal !important;
+    font-weight: 500;
 }
 
 .property-location i {
@@ -116,11 +118,11 @@
 .property-attributes {
     display: flex;
     flex-wrap: nowrap;
-    gap: 0.5rem 0.8rem;
-    margin: 0.5rem 0 0.5rem 0;
-    font-size: 1.1rem;
+    gap: 0.3rem 0.5rem;
+    margin: 0.3rem 0 0.3rem 0;
+    font-size: 1.2rem;
     color: #111;
-    letter-spacing: normal !important;
+    letter-spacing: -0.2px;
     word-spacing: normal !important;
     align-items: center;
     justify-content: flex-start;
@@ -135,11 +137,17 @@
     background: none;
     border-radius: 4px;
     padding: 0.1rem 0.5rem;
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     margin-bottom: 0.2rem;
     white-space: nowrap;
     letter-spacing: normal !important;
     vertical-align: middle;
+    font-weight: 600;
+}
+
+/* Mostrar solo 3 atributos principales */
+.property-attributes span:nth-child(n+4) {
+    display: none !important;
 }
 
 .property-attributes i {
@@ -152,9 +160,16 @@
 }
 
 .property-price {
-    font-size: 36px; /* Aumentado para ser más prominente */
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: #008080;
+    letter-spacing: -0.2px;
+}
+
+@media (min-width: 992px) {
+    .property-price {
+        font-size: 1rem;
+    }
 }
 
 .property-tags {
@@ -995,45 +1010,52 @@ body {
 
 /* --- Estilos para la tarjeta SIMPLE (.box) --- */
 .box .content {
-    padding: 1.5rem;
+    padding: 15px !important;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
 }
 .box .price {
-    font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0;
+    color: #008080 !important;
+    letter-spacing: -0.2px;
 }
 .box h3 {
-    font-size: 1.6rem;
-    margin-bottom: 1rem;
+    font-size: 1.8rem !important;
+    margin-bottom: 4px !important;
     flex-grow: 1;
+    letter-spacing: -0.2px;
+    font-weight: 700 !important;
+    color: #2d2d2d !important;
 }
 .box .location {
-    font-size: 1.3rem;
-    color: var(--color-gris);
-    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #777;
+    margin-bottom: 6px;
+    font-weight: 400;
 }
 
 .vehicle-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
 .vehicle-details span {
-    display: flex;
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 .vehicle-details i {
-    color: #222;
-    font-size: 1.6rem;
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
@@ -1155,33 +1177,35 @@ body {
 
 /* Inmuebles - Mismo estilo que vehículos */
 .real-estate-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
 /* Electrónica - Mismo estilo que otras categorías */
 .electronics-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
 .electronics-details span {
-    display: flex;
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 .electronics-details i {
-    color: #222;
-    font-size: 1.4rem;
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* --- INICIO AJUSTE ALINEACIÓN ATRIBUTOS INMUEBLE --- */
@@ -2568,11 +2592,11 @@ body#pagina-login {
 /* 2. Estilo de la Tarjeta (form-box) */
 .form-box {
     background-color: #ffffff;
-    padding: 40px;
+    padding: 20px 30px;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px; /* Ancho máximo para el formulario */
+    max-width: 700px;
     text-align: center;
 }
 
@@ -3083,28 +3107,58 @@ body#pagina-login {
     }
 
     .box .content, .property-details {
-        padding: 1rem;
+        padding: 12px !important;
     }
 
     .box h3, .property-title {
-        font-size: 1.4rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.8rem !important;
+        margin-bottom: 4px !important;
     }
 
     .box .price, .property-price {
-        font-size: 1.6rem;
-        margin-bottom: 0.3rem;
+        font-size: 2rem !important;
+        margin-bottom: 0 !important;
+        color: #008080 !important;
     }
 
     .box .location, .property-location {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.2rem !important;
+        margin-bottom: 6px !important;
+        font-weight: 400 !important;
+        color: #777 !important;
+    }
+
+    .box .location i, .property-location i {
+        font-size: 1rem !important;
+        color: #888 !important;
     }
 
     .box .description, .property-description {
-        font-size: 1rem;
-        line-height: 1.4;
-        margin-bottom: 0.5rem;
+        display: none !important;
+    }
+
+    /* Solo 3 atributos en móvil */
+    .box .content .property-details span:nth-child(n+4),
+    .property-attributes span:nth-child(n+4) {
+        display: none !important;
+    }
+
+    .box .content .property-details,
+    .property-attributes,
+    .vehicle-details,
+    .real-estate-details {
+        gap: 0.6rem !important;
+        margin-bottom: 8px !important;
+        font-size: 1.3rem !important;
+        color: #444 !important;
+        font-weight: 500 !important;
+    }
+
+    .box .content .property-details i,
+    .vehicle-details i,
+    .real-estate-details i {
+        font-size: 1.1rem !important;
+        color: #666 !important;
     }
 
     /* Botones más grandes para móvil */
@@ -3222,11 +3276,11 @@ body#pagina-login {
     }
 
     .box h3, .property-title {
-        font-size: 1.2rem;
+        font-size: 1.6rem !important;
     }
 
     .box .price, .property-price {
-        font-size: 1.4rem;
+        font-size: 2rem !important;
     }
 
     .box .content, .property-details {
