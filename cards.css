@@ -238,6 +238,12 @@
   font-weight: 500;
 }
 
+/* --- Descripción detallada (ocultar en tarjetas) --- */
+.property-description,
+.card-description {
+  display: none !important;
+}
+
 /* --- Botón de contacto --- */
 .btn-contact-card,
 .product-card-h .btn-contact {
