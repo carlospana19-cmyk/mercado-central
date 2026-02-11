@@ -61,7 +61,6 @@ async function loadDynamicStats() {
     }
 
     if (adsError) console.error('Error al contar anuncios:', adsError);
-    if (usersError) console.error('Error al contar usuarios:', usersError);
 
     // Actualizar las estadísticas en el DOM
     const adsElement = document.querySelector('.stat-item:nth-child(1) .stat-number');
