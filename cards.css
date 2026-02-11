@@ -138,16 +138,16 @@
 /* --- Precio --- */
 .property-price,
 .product-card-h .card-content .card-price {
-  font-size: 1.8rem;
+  font-size: 42px;
   font-weight: 700;
   color: #008080;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.5px;
 }
 
 @media (min-width: 992px) {
   .property-price,
   .product-card-h .card-content .card-price {
-    font-size: 1rem;
+    font-size: 42px;
   }
 }
 
