@@ -407,7 +407,22 @@ function displayFilteredProducts(ads) {
         return null;
     };
 
-    const adsHTML = ads.map(ad => {
+    const adsHTML = ads.map(product => {
+        // 1. Extraer la imagen correcta de este anuncio específico
+        const imagenUrl = (product.imagenes && product.imagenes[0]?.url_imagen) || product.url_portada || 'img/placeholder.jpg';
+
+        // 2. Asegurar que atributos_clave sea un objeto para la tarjeta
+        let attrs = product.atributos_clave || {};
+        if (typeof attrs === 'string') {
+            try { attrs = JSON.parse(attrs); } catch(e) { attrs = {}; }
+        }
+
+        // 3. Crear el objeto limpio para la tarjeta
+        const ad = { 
+            ...product, 
+            url_portada: imagenUrl, 
+            atributos_clave: attrs 
+        };
         const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
         const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';

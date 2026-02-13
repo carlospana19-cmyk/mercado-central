@@ -3,6 +3,7 @@
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML } from './utils-attributes.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
+import { UIComponents } from './UIComponents.js';
 
 export function initializeHomePage() {
 
@@ -76,26 +77,24 @@ export function initializeHomePage() {
             let adsHTML = '';
             let processedAds = 0;
 
-            // Función para convertir URL de YouTube/Vimeo a embed
-            const getVideoEmbedUrl = (videoUrl) => {
-                if (!videoUrl) return null;
-                
-                // YouTube
-                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                const youtubeMatch = videoUrl.match(youtubeRegex);
-                if (youtubeMatch) {
-                    return `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`;
-                }
-                
-                // Vimeo
-                const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/;
-                const vimeoMatch = videoUrl.match(vimeoRegex);
-                if (vimeoMatch) {
-                    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-                }
-                
-                return null;
-            };
+            // Función interna para convertir URL de YouTube/Vimeo a embed
+const getVideoEmbedUrl = (videoUrl) => {
+    if (!videoUrl) return null;
+    
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const youtubeMatch = videoUrl.match(youtubeRegex);
+    if (youtubeMatch) {
+        return `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`;
+    }
+    
+    const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/;
+    const vimeoMatch = videoUrl.match(vimeoRegex);
+    if (vimeoMatch) {
+        return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    }
+    
+    return null;
+};
 
             const generateCardHTML = (ad) => {
                 const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
@@ -209,7 +208,7 @@ if (ad.featured_plan === "top") {
                                 ${vendorAvatar}
                             </div>
                             <h3>${ad.titulo}</h3>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.provincia || 'N/A'}</div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}</div>
                             <div class="description">${ad.descripcion || ''}</div>
                             ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
                             ${profilePhotoHTML}
@@ -218,47 +217,84 @@ if (ad.featured_plan === "top") {
                     </div>`;
             };
 
-            // === RENDERIZADO POR FILAS SIMPLIFICADO ===
-            // Solo dos filas de 4 columnas: Top Selección Vehículos y Top Selección Inmuebles
+            // === RENDERIZADO POR FILAS REORGANIZADO ===
 
-            // Filtrar anuncios por categoría
-            const vehiclesTop = ads.filter(ad => 
-                ad.categoria && 
-                ad.categoria.toLowerCase().includes('vehículo') && 
-                ['top', 'destacado', 'premium'].includes(ad.featured_plan)
-            ).slice(0, 4);
+            // Separar anuncios por tipo
+            const topDestacadoAds = ads.filter(ad => ['top', 'destacado'].includes(ad.featured_plan));
+            const premiumAdsFiltered = ads.filter(ad => ad.featured_plan === 'premium');
+            const basicoAds = ads.filter(ad => ad.featured_plan === 'basico');
 
-            const realEstateTop = ads.filter(ad => 
-                ad.categoria && 
-                ad.categoria.toLowerCase().includes('bienes') && 
-                ['top', 'destacado', 'premium'].includes(ad.featured_plan)
-            ).slice(0, 4);
+            let adIndex = 0;
 
-            // Fila 1: Top Selección Vehículos (4 columnas)
-            if (vehiclesTop.length > 0) {
+            // Fila 1: Grid de 2 columnas para los primeros 2 anuncios TOP/Destacado
+            if (topDestacadoAds.length > 0) {
+                const row1Ads = topDestacadoAds.slice(0, 2);
                 adsHTML += `
                 <div class="featured-section-title">
-                    <span class="pill-top">Top Selección Vehículos</span>
+                    <span class="pill-top">Top selección</span>
                 </div>
-                <div class="ads-row row-4-cols">
-                    ${vehiclesTop.map(ad => generateCardHTML(ad)).join('')}
+                <div class="ads-row row-2-cols">
+                    ${row1Ads.map(ad => generateCardHTML(ad)).join('')}
                 </div>`;
+                adIndex = row1Ads.length;
             }
 
-            // Fila 2: Top Selección Inmuebles (4 columnas)
-            if (realEstateTop.length > 0) {
+            // Fila 2: Grid de 3 columnas para los siguientes 3 anuncios TOP/Destacado
+            if (adIndex < topDestacadoAds.length) {
+                const row2Ads = topDestacadoAds.slice(adIndex, adIndex + 3);
                 adsHTML += `
-                <div class="featured-section-title" style="margin-top: 3rem;">
-                    <span class="pill-top">Top Selección Inmuebles</span>
-                </div>
-                <div class="ads-row row-4-cols">
-                    ${realEstateTop.map(ad => generateCardHTML(ad)).join('')}
+                <div class="ads-row row-3-cols">
+                    ${row2Ads.map(ad => generateCardHTML(ad)).join('')}
+                </div>`;
+                adIndex += row2Ads.length;
+            }
+
+            // Fila 3: Carrusel de 4 columnas para anuncios TOP/Destacado restantes + Premium
+            const remainingTopDestacado = topDestacadoAds.slice(adIndex);
+            const combinedAdsForRow3 = [...remainingTopDestacado, ...premiumAdsFiltered];
+
+            if (combinedAdsForRow3.length > 0) {
+                const row3Ads = combinedAdsForRow3.slice(0, Math.min(8, combinedAdsForRow3.length));
+                adsHTML += `
+                <div class="carousel-row-wrapper">
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-3">
+                        <div class="swiper-wrapper">`;
+                row3Ads.forEach(ad => {
+                    adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
+                });
+                adsHTML += `
+                        </div>
+                    </div>
+                    <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
                 </div>`;
             }
 
-            // Si no hay vehículos ni inmuebles, mostrar mensaje
-            if (vehiclesTop.length === 0 && realEstateTop.length === 0) {
-                adsHTML += '<p style="text-align:center; padding: 2rem;">No hay anuncios destacados disponibles.</p>';
+            // Fila 4+: Carruseles de 4 columnas para anuncios restantes (basico)
+            let remainingBasicoAds = basicoAds;
+            if (combinedAdsForRow3.length > 8) {
+                remainingBasicoAds = [...combinedAdsForRow3.slice(8), ...basicoAds];
+            }
+
+            let rowCounter = 4;
+            let basicoIndex = 0;
+            while (basicoIndex < remainingBasicoAds.length) {
+                const rowAds = remainingBasicoAds.slice(basicoIndex, Math.min(basicoIndex + 8, remainingBasicoAds.length));
+                adsHTML += `
+                <div class="carousel-row-wrapper">
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-${rowCounter}">
+                        <div class="swiper-wrapper">`;
+                rowAds.forEach(ad => {
+                    adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
+                });
+                adsHTML += `
+                        </div>
+                    </div>
+                    <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                </div>`;
+                basicoIndex += rowAds.length;
+                rowCounter++;
             }
             // === FIN: Lógica de renderizado ===
 
