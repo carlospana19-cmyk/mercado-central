@@ -1123,3 +1123,76 @@ main, section.hero-search, section.categories-showcase, section.products {
         padding: 0 10px;
     }
 }
+
+/* ================================================= */
+/* === FLECHAS DEL CARRUSEL EN DETALLE PRODUCTO === */
+/* ================================================= */
+
+/* Contenedor del carrusel principal */
+.product-gallery-swiper {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Flechas del carrusel de detalle */
+.product-gallery-swiper .swiper-button-next,
+.product-gallery-swiper .swiper-button-prev {
+    z-index: 100 !important;
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    color: #333 !important;
+    filter: drop-shadow(0px 0px 3px rgba(0,0,0,0.5));
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Posicionar flechas fuera de la imagen */
+.product-gallery-swiper .swiper-button-prev {
+    left: -22px !important;
+}
+
+.product-gallery-swiper .swiper-button-next {
+    right: -22px !important;
+}
+
+/* Iconos de las flechas */
+.product-gallery-swiper .swiper-button-next::after,
+.product-gallery-swiper .swiper-button-prev::after {
+    font-size: 20px !important;
+    font-weight: bold;
+}
+
+/* Hover en flechas */
+.product-gallery-swiper .swiper-button-next:hover,
+.product-gallery-swiper .swiper-button-prev:hover {
+    background: #2da687 !important;
+    color: white !important;
+    transform: scale(1.1);
+}
+
+/* Responsive: ajustar flechas en móvil */
+@media (max-width: 768px) {
+    .product-gallery-swiper .swiper-button-next,
+    .product-gallery-swiper .swiper-button-prev {
+        width: 36px !important;
+        height: 36px !important;
+    }
+    
+    .product-gallery-swiper .swiper-button-prev {
+        left: 10px !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .product-gallery-swiper .swiper-button-next {
+        right: 10px !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .product-gallery-swiper .swiper-button-next::after,
+    .product-gallery-swiper .swiper-button-prev::after {
+        font-size: 16px !important;
+    }
+}
