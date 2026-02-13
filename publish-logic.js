@@ -3,22 +3,16 @@
 import { supabase } from './supabase-client.js';
 import { districtsByProvince } from './config-locations.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
+import { APP_CONFIG } from './AppConfig.js';
 
 // ✅ Permitir acceso sin autenticación - verificar estado más adelante
 
-// CONFIGURACIÓN DE PLANES
-const PLAN_LIMITS = {
-    'free': { maxFotos: 3, hasVideo: false, hasCarousel: false, priority: 0 },
-    'basico': { maxFotos: 5, hasVideo: false, hasCarousel: false, priority: 1 },
-    'premium': { maxFotos: 10, hasVideo: false, hasCarousel: true, priority: 2 },
-    'destacado': { maxFotos: 15, hasVideo: true, hasCarousel: true, priority: 3 },
-    'top': { maxFotos: 20, hasVideo: true, hasCarousel: true, priority: 4 }
-};
+
 
 // VALIDAR CANTIDAD DE FOTOS
 function validateImageCount(plan) {
     const selectedPlan = plan || 'free';
-    const limit = PLAN_LIMITS[selectedPlan].maxFotos;
+    const limit = APP_CONFIG.PLAN_LIMITS[selectedPlan].maxFotos;
     const currentImages = document.querySelectorAll('.image-preview').length;
     
     if (currentImages >= limit) {
@@ -1530,9 +1524,8 @@ form.addEventListener('submit', async (e) => {
 
             // 4. Añadir los datos del plan al objeto principal del anuncio
             adData.featured_plan = selectedPlan;
-            adData.featured_until = fechaExpiracion.toISOString();
-            adData.plan_priority = PLAN_LIMITS[selectedPlan].priority; // AGREGAR
-            adData.max_images = PLAN_LIMITS[selectedPlan].maxFotos; // AGREGAR
+            adData.plan_priority = APP_CONFIG.PLAN_LIMITS[selectedPlan].priority; // AGREGAR
+            adData.max_images = APP_CONFIG.PLAN_LIMITS[selectedPlan].maxFotos; // AGREGAR
             // adData.enhancements = enhancements; // Eliminado: ya no hay enhancements
 
             // ==================================================================
@@ -1837,16 +1830,7 @@ form.addEventListener('submit', async (e) => {
 
 console.log("Agente 11: Ejecutando script de navegación v2 (por clic en tarjeta).");
 
-// 1. Definimos los límites de los planes (si no está ya definido globalmente).
-const PLAN_LIMITS_V2 = {
-    'free': { maxFotos: 3 },
-    'basico': { maxFotos: 5 },
-    'premium': { maxFotos: 10 },
-    'destacado': { maxFotos: 15 },
-    'top': { maxFotos: 20 }
-};
 
-// 2. Seleccionamos TODOS los contenedores de las tarjetas de plan.
 const planCards = document.querySelectorAll('.plan-card-h');
 console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
 
@@ -1880,7 +1864,7 @@ planCards.forEach(card => {
         }, 300); // Reducimos un poco el tiempo para una sensación más rápida.
 
         // --- Lógica para actualizar los límites de fotos ---
-        const limits = PLAN_LIMITS_V2[selectedPlan];
+        const limits = APP_CONFIG.PLAN_LIMITS[selectedPlan];
         if (!limits) {
             console.error(`Error: No se encontraron límites para el plan "${selectedPlan}".`);
             return;

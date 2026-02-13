@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        console.log("Datos del anuncio:", ad);
         displayProductDetails(ad);
 
         // Incrementar contador de visitas

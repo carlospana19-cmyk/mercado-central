@@ -9,14 +9,14 @@
 /* --- HERO SECTION --- */
 .hero-search {
   position: relative;
-  padding: 11rem 2rem 4rem 2rem;
+  padding: 2rem 2rem 4rem 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
   color: var(--color-blanco);
-  min-height: 80vh;
+  min-height: 50vh;
 }
 
 /* Carrusel del Hero */
