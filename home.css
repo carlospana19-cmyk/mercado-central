@@ -1116,6 +1116,25 @@ main, section.hero-search, section.categories-showcase, section.products {
     .carousel-row-wrapper {
         padding: 0 15px;
     }
+    
+    /* Paginación para carruseles en móvil */
+    .row-carousel-pagination {
+        position: relative;
+        margin-top: 15px;
+        text-align: center;
+    }
+    
+    .row-carousel-pagination .swiper-pagination-bullet {
+        width: 8px;
+        height: 8px;
+        background: #ccc;
+        opacity: 1;
+        margin: 0 4px;
+    }
+    
+    .row-carousel-pagination .swiper-pagination-bullet-active {
+        background: var(--color-primario, #00bfae);
+    }
 }
 
 @media (max-width: 480px) {

@@ -1757,6 +1757,7 @@ body {
 .detalle-header {
     margin-bottom: 3rem;
     padding-left: 0;
+    /* Alineado con el borde izquierdo de la galería de imágenes */
 }
 
 .detalle-header h1 {
@@ -2137,7 +2138,7 @@ body {
     }
 
     .detalle-page-container {
-        padding: 2rem 15px;
+        padding: 0 15px;
     }
 
     .vehicle-details-container {
@@ -2150,8 +2151,9 @@ body {
     }
 
     .spec-item {
-        padding: 1.5rem;
+        padding: 15px;
         gap: 1rem;
+        min-height: auto;
     }
 
     .spec-item i {
@@ -2159,8 +2161,16 @@ body {
         width: 2.5rem;
     }
 
-.spec-value {
-    font-size: 1.6rem;
+    .spec-value {
+        font-size: 1.1rem;
+    }
+
+    /* Botones de contacto en móvil */
+    .btn.btn-whatsapp,
+    .btn.btn-email,
+    .btn.btn-phone {
+        padding: 15px;
+        font-size: 1.1rem;
     }
 }
 
