@@ -1757,6 +1757,7 @@ body {
 .detalle-header {
     margin-bottom: 3rem;
     padding-left: 0;
+    /* Alineado con el borde izquierdo de la galería de imágenes */
 }
 
 .detalle-header h1 {

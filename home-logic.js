@@ -683,19 +683,38 @@ function initializeRowCarousels() {
         const prevBtn = wrapper?.querySelector('.row-nav-prev');
         const nextBtn = wrapper?.querySelector('.row-nav-next');
         
+        // Crear contenedor de paginación si no existe
+        let paginationEl = wrapper?.querySelector('.swiper-pagination');
+        if (!paginationEl && wrapper) {
+            paginationEl = document.createElement('div');
+            paginationEl.className = 'swiper-pagination row-carousel-pagination';
+            wrapper.appendChild(paginationEl);
+        }
+        
         const swiperInstance = new Swiper(swiperEl, {
             slidesPerView: 4,
             slidesPerGroup: 1,
             spaceBetween: 24,
             loop: false,
+            touchMove: true,
+            touchRatio: 1,
+            resistance: true,
+            resistanceRatio: 0.85,
+            grabCursor: true,
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
             },
+            pagination: {
+                el: paginationEl,
+                clickable: true,
+                dynamicBullets: false,
+            },
             breakpoints: {
                 0: {
-                    slidesPerView: 1,
-                    spaceBetween: 16,
+                    slidesPerView: 1.1,
+                    spaceBetween: 12,
+                    centeredSlides: false,
                 },
                 640: {
                     slidesPerView: 2,
