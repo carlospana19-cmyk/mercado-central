@@ -41,9 +41,30 @@ function inicializarNavegacion() {
     const navItems = document.querySelectorAll('.nav-item');
     
     navItems.forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', async () => {
+            // Verificar sesión antes de cambiar de pestaña
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                alert('Sesion expirada. Redirigiendo al login...');
+                window.location.href = '/login.html';
+                return;
+            }
+            
             const sectionId = item.dataset.section;
             if (!sectionId) return;
+            
+            // Verificar que sigue siendo admin
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (!profile || !profile.is_admin) {
+                alert('No tienes permisos de administrador');
+                window.location.href = '/index.html';
+                return;
+            }
             
             navItems.forEach(n => n.classList.remove('active'));
             item.classList.add('active');
@@ -335,6 +356,7 @@ async function cargarUsuarios() {
 
         const userIds = usuarios.map(u => u.id);
         let anunciosCount = {};
+        let planesActivos = {};
         
         if (userIds.length > 0) {
             const { data: counts } = await supabase
@@ -342,6 +364,14 @@ async function cargarUsuarios() {
                 .select('user_id')
                 .in('user_id', userIds);
             if (counts) counts.forEach(c => anunciosCount[c.user_id] = (anunciosCount[c.user_id] || 0) + 1);
+            
+            // Obtener usuarios con planes activos
+            const { data: planes } = await supabase
+                .from('user_plans')
+                .select('user_id')
+                .in('user_id', userIds)
+                .eq('activo', true);
+            if (planes) planes.forEach(p => planesActivos[p.user_id] = true);
         }
 
         tbodyEl.innerHTML = '';
@@ -350,9 +380,11 @@ async function cargarUsuarios() {
             tbodyEl.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #555;">No hay usuarios</td></tr>';
         } else {
             usuarios.forEach(usuario => {
+                const tienePlan = planesActivos[usuario.id];
+                const vipBadge = tienePlan ? '<span style="background:#1a3d1a;color:#4ade80;padding:2px 8px;border-radius:4px;font-size:11px;margin-left:8px;">VIP</span>' : '';
                 tbodyEl.innerHTML += '<tr>' +
                     '<td>' + (usuario.email || 'N/A') + '</td>' +
-                    '<td>' + (usuario.nombre_negocio || usuario.full_name || '-') + '</td>' +
+                    '<td>' + (usuario.nombre_negocio || usuario.full_name || '-') + vipBadge + '</td>' +
                     '<td>' + formatearFecha(usuario.created_at) + '</td>' +
                     '<td>' + (anunciosCount[usuario.id] || 0) + '</td>' +
                     '<td><button class="btn btn-sm" onclick="asignarRapido(\'' + usuario.email + '\')">Dar TOP</button></td>' +
