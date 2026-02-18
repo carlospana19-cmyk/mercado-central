@@ -4,6 +4,7 @@ import { supabase } from './supabase-client.js';
 import { generateAttributesHTML } from './utils-attributes.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
 import { UIComponents } from './UIComponents.js';
+import { getSellerReviewStats } from './reviews-logic.js';
 
 export function initializeHomePage() {
 
@@ -25,7 +26,7 @@ export function initializeHomePage() {
             // ✅ CARGAR ANUNCIOS TOP Y DESTACADO PRIMERO (para fila de 2 columnas)
             let { data: premiumAds, error: premiumError } = await supabase
                 .from('anuncios')
-                .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)')
+                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil)')
                 .in('featured_plan', ['top', 'destacado'])
                 .order('fecha_publicacion', { ascending: false })
                 .limit(20); // Aumentado para tener más tarjetas en el carrusel
@@ -35,7 +36,7 @@ export function initializeHomePage() {
             // ✅ CARGAR RESTO DE ANUNCIOS (premium, basico) para otras filas
             let { data: regularAds, error } = await supabase
                 .from('anuncios')
-                .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)')
+                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil)')
                 .in('featured_plan', ['premium', 'basico'])
                 .order('fecha_publicacion', { ascending: false })
                 .limit(10);
@@ -48,7 +49,7 @@ export function initializeHomePage() {
                 console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios.');
                 const { data: adsWithoutFilter, error: error2 } = await supabase
                     .from('anuncios')
-                    .select('*, profiles(nombre_negocio, url_foto_perfil)')
+                    .select('*, profiles(id, nombre_negocio, url_foto_perfil)')
                     .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                     .order('fecha_publicacion', { ascending: false })
                     .limit(15);
@@ -72,6 +73,25 @@ export function initializeHomePage() {
                 container.innerHTML = '<p>No hay anuncios destacados en este momento.</p>';
                 return;
             }
+
+            // ✅ Obtener estadísticas de reseñas de todos los vendedores únicos
+            const uniqueSellerIds = [...new Set(ads.map(ad => ad.profiles?.id).filter(Boolean))];
+            const sellerStatsMap = {};
+            
+            if (uniqueSellerIds.length > 0) {
+                // Obtener estadísticas para cada vendedor
+                for (const sellerId of uniqueSellerIds) {
+                    try {
+                        const stats = await getSellerReviewStats(sellerId);
+                        sellerStatsMap[sellerId] = stats;
+                    } catch (e) {
+                        console.warn('Error obteniendo estadísticas del vendedor:', sellerId, e);
+                        sellerStatsMap[sellerId] = { total_reviews: 0, average_rating: 0 };
+                    }
+                }
+            }
+            
+            console.log('Estadísticas de vendedores:', sellerStatsMap);
 
             // === INICIO: Lógica de renderizado por filas personalizadas ===
             let adsHTML = '';
@@ -178,13 +198,24 @@ if (ad.featured_plan === "top") {
                 const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
                 const vendorPhoto = vendorProfile?.url_foto_perfil;
                 const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
+                const vendorId = vendorProfile?.id;
+                
+                // ✅ Obtener estadísticas de reseñas del vendedor
+                const vendorStats = vendorId ? (sellerStatsMap[vendorId] || { total_reviews: 0, average_rating: 0 }) : { total_reviews: 0, average_rating: 0 };
+                const starsDisplay = vendorStats.total_reviews > 0 
+                    ? `<span class="vendor-rating"><i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})</span>`
+                    : '';
+                
                 const vendorAvatar = vendorPhoto ? `<div class="vendor-avatar" title="${vendorName}">
                     <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-                    <span class="vendor-name-tooltip">${vendorName}</span>
+                    <span class="vendor-name-tooltip">${vendorName}${starsDisplay ? '<br>' + starsDisplay : ''}</span>
                 </div>` : '';
 
+                // ✅ Agregar data-category para filtrado en tiempo real
+                const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
+
                 return `
-                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory} style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
                        ${badgeHTML}
                          ${urgentBadge}
                          ${soldBadgeHome}
@@ -212,7 +243,7 @@ if (ad.featured_plan === "top") {
                             <div class="description">${ad.descripcion || ''}</div>
                             ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
                             ${profilePhotoHTML}
-                            <a href="#" class="btn-contact">Contactar</a>
+                            <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>
                         </div>
                     </div>`;
             };
@@ -365,21 +396,23 @@ if (ad.featured_plan === "top") {
             initializeRowCarousels();
 
             // ✅ Agregar listeners para clicks en tarjetas (delegación de eventos)
+            // Limpiar eventos anteriores completamente
             if (container._cardClickListener) {
                 container.removeEventListener('click', container._cardClickListener);
+                container._cardClickListener = null;
             }
+            
+            // El botón Contactar ahora es un enlace directo con href.
+            // No necesitamos JavaScript para redirigir - el navegador lo hace automáticamente.
+            // Solo prevenimos la propagación para evitar conflictos con otros elementos.
             
             container._cardClickListener = (e) => {
                 // Solo responder al botón de contactar
                 const btnContact = e.target.closest('.btn-contact');
                 if (!btnContact) return;
                 
-                e.preventDefault();
-                const adId = btnContact.closest('.card')?.getAttribute('data-ad-id');
-                
-                if (adId) {
-                    window.location.href = `detalle-producto.html?id=${adId}`;
-                }
+                // No prevenimos el comportamiento por defecto - dejamos que el href funcione
+                console.log('Click en Contactar - ID:', btnContact.getAttribute('data-ad-id'));
             };
             
             container.addEventListener('click', container._cardClickListener, false);

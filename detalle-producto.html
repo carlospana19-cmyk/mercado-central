@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
     <title>Detalle del Producto - Mercado Central</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,6 +130,15 @@
         </div>
     </div>
 </main>
+
+<!-- Sección de Opiniones sobre el Vendedor -->
+<section class="seller-reviews-section" id="seller-reviews-section" style="display: none;">
+    <div class="container">
+        <h2><i class="fas fa-star"></i> Opiniones sobre el vendedor</h2>
+        <div id="seller-reviews-stats" class="reviews-stats"></div>
+        <div id="seller-reviews-list" class="reviews-list"></div>
+    </div>
+</section>
 
     <!-- =============================================================== -->
     <!-- COPIA Y PEGA AQUÍ TU CÓDIGO COMPLETO DEL FOOTER -->

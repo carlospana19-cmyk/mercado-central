@@ -1307,6 +1307,26 @@ body {
   font-weight: 600;
 }
 
+/* Estado activo para categorías seleccionadas */
+.category-item.category-active {
+  background-color: var(--color-primario);
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+}
+
+.category-item.category-active .category-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.category-item.category-active .category-icon i {
+  color: white;
+}
+
+.category-item.category-active h3 {
+  color: white;
+}
+
 /* --- 10. ESTILOS PARA DROPDOWN DE CATEGORÍAS (NUEVA VERSIÓN ANIDADA) --- */
 .category-dropdown-container {
   position: relative;
@@ -3356,7 +3376,156 @@ body#pagina-login {
     .modal-header h3 {
         font-size: 1.6rem;
     }
-}/* ========== SISTEMA DE LIKES ========== */ 
+}
+
+/* ========== ESTILOS PARA LISTA DE RESEÑAS ========== */
+.review-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eee;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #00bfae;
+}
+
+.reviewer-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.review-rating {
+    display: flex;
+    gap: 2px;
+}
+
+.review-rating i {
+    font-size: 14px;
+    color: #ffd700;
+}
+
+.review-comment {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Estadísticas de reseñas */
+.review-stats {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.review-stats.empty {
+    text-align: center;
+    padding: 30px;
+}
+
+.average-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.average-rating .rating-number {
+    font-size: 48px;
+    font-weight: 700;
+    color: #333;
+}
+
+.average-rating .stars {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0;
+}
+
+.average-rating .stars i {
+    font-size: 20px;
+    color: #ffd700;
+}
+
+.average-rating .total-reviews {
+    font-size: 14px;
+    color: #666;
+}
+
+.rating-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rating-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.rating-bar .star-count {
+    width: 12px;
+    text-align: right;
+}
+
+.rating-bar .bar {
+    flex: 1;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rating-bar .fill {
+    height: 100%;
+    background: #00bfae;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.rating-bar .count {
+    width: 24px;
+    text-align: right;
+    color: #666;
+}
+
+/* ========== SISTEMA DE LIKES ========== */ 
 .card-actions { 
     position: absolute; 
     top: 12px; 

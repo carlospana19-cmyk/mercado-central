@@ -80,6 +80,16 @@ async function handleLogin(e) {
 
         console.log('✅ Login exitoso:', data.user.email);
         
+        // ✅ VERIFICAR SI HAY REDIRECCIÓN PENDIENTE (desde publicar.html)
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        
+        if (redirectUrl) {
+            console.log('🔄 Redirigiendo a:', redirectUrl);
+            window.location.href = redirectUrl;
+            return;
+        }
+        
         // Verificar si es admin para redirigir a panel de administrador
         const { data: profile } = await supabase
             .from('profiles')
@@ -127,6 +137,32 @@ async function handleRegister(e) {
 
         console.log('✅ Registro exitoso');
 
+        // =====================================================
+        // AUTO-CREACIÓN DE PERFIL
+        // =====================================================
+        try {
+            console.log('🔧 Creando perfil automáticamente...');
+            
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert({
+                    id: authData.user.id,
+                    email: authData.user.email,
+                    nombre_negocio: authData.user.email.split('@')[0],
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+            
+            if (profileError) {
+                console.warn('⚠️ No se pudo crear el perfil (puede que ya exista):', profileError.message);
+            } else {
+                console.log('✅ Perfil creado exitosamente');
+            }
+        } catch (profileErr) {
+            console.warn('⚠️ Error creando perfil:', profileErr);
+        }
+        // =====================================================
+
         // Variable para saber si aplicó código de cortesía
         let codigoAplicado = false;
 
@@ -152,9 +188,9 @@ async function handleRegister(e) {
                     // Limpiar cualquier plan en sessionStorage
                     sessionStorage.removeItem('selectedPlan');
                     sessionStorage.removeItem('afterRegisterAction');
-                    // Redirigir directo a index (ya tiene plan gratis)
+                    // Redirigir directo a publicar (ya tiene plan gratis)
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'publicar.html';
                     }, 2000);
                     return; // Importante: salir aquí para no continuar
                 } else {
@@ -167,25 +203,20 @@ async function handleRegister(e) {
 
         // Solo si NO aplicó código de cortesía, continuar con flujo normal
         if (!codigoAplicado) {
-            // Obtener plan seleccionado de sessionStorage o URL
+            // ✅ VERIFICAR SI HAY REDIRECCIÓN PENDIENTE (desde publicar.html)
             const urlParams = new URLSearchParams(window.location.search);
-            const selectedPlan = urlParams.get('plan') || sessionStorage.getItem('selectedPlan');
-
-            if (selectedPlan === 'gratis') {
-                // Plan gratis: redirigir a publicar con plan preseleccionado
-                sessionStorage.setItem('selectedPlan', 'gratis');
-                sessionStorage.setItem('afterRegisterAction', 'continuePlan');
-                alert('¡Registro exitoso! Redirigiendo a la publicación de anuncio...');
-                window.location.href = 'publicar.html';
-            } else if (selectedPlan) {
-                // Plan de pago: redirigir a pago nuevamente
-                alert('¡Registro exitoso! Completando el pago...');
-                window.location.href = `/payment.html?plan=${selectedPlan}`;
-            } else {
-                // Sin plan: ir a home
-                alert('¡Registro exitoso! Revisa tu correo para confirmar.');
-                window.location.href = 'index.html';
+            const redirectUrl = urlParams.get('redirect');
+            
+            if (redirectUrl) {
+                console.log('🔄 Redirigiendo a:', redirectUrl);
+                alert('¡Registro exitoso! Redirigiendo...');
+                window.location.href = redirectUrl;
+                return;
             }
+            
+            // Por defecto: redirigir a publicar.html para que pueda publicar su anuncio
+            alert('¡Registro exitoso! Ya puedes publicar tu anuncio.');
+            window.location.href = 'publicar.html';
         }
     } catch (err) {
         console.error('❌ Error:', err);

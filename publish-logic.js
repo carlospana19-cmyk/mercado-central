@@ -1,13 +1,216 @@
-// publish-logic.js - VERSIÓN FINAL CON SINCRONIZACIÓN COMPLETA
+// publish-logic.js - VERSIÓN FINAL CON GUARDIÁN DE PUBLICACIÓN
 
 import { supabase } from './supabase-client.js';
 import { districtsByProvince } from './config-locations.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
 import { APP_CONFIG } from './AppConfig.js';
 
-// ✅ Permitir acceso sin autenticación - verificar estado más adelante
+// =====================================================
+// GUARDIÁN DE PUBLICACIÓN - Validación de Sesión
+// =====================================================
 
+let currentUser = null;
+let isSessionChecked = false;
 
+/**
+ * Verifica si hay un usuario autenticado antes de permitir publicar
+ * Muestra modal de login si no hay sesión
+ */
+async function checkPublishSession() {
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+            console.error('Error verificando sesión:', error);
+            showLoginRequiredModal();
+            return null;
+        }
+        
+        if (!session || !session.user) {
+            console.log('No hay sesión activa');
+            showLoginRequiredModal();
+            return null;
+        }
+        
+        currentUser = session.user;
+        isSessionChecked = true;
+        console.log('Usuario autenticado:', currentUser.email);
+        return currentUser;
+        
+    } catch (error) {
+        console.error('Error en checkPublishSession:', error);
+        showLoginRequiredModal();
+        return null;
+    }
+}
+
+/**
+ * Muestra un modal elegante pidiendo iniciar sesión
+ */
+function showLoginRequiredModal() {
+    // Crear overlay del modal
+    const modalOverlay = document.createElement('div');
+    modalOverlay.id = 'login-required-modal';
+    modalOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
+    
+    // Contenido del modal
+    modalOverlay.innerHTML = `
+        <div class="login-required-content" style="
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        ">
+            <div style="
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #00bfae, #00a896);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+            ">
+                <i class="fas fa-user-lock" style="font-size: 36px; color: white;"></i>
+            </div>
+            <h2 style="
+                font-size: 24px;
+                color: #333;
+                margin-bottom: 12px;
+                font-family: 'Poppins', sans-serif;
+            ">¡Ups! Necesitas iniciar sesión</h2>
+            <p style="
+                font-size: 16px;
+                color: #666;
+                margin-bottom: 28px;
+                line-height: 1.6;
+            ">Para publicar tu anuncio, primero debes iniciar sesión en tu cuenta. Es rápido y seguro.</p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button id="go-to-login" style="
+                    background: linear-gradient(135deg, #00bfae, #00a896);
+                    color: white;
+                    border: none;
+                    padding: 14px 32px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                ">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                <button id="go-to-register" style="
+                    background: white;
+                    color: #00bfae;
+                    border: 2px solid #00bfae;
+                    padding: 12px 28px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                ">
+                    <i class="fas fa-user-plus"></i> Registrarme
+                </button>
+            </div>
+            <button id="close-login-modal" style="
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #999;
+                cursor: pointer;
+            ">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modalOverlay);
+    
+    // Animar entrada
+    setTimeout(() => {
+        modalOverlay.style.opacity = '1';
+        modalOverlay.querySelector('.login-required-content').style.transform = 'scale(1)';
+    }, 10);
+    
+    // Event listeners
+    const loginBtn = modalOverlay.querySelector('#go-to-login');
+    const registerBtn = modalOverlay.querySelector('#go-to-register');
+    const closeBtn = modalOverlay.querySelector('#close-login-modal');
+    
+    // Guardar URL actual para regresar después del login
+    const currentUrl = window.location.href;
+    
+    loginBtn.addEventListener('click', () => {
+        window.location.href = `login.html?redirect=${encodeURIComponent(currentUrl)}`;
+    });
+    
+    registerBtn.addEventListener('click', () => {
+        window.location.href = `registro.html?redirect=${encodeURIComponent(currentUrl)}`;
+    });
+    
+    closeBtn.addEventListener('click', () => {
+        modalOverlay.style.opacity = '0';
+        modalOverlay.querySelector('.login-required-content').style.transform = 'scale(0.9)';
+        setTimeout(() => modalOverlay.remove(), 300);
+    });
+    
+    // Cerrar al hacer clic fuera
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+            closeBtn.click();
+        }
+    });
+}
+
+/**
+ * Deshabilita el formulario si no hay sesión
+ */
+function disableFormForGuests() {
+    const publishButton = document.querySelector('.publish-btn, #publish-btn, button[type="submit"]');
+    if (publishButton) {
+        publishButton.disabled = true;
+        publishButton.style.opacity = '0.5';
+        publishButton.style.cursor = 'not-allowed';
+        publishButton.title = 'Inicia sesión para publicar';
+    }
+}
+
+/**
+ * Habilita el formulario cuando hay sesión válida
+ */
+function enableFormForUsers() {
+    const publishButton = document.querySelector('.publish-btn, #publish-btn, button[type="submit"]');
+    if (publishButton) {
+        publishButton.disabled = false;
+        publishButton.style.opacity = '1';
+        publishButton.style.cursor = 'pointer';
+        publishButton.title = '';
+    }
+}
+
+// =====================================================
+// FIN GUARDIÁN DE PUBLICACIÓN
+// =====================================================
 
 // VALIDAR CANTIDAD DE FOTOS
 function validateImageCount(plan) {
@@ -22,9 +225,41 @@ function validateImageCount(plan) {
     return true;
 }
 
-export function initializePublishPage() {
+export async function initializePublishPage() {
     const form = document.getElementById('ad-form');
     if (!form) return;
+    
+    // =====================================================
+    // VERIFICACIÓN DE SESIÓN AL CARGAR LA PÁGINA
+    // =====================================================
+    const user = await checkPublishSession();
+    
+    if (!user) {
+        // No hay sesión - deshabilitar formulario
+        disableFormForGuests();
+        // El modal ya se mostró en checkPublishSession
+    } else {
+        // Hay sesión - habilitar formulario
+        enableFormForUsers();
+    }
+    
+    // Escuchar cambios de autenticación
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            currentUser = session.user;
+            isSessionChecked = true;
+            enableFormForUsers();
+            // Cerrar modal si está abierto
+            const modal = document.getElementById('login-required-modal');
+            if (modal) modal.remove();
+        } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            isSessionChecked = false;
+            disableFormForGuests();
+            showLoginRequiredModal();
+        }
+    });
+    // =====================================================
 
     // --- ELEMENTOS DEL DOM ---
     const allSteps = form.querySelectorAll('.form-section');
@@ -1076,8 +1311,13 @@ function showCommunityFields() {
     // --- EVENT LISTENERS PARA SUBIDA DE IMÁGENES ---
     coverImageInput.addEventListener('change', function() {
         const file = this.files[0];
+        const coverImageError = document.getElementById('cover-image-error');
         if (file) {
             coverImageName.textContent = file.name;
+            // Ocultar mensaje de error si hay imagen
+            if (coverImageError) {
+                coverImageError.style.display = 'none';
+            }
         } else {
             coverImageName.textContent = 'Ningún archivo seleccionado.';
         }
@@ -1350,26 +1590,18 @@ function showCommunityFields() {
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // =====================================================
+    // VALIDACIÓN DE SESIÓN - GUARDIÁN DE PUBLICACIÓN
+    // =====================================================
+    if (!currentUser || !isSessionChecked) {
+        showLoginRequiredModal();
+        return;
+    }
+    // =====================================================
+    
     const publishButton = document.getElementById('publish-ad-btn');
     publishButton.disabled = true;
     publishButton.textContent = 'Publicando...';
-
-    let user = null;
-    try {
-        const { data: { user: sessionUser } } = await supabase.auth.getUser();
-        user = sessionUser;
-    } catch (err) {
-        console.log("⚠️ Error al verificar sesión:", err.message);
-        user = null;
-    }
-    
-    if (!user) {
-        // Mostrar modal de login en lugar de alert
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        showLoginModalForPublishing();
-        return;
-    }
 
     // --- VALIDACIÓN FINAL ANTES DE ENVIAR ---
     const title = document.getElementById('title').value.trim();
@@ -1404,8 +1636,27 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    if (!category || !province || !district || !coverImageFile) {
-        alert('Por favor, completa todos los campos obligatorios (Categoría, Ubicación e Imagen de Portada).');
+    // ✅ VALIDACIÓN VISUAL DE IMAGEN DE PORTADA
+    const coverImageError = document.getElementById('cover-image-error');
+    if (!coverImageFile) {
+        // Mostrar mensaje de error en rojo
+        if (coverImageError) {
+            coverImageError.style.display = 'block';
+            coverImageError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        alert('Por favor, sube una foto de portada para tu anuncio.');
+        publishButton.disabled = false;
+        publishButton.textContent = 'Publicar Anuncio';
+        return;
+    } else {
+        // Ocultar mensaje de error si hay imagen
+        if (coverImageError) {
+            coverImageError.style.display = 'none';
+        }
+    }
+
+    if (!category || !province || !district) {
+        alert('Por favor, completa todos los campos obligatorios (Categoría y Ubicación).');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
@@ -1449,9 +1700,51 @@ form.addEventListener('submit', async (e) => {
     const subcategoryName = subcategorySelect.value; // Ya es el nombre
 
     try {
+        // =====================================================
+        // VERIFICACIÓN DUAL: Verificar si el perfil existe
+        // =====================================================
+        console.log('🔍 Verificando perfil del usuario...');
+        
+        const { data: existingProfile, error: profileCheckError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', currentUser.id)
+            .single();
+        
+        if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+            // Error diferente a "no encontrado"
+            console.error('Error verificando perfil:', profileCheckError);
+            throw new Error('Error de sincronización de cuenta. Por favor, intenta cerrar e iniciar sesión de nuevo.');
+        }
+        
+        if (!existingProfile) {
+            // El perfil no existe, crear automáticamente
+            console.log('⚠️ Perfil no encontrado, creando automáticamente...');
+            
+            const { error: createProfileError } = await supabase
+                .from('profiles')
+                .insert({
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    nombre_negocio: currentUser.email.split('@')[0],
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+            
+            if (createProfileError) {
+                console.error('Error creando perfil:', createProfileError);
+                throw new Error('Error de sincronización de cuenta. Por favor, intenta cerrar e iniciar sesión de nuevo.');
+            }
+            
+            console.log('✅ Perfil creado exitosamente');
+        } else {
+            console.log('✅ Perfil verificado correctamente');
+        }
+        // =====================================================
+        
         if (!coverImageFile) throw new Error("La imagen de portada es obligatoria.");
 
-            const coverFileName = `${user.id}/cover-${Date.now()}-${coverImageFile.name}`;
+            const coverFileName = `${currentUser.id}/cover-${Date.now()}-${coverImageFile.name}`;
             let { error: coverUploadError } = await supabase.storage.from('imagenes_anuncios').upload(coverFileName, coverImageFile);
             if (coverUploadError) throw coverUploadError;
             
@@ -1460,7 +1753,7 @@ form.addEventListener('submit', async (e) => {
             // Subir imágenes de galería
             const uploadedGalleryUrls = [];
             for (const file of galleryFiles) {
-                const galleryFileName = `${user.id}/gallery-${Date.now()}-${file.name}`;
+                const galleryFileName = `${currentUser.id}/gallery-${Date.now()}-${file.name}`;
                 const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
                 if (galleryUploadError) throw galleryUploadError;
                 const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
@@ -1475,7 +1768,7 @@ form.addEventListener('submit', async (e) => {
                 categoria: categoryName,
                 provincia: formData.get('provincia'),
                 distrito: formData.get('distrito'),
-                user_id: user.id,
+                user_id: currentUser.id,
                 url_portada: coverPublicUrl,
                 url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
                 url_video: (selectedPlan === 'destacado' || selectedPlan === 'top') ? formData.get('video_url') : null,

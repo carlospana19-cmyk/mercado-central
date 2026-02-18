@@ -1,5 +1,5 @@
 import { supabase } from './supabase-client.js';
-import { ReviewModal, hasUserReviewedSeller } from './reviews-logic.js';
+import { ReviewModal, hasUserReviewedSeller, getSellerReviews, getSellerReviewStats, generateReviewStatsHTML, generateReviewHTML } from './reviews-logic.js';
 
 // product-detail-logic.js (VERSIÓN CON GALERÍA Y MEJOR MANEJO DE ERRORES)
 
@@ -8,8 +8,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const params = new URLSearchParams(window.location.search);
     const adId = params.get('id');
+    const openChat = params.get('chat') === 'true';
 
     console.log('ID del anuncio:', adId);
+    console.log('Abrir chat automáticamente:', openChat);
 
     if (!adId) {
         console.error('No se especificó ningún ID de producto');
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         console.log("Datos del anuncio:", ad);
-        displayProductDetails(ad);
+        displayProductDetails(ad, openChat);
 
         // Incrementar contador de visitas
         try {
@@ -64,8 +66,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-async function displayProductDetails(ad) {
+async function displayProductDetails(ad, openChat = false) {
     console.log('Mostrando detalles del producto:', ad);
+    console.log('¿Abrir chat automáticamente?:', openChat);
 
     // Verificar que los elementos del DOM existan
     const productNameEl = document.getElementById('product-name');
@@ -97,8 +100,33 @@ async function displayProductDetails(ad) {
     // Mostrar información de contacto del vendedor
     loadSellerContactInfo(ad);
 
+    // Si viene con parámetro chat=true, hacer scroll al formulario de contacto
+    if (openChat) {
+        setTimeout(() => {
+            const contactFormSection = document.querySelector('.contact-form-section');
+            const messageTextarea = document.querySelector('#contact-form textarea[name="message"]');
+            
+            if (contactFormSection) {
+                contactFormSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                console.log('Scroll al formulario de contacto realizado');
+            }
+            
+            if (messageTextarea) {
+                setTimeout(() => {
+                    messageTextarea.focus();
+                    console.log('Focus en el textarea de mensaje');
+                }, 500);
+            }
+        }, 800);
+    }
+
     // Configurar botón de reseñas
     setupReviewButton(ad);
+
+    // ✅ Cargar y mostrar reseñas del vendedor
+    if (ad.user_id) {
+        loadSellerReviewsSection(ad.user_id);
+    }
 
     // Calcular y mostrar fecha de publicación
     if (ad.fecha_publicacion) {
@@ -1234,5 +1262,50 @@ function displayError(message) {
                 </div>
             </div>
         `;
+    }
+}
+
+// ✅ Función para cargar y mostrar las reseñas del vendedor
+async function loadSellerReviewsSection(sellerId) {
+    const section = document.getElementById('seller-reviews-section');
+    const statsContainer = document.getElementById('seller-reviews-stats');
+    const listContainer = document.getElementById('seller-reviews-list');
+    
+    if (!section || !statsContainer || !listContainer) {
+        console.warn('Contenedores de reseñas no encontrados en el DOM');
+        return;
+    }
+    
+    try {
+        // Obtener estadísticas y reseñas del vendedor
+        const [stats, reviews] = await Promise.all([
+            getSellerReviewStats(sellerId),
+            getSellerReviews(sellerId)
+        ]);
+        
+        // Mostrar la sección
+        section.style.display = 'block';
+        
+        // Generar estadísticas
+        if (stats.total_reviews > 0) {
+            statsContainer.innerHTML = generateReviewStatsHTML(stats);
+        } else {
+            statsContainer.innerHTML = '<p class="no-reviews">Este vendedor aún no tiene reseñas.</p>';
+        }
+        
+        // Generar lista de reseñas
+        if (reviews && reviews.length > 0) {
+            listContainer.innerHTML = `
+                <div class="reviews-list">
+                    ${reviews.map(review => generateReviewHTML(review)).join('')}
+                </div>
+            `;
+        } else {
+            listContainer.innerHTML = '<p class="no-reviews">No hay opiniones sobre este vendedor todavía.</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error cargando reseñas del vendedor:', error);
+        section.style.display = 'none';
     }
 }
