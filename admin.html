@@ -5,480 +5,781 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
     <title>Panel Administrador - Mercado Central</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
+        /* =========================================
+           VERCEL ULTRA-WIDE ADMIN
+           Fondo: #000 | Sidebar: #000 | Main: #000
+           Texto: #fff / #888 | Borde: #333
+           ========================================= */
+        
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --border-color: #333333;
+            --border-subtle: #222222;
+            --sidebar-width: 240px;
         }
 
-        .admin-header {
-            background: linear-gradient(135deg, #2980b9, #00bfae);
-            color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-        }
-
-        .admin-header h1 {
-            margin: 0 0 0.5rem 0;
-            font-size: 2rem;
-        }
-
-        .admin-header p {
+        * {
+            box-sizing: border-box;
             margin: 0;
-            opacity: 0.9;
+            padding: 0;
         }
 
-        .admin-tabs {
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* =========================================
+           LAYOUT FLEX
+           ========================================= */
+        
+        .admin-layout {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
+            min-height: 100vh;
         }
 
-        .admin-tab {
-            padding: 1rem 2rem;
-            background: transparent;
-            border: none;
+        /* =========================================
+           SIDEBAR
+           ========================================= */
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-header span {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            color: #888;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
+            border-radius: 6px;
+            margin-bottom: 2px;
+            font-size: 14px;
+            font-weight: 400;
+            border: 1px solid transparent;
+            justify-content: center;
         }
 
-        .admin-tab.active {
-            color: #2980b9;
-            border-bottom-color: #2980b9;
+        .nav-item:hover {
+            color: #fff;
+            background: #111;
+            border-color: #222;
         }
 
-        .admin-tab:hover {
-            color: #2980b9;
-            background: rgba(41, 128, 185, 0.05);
+        .nav-item.active {
+            color: #fff;
+            background: #111;
+            border-color: #333;
         }
 
-        .tab-content {
+        .nav-item .icon {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.5px;
+            flex-shrink: 0;
             display: none;
-            animation: fadeIn 0.3s ease;
         }
 
-        .tab-content.active {
+        .nav-item .label {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 12px;
+            border-top: 1px solid #222;
+        }
+
+        .nav-item .label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* =========================================
+           MAIN CONTENT
+           ========================================= */
+        
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            background: var(--bg-primary);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .section.active {
             display: block;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .admin-card {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+        /* =========================================
+           TÍTULOS DE SECCIÓN
+           ========================================= */
+        
+        .section-header {
+            margin-bottom: 32px;
         }
 
-        .admin-card h2 {
-            margin: 0 0 1.5rem 0;
-            color: #2c3e50;
-            font-size: 1.5rem;
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* =========================================
+           ESTADÍSTICAS DASHBOARD
+           ========================================= */
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 32px;
+        }
+
+        .stat-card h3 {
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+        }
+
+        .stat-card p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* =========================================
+           GANANCIAS CHART (Placeholder)
+           ========================================= */
+        
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding-top: 20px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--border-color);
+            min-height: 20px;
+            transition: height 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            background: var(--text-secondary);
+        }
+
+        /* =========================================
+           TABLAS
+           ========================================= */
+        
+        .data-table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .data-table-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-table-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px 24px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-primary);
+        }
+
+        .data-table td {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-primary);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* =========================================
+           BADGES
+           ========================================= */
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: transparent;
+        }
+
+        .badge-active {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        /* =========================================
+           FORMULARIOS
+           ========================================= */
+        
+        .form-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            max-width: 600px;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #555;
+            color: var(--text-secondary);
+            font-size: 13px;
             font-weight: 500;
+            margin-bottom: 8px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
+            padding: 12px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.15s ease;
         }
 
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--text-secondary);
         }
 
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         .btn {
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            padding: 12px 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            background: var(--bg-primary);
+            border-color: var(--text-secondary);
         }
 
         .btn-primary {
-            background: #2980b9;
-            color: white;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-color: var(--text-primary);
         }
 
         .btn-primary:hover {
-            background: #1f6391;
-        }
-
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #1e8449;
+            background: var(--text-secondary);
+            border-color: var(--text-secondary);
         }
 
         .btn-danger {
-            background: #e74c3c;
-            color: white;
+            border-color: #442222;
+            color: #aa4444;
         }
 
         .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        .tokens-table,
-        .cortesias-table,
-        .usuarios-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        .tokens-table th,
-        .cortesias-table th,
-        .usuarios-table th {
-            background: #f8f9fa;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .tokens-table td,
-        .cortesias-table td,
-        .usuarios-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .tokens-table tr:hover,
-        .cortesias-table tr:hover,
-        .usuarios-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .badge-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .badge-danger {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .codigo-display {
-            font-family: 'Courier New', monospace;
-            background: #f8f9fa;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2980b9;
-            display: inline-block;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 2rem;
-            color: #2980b9;
-        }
-
-        .stat-card p {
-            margin: 0;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #999;
+            background: #331111;
+            border-color: #ff4444;
         }
 
         .btn-sm {
-            padding: 0.4rem 1rem;
-            font-size: 0.9rem;
+            padding: 8px 16px;
+            font-size: 12px;
         }
 
-        .action-buttons {
+        /* =========================================
+           CÓDIGO
+           ========================================= */
+        
+        .codigo-display {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-primary);
+            padding: 16px 24px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin: 16px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .codigo-box {
+            margin-top: 24px;
+            padding: 24px;
+            background: var(--bg-primary);
+            border: 1px dashed var(--border-color);
+            text-align: center;
+        }
+
+        /* =========================================
+           FILTROS
+           ========================================= */
+        
+        .filters {
             display: flex;
-            gap: 0.5rem;
+            gap: 12px;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filters select:focus,
+        .filters input:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        /* =========================================
+           INVENTARIO ITEMS
+           ========================================= */
+        
+        .inventario-list {
+            padding: 0;
+        }
+
+        .inventario-item {
+            display: grid;
+            grid-template-columns: 60px 1fr auto;
+            gap: 20px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            align-items: center;
+        }
+
+        .inventario-item:last-child {
+            border-bottom: none;
+        }
+
+        .inventario-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: var(--bg-primary);
+        }
+
+        .inventario-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .inventario-meta {
+            display: flex;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .inventario-stats {
+            text-align: right;
+        }
+
+        .inventario-stats .number {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .inventario-stats .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* =========================================
+           LOADING
+           ========================================= */
+        
+        .loading {
+            padding: 48px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-color);
+            border-top-color: var(--text-secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           ACCESS DENIED
+           ========================================= */
+        
+        .access-denied {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .access-denied.show {
+            display: flex;
+        }
+
+        /* =========================================
+           RESPONSIVE
+           ========================================= */
+        
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 24px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>🔐 Panel de Administrador</h1>
-            <p>Control de cortesías y planes gratuitos</p>
-        </div>
+    <!-- Acceso Denegado -->
+    <div class="access-denied" id="access-denied">
+        <h1>🔒</h1>
+        <h2>Acceso Denegado</h2>
+        <p>No tienes permisos para acceder a este panel.</p>
+    </div>
 
-        <!-- Tabs -->
-        <div class="admin-tabs">
-            <button class="admin-tab active" data-tab="generar">Generar Códigos</button>
-            <button class="admin-tab" data-tab="tokens">Tokens Activos</button>
-            <button class="admin-tab" data-tab="cortesias">Cortesías Aplicadas</button>
-            <button class="admin-tab" data-tab="usuarios">Asignar Manual</button>
-        </div>
-
-        <!-- Tab 1: Generar Códigos -->
-        <div class="tab-content active" id="tab-generar">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3 id="stat-total-tokens">0</h3>
-                    <p>Códigos Generados</p>
+    <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span>Mercado Central</span>
+                <h1>Admin</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-section="dashboard">
+                    <span class="label">Dashboard</span>
                 </div>
-                <div class="stat-card">
-                    <h3 id="stat-disponibles">0</h3>
-                    <p>Disponibles</p>
+                <div class="nav-item" data-section="ganancias">
+                    <span class="label">Ganancias</span>
                 </div>
-                <div class="stat-card">
-                    <h3 id="stat-usados">0</h3>
-                    <p>Usados</p>
+                <div class="nav-item" data-section="inventario">
+                    <span class="label">Inventario</span>
                 </div>
-                <div class="stat-card">
-                    <h3 id="stat-cortesias-activas">0</h3>
-                    <p>Cortesías Activas</p>
+                <div class="nav-item" data-section="usuarios">
+                    <span class="label">Usuarios</span>
+                </div>
+                <div class="nav-item" data-section="tokens">
+                    <span class="label">Tokens</span>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="nav-item" onclick="cerrarSesion()">
+                    <span class="label">Cerrar Sesión</span>
                 </div>
             </div>
+        </aside>
 
-            <div class="admin-card">
-                <h2>Generar Nuevo Código de Invitación</h2>
-                <div id="alert-generar"></div>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- DASHBOARD -->
+            <section class="section active" id="section-dashboard">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <p>Resumen de la plataforma</p>
+                </div>
                 
-                <form id="form-generar-token">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Tipo de Plan *</label>
-                            <select id="plan-tipo" required>
-                                <option value="top">TOP (20 fotos + video + redes)</option>
-                                <option value="destacado">DESTACADO (15 fotos + carrusel)</option>
-                                <option value="premium">PREMIUM (10 fotos + carrusel)</option>
-                                <option value="basico">BÁSICO (5 fotos)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Duración (días) *</label>
-                            <input type="number" id="duracion-dias" value="30" min="1" max="365" required>
-                        </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="stat-anuncios">0</h3>
+                        <p>Anuncios</p>
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Categoría Específica (opcional)</label>
-                            <select id="categoria-especifica">
-                                <option value="">Todas las categorías</option>
-                                <option value="vehiculos">Solo Vehículos</option>
-                                <option value="inmuebles">Solo Inmuebles</option>
-                                <option value="electronica">Solo Electrónica</option>
-                                <option value="hogar">Solo Hogar</option>
-                                <option value="moda">Solo Moda</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha de Expiración del Código (opcional)</label>
-                            <input type="date" id="expira-en">
-                        </div>
+                    <div class="stat-card">
+                        <h3 id="stat-usuarios">0</h3>
+                        <p>Usuarios</p>
                     </div>
-
-                    <div class="form-group">
-                        <label>Notas (opcional)</label>
-                        <textarea id="notas" placeholder="Ej: Para vendedores de vehículos del lanzamiento 2026"></textarea>
+                    <div class="stat-card">
+                        <h3 id="stat-mensual">$0</h3>
+                        <p>Ingresos Mes</p>
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Generar Código</button>
-                </form>
-
-                <div id="codigo-generado" style="display: none; margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 10px; text-align: center;">
-                    <h3 style="margin: 0 0 1rem 0;">✅ Código Generado Exitosamente</h3>
-                    <div class="codigo-display" id="codigo-value"></div>
-                    <p style="margin: 1rem 0 0 0; color: #666;">Comparte este código con el vendedor</p>
-                    <button class="btn btn-success btn-sm" style="margin-top: 1rem;" onclick="copiarCodigo()">Copiar Código</button>
+                    <div class="stat-card">
+                        <h3 id="stat-anual">$0</h3>
+                        <p>Ingresos Año</p>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Tab 2: Tokens Activos -->
-        <div class="tab-content" id="tab-tokens">
-            <div class="admin-card">
-                <h2>Códigos de Invitación</h2>
-                <div id="loading-tokens" class="loading">Cargando...</div>
-                <div id="tokens-container" style="display: none;">
-                    <table class="tokens-table">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Plan</th>
-                                <th>Días</th>
-                                <th>Categoría</th>
-                                <th>Estado</th>
-                                <th>Usado Por</th>
-                                <th>Creado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tokens-tbody"></tbody>
-                    </table>
+                <div class="chart-container">
+                    <h3>Ingresos por Mes (2026)</h3>
+                    <div class="chart-placeholder" id="chart-ganancias">
+                        <!-- Bars generated by JS -->
+                    </div>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <!-- Tab 3: Cortesías Aplicadas -->
-        <div class="tab-content" id="tab-cortesias">
-            <div class="admin-card">
-                <h2>Cortesías Activas</h2>
-                <div id="loading-cortesias" class="loading">Cargando...</div>
-                <div id="cortesias-container" style="display: none;">
-                    <table class="cortesias-table">
+            <!-- GANANCIAS -->
+            <section class="section" id="section-ganancias">
+                <div class="section-header">
+                    <h2>Ganancias</h2>
+                    <p>Resumen de ingresos y planes</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="ganancia-mensual">$0</h3>
+                        <p>Este Mes</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="ganancia-anual">$0</h3>
+                        <p>Este Año</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="ganancia-tokens">0</h3>
+                        <p>Tokens Usados</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="ganancia-cortesias">0</h3>
+                        <p>Cortesías Activas</p>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <div class="data-table-header">
+                        <h3>Historial de Planes</h3>
+                    </div>
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Usuario</th>
-                                <th>Negocio</th>
                                 <th>Plan</th>
-                                <th>Inicio</th>
-                                <th>Fin</th>
-                                <th>Días Rest.</th>
-                                <th>Estado</th>
-                                <th>Método</th>
-                                <th>Acciones</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
                             </tr>
                         </thead>
-                        <tbody id="cortesias-tbody"></tbody>
+                        <tbody id="ganancias-tbody">
+                            <tr><td colspan="5" class="loading">Cargando...</td></tr>
+                        </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <!-- Tab 4: Asignar Manual -->
-        <div class="tab-content" id="tab-usuarios">
-            <div class="admin-card">
-                <h2>Asignar Plan Gratis Manualmente</h2>
-                <div id="alert-asignar"></div>
-                
-                <form id="form-asignar-manual">
-                    <div class="form-group">
-                        <label>Email del Usuario *</label>
-                        <input type="email" id="email-usuario" placeholder="usuario@ejemplo.com" required>
+            <!-- INVENTARIO -->
+            <section class="section" id="section-inventario">
+                <div class="section-header">
+                    <h2>Inventario</h2>
+                    <p>Todos los anuncios de la plataforma</p>
+                </div>
+
+                <div class="filters" style="margin-bottom: 24px;">
+                    <select id="filter-categoria">
+                        <option value="">Categoría</option>
+                        <option value="vehiculos">Vehículos</option>
+                        <option value="inmuebles">Inmuebles</option>
+                        <option value="electronica">Electrónica</option>
+                        <option value="hogar">Hogar</option>
+                        <option value="moda">Moda</option>
+                    </select>
+                    <select id="filter-estado">
+                        <option value="">Estado</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                    <input type="text" id="filter-buscar" placeholder="Buscar título..." style="width: 200px;">
+                </div>
+
+                <div class="data-table-container">
+                    <div id="loading-inventario" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando inventario...</p>
                     </div>
+                    <div id="inventario-list" style="display: none;"></div>
+                </div>
+            </section>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Tipo de Plan *</label>
-                            <select id="plan-manual" required>
-                                <option value="top">TOP (20 fotos + video + redes)</option>
-                                <option value="destacado">DESTACADO (15 fotos + carrusel)</option>
-                                <option value="premium">PREMIUM (10 fotos + carrusel)</option>
-                                <option value="basico">BÁSICO (5 fotos)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Duración (días) *</label>
-                            <input type="number" id="duracion-manual" value="30" min="1" max="365" required>
-                        </div>
+            <!-- USUARIOS -->
+            <section class="section" id="section-usuarios">
+                <div class="section-header">
+                    <h2>Usuarios</h2>
+                    <p>Base de datos de clientes</p>
+                </div>
+
+                <div class="data-table-container">
+                    <div id="loading-usuarios" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando usuarios...</p>
                     </div>
-
-                    <div class="form-group">
-                        <label>Notas *</label>
-                        <textarea id="notas-manual" placeholder="Razón de la cortesía..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-success">Asignar Plan Gratis</button>
-                </form>
-            </div>
-
-            <div class="admin-card">
-                <h2>Usuarios Registrados</h2>
-                <div id="loading-usuarios" class="loading">Cargando...</div>
-                <div id="usuarios-container" style="display: none;">
-                    <table class="usuarios-table">
+                    <table class="data-table" id="usuarios-table" style="display: none;">
                         <thead>
                             <tr>
                                 <th>Email</th>
-                                <th>Nombre/Negocio</th>
+                                <th>Nombre</th>
                                 <th>Registro</th>
                                 <th>Anuncios</th>
                                 <th>Acciones</th>
@@ -487,8 +788,89 @@
                         <tbody id="usuarios-tbody"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <!-- TOKENS -->
+            <section class="section" id="section-tokens">
+                <div class="section-header">
+                    <h2>Tokens</h2>
+                    <p>Generador de códigos de invitación</p>
+                </div>
+
+                <!-- Generar Token -->
+                <div class="form-card" style="margin-bottom: 32px;">
+                    <h3 style="margin-bottom: 20px; font-size: 16px;">Generar Código</h3>
+                    <form id="form-generar-token">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tipo de Plan</label>
+                                <select id="plan-tipo" required>
+                                    <option value="top">TOP</option>
+                                    <option value="destacado">DESTACADO</option>
+                                    <option value="premium">PREMIUM</option>
+                                    <option value="basico">BÁSICO</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Días</label>
+                                <input type="number" id="duracion-dias" value="30" min="1" max="365" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select id="categoria-especifica">
+                                    <option value="">Todas</option>
+                                    <option value="vehiculos">Vehículos</option>
+                                    <option value="inmuebles">Inmuebles</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Expira</label>
+                                <input type="date" id="expira-en">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Notas</label>
+                            <textarea id="notas" rows="2" placeholder="Notas"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generar Código</button>
+                    </form>
+                    <div id="codigo-generado" style="display: none;">
+                        <div class="codigo-box">
+                            <p>Código generado:</p>
+                            <div class="codigo-display" id="codigo-value"></div>
+                            <button class="btn btn-sm" onclick="copiarCodigo()">Copiar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tokens Activos -->
+                <div class="data-table-container">
+                    <div class="data-table-header">
+                        <h3>Códigos Activos</h3>
+                    </div>
+                    <div id="loading-tokens" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando...</p>
+                    </div>
+                    <table class="data-table" id="tokens-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Plan</th>
+                                <th>Días</th>
+                                <th>Estado</th>
+                                <th>Creado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokens-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
     </div>
 
     <script type="module" src="admin-logic.js"></script>

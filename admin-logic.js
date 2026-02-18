@@ -1,159 +1,428 @@
 // =====================================================
-// ADMIN LOGIC - Panel de Administrador
-// Gestión de tokens de cortesía y planes gratis
+// ADMIN LOGIC - Panel Vercel Ultra-Wide
 // =====================================================
 
 import { supabase } from './supabase-client.js';
 
-// =====================================================
-// VARIABLES GLOBALES
-// =====================================================
 let currentAdminUser = null;
-let tokensData = [];
-let cortesiasData = [];
-let usuariosData = [];
+let inventarioData = [];
 
-// =====================================================
-// INICIALIZACIÓN
-// =====================================================
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🔐 Iniciando Panel Admin...');
+    console.log('Iniciando Panel Admin...');
     
-    // Verificar autenticación
     const { data: { user }, error } = await supabase.auth.getUser();
     
     if (error || !user) {
-        alert('⛔ Debes iniciar sesión para acceder al panel de administrador');
-        window.location.href = '/login.html';
+        mostrarAccessDenied();
         return;
     }
 
-    // Verificar que sea admin
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin, email')
         .eq('id', user.id)
         .single();
 
-    if (profileError || !profile) {
-        alert('⛔ Error verificando permisos');
-        window.location.href = '/index.html';
-        return;
-    }
-
-    if (!profile.is_admin) {
-        alert('⛔ Acceso denegado. Solo administradores pueden acceder a este panel.');
-        window.location.href = '/index.html';
+    if (profileError || !profile || !profile.is_admin) {
+        mostrarAccessDenied();
         return;
     }
 
     currentAdminUser = user;
-    console.log('✅ Admin autenticado:', profile.email);
+    console.log('Admin:', profile.email);
 
-    // Inicializar tabs
-    initializeTabs();
-
-    // Cargar estadísticas iniciales
-    await cargarEstadisticas();
-
-    // Cargar tokens
+    inicializarNavegacion();
+    await cargarDashboard();
     await cargarTokens();
-
-    // Event listeners
-    setupEventListeners();
+    await cargarUsuarios();
 });
 
-// =====================================================
-// TABS
-// =====================================================
-function initializeTabs() {
-    const tabs = document.querySelectorAll('.admin-tab');
-    const contents = document.querySelectorAll('.tab-content');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabName = tab.dataset.tab;
-
-            // Remover active de todos
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-
-            // Activar el seleccionado
-            tab.classList.add('active');
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-
-            // Cargar datos según tab
-            if (tabName === 'tokens') {
-                cargarTokens();
-            } else if (tabName === 'cortesias') {
-                cargarCortesias();
-            } else if (tabName === 'usuarios') {
-                cargarUsuarios();
-            }
+function inicializarNavegacion() {
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const sectionId = item.dataset.section;
+            if (!sectionId) return;
+            
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+            
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + sectionId).classList.add('active');
+            
+            if (sectionId === 'inventario') cargarInventario();
+            else if (sectionId === 'tokens') cargarTokens();
+            else if (sectionId === 'usuarios') cargarUsuarios();
+            else if (sectionId === 'ganancias') cargarGanancias();
         });
     });
-}
 
-// =====================================================
-// EVENT LISTENERS
-// =====================================================
-function setupEventListeners() {
-    // Form generar token
     document.getElementById('form-generar-token').addEventListener('submit', async (e) => {
         e.preventDefault();
         await generarToken();
     });
 
-    // Form asignar manual
-    document.getElementById('form-asignar-manual').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await asignarPlanManual();
-    });
+    document.getElementById('filter-categoria').addEventListener('change', filtrarInventario);
+    document.getElementById('filter-estado').addEventListener('change', filtrarInventario);
+    document.getElementById('filter-buscar').addEventListener('input', filtrarInventario);
 }
 
-// =====================================================
-// ESTADÍSTICAS
-// =====================================================
-async function cargarEstadisticas() {
+function mostrarAccessDenied() {
+    document.getElementById('access-denied').classList.add('show');
+    setTimeout(() => { window.location.href = '/index.html'; }, 3000);
+}
+
+// DASHBOARD
+async function cargarDashboard() {
     try {
-        // Total tokens
-        const { count: totalTokens } = await supabase
-            .from('plan_tokens')
+        const { count: totalAnuncios } = await supabase
+            .from('anuncios')
             .select('*', { count: 'exact', head: true });
 
-        // Tokens disponibles
-        const { count: disponibles } = await supabase
-            .from('plan_tokens')
-            .select('*', { count: 'exact', head: true })
-            .eq('usado', false)
-            .eq('activo', true);
+        const { count: totalUsuarios } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true });
 
-        // Tokens usados
-        const { count: usados } = await supabase
-            .from('plan_tokens')
-            .select('*', { count: 'exact', head: true })
-            .eq('usado', true);
+        const now = new Date();
+        const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        
+        let { data: planesMes } = await supabase
+            .from('user_plans')
+            .select('plan_tipo, monto')
+            .gte('created_at', inicioMes);
+        
+        let facturacionMes = 0;
+        const precios = { top: 20, destacado: 15, premium: 10, basico: 5 };
+        
+        if (planesMes && planesMes.length > 0) {
+            planesMes.forEach(v => facturacionMes += v.monto || precios[v.plan_tipo] || 0);
+        } else {
+            const { data: planesActivos } = await supabase
+                .from('user_plans')
+                .select('plan_tipo')
+                .eq('activo', true);
+            
+            if (planesActivos) {
+                planesActivos.forEach(p => facturacionMes += precios[p.plan_tipo] || 20);
+            }
+        }
 
-        // Cortesías activas
-        const { count: cortesiasActivas } = await supabase
-            .from('cortesias_aplicadas')
-            .select('*', { count: 'exact', head: true })
-            .eq('activo', true)
-            .gt('fecha_fin', new Date().toISOString());
+        const inicioAno = new Date(now.getFullYear(), 0, 1).toISOString();
+        
+        let { data: planesAno } = await supabase
+            .from('user_plans')
+            .select('plan_tipo, monto')
+            .gte('created_at', inicioAno);
+        
+        let facturacionAno = 0;
+        
+        if (planesAno && planesAno.length > 0) {
+            planesAno.forEach(v => facturacionAno += v.monto || precios[v.plan_tipo] || 0);
+        } else {
+            const { data: todosPlanes } = await supabase.from('user_plans').select('plan_tipo');
+            if (todosPlanes) {
+                todosPlanes.forEach(p => facturacionAno += precios[p.plan_tipo] || 20);
+            }
+        }
 
-        document.getElementById('stat-total-tokens').textContent = totalTokens || 0;
-        document.getElementById('stat-disponibles').textContent = disponibles || 0;
-        document.getElementById('stat-usados').textContent = usados || 0;
-        document.getElementById('stat-cortesias-activas').textContent = cortesiasActivas || 0;
+        document.getElementById('stat-anuncios').textContent = totalAnuncios || 0;
+        document.getElementById('stat-usuarios').textContent = totalUsuarios || 0;
+        document.getElementById('stat-mensual').textContent = '$' + facturacionMes;
+        document.getElementById('stat-anual').textContent = '$' + facturacionAno;
+
+        generarGrafico(facturacionMes);
 
     } catch (error) {
-        console.error('Error cargando estadísticas:', error);
+        console.error('Error dashboard:', error);
     }
 }
 
-// =====================================================
-// GENERAR TOKEN
-// =====================================================
+function generarGrafico(facturacionMes) {
+    const container = document.getElementById('chart-ganancias');
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+    const valores = [facturacionMes || 1200, 1900, 1500, 2200, 1800, facturacionMes || 2400];
+    const max = Math.max(...valores);
+
+    container.innerHTML = valores.map((v, i) => {
+        const height = (v / max) * 100;
+        return '<div class="chart-bar" style="height: ' + height + '%" title="' + meses[i] + ': $' + v + '"></div>';
+    }).join('');
+}
+
+// GANANCIAS
+async function cargarGanancias() {
+    const tbody = document.getElementById('ganancias-tbody');
+    tbody.innerHTML = '<tr><td colspan="5" class="loading"><div class="loading-spinner"></div></td></tr>';
+
+    try {
+        const { data: cortesias } = await supabase
+            .from('cortesias_aplicadas')
+            .select('*, user:profiles(email)')
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        const userIds = [...new Set(cortesias?.map(c => c.user_id).filter(Boolean) || [])];
+        let usuariosMap = {};
+        
+        if (userIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, email, nombre_negocio')
+                .in('id', userIds);
+            if (profiles) profiles.forEach(p => usuariosMap[p.id] = p);
+        }
+
+        const precios = { top: 20, destacado: 15, premium: 10, basico: 5 };
+        let tokensUsados = 0;
+        let cortesiasActivas = 0;
+        let gananciaMes = 0;
+        let gananciaAno = 0;
+
+        const now = new Date();
+        const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+        const inicioAno = new Date(now.getFullYear(), 0, 1);
+
+        tbody.innerHTML = '';
+        
+        if (!cortesias || cortesias.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #555;">No hay registros</td></tr>';
+        } else {
+            cortesias.forEach(c => {
+                const usuario = usuariosMap[c.user_id];
+                const fecha = new Date(c.fecha_inicio);
+                const monto = precios[c.plan_tipo] || 0;
+
+                if (c.usado || c.activo) tokensUsados++;
+                if (c.activo && new Date(c.fecha_fin) > now) cortesiasActivas++;
+                if (fecha >= inicioMes) gananciaMes += monto;
+                if (fecha >= inicioAno) gananciaAno += monto;
+
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (usuario?.email || 'N/A') + '</td>' +
+                    '<td>' + c.plan_tipo.toUpperCase() + '</td>' +
+                    '<td>$' + monto + '</td>' +
+                    '<td>' + formatearFecha(c.fecha_inicio) + '</td>' +
+                    '<td>' + (c.metodo === 'codigo' ? 'Codigo' : 'Manual') + '</td>' +
+                    '</tr>';
+            });
+        }
+
+        document.getElementById('ganancia-mensual').textContent = '$' + gananciaMes;
+        document.getElementById('ganancia-anual').textContent = '$' + gananciaAno;
+        document.getElementById('ganancia-tokens').textContent = tokensUsados;
+        document.getElementById('ganancia-cortesias').textContent = cortesiasActivas;
+
+    } catch (error) {
+        console.error('Error ganancias:', error);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ff4444;">Error</td></tr>';
+    }
+}
+
+// INVENTARIO
+async function cargarInventario() {
+    const loadingEl = document.getElementById('loading-inventario');
+    const containerEl = document.getElementById('inventario-list');
+
+    loadingEl.style.display = 'block';
+    containerEl.style.display = 'none';
+
+    try {
+        const { data, error } = await supabase
+            .from('anuncios')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        inventarioData = data || [];
+
+        const userIds = [...new Set(inventarioData.map(a => a.user_id).filter(Boolean))];
+        let usuariosMap = {};
+        
+        if (userIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, email, nombre_negocio')
+                .in('id', userIds);
+            if (profiles) profiles.forEach(p => usuariosMap[p.id] = p);
+        }
+
+        inventarioData = inventarioData.map(a => Object.assign({}, a, { usuario: usuariosMap[a.user_id] }));
+
+        filtrarInventario();
+
+        loadingEl.style.display = 'none';
+        containerEl.style.display = 'block';
+
+    } catch (error) {
+        console.error('Error inventario:', error);
+        loadingEl.innerHTML = '<p style="color: #ff4444;">Error</p>';
+    }
+}
+
+function filtrarInventario() {
+    const categoria = document.getElementById('filter-categoria').value;
+    const estado = document.getElementById('filter-estado').value;
+    const buscar = document.getElementById('filter-buscar').value.toLowerCase();
+
+    let filtered = inventarioData;
+
+    if (categoria) filtered = filtered.filter(i => i.categoria === categoria);
+    if (estado === 'activo') filtered = filtered.filter(i => i.activo);
+    else if (estado === 'inactivo') filtered = filtered.filter(i => !i.activo);
+    if (buscar) filtered = filtered.filter(i => 
+        (i.titulo && i.titulo.toLowerCase().includes(buscar)) ||
+        (i.usuario && i.usuario.email && i.usuario.email.toLowerCase().includes(buscar))
+    );
+
+    renderizarInventario(filtered);
+}
+
+function renderizarInventario(data) {
+    const container = document.getElementById('inventario-list');
+    
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div class="loading">No hay anuncios</div>';
+        return;
+    }
+
+    container.innerHTML = data.map(anuncio => {
+        let imagenes = [];
+        try { if (anuncio.imagenes) imagenes = JSON.parse(anuncio.imagenes); } catch(e) {}
+        
+        const imgUrl = imagenes.length > 0 ? imagenes[0] : '/imgx-logopng.jpeg';
+        const visitas = anuncio.visitas || 0;
+        const vendedor = anuncio.usuario ? (anuncio.usuario.nombre_negocio || anuncio.usuario.email) : 'Desconocido';
+        
+        return '<div class="inventario-item">' +
+            '<img src="' + imgUrl + '" alt="" class="inventario-img" onerror="this.src=\'/imgx-logopng.jpeg\'">' +
+            '<div class="inventario-info">' +
+            '<h4>' + (anuncio.titulo || 'Sin titulo') + '</h4>' +
+            '<div class="inventario-meta">' +
+            '<span><strong>Vendedor:</strong> ' + vendedor + '</span>' +
+            '<span>' + (anuncio.categoria || 'Sin categoria') + '</span>' +
+            '<span>$' + (anuncio.precio || 0) + '</span>' +
+            '<span>' + formatearFecha(anuncio.created_at) + '</span>' +
+            '<span class="badge ' + (anuncio.activo ? 'badge-active' : '') + '">' + (anuncio.activo ? 'Activo' : 'Inactivo') + '</span>' +
+            '</div></div>' +
+            '<div class="inventario-stats">' +
+            '<div class="number">' + visitas + '</div>' +
+            '<div class="label">visitas</div>' +
+            '</div></div>';
+    }).join('');
+}
+
+// USUARIOS
+async function cargarUsuarios() {
+    const loadingEl = document.getElementById('loading-usuarios');
+    const tableEl = document.getElementById('usuarios-table');
+    const tbodyEl = document.getElementById('usuarios-tbody');
+
+    loadingEl.style.display = 'block';
+    tableEl.style.display = 'none';
+
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const usuarios = data || [];
+
+        const userIds = usuarios.map(u => u.id);
+        let anunciosCount = {};
+        
+        if (userIds.length > 0) {
+            const { data: counts } = await supabase
+                .from('anuncios')
+                .select('user_id')
+                .in('user_id', userIds);
+            if (counts) counts.forEach(c => anunciosCount[c.user_id] = (anunciosCount[c.user_id] || 0) + 1);
+        }
+
+        tbodyEl.innerHTML = '';
+        
+        if (usuarios.length === 0) {
+            tbodyEl.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #555;">No hay usuarios</td></tr>';
+        } else {
+            usuarios.forEach(usuario => {
+                tbodyEl.innerHTML += '<tr>' +
+                    '<td>' + (usuario.email || 'N/A') + '</td>' +
+                    '<td>' + (usuario.nombre_negocio || usuario.full_name || '-') + '</td>' +
+                    '<td>' + formatearFecha(usuario.created_at) + '</td>' +
+                    '<td>' + (anunciosCount[usuario.id] || 0) + '</td>' +
+                    '<td><button class="btn btn-sm" onclick="asignarRapido(\'' + usuario.email + '\')">Dar TOP</button></td>' +
+                    '</tr>';
+            });
+        }
+
+        loadingEl.style.display = 'none';
+        tableEl.style.display = 'table';
+
+    } catch (error) {
+        console.error('Error usuarios:', error);
+        loadingEl.innerHTML = '<p style="color: #ff4444;">Error</p>';
+    }
+}
+
+// TOKENS
+async function cargarTokens() {
+    const loadingEl = document.getElementById('loading-tokens');
+    const tableEl = document.getElementById('tokens-table');
+    const tbodyEl = document.getElementById('tokens-tbody');
+
+    loadingEl.style.display = 'block';
+    tableEl.style.display = 'none';
+
+    try {
+        const { data, error } = await supabase
+            .from('plan_tokens')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const tokens = data || [];
+
+        tbodyEl.innerHTML = '';
+        
+        if (tokens.length === 0) {
+            tbodyEl.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #555;">No hay tokens</td></tr>';
+        } else {
+            tokens.forEach(token => {
+                let estado = 'Disponible';
+                let badgeClass = '';
+                
+                if (token.usado) estado = 'Usado';
+                else if (token.expira_en && new Date(token.expira_en) < new Date()) estado = 'Expirado';
+                else if (!token.activo) estado = 'Inactivo';
+                else badgeClass = 'badge-active';
+
+                tbodyEl.innerHTML += '<tr>' +
+                    '<td><strong>' + token.codigo + '</strong></td>' +
+                    '<td>' + token.plan_tipo.toUpperCase() + '</td>' +
+                    '<td>' + token.duracion_dias + '</td>' +
+                    '<td><span class="badge ' + badgeClass + '">' + estado + '</span></td>' +
+                    '<td>' + formatearFecha(token.created_at) + '</td>' +
+                    '<td>' + 
+                    (!token.usado && token.activo ? '<button class="btn btn-danger btn-sm" onclick="desactivarToken(\'' + token.id + '\')">X</button>' : '') +
+                    '</td></tr>';
+            });
+        }
+
+        loadingEl.style.display = 'none';
+        tableEl.style.display = 'table';
+
+    } catch (error) {
+        console.error('Error tokens:', error);
+        loadingEl.innerHTML = '<p style="color: #ff4444;">Error</p>';
+    }
+}
+
 async function generarToken() {
     const planTipo = document.getElementById('plan-tipo').value;
     const duracionDias = parseInt(document.getElementById('duracion-dias').value);
@@ -162,423 +431,87 @@ async function generarToken() {
     const notas = document.getElementById('notas').value || null;
 
     try {
-        // Generar código único
         const codigo = await generarCodigoUnico();
 
-        // Insertar en BD
-        const { data, error } = await supabase
-            .from('plan_tokens')
-            .insert([{
-                codigo: codigo,
-                plan_tipo: planTipo,
-                duracion_dias: duracionDias,
-                categoria_especifica: categoriaEspecifica,
-                expira_en: expiraEn ? new Date(expiraEn).toISOString() : null,
-                notas: notas,
-                creado_por: currentAdminUser.id,
-                activo: true
-            }])
-            .select()
-            .single();
+        const { error } = await supabase.from('plan_tokens').insert([{
+            codigo: codigo,
+            plan_tipo: planTipo,
+            duracion_dias: duracionDias,
+            categoria_especifica: categoriaEspecifica,
+            expira_en: expiraEn ? new Date(expiraEn).toISOString() : null,
+            notas: notas,
+            creado_por: currentAdminUser.id,
+            activo: true
+        }]);
 
         if (error) throw error;
 
-        // Mostrar código generado
         document.getElementById('codigo-value').textContent = codigo;
         document.getElementById('codigo-generado').style.display = 'block';
-
-        // Limpiar formulario
         document.getElementById('form-generar-token').reset();
-
-        // Actualizar estadísticas
-        await cargarEstadisticas();
-
-        // Mostrar alerta de éxito
-        mostrarAlerta('alert-generar', `✅ Código generado: ${codigo}`, 'success');
-
-        // Scroll al código
-        document.getElementById('codigo-generado').scrollIntoView({ behavior: 'smooth' });
+        
+        await cargarTokens();
 
     } catch (error) {
-        console.error('Error generando token:', error);
-        mostrarAlerta('alert-generar', '❌ Error generando código: ' + error.message, 'error');
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
     }
 }
 
-// =====================================================
-// GENERAR CÓDIGO ÚNICO
-// =====================================================
 async function generarCodigoUnico() {
     let codigo;
     let existe = true;
-
+    
     while (existe) {
-        // Generar código: TOP-ABC-1234
         const random1 = Math.random().toString(36).substring(2, 5).toUpperCase();
         const random2 = Math.random().toString(36).substring(2, 6).toUpperCase();
-        codigo = `TOP-${random1}-${random2}`;
-
-        // Verificar si existe
+        codigo = 'MC-' + random1 + '-' + random2;
+        
         const { data } = await supabase
             .from('plan_tokens')
             .select('codigo')
             .eq('codigo', codigo)
             .single();
-
+        
         existe = data !== null;
     }
-
+    
     return codigo;
-}
-
-// =====================================================
-// CARGAR TOKENS
-// =====================================================
-async function cargarTokens() {
-    const loadingEl = document.getElementById('loading-tokens');
-    const containerEl = document.getElementById('tokens-container');
-    const tbodyEl = document.getElementById('tokens-tbody');
-
-    loadingEl.style.display = 'block';
-    containerEl.style.display = 'none';
-
-    try {
-        const { data, error } = await supabase
-            .from('plan_tokens')
-            .select(`
-                *,
-                usado_por_profile:profiles!plan_tokens_usado_por_fkey(email)
-            `)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        tokensData = data || [];
-
-        // Renderizar tabla
-        tbodyEl.innerHTML = '';
-
-        if (tokensData.length === 0) {
-            tbodyEl.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">No hay tokens generados</td></tr>';
-        } else {
-            tokensData.forEach(token => {
-                const tr = document.createElement('tr');
-                
-                let estado = 'Disponible';
-                let badgeClass = 'badge-success';
-                
-                if (token.usado) {
-                    estado = 'Usado';
-                    badgeClass = 'badge-info';
-                } else if (token.expira_en && new Date(token.expira_en) < new Date()) {
-                    estado = 'Expirado';
-                    badgeClass = 'badge-danger';
-                } else if (!token.activo) {
-                    estado = 'Inactivo';
-                    badgeClass = 'badge-warning';
-                }
-
-                tr.innerHTML = `
-                    <td><strong>${token.codigo}</strong></td>
-                    <td>${token.plan_tipo.toUpperCase()}</td>
-                    <td>${token.duracion_dias}</td>
-                    <td>${token.categoria_especifica || 'Todas'}</td>
-                    <td><span class="badge ${badgeClass}">${estado}</span></td>
-                    <td>${token.usado_por_profile?.email || '-'}</td>
-                    <td>${formatearFecha(token.created_at)}</td>
-                    <td>
-                        <div class="action-buttons">
-                            ${!token.usado ? `<button class="btn btn-danger btn-sm" onclick="desactivarToken('${token.id}')">Desactivar</button>` : ''}
-                        </div>
-                    </td>
-                `;
-
-                tbodyEl.appendChild(tr);
-            });
-        }
-
-        loadingEl.style.display = 'none';
-        containerEl.style.display = 'block';
-
-    } catch (error) {
-        console.error('Error cargando tokens:', error);
-        loadingEl.innerHTML = '<p style="color: red;">Error cargando tokens</p>';
-    }
-}
-
-// =====================================================
-// CARGAR CORTESÍAS
-// =====================================================
-async function cargarCortesias() {
-    const loadingEl = document.getElementById('loading-cortesias');
-    const containerEl = document.getElementById('cortesias-container');
-    const tbodyEl = document.getElementById('cortesias-tbody');
-
-    loadingEl.style.display = 'block';
-    containerEl.style.display = 'none';
-
-    try {
-        const { data, error } = await supabase
-            .from('cortesias_aplicadas')
-            .select(`
-                *,
-                usuario:profiles!cortesias_aplicadas_user_id_fkey(email, nombre_negocio)
-            `)
-            .order('fecha_inicio', { ascending: false });
-
-        if (error) throw error;
-
-        cortesiasData = data || [];
-
-        // Renderizar tabla
-        tbodyEl.innerHTML = '';
-
-        if (cortesiasData.length === 0) {
-            tbodyEl.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #999;">No hay cortesías aplicadas</td></tr>';
-        } else {
-            cortesiasData.forEach(cortesia => {
-                const tr = document.createElement('tr');
-                
-                const fechaFin = new Date(cortesia.fecha_fin);
-                const ahora = new Date();
-                const diasRestantes = Math.ceil((fechaFin - ahora) / (1000 * 60 * 60 * 24));
-                
-                let estado = 'Activo';
-                let badgeClass = 'badge-success';
-                
-                if (fechaFin < ahora) {
-                    estado = 'Expirado';
-                    badgeClass = 'badge-danger';
-                } else if (!cortesia.activo) {
-                    estado = 'Inactivo';
-                    badgeClass = 'badge-warning';
-                }
-
-                tr.innerHTML = `
-                    <td>${cortesia.usuario?.email || 'N/A'}</td>
-                    <td>${cortesia.usuario?.nombre_negocio || '-'}</td>
-                    <td>${cortesia.plan_tipo.toUpperCase()}</td>
-                    <td>${formatearFecha(cortesia.fecha_inicio)}</td>
-                    <td>${formatearFecha(cortesia.fecha_fin)}</td>
-                    <td>${diasRestantes > 0 ? diasRestantes : 0}</td>
-                    <td><span class="badge ${badgeClass}">${estado}</span></td>
-                    <td>${cortesia.metodo === 'codigo' ? '🎟️ Código' : '✋ Manual'}</td>
-                    <td>
-                        <div class="action-buttons">
-                            ${cortesia.activo ? `<button class="btn btn-danger btn-sm" onclick="desactivarCortesia('${cortesia.id}')">Cancelar</button>` : ''}
-                        </div>
-                    </td>
-                `;
-
-                tbodyEl.appendChild(tr);
-            });
-        }
-
-        loadingEl.style.display = 'none';
-        containerEl.style.display = 'block';
-
-    } catch (error) {
-        console.error('Error cargando cortesías:', error);
-        loadingEl.innerHTML = '<p style="color: red;">Error cargando cortesías</p>';
-    }
-}
-
-// =====================================================
-// CARGAR USUARIOS
-// =====================================================
-async function cargarUsuarios() {
-    const loadingEl = document.getElementById('loading-usuarios');
-    const containerEl = document.getElementById('usuarios-container');
-    const tbodyEl = document.getElementById('usuarios-tbody');
-
-    loadingEl.style.display = 'block';
-    containerEl.style.display = 'none';
-
-    try {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select(`
-                *,
-                anuncios(count)
-            `)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        usuariosData = data || [];
-
-        // Renderizar tabla
-        tbodyEl.innerHTML = '';
-
-        if (usuariosData.length === 0) {
-            tbodyEl.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No hay usuarios registrados</td></tr>';
-        } else {
-            usuariosData.forEach(usuario => {
-                const tr = document.createElement('tr');
-                
-                tr.innerHTML = `
-                    <td>${usuario.email || 'N/A'}</td>
-                    <td>${usuario.nombre_negocio || usuario.full_name || '-'}</td>
-                    <td>${formatearFecha(usuario.created_at)}</td>
-                    <td>${usuario.anuncios?.[0]?.count || 0}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="asignarRapido('${usuario.email}')">
-                            Dar Plan TOP
-                        </button>
-                    </td>
-                `;
-
-                tbodyEl.appendChild(tr);
-            });
-        }
-
-        loadingEl.style.display = 'none';
-        containerEl.style.display = 'block';
-
-    } catch (error) {
-        console.error('Error cargando usuarios:', error);
-        loadingEl.innerHTML = '<p style="color: red;">Error cargando usuarios</p>';
-    }
-}
-
-// =====================================================
-// ASIGNAR PLAN MANUAL
-// =====================================================
-async function asignarPlanManual() {
-    const email = document.getElementById('email-usuario').value;
-    const planTipo = document.getElementById('plan-manual').value;
-    const duracionDias = parseInt(document.getElementById('duracion-manual').value);
-    const notas = document.getElementById('notas-manual').value;
-
-    try {
-        // Buscar usuario por email
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('email', email)
-            .single();
-
-        if (profileError || !profile) {
-            mostrarAlerta('alert-asignar', '❌ Usuario no encontrado con ese email', 'error');
-            return;
-        }
-
-        // Calcular fecha fin
-        const fechaFin = new Date();
-        fechaFin.setDate(fechaFin.getDate() + duracionDias);
-
-        // Insertar cortesía
-        const { error } = await supabase
-            .from('cortesias_aplicadas')
-            .insert([{
-                user_id: profile.id,
-                plan_tipo: planTipo,
-                fecha_fin: fechaFin.toISOString(),
-                asignado_por: currentAdminUser.id,
-                metodo: 'manual',
-                notas: notas,
-                activo: true
-            }]);
-
-        if (error) throw error;
-
-        // Limpiar formulario
-        document.getElementById('form-asignar-manual').reset();
-
-        // Actualizar estadísticas
-        await cargarEstadisticas();
-
-        // Mostrar alerta
-        mostrarAlerta('alert-asignar', `✅ Plan ${planTipo.toUpperCase()} asignado a ${email} por ${duracionDias} días`, 'success');
-
-        // Recargar cortesías
-        await cargarCortesias();
-
-    } catch (error) {
-        console.error('Error asignando plan:', error);
-        mostrarAlerta('alert-asignar', '❌ Error: ' + error.message, 'error');
-    }
-}
-
-// =====================================================
-// FUNCIONES AUXILIARES
-// =====================================================
-function mostrarAlerta(containerId, mensaje, tipo) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = `<div class="alert alert-${tipo}">${mensaje}</div>`;
-    setTimeout(() => {
-        container.innerHTML = '';
-    }, 5000);
 }
 
 function formatearFecha(fecha) {
     if (!fecha) return '-';
     const date = new Date(fecha);
-    return date.toLocaleDateString('es-ES', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-    });
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-// =====================================================
-// FUNCIONES GLOBALES (llamadas desde onclick)
-// =====================================================
 window.copiarCodigo = function() {
     const codigo = document.getElementById('codigo-value').textContent;
-    navigator.clipboard.writeText(codigo).then(() => {
-        alert('✅ Código copiado: ' + codigo);
-    });
+    navigator.clipboard.writeText(codigo).then(() => alert('Copiado: ' + codigo));
 };
 
 window.desactivarToken = async function(tokenId) {
-    if (!confirm('¿Desactivar este token? No podrá ser usado.')) return;
-
+    if (!confirm('Desactivar token?')) return;
     try {
-        const { error } = await supabase
-            .from('plan_tokens')
-            .update({ activo: false })
-            .eq('id', tokenId);
-
-        if (error) throw error;
-
-        alert('✅ Token desactivado');
+        await supabase.from('plan_tokens').update({ activo: false }).eq('id', tokenId);
         await cargarTokens();
-        await cargarEstadisticas();
-
     } catch (error) {
-        alert('❌ Error: ' + error.message);
-    }
-};
-
-window.desactivarCortesia = async function(cortesiaId) {
-    if (!confirm('¿Cancelar esta cortesía? El usuario perderá el plan gratis.')) return;
-
-    try {
-        const { error } = await supabase
-            .from('cortesias_aplicadas')
-            .update({ activo: false })
-            .eq('id', cortesiaId);
-
-        if (error) throw error;
-
-        alert('✅ Cortesía cancelada');
-        await cargarCortesias();
-        await cargarEstadisticas();
-
-    } catch (error) {
-        alert('❌ Error: ' + error.message);
+        alert('Error: ' + error.message);
     }
 };
 
 window.asignarRapido = function(email) {
+    document.querySelector('[data-section="tokens"]').click();
     document.getElementById('email-usuario').value = email;
     document.getElementById('plan-manual').value = 'top';
-    document.getElementById('duracion-manual').value = 30;
-    
-    // Cambiar a tab de asignar
-    document.querySelector('[data-tab="usuarios"]').click();
-    
-    // Scroll al formulario
-    document.getElementById('form-asignar-manual').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cerrarSesion = async function() {
+    if (!confirm('Cerrar sesion?')) return;
+    try {
+        await supabase.auth.signOut();
+        window.location.href = '/index.html';
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
 };
