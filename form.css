@@ -15,6 +15,88 @@ label,
     color: #2f3542;
 }
 
+/* ======================================================= */
+/* === UNIFICACIÓN: CLASIFICACIÓN Y LUGAR === */
+/* ======================================================= */
+
+/* Contenedor unificado para Categoría + Ubicación */
+.classification-location-block {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px 12px 0 0; /* Redondeado arriba, plano abajo */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0; /* Sin margen para unir con el siguiente bloque */
+    border: 2px solid #e0e0e0;
+    border-bottom: none; /* Sin borde inferior */
+    transition: all 0.3s ease;
+}
+
+.classification-location-block:hover {
+    border-color: #00bfae;
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.1);
+}
+
+/* Título de sección para el bloque unificado */
+.classification-location-block .block-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #00bfae;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.classification-location-block .block-title i {
+    color: #00bfae;
+    font-size: 1.3rem;
+}
+
+/* Subtítulos internos para separar Categoría de Ubicación */
+.classification-location-block .internal-subtitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-top: 15px;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 3px solid #00bfae;
+}
+
+/* Ajuste de los grupos de formulario dentro del bloque */
+.classification-location-block .form-group {
+    margin-bottom: 15px;
+}
+
+.classification-location-block .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Grid interno para campos en fila */
+.classification-location-block .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Responsive para el bloque unificado */
+@media (max-width: 768px) {
+    .classification-location-block {
+        padding: 18px;
+    }
+
+    .classification-location-block .block-title {
+        font-size: 1.3rem;
+    }
+
+    .classification-location-block .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
 /* 2. Estilos para la barra de progreso */
 .progress-steps {
   display: flex;

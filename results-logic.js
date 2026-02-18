@@ -8,6 +8,7 @@ function initializeCategoryHero() {
     const categorySlidesContainer = document.getElementById('category-slides');
     const categoryTitleEl = document.getElementById('category-title');
     const categorySubtitleEl = document.getElementById('category-subtitle');
+    const sectionTitleEl = document.getElementById('section-page-title');
 
     if (!categorySlidesContainer) return;
 
@@ -42,6 +43,7 @@ function initializeCategoryHero() {
 
     if (categoryTitleEl) categoryTitleEl.textContent = categoryTitle;
     if (categorySubtitleEl) categorySubtitleEl.textContent = categorySubtitle;
+    if (sectionTitleEl) sectionTitleEl.textContent = categoryTitle;
 
     // Cargar imágenes según la categoría
     loadCategoryImages(categoryParam);

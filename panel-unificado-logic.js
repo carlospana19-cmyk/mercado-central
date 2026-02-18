@@ -150,11 +150,15 @@ function renderAds(ads) {
         return `
             <div class="dashboard-card unified-card ${soldClass}" data-ad-id="${ad.id}">
                 ${soldBadge}
-                <img src="${imageUrl}" alt="${ad.titulo}" class="dashboard-ad-image ${ad.is_sold ? 'image-sold' : ''}">
+                <a href="detalle-producto.html?id=${ad.id}" class="card-image-link">
+                    <img src="${imageUrl}" alt="${ad.titulo}" class="dashboard-ad-image ${ad.is_sold ? 'image-sold' : ''}">
+                </a>
                 <div class="dashboard-ad-info">
-                    <div class="dashboard-ad-title">
-                        <h3>${ad.titulo}</h3>
-                    </div>
+                    <a href="detalle-producto.html?id=${ad.id}" class="card-title-link">
+                        <div class="dashboard-ad-title">
+                            <h3>${ad.titulo}</h3>
+                        </div>
+                    </a>
                     <div class="dashboard-ad-price">
                         ${ad.precio ? `$${ad.precio.toLocaleString('es-PA')}` : 'Precio a convenir'}
                     </div>
@@ -163,6 +167,9 @@ function renderAds(ads) {
                     </div>
                 </div>
                 <div class="dashboard-ad-actions">
+                    <a href="detalle-producto.html?id=${ad.id}" class="btn-view" title="Ver anuncio">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
                     <a href="editar-anuncio.html?id=${ad.id}" class="btn-edit" title="Editar anuncio">
                         <i class="fas fa-edit"></i> Editar
                     </a>

@@ -362,14 +362,14 @@
 
 .dashboard-ad-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.8rem;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0.6rem;
     padding: 1rem;
     background: #f9f9f9;
     border-top: 1px solid #eee;
 }
 
-.btn-edit, .btn-sold, .btn-delete {
+.btn-view, .btn-edit, .btn-sold, .btn-delete {
     padding: 0.8rem 1rem;
     border: none;
     border-radius: 0.8rem;
@@ -382,6 +382,16 @@
     justify-content: center;
     gap: 0.4rem;
     text-decoration: none;
+}
+
+.btn-view {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.btn-view:hover {
+    background: linear-gradient(135deg, #2980b9, #1a5276);
+    transform: translateY(-2px);
 }
 
 .btn-edit {
@@ -414,8 +424,27 @@
     transform: translateY(-2px);
 }
 
-.btn-edit i, .btn-sold i, .btn-delete i {
+.btn-view i, .btn-edit i, .btn-sold i, .btn-delete i {
     font-size: 1.2rem;
+}
+
+/* Enlaces clickeables en tarjetas */
+.card-image-link {
+    display: block;
+    line-height: 0;
+}
+
+.card-image-link:hover {
+    opacity: 0.95;
+}
+
+.card-title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-title-link:hover h3 {
+    color: #00bfae;
 }
 
 /* ============================================

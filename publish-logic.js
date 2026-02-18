@@ -264,12 +264,25 @@ export async function initializePublishPage() {
     // --- ELEMENTOS DEL DOM ---
     const allSteps = form.querySelectorAll('.form-section');
     const progressSteps = document.querySelectorAll('.step');
+    
+    // Selectores de categoría (Paso 1 y Paso 4)
     const categorySelect = document.getElementById('categoria');
+    const categorySelectStep4 = document.getElementById('categoria-step4');
     const subcategoryGroup = document.getElementById('subcategory-group');
+    const subcategoryGroupStep4 = document.getElementById('subcategory-group-step4');
     const subcategorySelect = document.getElementById('subcategoria');
+    const subcategorySelectStep4 = document.getElementById('subcategoria-step4');
+    
+    // Selectores de ubicación (Paso 2 y Paso 4)
     const provinceSelect = document.getElementById('province');
+    const provinceSelectStep4 = document.getElementById('province-step4');
     const districtGroup = document.getElementById('district-group');
+    const districtGroupStep4 = document.getElementById('district-group-step4');
     const districtSelect = document.getElementById('district');
+    const districtSelectStep4 = document.getElementById('district-step4');
+    const addressInput = document.getElementById('address');
+    const addressInputStep4 = document.getElementById('address-step4');
+    
     const vehicleDetails = document.getElementById('vehicle-details');
     const realestateDetails = document.getElementById('realestate-details');
     const electronicsDetails = document.getElementById('electronics-details');
@@ -297,7 +310,7 @@ export async function initializePublishPage() {
     const galleryPreviewContainer = document.getElementById('gallery-preview-container');
     const contactName = document.getElementById('contact-name');
     const contactEmail = document.getElementById('contact-email');
-    const nextBtns = form.querySelectorAll('.next-btn, #continue-to-step2'); // Incluimos el primer botón
+    const nextBtns = form.querySelectorAll('.next-btn, #continue-to-details'); // Botón para ir a Detalles
     const backBtns = form.querySelectorAll('.back-btn');
 
     let allCategories = [];
@@ -1153,16 +1166,16 @@ function showCommunityFields() {
         // Mostrar el paso específico
         document.getElementById(`step-${stepNumber}`).style.display = 'block';
         
-        // SI es paso 4, actualizar restricciones del plan
-        if (stepNumber === 4) {
+        // SI es paso 2 (Detalles), actualizar restricciones del plan
+        if (stepNumber === 2) {
             const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value;
             if (selectedPlan) {
                 updatePlanRestrictions(selectedPlan);
             }
 
             const titleInput = document.getElementById('title');
-            const mainCategoryText = categorySelect.options[categorySelect.selectedIndex].text; // Usamos la categoría principal
-            const subcategoryValue = subcategorySelect.value;
+            const mainCategoryText = categorySelectStep4?.options[categorySelectStep4.selectedIndex]?.text || ''; // Usamos la categoría del paso 2
+            const subcategoryValue = subcategorySelectStep4?.value || '';
             
             let placeholder = "Ej: Descripción breve y atractiva de tu artículo"; // Nuevo placeholder por defecto
 
@@ -1210,8 +1223,8 @@ function showCommunityFields() {
         console.log('Loading categories...');
         console.log('categorySelect:', categorySelect);
 
-        if (!categorySelect) {
-            console.error('❌ categorySelect element not found!');
+        if (!categorySelect && !categorySelectStep4) {
+            console.error('❌ No category select elements found!');
             return;
         }
 
@@ -1228,19 +1241,34 @@ function showCommunityFields() {
         const mainCategories = allCategories.filter(c => c.parent_id === null);
         console.log('Main categories loaded:', mainCategories.map(c => c.nombre));
 
-        categorySelect.innerHTML = '<option value="" disabled selected>Selecciona una categoría principal</option>';
-        mainCategories.forEach(group => {
-            const option = document.createElement('option');
-            option.value = group.id;
-            option.textContent = group.nombre;
-            categorySelect.appendChild(option);
-        });
+        // Cargar en el selector del Paso 1
+        if (categorySelect) {
+            categorySelect.innerHTML = '<option value="" disabled selected>Selecciona una categoría principal</option>';
+            mainCategories.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.id;
+                option.textContent = group.nombre;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Cargar en el selector del Paso 4 (unificado)
+        if (categorySelectStep4) {
+            categorySelectStep4.innerHTML = '<option value="" disabled selected>Selecciona una categoría principal</option>';
+            mainCategories.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.id;
+                option.textContent = group.nombre;
+                categorySelectStep4.appendChild(option);
+            });
+        }
 
         console.log('✅ Categories loaded successfully');
     }
 
-    categorySelect.addEventListener('change', function() {
-        const selectedParentId = parseInt(this.value, 10);
+    // Función para manejar cambio de categoría (compartida)
+    function handleCategoryChange(selectElement, subcategoryGroupEl, subcategorySelectEl) {
+        const selectedParentId = parseInt(selectElement.value, 10);
         selectedMainCategory = allCategories.find(c => c.id === selectedParentId)?.nombre || '';
         console.log('Category changed. Selected Main Category:', selectedMainCategory, 'ID:', selectedParentId);
         const subcategories = allCategories.filter(c => c.parent_id === selectedParentId);
@@ -1251,29 +1279,44 @@ function showCommunityFields() {
         }
 
         if (subcategories.length > 0) {
-            subcategorySelect.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
+            subcategorySelectEl.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
             subcategories.forEach(sub => {
                 const option = document.createElement('option');
                 option.value = sub.nombre;
                 option.textContent = sub.nombre;
-                subcategorySelect.appendChild(option);
+                subcategorySelectEl.appendChild(option);
             });
-            subcategoryGroup.style.display = 'block';
+            subcategoryGroupEl.style.display = 'block';
             console.log('Subcategories loaded:', subcategories.map(s => s.nombre));
         } else {
             // Si una categoría principal no tiene hijos, la tratamos como la selección final
-            subcategoryGroup.style.display = 'none';
-            subcategorySelect.innerHTML = '';
+            subcategoryGroupEl.style.display = 'none';
+            subcategorySelectEl.innerHTML = '';
             console.log('No subcategories for this main category.');
         }
 
         // Mostrar campos dinámicos inmediatamente al cambiar categoría
         console.log('Calling showDynamicFields from category change.');
         showDynamicFields();
-    });
+    }
 
-    subcategorySelect.addEventListener('change', function() {
-        selectedSubcategory = this.value;
+    // Event listener para categoría del Paso 1
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            handleCategoryChange(this, subcategoryGroup, subcategorySelect);
+        });
+    }
+
+    // Event listener para categoría del Paso 4 (unificado)
+    if (categorySelectStep4) {
+        categorySelectStep4.addEventListener('change', function() {
+            handleCategoryChange(this, subcategoryGroupStep4, subcategorySelectStep4);
+        });
+    }
+
+    // Función para manejar cambio de subcategoría (compartida)
+    function handleSubcategoryChange(selectElement) {
+        selectedSubcategory = selectElement.value;
         console.log('Subcategory changed to:', selectedSubcategory);
         console.log('Main category is:', selectedMainCategory);
         if (selectedMainCategory.toLowerCase().includes('electrónica')) {
@@ -1303,7 +1346,57 @@ function showCommunityFields() {
         } else {
             console.log('Main category does not have dynamic fields.');
         }
-    });
+    }
+
+    // Event listener para subcategoría del Paso 1
+    if (subcategorySelect) {
+        subcategorySelect.addEventListener('change', function() {
+            handleSubcategoryChange(this);
+        });
+    }
+
+    // Event listener para subcategoría del Paso 4 (unificado)
+    if (subcategorySelectStep4) {
+        subcategorySelectStep4.addEventListener('change', function() {
+            handleSubcategoryChange(this);
+        });
+    }
+
+    // --- LÓGICA DE UBICACIÓN ---
+    // Función para manejar cambio de provincia (compartida)
+    function handleProvinceChange(selectElement, districtGroupEl, districtSelectEl) {
+        const province = selectElement.value;
+        console.log('Province changed to:', province);
+        
+        const districts = districtsByProvince[province] || [];
+        if (districts.length > 0) {
+            districtSelectEl.innerHTML = '<option value="">Selecciona un distrito</option>';
+            districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                districtSelectEl.appendChild(option);
+            });
+            districtGroupEl.style.display = 'block';
+        } else {
+            districtGroupEl.style.display = 'none';
+            districtSelectEl.innerHTML = '';
+        }
+    }
+
+    // Event listener para provincia del Paso 2
+    if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+            handleProvinceChange(this, districtGroup, districtSelect);
+        });
+    }
+
+    // Event listener para provincia del Paso 4 (unificado)
+    if (provinceSelectStep4) {
+        provinceSelectStep4.addEventListener('change', function() {
+            handleProvinceChange(this, districtGroupStep4, districtSelectStep4);
+        });
+    }
 
     // REMOVER EVENT LISTENER DUPLICADO si existe
     // Verificar que no haya otro addEventListener llamando a showElectronicsFields
@@ -1510,70 +1603,40 @@ function showCommunityFields() {
         radio.addEventListener('change', updateImageLimit);
     });
 
-    provinceSelect.addEventListener('change', function() {
-        const selectedProvince = this.value;
-        const districts = districtsByProvince[selectedProvince];
-
-        if (districts && districts.length > 0) {
-            districtSelect.innerHTML = '<option value="" disabled selected>Selecciona un distrito</option>';
-            districts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district;
-                option.textContent = district;
-                districtSelect.appendChild(option);
-            });
-            districtGroup.style.display = 'block';
-        } else {
-            districtGroup.style.display = 'none';
-            districtSelect.innerHTML = '';
-        }
-    });
-
     // --- EVENT LISTENERS PARA BOTONES DE NAVEGACIÓN ---
     nextBtns.forEach(btn => {
         btn.addEventListener('click', async () => {
             const currentStep = btn.closest('.form-section');
             const currentStepNumber = parseInt(currentStep.id.split('-')[1], 10);
             
-            // Validación del Paso 1
+            // Validación del Paso 1 (Planes) - Ahora solo verifica que haya un plan seleccionado
             if (currentStepNumber === 1) {
-                if (categorySelect.value && (subcategorySelect.value || subcategoryGroup.style.display === 'none')) {
-                    navigateToStep(currentStepNumber + 1);
+                const selectedPlan = document.querySelector('input[name="plan"]:checked');
+                if (selectedPlan) {
+                    // Verificar si el usuario está autenticado antes de ir al paso 2
+                    console.log("🔍 Paso 1: Verificando autenticación...");
+                    let user = null;
+                    try {
+                        const { data: { user: sessionUser } } = await supabase.auth.getUser();
+                        user = sessionUser;
+                    } catch (err) {
+                        console.log("⚠️ Error al verificar sesión:", err.message);
+                        user = null;
+                    }
+                    console.log("👤 Usuario:", user ? user.email : "No autenticado");
+                    
+                    if (!user) {
+                        // Si no está autenticado, mostrar modal de login
+                        console.log("📋 Mostrando modal de login...");
+                        showLoginRequiredModal();
+                    } else {
+                        // Si está autenticado, continuar al paso 2 (Detalles)
+                        console.log("✅ Usuario autenticado, yendo al paso 2...");
+                        navigateToStep(2);
+                    }
                 } else {
-                    alert('Por favor, selecciona una categoría y subcategoría.');
+                    alert('Por favor, selecciona un plan para continuar.');
                 }
-            } else if (currentStepNumber === 2) {
-                // Validación del Paso 2
-                if (provinceSelect.value && districtSelect.value) {
-                    navigateToStep(currentStepNumber + 1);
-                } else {
-                    alert('Por favor, selecciona una provincia y un distrito.');
-                }
-            } else if (currentStepNumber === 3) {
-                // Verificar si el usuario está autenticado antes de ir al paso 4 (planes)
-                console.log("🔍 Paso 3: Verificando autenticación...");
-                let user = null;
-                try {
-                    const { data: { user: sessionUser } } = await supabase.auth.getUser();
-                    user = sessionUser;
-                } catch (err) {
-                    console.log("⚠️ Error al verificar sesión (normal si está cerrada):", err.message);
-                    user = null;
-                }
-                console.log("👤 Usuario:", user ? user.email : "No autenticado");
-                if (!user) {
-                    // Si no está autenticado, mostrar modal de planes con opción de registro
-                    console.log("📋 Mostrando modal de planes...");
-                    showPlanSelectionModal();
-                } else {
-                    // Si está autenticado, continuar normalmente
-                    console.log("✅ Usuario autenticado, yendo al paso 4...");
-                    navigateToStep(currentStepNumber + 1);
-                }
-            } else {
-                 // Aquí añadiremos validación para futuros pasos
-                 const nextStepNumber = parseInt(btn.dataset.target || (currentStepNumber + 1), 10);
-                 navigateToStep(nextStepNumber);
             }
         });
     });
@@ -1607,10 +1670,10 @@ form.addEventListener('submit', async (e) => {
     const title = document.getElementById('title').value.trim();
     const description = document.getElementById('description').value.trim();
     const price = document.getElementById('price').value.trim();
-    const category = categorySelect.value;
-    const subcategory = subcategorySelect.value;
-    const province = provinceSelect.value;
-    const district = districtSelect.value;
+    const category = categorySelectStep4?.value || '';
+    const subcategory = subcategorySelectStep4?.value || '';
+    const province = provinceSelectStep4?.value || '';
+    const district = districtSelectStep4?.value || '';
     const coverImageFile = coverImageInput.files[0];
     const termsAgreement = document.getElementById('terms-agreement');
 
@@ -1696,8 +1759,8 @@ form.addEventListener('submit', async (e) => {
     }
 
     // Obtener nombres de categoría y subcategoría
-    const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
-    const subcategoryName = subcategorySelect.value; // Ya es el nombre
+    const categoryName = categorySelectStep4?.options[categorySelectStep4.selectedIndex]?.text || '';
+    const subcategoryName = subcategorySelectStep4?.value || ''; // Ya es el nombre
 
     try {
         // =====================================================

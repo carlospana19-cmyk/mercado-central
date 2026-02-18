@@ -9,14 +9,14 @@
 /* --- HERO SECTION --- */
 .hero-search {
   position: relative;
-  padding: 2rem 2rem 4rem 2rem;
+  padding: 4rem 2rem 100px 2rem !important;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   text-align: center;
   color: var(--color-blanco);
-  min-height: 50vh;
+  overflow: visible;
 }
 
 /* Carrusel del Hero */
@@ -134,6 +134,11 @@
   max-width: 700px;
 }
 
+/* Contenedor para separar texto de búsqueda */
+.hero-text-content {
+  margin-bottom: 3rem;
+}
+
 .search-form-container {
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(10px);
@@ -144,7 +149,12 @@
   gap: 1rem;
   max-width: 900px;
   width: 100%;
-  margin: 0 auto 5rem auto;
+  margin: 0 auto;
+  z-index: 100;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @media (min-width: 768px) {
@@ -220,7 +230,9 @@
 /* --- SECCIÓN DE CATEGORÍAS --- */
 .categories-showcase {
   background: var(--color-blanco);
-  padding: 8rem 2rem;
+  padding: 16rem 2rem 8rem;
+  position: relative;
+  z-index: 10;
 }
 
 .categories-grid-modern {
