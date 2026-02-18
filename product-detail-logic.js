@@ -1,6 +1,27 @@
 import { supabase } from './supabase-client.js';
 import { ReviewModal, hasUserReviewedSeller, getSellerReviews, getSellerReviewStats, generateReviewStatsHTML, generateReviewHTML } from './reviews-logic.js';
 
+// ============================================
+// FUNCIÓN AUXILIAR: Convertir rutas de imágenes a URLs completas
+// ============================================
+const convertToFullUrl = (imagePath) => {
+    if (!imagePath) return null;
+    // Si ya es una URL completa (http/https), devolverla tal cual
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+    // Si es una ruta relativa, convertirla a URL completa de Supabase
+    try {
+        const { data: { publicUrl } } = supabase.storage
+            .from('imagenes_anuncios')
+            .getPublicUrl(imagePath);
+        return publicUrl;
+    } catch (error) {
+        console.warn('Error convirtiendo imagen:', imagePath, error);
+        return imagePath; // Devolver la ruta original como fallback
+    }
+};
+
 // product-detail-logic.js (VERSIÓN CON GALERÍA Y MEJOR MANEJO DE ERRORES)
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -23,7 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Hacemos ambas peticiones a la vez
         console.log('Realizando consultas a la base de datos...');
         const [adResponse, imagesResponse] = await Promise.all([
-            supabase.from('anuncios').select('*').eq('id', adId).single()
+            supabase.from('anuncios').select('*').eq('id', adId).single(),
+            supabase.from('imagenes').select('url_imagen, orden').eq('anuncio_id', adId).order('orden', { ascending: true })
         ]);
 
         const { data: ad, error: adError } = adResponse;
@@ -43,7 +65,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         console.log("Datos del anuncio:", ad);
-        displayProductDetails(ad, openChat);
+        
+        // Procesar imágenes de la tabla imagenes
+        let galleryImages = [];
+        if (imagesResponse.data && imagesResponse.data.length > 0) {
+            galleryImages = imagesResponse.data.map(img => convertToFullUrl(img.url_imagen));
+        } else if (ad.url_portada) {
+            // Fallback a las imágenes del anuncio
+            const rawGalleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length
+                ? ad.url_galeria
+                : [ad.url_portada];
+            galleryImages = rawGalleryImages.map(convertToFullUrl);
+        }
+        
+        displayProductDetails(ad, openChat, galleryImages);
 
         // Incrementar contador de visitas
         try {
@@ -66,9 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-async function displayProductDetails(ad, openChat = false) {
+async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     console.log('Mostrando detalles del producto:', ad);
     console.log('¿Abrir chat automáticamente?:', openChat);
+    console.log('Imágenes de la galería:', galleryImages);
 
     // Verificar que los elementos del DOM existan
     const productNameEl = document.getElementById('product-name');
@@ -183,115 +219,68 @@ async function displayProductDetails(ad, openChat = false) {
     // Agregar información detallada de comunidad si existe
     addCommunityDetails(ad);
 
-    // Construir la galería usando url_galeria o url_portada
-    // Convertir rutas de imágenes a URLs completas de Supabase Storage
-    const convertToFullUrl = (imagePath) => {
-        if (!imagePath) return null;
-        // Si ya es una URL completa (http/https), devolverla tal cual
-        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-            return imagePath;
-        }
-        // Si es una ruta relativa, convertirla a URL completa de Supabase
-        try {
-            const { data: { publicUrl } } = supabase.storage
-                .from('imagenes_anuncios')
-                .getPublicUrl(imagePath);
-            return publicUrl;
-        } catch (error) {
-            console.warn('Error convirtiendo imagen:', imagePath, error);
-            return imagePath; // Devolver la ruta original como fallback
-        }
-    };
-
-    const rawGalleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length
-        ? ad.url_galeria
-        : [ad.url_portada];
-
-    const galleryImages = rawGalleryImages
-        .map(convertToFullUrl)
-        .filter(img => img); // Filtrar imágenes nulas/inválidas
-
+    // ✅ Construir la galería con imagen principal y miniaturas
+    // Las imágenes ya vienen procesadas del parámetro galleryImages
     console.log('Imágenes válidas para mostrar:', galleryImages);
 
     if (galleryImages.length > 0) {
         const galleryWrapper = document.getElementById('gallery-wrapper');
-        galleryWrapper.innerHTML = galleryImages
-            .map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}"></div>`)
-            .join('');
-
-        // Insertar control para duplicar imagen si solo hay una
-        const currentSlides = galleryWrapper.querySelectorAll('.swiper-slide');
-
-        if (currentSlides.length === 1) {
-            // duplicar una vez la misma imagen, así Swiper puede desplazarse
-            const clone = currentSlides[0].cloneNode(true);
-            galleryWrapper.appendChild(clone);
+        
+        // ✅ Estructura: Imagen principal + miniaturas
+        const mainImage = galleryImages[0];
+        const thumbnails = galleryImages.slice(1);
+        
+        // Construir HTML de la galería con miniaturas
+        let galleryHTML = `
+            <div class="gallery-main">
+                <img id="main-product-image" src="${mainImage}" alt="${ad.titulo}">
+            </div>
+        `;
+        
+        if (thumbnails.length > 0) {
+            galleryHTML += `
+                <div class="gallery-thumbnails">
+                    ${galleryImages.map((img, index) => `
+                        <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                            <img src="${img}" alt="Miniatura ${index + 1}">
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
-
-        const slidesCount = document.querySelectorAll('.product-gallery-swiper .swiper-slide').length;
-
-        window.detailSwiper = new Swiper('.product-gallery-swiper', {
-            loop: slidesCount > 1,      // loop solo si hay más de una imagen (ahora mínimo 2)
-            slidesPerView: 1,
-            spaceBetween: 0,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            autoplay: false, // Desactivar autoplay - solo click en flechas
-            effect: 'slide',            // usar desplazamiento normal (sin crossFade)
+        
+        galleryWrapper.innerHTML = galleryHTML;
+        
+        // ✅ Agregar event listeners a las miniaturas
+        const thumbnailElements = galleryWrapper.querySelectorAll('.thumbnail');
+        const mainImageElement = document.getElementById('main-product-image');
+        
+        thumbnailElements.forEach((thumb, index) => {
+            thumb.addEventListener('click', () => {
+                // Quitar clase active de todas las miniaturas
+                thumbnailElements.forEach(t => t.classList.remove('active'));
+                // Agregar clase active a la miniatura seleccionada
+                thumb.classList.add('active');
+                // Cambiar la imagen principal con transición
+                mainImageElement.style.opacity = '0';
+                setTimeout(() => {
+                    mainImageElement.src = galleryImages[index];
+                    mainImageElement.style.opacity = '1';
+                }, 200);
+            });
         });
-
-        // Mostrar flechas aunque haya una sola imagen (ahora mínimo 2 si se duplicó)
-        document.querySelectorAll('.swiper-button-next, .swiper-button-prev').forEach(btn => {
-            btn.style.display = 'flex';
-        });
-
-        console.log('Carrusel Swiper inicializado');
+        
+        // ✅ Transición suave para la imagen principal
+        mainImageElement.style.transition = 'opacity 0.2s ease';
+        
+        console.log('Galería con miniaturas inicializada');
     } else {
         console.log('No hay imágenes disponibles, usando placeholder');
         galleryWrapperEl.innerHTML = `
-            <div class="swiper-slide">
+            <div class="gallery-main">
                 <img src="https://via.placeholder.com/500x400?text=Sin+Imagen" alt="Sin imagen disponible">
             </div>
         `;
-
-        // Configurar Swiper para una sola imagen placeholder
-        const galleryWrapper = document.querySelector('.product-gallery-swiper .swiper-wrapper');
-        const currentSlides = galleryWrapper.querySelectorAll('.swiper-slide');
-
-        if (currentSlides.length === 1) {
-            const clone = currentSlides[0].cloneNode(true);
-            galleryWrapper.appendChild(clone);
-        }
-
-        const slidesCount = document.querySelectorAll('.product-gallery-swiper .swiper-slide').length;
-
-        window.detailSwiper = new Swiper('.product-gallery-swiper', {
-            loop: slidesCount > 1,
-            slidesPerView: 1,
-            spaceBetween: 0,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            autoplay: false, // Desactivar autoplay para placeholder
-            effect: 'slide',
-        });
-
-        document.querySelectorAll('.swiper-button-next, .swiper-button-prev').forEach(btn => {
-            btn.style.display = 'flex';
-        });
-
-        console.log('Carrusel Swiper inicializado con placeholder');
     }
 
     // --- LÓGICA DEL BOTÓN DE EDICIÓN ---
@@ -1096,46 +1085,34 @@ async function loadSellerContactInfo(ad) {
         const emailLinkEl = document.getElementById('email-link');
         const phoneLinkEl = document.getElementById('phone-link');
 
+        // ✅ WhatsApp: Enlace directo con mensaje prellenado
         if (whatsappLinkEl && sellerProfile?.telefono) {
-            whatsappLinkEl.onclick = () => {
-                // Mostrar el número de teléfono como fondo
-                whatsappLinkEl.style.background = `linear-gradient(135deg, #25D366, #128C7E)`;
-                whatsappLinkEl.innerHTML = `<i class="fab fa-whatsapp"></i> ${sellerProfile.telefono}`;
-                setTimeout(() => {
-                    window.open(`https://wa.me/${sellerProfile.telefono.replace(/\D/g, '')}?text=Hola, estoy interesado en tu anuncio: ${ad.titulo}`, '_blank');
-                    whatsappLinkEl.innerHTML = `<i class="fab fa-whatsapp"></i> WhatsApp`;
-                }, 1000);
-            };
+            const phoneNumber = sellerProfile.telefono.replace(/\D/g, ''); // Solo dígitos, eliminar cualquier carácter no numérico
+            const message = `Hola! Estoy interesado en el anuncio: ${ad.titulo}`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            whatsappLinkEl.href = whatsappUrl;
+            whatsappLinkEl.target = '_blank';
+            whatsappLinkEl.rel = 'noopener noreferrer';
+            console.log('URL de WhatsApp:', whatsappUrl);
             whatsappLinkEl.style.display = 'inline-block';
         } else {
             if (whatsappLinkEl) whatsappLinkEl.style.display = 'none';
         }
 
+        // ✅ Email: Enlace mailto con asunto y cuerpo
         if (emailLinkEl && sellerProfile?.email) {
-            emailLinkEl.onclick = () => {
-                // Mostrar el email como fondo
-                emailLinkEl.style.background = `linear-gradient(135deg, #007bff, #0056b3)`;
-                emailLinkEl.innerHTML = `<i class="fas fa-envelope"></i> ${sellerProfile.email}`;
-                setTimeout(() => {
-                    window.open(`mailto:${sellerProfile.email}?subject=Interesado en tu anuncio: ${ad.titulo}&body=Hola, estoy interesado en tu anuncio y me gustaría tener más detalles.`, '_blank');
-                    emailLinkEl.innerHTML = `<i class="fas fa-envelope"></i> Email`;
-                }, 1000);
-            };
+            const subject = encodeURIComponent(`Interesado en tu anuncio: ${ad.titulo}`);
+            const body = encodeURIComponent(`Hola, estoy interesado en tu anuncio "${ad.titulo}" y me gustaría tener más detalles.`);
+            emailLinkEl.href = `mailto:${sellerProfile.email}?subject=${subject}&body=${body}`;
             emailLinkEl.style.display = 'inline-block';
         } else {
             if (emailLinkEl) emailLinkEl.style.display = 'none';
         }
 
+        // ✅ Teléfono: Enlace tel para llamar directamente
         if (phoneLinkEl && sellerProfile?.telefono) {
-            phoneLinkEl.onclick = () => {
-                // Mostrar el número de teléfono como fondo
-                phoneLinkEl.style.background = `linear-gradient(135deg, #28a745, #1e7e34)`;
-                phoneLinkEl.innerHTML = `<i class="fas fa-phone-alt"></i> ${sellerProfile.telefono}`;
-                setTimeout(() => {
-                    window.open(`tel:${sellerProfile.telefono}`, '_blank');
-                    phoneLinkEl.innerHTML = `<i class="fas fa-phone-alt"></i> Teléfono`;
-                }, 1000);
-            };
+            phoneLinkEl.href = `tel:${sellerProfile.telefono}`;
             phoneLinkEl.style.display = 'inline-block';
         } else {
             if (phoneLinkEl) phoneLinkEl.style.display = 'none';

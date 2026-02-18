@@ -1942,6 +1942,83 @@ body {
     font-weight: bold;
 }
 
+/* ============================================
+   GALERÍA CON MINIATURAS ( NUEVA ESTRUCTURA )
+   ============================================ */
+
+#gallery-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.gallery-main {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.gallery-main img#main-product-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.gallery-thumbnails {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 5px 0;
+    scroll-behavior: smooth;
+}
+
+.gallery-thumbnails .thumbnail {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.gallery-thumbnails .thumbnail:hover {
+    opacity: 1;
+    border-color: #aaa;
+}
+
+.gallery-thumbnails .thumbnail.active {
+    border-color: #00bfae; /* Verde de Mercado Central */
+    opacity: 1;
+    box-shadow: 0 2px 8px rgba(0, 191, 174, 0.3);
+}
+
+.gallery-thumbnails .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Scrollbar personalizado para miniaturas */
+.gallery-thumbnails::-webkit-scrollbar {
+    height: 6px;
+}
+
+.gallery-thumbnails::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.gallery-thumbnails::-webkit-scrollbar-thumb {
+    background: #00bfae;
+    border-radius: 3px;
+}
+
 /* Columna de Información */
 .info-container-premium {
     position: relative;
@@ -2032,6 +2109,10 @@ body {
     background-color: #25D366 !important;
     color: white !important;
     border: none;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .btn-whatsapp:hover {
@@ -2040,6 +2121,14 @@ body {
 
 .btn-whatsapp i {
     color: white !important;
+}
+
+/* Botón de Teléfono */
+.btn-phone {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 /* Descripción */

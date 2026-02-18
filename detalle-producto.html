@@ -64,13 +64,8 @@
     <div class="detalle-grid-premium">
         <!-- Columna Izquierda: Galería de Imágenes -->
         <div class="gallery-container-premium">
-            <div class="swiper product-gallery-swiper">
-                <div class="swiper-wrapper" id="gallery-wrapper">
-                    <!-- Imágenes del carrusel generadas por JS -->
-                </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+            <div id="gallery-wrapper">
+                <!-- Imagen principal y miniaturas generadas por JS -->
             </div>
 
             <!-- Descripción justo debajo de la galería -->
@@ -108,15 +103,15 @@
                     </div>
 
                     <div class="contact-options">
-                        <button class="btn btn-whatsapp" id="whatsapp-link" style="display: none; margin-bottom: 10px;">
+                        <a class="btn btn-whatsapp" id="whatsapp-link" style="display: none; margin-bottom: 10px; text-decoration: none; cursor: pointer;">
                             <i class="fab fa-whatsapp"></i> WhatsApp
-                        </button>
-                        <button class="btn btn-email" id="email-link" style="display: none; margin-bottom: 10px;">
+                        </a>
+                        <a class="btn btn-email" id="email-link" style="display: none; margin-bottom: 10px; text-decoration: none; cursor: pointer;">
                             <i class="fas fa-envelope"></i> Email
-                        </button>
-                        <button class="btn btn-phone" id="phone-link" style="display: none;">
+                        </a>
+                        <a class="btn btn-phone" id="phone-link" style="display: none; text-decoration: none; cursor: pointer;">
                             <i class="fas fa-phone-alt"></i> Teléfono
-                        </button>
+                        </a>
                     </div>
                     <div class="contact-form-section">
                         <h4>O envía un mensaje directo</h4>

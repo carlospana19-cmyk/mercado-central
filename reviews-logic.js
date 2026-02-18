@@ -131,18 +131,35 @@ export async function getSellerReviews(sellerId) {
 // Obtener estadísticas de reseñas de un vendedor
 export async function getSellerReviewStats(sellerId) {
     try {
-        const { data, error } = await supabase
-            .rpc('get_seller_review_stats', { seller_uuid: sellerId });
+        // Consulta directa a la tabla reviews en lugar de RPC
+        const { data: reviews, error } = await supabase
+            .from('reviews')
+            .select('rating')
+            .eq('seller_id', sellerId);
 
         if (error) throw error;
-        return data[0] || {
-            total_reviews: 0,
-            average_rating: 0,
-            rating_5_stars: 0,
-            rating_4_stars: 0,
-            rating_3_stars: 0,
-            rating_2_stars: 0,
-            rating_1_star: 0
+
+        // Calcular estadísticas manualmente
+        const totalReviews = reviews?.length || 0;
+        const totalRating = reviews?.reduce((sum, r) => sum + (r.rating || 0), 0) || 0;
+        const averageRating = totalReviews > 0 ? (totalRating / totalReviews) : 0;
+
+        // Contar por estrellas
+        const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        reviews?.forEach(r => {
+            if (r.rating >= 1 && r.rating <= 5) {
+                ratingCounts[r.rating]++;
+            }
+        });
+
+        return {
+            total_reviews: totalReviews,
+            average_rating: Math.round(averageRating * 10) / 10,
+            rating_5_stars: ratingCounts[5],
+            rating_4_stars: ratingCounts[4],
+            rating_3_stars: ratingCounts[3],
+            rating_2_stars: ratingCounts[2],
+            rating_1_star: ratingCounts[1]
         };
     } catch (error) {
         console.error('Error obteniendo estadísticas:', error);
