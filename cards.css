@@ -358,21 +358,46 @@
 /* === SLIDER CONTAINER PARA CARRUSEL DE TARJETAS === */
 /* ================================================= */
 
-.slider-container {
-  display: flex;
-  gap: 20px;
-  padding: 20px !important; /* Aumentar padding para que las sombras no se corten */
-  margin: 0 -10px; /* Margen negativo para compensar el padding y alinear con el resto */
-  overflow-x: auto;
-  overflow-y: visible !important; /* Crucial para que no se muerda arriba/abajo */
-  width: auto;
-  scroll-behavior: smooth;
+/* 1. Forzar que NADA en la sección de tarjetas recorte contenido */
+.featured-ads, 
+.carousel-wrapper, 
+.carousel-row-wrapper,
+.slider-outer-container,
+.box-container,
+.products,
+section {
+    overflow: visible !important;
 }
 
-/* Quitar cualquier recorte en los padres directos */
-.carousel-wrapper,
-.section-cards {
-  overflow: visible !important;
+/* 2. El slider DEBE tener espacio lateral interno */
+.slider-container {
+    display: flex !important;
+    padding: 20px 50px !important; /* Aumentamos a 50px para dar aire total */
+    gap: 25px !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    width: auto !important;
+}
+
+/* 3. Evitar que la tarjeta se pegue al borde izquierdo del navegador */
+.ad-card:first-child, 
+.property-card:first-child,
+.box:first-child,
+.tarjeta-auto:first-child {
+    margin-left: 30px !important;
+}
+
+/* 4. Asegurar que la tarjeta no se deforme */
+.ad-card, .property-card, .box, .tarjeta-auto {
+    flex: 0 0 300px !important; /* Ancho fijo para que no se aplaste */
+    min-width: 300px !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; /* Forzamos sombra para ver si se corta */
+    overflow: visible !important;
+}
+
+/* 5. Swiper slide debe permitir overflow visible */
+.swiper-slide {
+    overflow: visible !important;
 }
 
 /* ================================================= */

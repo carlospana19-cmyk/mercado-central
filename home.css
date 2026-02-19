@@ -396,7 +396,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     background: var(--color-blanco);
     border-radius: 1.6rem;
     box-shadow: var(--sombra-suave);
-    overflow: hidden; /* Mantener hidden para el contenido de la tarjeta */
+    overflow: visible !important; /* Permite que las sombras se vean */
     display: flex;
     flex-direction: column;
     transition: all 0.4s;
@@ -824,8 +824,8 @@ main, section.hero-search, section.categories-showcase, section.products {
 .featured-carousel-wrapper {
   margin-bottom: 3rem;
   position: relative;
-  overflow: hidden; /* Ocultar tarjetas que no están en vista */
-  padding: 0 70px; /* Espacio para flechas */
+  overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
+  padding: 20px 70px; /* Espacio para flechas y sombras */
 }
 
 /* Flechas posicionadas dentro del wrapper */
@@ -867,7 +867,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 .featured-swiper {
   padding: 0 !important;
-  overflow: hidden !important;
+  overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
   width: 100% !important;
   box-sizing: border-box;
   margin: 0; /* Sin margen, las flechas quedan afuera */
@@ -1050,14 +1050,14 @@ main, section.hero-search, section.categories-showcase, section.products {
 .carousel-row-wrapper {
     position: relative;
     width: 100%;
-    padding: 0 60px; /* Espacio para las flechas verdes */
+    padding: 20px 60px; /* Espacio para las flechas verdes y sombras */
     margin-bottom: 3rem;
-    overflow: hidden; /* Ocultar tarjetas que no están en vista */
+    overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
 }
 
 .row-carousel {
     width: 100%;
-    overflow: hidden; /* Ocultar overflow */
+    overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
 }
 
 .row-carousel .swiper-wrapper {
