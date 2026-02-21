@@ -1590,7 +1590,7 @@ body {
 }
 
 .featured-swiper {
-  overflow: hidden !important; /* oculta tarjetas fuera de vista */
+  overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
   width: 100% !important;
   padding: 0 !important;
   box-sizing: border-box;
@@ -2152,6 +2152,14 @@ body {
 
 /* Botón de Teléfono */
 .btn-phone {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Botón de Email */
+.btn-email {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;

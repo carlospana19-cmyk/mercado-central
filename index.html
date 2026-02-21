@@ -28,22 +28,23 @@
         
         /* Contenedor del carrusel TOP: más ancho y sin flechas */
         .featured-carousel-wrapper {
-            padding: 0 24px !important;
+            padding: 20px 24px !important; /* Padding extra para que las sombras no se corten */
             position: relative !important;
             margin-bottom: 4rem !important; /* Más espacio abajo */
+            overflow: visible !important; /* Permite que las sombras se vean */
         }
 
         /* Ajustes móviles para que las imágenes ocupen todo el ancho */
         @media (max-width: 768px) {
             .featured-carousel-wrapper {
-                padding: 0 12px !important;
+                padding: 15px 12px !important;
                 margin-bottom: 3rem !important;
             }
         }
 
         @media (max-width: 480px) {
             .featured-carousel-wrapper {
-                padding: 0 8px !important;
+                padding: 10px 8px !important;
                 margin-bottom: 2.5rem !important;
             }
         }

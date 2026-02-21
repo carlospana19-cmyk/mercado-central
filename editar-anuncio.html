@@ -39,91 +39,69 @@
             <div class="progress-steps">
                 <div class="step active" data-step="1">
                     <div class="step-circle">1</div>
-                    <div class="step-title">Categoría</div>
-                </div>
-                <div class="step" data-step="2">
-                    <div class="step-circle">2</div>
-                    <div class="step-title">Ubicación</div>
-                </div>
-                <div class="step" data-step="3">
-                    <div class="step-circle">3</div>
-                    <div class="step-title">Detalles</div>
+                    <div class="step-title">Editar Anuncio</div>
                 </div>
             </div>
         </div>
 
         <form id="edit-ad-form">
-            <!-- PASO 1: CATEGORÍA -->
+            <!-- PASO ÚNICO: EDITAR ANUNCIO -->
             <div class="form-section active" id="step-1">
-                <h2 class="section-title"><i class="fas fa-list"></i> Elige la Categoría</h2>
-                <div class="form-group">
-                    <label for="category">Categoría Principal</label>
-                    <select id="category" name="categoria_principal" required>
-                        <option value="" disabled selected>Cargando categorías...</option>
-                    </select>
-    </div>
-                <div class="form-group" id="subcategory-group" style="display: none;">
-                    <label for="subcategory">Subcategoría</label>
-                    <select id="subcategory" name="categoria" required>
-                        <option value="" disabled selected>Selecciona una opción</option>
-                    </select>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary" id="continue-to-step2">
-                        Continuar <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- PASO 2: UBICACIÓN -->
-            <div class="form-section" id="step-2" style="display: none;">
-                <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Ubicación del Anuncio</h2>
-
-    <div class="form-group">
-                    <label for="province">Provincia</label>
-                    <select id="province" name="provincia" required>
-                        <option value="">Selecciona una provincia</option>
-                        <option value="Panamá">Panamá</option>
-                        <option value="Panamá Oeste">Panamá Oeste</option>
-                        <option value="Colón">Colón</option>
-                        <option value="Chiriquí">Chiriquí</option>
-                        <option value="Veraguas">Veraguas</option>
-                        <option value="Coclé">Coclé</option>
-                        <option value="Los Santos">Los Santos</option>
-                        <option value="Herrera">Herrera</option>
-                        <option value="Darién">Darién</option>
-                        <option value="Bocas del Toro">Bocas del Toro</option>
-                    </select>
-                </div>
-
-                <div class="form-group" id="district-group" style="display: none;">
-                    <label for="district">Distrito / Corregimiento</label>
-                    <select id="district" name="distrito" required>
-                        <option value="">Selecciona un distrito</option>
-                    </select>
-    </div>
-
-    <div class="form-group">
-                    <label for="address">Dirección o Sector Específico (ej: El Cangrejo, Bella Vista)</label>
-                    <input type="text" id="address" name="direccion_especifica" placeholder="Sé lo más específico posible">
-                </div>
-
-                <div class="btn-group">
-                    <button type="button" class="btn btn-secondary back-btn" data-target="1">
-                        <i class="fas fa-arrow-left"></i> Atrás
-                    </button>
-                    <button type="button" class="btn btn-primary next-btn" data-target="3">
-                        Continuar <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- PASO 3: DETALLES -->
-            <div class="form-section" id="step-3" style="display: none;">
-                <h2 class="section-title"><i class="fas fa-info-circle"></i> Detalles del Anuncio</h2>
+                <h2 class="section-title"><i class="fas fa-edit"></i> Editar Anuncio</h2>
 
                 <div class="details-layout">
                     <div class="left-column">
+                        <!-- ===== BLOQUE UNIFICADO: CLASIFICACIÓN Y LUGAR ===== -->
+                        <div class="classification-location-block">
+                            <h3 class="block-title"><i class="fas fa-tags"></i> Clasificación y Lugar</h3>
+                            
+                            <!-- Categoría -->
+                            <div class="internal-subtitle"><i class="fas fa-list"></i> Categoría</div>
+                            <div class="form-group">
+                                <label for="category">Categoría Principal</label>
+                                <select id="category" name="categoria_principal" required>
+                                    <option value="" disabled selected>Cargando categorías...</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="subcategory-group" style="display: none;">
+                                <label for="subcategory">Subcategoría</label>
+                                <select id="subcategory" name="categoria" required>
+                                    <option value="" disabled selected>Selecciona una opción</option>
+                                </select>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="internal-subtitle"><i class="fas fa-map-marker-alt"></i> Ubicación</div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="province">Provincia</label>
+                                    <select id="province" name="provincia" required>
+                                        <option value="">Selecciona una provincia</option>
+                                        <option value="Panamá">Panamá</option>
+                                        <option value="Panamá Oeste">Panamá Oeste</option>
+                                        <option value="Colón">Colón</option>
+                                        <option value="Chiriquí">Chiriquí</option>
+                                        <option value="Veraguas">Veraguas</option>
+                                        <option value="Coclé">Coclé</option>
+                                        <option value="Los Santos">Los Santos</option>
+                                        <option value="Herrera">Herrera</option>
+                                        <option value="Darién">Darién</option>
+                                        <option value="Bocas del Toro">Bocas del Toro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="district-group" style="display: none;">
+                                    <label for="district">Distrito / Corregimiento</label>
+                                    <select id="district" name="distrito" required>
+                                        <option value="">Selecciona un distrito</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Dirección o Sector Específico</label>
+                                <input type="text" id="address" name="direccion_especifica" placeholder="Ej: El Cangrejo, Bella Vista">
+                            </div>
+                        </div>
+
                         <!-- SECCIÓN PRINCIPAL: TÍTULO Y PRECIO -->
                         <div class="primary-section">
                             <div class="form-row">
@@ -739,8 +717,8 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" class="btn btn-secondary back-btn" data-target="2">
-                        <i class="fas fa-arrow-left"></i> Atrás
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='panel-unificado.html'">
+                        <i class="fas fa-times"></i> Cancelar
                     </button>
                     <button type="button" class="btn btn-primary" id="btn-save-edit">
                         Guardar cambios <i class="fas fa-save"></i>

@@ -21,8 +21,7 @@ export function initializeEditPage() {
     const galleryDropArea = document.getElementById('gallery-drop-area');
     const galleryImagesInput = document.getElementById('gallery-images-input');
     const galleryPreviewContainer = document.getElementById('gallery-preview-container');
-    const nextBtns = form.querySelectorAll('.next-btn, #continue-to-step2');
-    const backBtns = form.querySelectorAll('.back-btn');
+    // Botones de navegación eliminados - ahora es un solo paso
     const vehicleDetails = document.getElementById('vehicle-details');
     const realestateDetails = document.getElementById('realestate-details');
     const electronicsDetails = document.getElementById('electronics-details');
@@ -1896,23 +1895,7 @@ if (Array.isArray(categories) && categories.length) {
             }
     });
 
-    // LÓGICA DE NAVEGACIÓN PARA BOTONES (¡AÑADIDA!)
-    nextBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const currentStep = btn.closest('.form-section');
-            const currentStepNumber = parseInt(currentStep.id.split('-')[1], 10);
-            // (Aquí añadiremos validación por paso más adelante)
-            navigateToStep(currentStepNumber + 1);
-        });
-                });
-
-    backBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const currentStep = btn.closest('.form-section');
-            const currentStepNumber = parseInt(currentStep.id.split('-')[1], 10);
-            navigateToStep(currentStepNumber - 1);
-        });
-    });
+    // NAVEGACIÓN ELIMINADA - Ahora es un solo paso, no se necesita navegación
 
 
     // ✅ FUNCIÓN UNIFICADA PARA TODAS LAS CATEGORÍAS
@@ -1966,25 +1949,6 @@ if (Array.isArray(categories) && categories.length) {
     }
 
     // ✅ FUNCIÓN UNIFICADA PARA RELLENAR CAMPOS DE ATRIBUTOS
-    // --- FUNCIÓN DE NAVEGACIÓN (COMPLETA) ---
-    const navigateToStep = (stepNumber) => {
-        allSteps.forEach(step => step.style.display = 'none');
-        const targetStep = document.getElementById(`step-${stepNumber}`);
-        if(targetStep) targetStep.style.display = 'block';
-
-        progressSteps.forEach((step, index) => {
-            const currentStepNumber = parseInt(step.dataset.step, 10);
-            step.classList.remove('active', 'completed');
-            if (currentStepNumber < stepNumber) {
-                step.classList.add('completed');
-            } else if (currentStepNumber === stepNumber) {
-                step.classList.add('active');
-            }
-        });
-
-        // Lógica de campos dinámicos para el Paso 3
-        if (stepNumber === 3) {
-            showDynamicFields();
-        }
-    };
+    // --- FUNCIÓN DE NAVEGACIÓN ELIMINADA - Ahora es un solo paso ---
+    // Los campos dinámicos se muestran automáticamente al cambiar la categoría
 }
