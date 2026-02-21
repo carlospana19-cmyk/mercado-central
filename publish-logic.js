@@ -2238,11 +2238,7 @@ planCards.forEach(card => {
                 existingHelpText.remove();
             }
 
-            const helpText = document.createElement('p');
-            helpText.className = 'help-text';
-            helpText.style.marginTop = '10px';
-            helpText.innerHTML = `📸 Tu plan <strong>${selectedPlan.toUpperCase()}</strong> permite hasta <strong>${maxFiles}</strong> fotos.`;
-            helpTextContainer.appendChild(helpText);
+            // Texto de límite eliminado - ahora se muestra en el cuadro de carga
         }
     });
 });

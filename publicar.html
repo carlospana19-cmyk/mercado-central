@@ -701,12 +701,18 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Galería de Imágenes (hasta el límite de tu plan)</label>
-                                <div id="gallery-drop-area" class="drop-area">
+                                <label>Galería de Imágenes</label>
+                                <div id="gallery-drop-area" class="drop-area upload-zone">
                                     <input type="file" id="gallery-images-input" name="gallery_images" accept="image/*" multiple style="display: none;">
-                                    <p><i class="fas fa-cloud-upload-alt"></i> Arrastra y suelta imágenes aquí o haz clic para seleccionar</p>
+                                    <div class="upload-container">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-images"></i>
+                                        </div>
+                                        <p class="upload-text"><strong>Arrastra tus fotos aquí</strong></p>
+                                        <p class="upload-subtext">o haz clic para buscarlas</p>
+                                        <span class="upload-limit">Máximo 10 archivos, JPG o PNG</span>
+                                    </div>
                                 </div>
-                                <div class="plan-limit-info"></div>
                                 <div id="gallery-preview-container" class="gallery-preview-container">
                                     <!-- Las previsualizaciones de imágenes se insertarán aquí -->
                                 </div>

@@ -11,6 +11,16 @@
   padding: 2rem;
 }
 
+/* Esto separa las tarjetas de forma profesional */
+.results-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 15px !important;
+    padding: 15px !important;
+    margin-top: 10px;
+    justify-items: center;
+}
+
 @media (max-width: 992px) {
   #results-container {
     grid-template-columns: repeat(2, 1fr);
@@ -25,6 +35,7 @@
 }
 
 /* --- Tarjeta principal (property-card) --- */
+/* Bloque maestro para tarjetas en todo el sitio */
 .property-card {
   border: none;
   background: #fff;
@@ -33,25 +44,25 @@
   overflow: visible; /* Para que no corte sombras o bordes */
   display: flex;
   flex-direction: column;
-  min-width: 280px; /* Asegurar que la tarjeta tenga un ancho mínimo y no se colapse */
-  width: 100%;
-  max-width: none;
+  width: 100% !important;
+  min-width: 280px;
+  max-width: 350px;
+  margin: 0 auto !important;
   height: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  flex: 0 0 280px; /* Evita que el flexbox "apriete" la tarjeta */
-  margin-bottom: 15px; /* Espacio para la sombra inferior */
 }
 
 /* --- Clase ad-card (alias para property-card) --- */
 .ad-card {
+  width: 100% !important;
   min-width: 280px;
+  max-width: 350px;
+  margin: 0 auto !important;
   height: auto;
   display: flex;
   flex-direction: column;
   overflow: visible;
-  flex: 0 0 280px; /* Evita que el flexbox "apriete" la tarjeta */
-  margin-bottom: 15px; /* Espacio para la sombra inferior */
 }
 
 .property-card:hover {
@@ -372,19 +383,24 @@ section {
 /* 2. El slider DEBE tener espacio lateral interno */
 .slider-container {
     display: flex !important;
-    padding: 20px 50px !important; /* Aumentamos a 50px para dar aire total */
-    gap: 25px !important;
+    justify-content: flex-start !important;
+    padding-left: 25px !important; /* Para que la primera no se pegue al borde */
+    padding-right: 15px !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    gap: 20px !important;
     overflow-x: auto !important;
     overflow-y: visible !important;
     width: auto !important;
+    scroll-padding: 25px !important;
 }
 
-/* 3. Evitar que la tarjeta se pegue al borde izquierdo del navegador */
+/* 3. Primera tarjeta sin margen extra - el padding del contenedor ya da espacio */
 .ad-card:first-child, 
 .property-card:first-child,
 .box:first-child,
 .tarjeta-auto:first-child {
-    margin-left: 30px !important;
+    margin-left: 0 !important;
 }
 
 /* 4. Asegurar que la tarjeta no se deforme */

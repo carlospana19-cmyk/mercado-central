@@ -307,53 +307,154 @@ main.container.publish-wizard {
     font-style: italic;
 }
 
-/* 2. Estilos para la zona de "Arrastrar y Soltar" (Drop Area) */
+/* 2. Estilos para la zona de "Arrastrar y Soltar" (Drop Area) - Diseño Minimalista */
+.images-block .upload-zone {
+    border: 2px dashed #d1d5db !important; /* Gris suave */
+    background: #f9fafb !important; /* Fondo muy claro */
+    border-radius: 16px !important;
+    padding: 40px 20px !important;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.images-block .upload-zone:hover {
+    background-color: #f0fdfa !important; /* Turquesa muy suave */
+    border: 2px solid #00bfae !important; /* Borde sólido resaltado */
+    transform: translateY(-2px); /* Pequeño levante */
+    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.1);
+}
+
+.images-block .upload-zone.dragover {
+    border-color: #00bfae !important;
+    background: #e6fff9 !important;
+    box-shadow: 0 4px 20px rgba(0, 191, 174, 0.15);
+}
+
+.upload-icon i {
+    font-size: 3rem;
+    color: #00bfae;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+.images-block .upload-zone:hover .upload-icon i {
+    transform: translateY(-5px);
+}
+
+.upload-text {
+    font-size: 1.2rem;
+    color: #1f2937; /* Oscurecido para mejor visibilidad */
+    margin-bottom: 5px;
+}
+
+.upload-subtext {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-bottom: 15px;
+}
+
+.upload-limit {
+    font-size: 0.85rem;
+    color: #4b5563; /* Gris más oscuro y legible */
+    background: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* Contenedor de miniaturas - Grid profesional */
+#preview-container,
+.gallery-preview-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+    padding: 10px;
+}
+
+#preview-container .preview-item,
+.gallery-preview-container .preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#preview-container .preview-item img,
+.gallery-preview-container .preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#preview-container .preview-item .remove-btn,
+.gallery-preview-container .preview-item .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+#preview-container .preview-item .remove-btn:hover,
+.gallery-preview-container .preview-item .remove-btn:hover {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    #preview-container,
+    .gallery-preview-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    #preview-container,
+    .gallery-preview-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Estilos legacy para compatibilidad */
 .drop-area {
-    border: 3px dashed #00bfae;
+    border: 2px dashed #d1d5db;
     border-radius: 16px;
-    padding: 6rem 3rem;
+    padding: 40px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: linear-gradient(135deg, #f0fffe 0%, #e8faf8 100%);
+    background: #f9fafb;
     margin-top: 1rem;
     position: relative;
-    overflow: hidden;
-}
-
-.drop-area::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(0, 191, 174, 0.05), transparent);
-    pointer-events: none;
 }
 
 .drop-area:hover {
-    border-color: #008f88;
-    background: linear-gradient(135deg, #e8faf8 0%, #d9f5f2 100%);
-    box-shadow: 0 8px 24px rgba(0, 191, 174, 0.2);
-    transform: translateY(-2px);
-}
-
-.drop-area:hover i {
-    transform: scale(1.15) rotate(5deg);
+    border-color: #00bfae;
+    background: #f0fdfa;
 }
 
 .drop-area i {
-    font-size: 3.5rem;
+    font-size: 3rem;
     color: #00bfae;
-    margin-bottom: 1rem;
+    margin-bottom: 15px;
     transition: all 0.3s ease;
 }
 
 .drop-area p {
-    font-size: 1.6rem;
-    color: #2c3e50;
-    font-weight: 600;
+    font-size: 1.2rem;
+    color: #374151;
+    font-weight: 500;
     margin: 0;
 }
 
@@ -1237,8 +1338,6 @@ input:focus, select:focus, textarea:focus {
 .btn-primary:active {
     transform: translateY(0px);
 }
-    transform: translateY(-3px);
-}
 
 /* ===== RESPONSIVE DESIGN PARA MÓVILES ===== */
 @media (max-width: 768px) {
@@ -1531,9 +1630,8 @@ input:focus, select:focus, textarea:focus {
         font-size: 1.1rem;
     }
 }
-        margin-bottom: 0.8rem;
-    }
 
+@media (max-width: 480px) {
     .section-title {
         font-size: 1.2rem;
         margin-bottom: 1rem;
