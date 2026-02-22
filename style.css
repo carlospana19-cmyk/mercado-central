@@ -2364,26 +2364,26 @@ body {
 }
 /* ========== SISTEMA DE DESTACADOS ========== */
 
-/* Tarjetas Premium - Borde diamante */
+/* Tarjetas Premium - Sin borde, solo sombra */
 .card-premium {
-    border: 2px solid #d4d4d4;
+    border: none !important;
     box-shadow: 0 4px 15px rgba(192,192,192,0.3);
     position: relative;
-    overflow: visible;
+    overflow: hidden !important;
 }
 
 /* Tarjetas Destacadas - Sin borde dorado */
 .card-destacado {
     box-shadow: 0 4px 15px rgba(255,215,0,0.2);
     position: relative;
-    overflow: visible;
+    overflow: hidden !important;
 }
 
 
 /* Asegurar que las tarjetas tengan position relative */
 .box, .tarjeta-auto, .plan-card { /* Añadido .plan-card */
     position: relative;
-    overflow: visible; /* Permitir que el badge se extienda fuera de la tarjeta */
+    overflow: hidden !important; /* Cambiado a hidden para evitar espacios */
     min-height: 380px; /* Aumentar la altura mínima de la tarjeta para más espacio */
 }
 

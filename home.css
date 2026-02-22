@@ -2,6 +2,57 @@
 /* === ESTILOS ESPECÍFICOS PARA HOME.CSS (index.html) === */
 /* ================================================= */
 
+/* Fondo del body con profundidad elegante */
+body {
+    background-color: #f8fafc !important; /* El fondo "nube" que da elegancia */
+    margin: 0;
+    padding: 0;
+}
+
+/* ================================================= */
+/* === COMBO MAESTRO PARA TARJETAS === */
+/* El padre manda, la imagen se adapta */
+/* ================================================= */
+
+/* 1. El padre (la tarjeta) tiene que mandar */
+.ad-card, .property-card, .box {
+    background-color: #ffffff !important;
+    border-radius: 20px !important; /* El radio elegido */
+    overflow: hidden !important;    /* ESTO CORTA LO QUE SOBRA */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: none !important; /* Sin borde para evitar espacios visuales */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    width: 380px !important; /* Ancho actualizado para más presencia */
+    min-width: 380px !important;
+    max-width: 380px !important;
+    gap: 0 !important; /* Sin espacio entre elementos hijos */
+}
+
+/* 1.5 Asegurar que el contenedor de la foto no tenga espacios */
+.ad-card .card-image-container, 
+.property-card .card-image-container,
+.ad-card .image-container,
+.property-card .image-container,
+.box .image-container {
+    width: 100% !important;
+    padding: 0 !important;   /* Elimina cualquier espacio interno */
+    margin: 0 !important;    /* Elimina márgenes externos */
+    line-height: 0 !important; /* Evita un espacio pequeño abajo de la foto */
+    overflow: hidden !important;
+    flex-shrink: 0 !important; /* Evita que se comprima */
+}
+
+/* 2. La imagen tiene que adaptarse - Full-Bleed */
+.ad-card img, .property-card img, .box img {
+    width: 100% !important;   /* Ocupa todo el ancho disponible */
+    height: 240px !important;  /* Alto ajustado */
+    object-fit: cover !important; /* Evita que la foto se estire */
+    display: block !important;
+    border-radius: 0 !important; /* El redondeado lo da el padre */
+}
+
 .card {
   position: relative;
 }
@@ -347,12 +398,16 @@
   margin-bottom: 0;
 }
 
-.row-2-cols {
-  grid-template-columns: repeat(2, 1fr);
-}
-
+/* Fila de 3 columnas - Estándar para tarjetas debajo del banner */
+.row-2-cols,
 .row-3-cols {
-  grid-template-columns: repeat(3, 1fr);
+  display: grid !important;
+  /* Subimos a 380px para que se vean más anchas y potentes */
+  grid-template-columns: repeat(3, 380px) !important;
+  gap: 30px !important;
+  justify-content: center !important;
+  margin: 40px auto !important;
+  max-width: 100% !important; /* Se ajusta al contenedor padre de 1200px */
 }
 
 .row-4-cols {
@@ -361,8 +416,30 @@
 
 /* Responsive para filas */
 @media (max-width: 1200px) {
+  .row-2-cols,
+  .row-3-cols {
+    grid-template-columns: repeat(3, 1fr) !important;
+    max-width: 100% !important;
+  }
+  
   .row-4-cols {
     grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Tarjetas fluidas en pantallas medianas */
+  .ad-card, .property-card, .box {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .row-2-cols,
+  .row-3-cols {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+    max-width: 800px !important;
   }
 }
 
@@ -370,7 +447,9 @@
   .row-2-cols,
   .row-3-cols,
   .row-4-cols {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 15px !important;
+    max-width: 100% !important;
   }
 }
 
@@ -378,7 +457,14 @@
   .row-2-cols,
   .row-3-cols,
   .row-4-cols {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+  }
+  
+  .ad-card, .property-card, .box {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
   }
 }
 
@@ -392,15 +478,9 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 /* --- TARJETAS DE PRODUCTO (.box) --- */
+/* Los estilos principales están en el COMBO MAESTRO arriba */
 .box {
-    background: var(--color-blanco);
-    border-radius: 1.6rem;
-    box-shadow: var(--sombra-suave);
-    overflow: visible !important; /* Permite que las sombras se vean */
-    display: flex;
-    flex-direction: column;
     transition: all 0.4s;
-    position: relative;
 }
 .box:hover {
     transform: translateY(-1rem);
@@ -408,11 +488,11 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 .box .image-container {
     width: 100%;
-    height: 240px; /* Ajustada la altura para una imagen más grande */
+    height: 240px; /* Mismo alto que el COMBO MAESTRO actualizado */
     position: relative;
     background-color: #f5f5f5;
-    border-radius: 1.2rem 1.2rem 0 0; /* Solo esquinas superiores redondeadas */
-    overflow: visible; /* Permitir que las flechas salgan */
+    border-radius: 0 !important; /* Sin border-radius, el padre ya lo tiene */
+    overflow: hidden !important;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -421,8 +501,8 @@ main, section.hero-search, section.categories-showcase, section.products {
 .box .swiper {
     width: 100%;
     height: 100%;
-    border-radius: 1.2rem 1.2rem 0 0;
-    overflow: hidden; /* Las imágenes se mantienen dentro */
+    border-radius: 0 !important; /* Sin border-radius */
+    overflow: hidden !important;
 }
 .box .swiper-slide {
     display: flex;
@@ -438,6 +518,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     height: 100%;
     object-fit: cover;
     object-position: center;
+    border-radius: 0 !important; /* Sin border-radius individual */
 }
 
 .box .content {
@@ -596,13 +677,13 @@ main, section.hero-search, section.categories-showcase, section.products {
     cursor: pointer;
 }
 
-/* Posicionar flechas DENTRO de la imagen */
+/* Posicionar flechas DENTRO de la imagen (no en los bordes) */
 .box .swiper-button-prev {
-    left: 10px;
+    left: 15px;
 }
 
 .box .swiper-button-next {
-    right: 10px;
+    right: 15px;
 }
 
 .box .swiper-button-prev::after,
@@ -759,6 +840,13 @@ main, section.hero-search, section.categories-showcase, section.products {
     width: 100%;
     height: 100%;
     position: relative;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.product-swiper .swiper-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .product-swiper .swiper-slide {
@@ -766,12 +854,17 @@ main, section.hero-search, section.categories-showcase, section.products {
     align-items: center;
     justify-content: center;
     background: #f5f5f5;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .product-swiper .swiper-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Overlay para permitir deslizamiento sobre iframes de video */
@@ -819,6 +912,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 .product-swiper .swiper-button-next,
 .product-swiper .swiper-button-prev {
     color: white;
+}
 
 /* === CARRUSEL DE TARJETAS TOP/DESTACADO === */
 .featured-carousel-wrapper {
@@ -983,6 +1077,8 @@ main, section.hero-search, section.categories-showcase, section.products {
     }
 }
 
+.product-swiper .swiper-button-next,
+.product-swiper .swiper-button-prev {
     background: rgba(0, 0, 0, 0.5);
     width: 40px;
     height: 40px;
@@ -1047,74 +1143,190 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* === ESTILOS PARA CARRUSELES DE FILAS === */
 /* ================================================= */
 
+/* 1. El contenedor del carrusel debe ignorar los márgenes del padre */
 .carousel-row-wrapper {
+    width: 100vw !important; /* Ocupa todo el ancho de la ventana */
     position: relative;
-    width: 100%;
-    padding: 20px 60px; /* Espacio para las flechas verdes y sombras */
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
+    overflow: hidden;
+    padding: 20px 0;
     margin-bottom: 3rem;
-    overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
 }
 
+/* 2. La fila de tarjetas con padding para que respire */
 .row-carousel {
     width: 100%;
-    overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
+    overflow: visible !important;
+    position: relative; /* Contenedor principal para que las flechas tengan de donde agarrarse */
+    padding: 0 50px; /* Creamos un 'pasillo' para las flechas en los lados */
 }
 
 .row-carousel .swiper-wrapper {
     display: flex;
+    gap: 20px !important;
+    padding: 0 5% !important; /* Solo padding horizontal, sin espacio arriba */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
 }
 
+/* Añadimos un margen interno al carrusel para que las tarjetas no choquen con las flechas */
+.row-carousel .swiper {
+    padding: 0 50px !important; /* Esto crea el espacio para que las flechas vivan sin tapar las tarjetas */
+}
+
+/* 3. El slide con ancho exacto - el CSS manda sobre el JS */
 .row-carousel .swiper-slide {
+    width: 380px !important;    /* Definimos el tamaño aquí para que Swiper no invente */
+    margin-right: 0 !important; /* El Swiper maneja el espacio con spaceBetween */
+    padding: 0 !important;
     height: auto;
     display: flex;
+    /* Atacamos la 'funda' del carrusel que es la que está rompiendo el diseño */
+    overflow: hidden !important; /* Esto obliga a la funda a respetar la forma */
+    border-radius: 20px !important; /* Le damos la misma curva que a tus tarjetas */
+    background: transparent !important;
 }
 
-/* Flechas verdes grandes para navegación de filas */
+/* 4. RESET TOTAL DEL CONTENEDOR */
+.row-carousel .ad-card {
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 20px !important;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 5. FORZAMOS AL CONTENEDOR DE LA IMAGEN A IGNORAR SWIPER */
+.row-carousel .ad-card .card-image, 
+.row-carousel .ad-card .image-wrapper,
+.row-carousel .ad-card .image-container,
+.row-carousel .ad-card [class*="image"] {
+    width: 100% !important;
+    min-width: 100% !important;
+    flex: 1 1 100% !important;
+}
+
+/* 6. LA IMAGEN ROMPE CUALQUIER CANDADO */
+.row-carousel .ad-card img {
+    position: relative !important;
+    left: 0 !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important; /* Por si tiene un max-width escondido */
+    transform: none !important; /* Por si Swiper la está centrando */
+    height: 240px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 7. EL TEXTO: Re-ajustamos para que no quede pegado a los bordes */
+.row-carousel .ad-card .content,
+.row-carousel .ad-card .card-body,
+.row-carousel .ad-card .card-content {
+    padding: 15px !important;
+    width: calc(100% - 30px) !important;
+}
+
+/* Flechas rectangulares para navegación de filas - Estilo Encuentra24 */
 .row-nav-prev,
 .row-nav-next {
     position: absolute;
-    background: linear-gradient(135deg, #00d084 0%, #00bf6f 100%);
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 15px rgba(0, 208, 132, 0.4);
+    background: rgba(255, 255, 255, 0.9) !important;
+    width: 45px !important;
+    height: 100% !important;        /* Ocupan todo el alto de la tarjeta */
+    border: 1px solid #ddd;
     cursor: pointer;
-    z-index: 50;
-    top: 50%;
-    transform: translateY(-50%);
+    z-index: 100;
+    top: 0 !important;              /* Desde el borde superior */
+    transform: none !important;      /* Sin centrado vertical */
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #333 !important;
+    font-size: 18px;
 }
 
 .row-nav-prev {
-    left: 0;
+    left: 0 !important;             /* Pegada al borde izquierdo */
+    border-radius: 0 12px 12px 0 !important; /* Curva solo hacia adentro */
 }
 
 .row-nav-next {
-    right: 0;
+    right: 0 !important;            /* Pegada al borde derecho */
+    border-radius: 12px 0 0 12px !important; /* Curva solo hacia adentro */
 }
 
 .row-nav-prev:hover,
 .row-nav-next:hover {
-    background: linear-gradient(135deg, #00e090 0%, #00d080 100%);
-    transform: translateY(-50%) scale(1.15);
-    box-shadow: 0 6px 25px rgba(0, 208, 132, 0.6);
+    background: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+    color: #00bfae;
 }
 
 .row-nav-prev i,
 .row-nav-next i {
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+/* --- AJUSTE DE ALTURA Y COLOR TURQUESA FINAL --- */
+
+.row-nav-prev,
+.row-nav-next {
+    height: 120px !important;       /* Altura reducida para que no sea tan largo */
+    width: 45px !important;
+    top: 40% !important;            /* Centrado a la altura de la imagen */
+    transform: none !important;     /* Sin centrado vertical */
+    margin-top: 0 !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease !important; /* Para que el cambio de color sea suave */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    z-index: 100;
+    color: #333 !important;
+}
+
+/* EFECTO HOVER: Cuando pasas el mouse se pone turquesa */
+.row-nav-prev:hover,
+.row-nav-next:hover {
+    background-color: #00ced1 !important; /* Turquesa */
+    border-color: #00ced1 !important;
+    color: #ffffff !important;
+}
+
+/* Mantener el pegado a los bordes */
+.row-nav-prev {
+    left: 0 !important;
+    border-radius: 0 10px 10px 0 !important;
+}
+
+.row-nav-next {
+    right: 0 !important;
+    border-radius: 10px 0 0 10px !important;
+}
+
+.row-nav-prev i,
+.row-nav-next i {
+    font-size: 18px;
+    font-weight: 900;
 }
 
 /* Responsive para carruseles de filas */
 @media (max-width: 1024px) {
     .carousel-row-wrapper {
-        padding: 0 20px;
+        width: 100vw !important;
+        margin-left: -50vw !important;
+        margin-right: -50vw !important;
+        left: 50%;
+        right: 50%;
     }
     
     /* Ocultar flechas en tablet y móvil */
@@ -1126,7 +1338,12 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 @media (max-width: 768px) {
     .carousel-row-wrapper {
-        padding: 0 15px;
+        width: 100vw !important;
+        margin-left: -50vw !important;
+        margin-right: -50vw !important;
+        left: 50%;
+        right: 50%;
+        padding: 0 10px;
     }
     
     /* Paginación para carruseles en móvil */
@@ -1226,4 +1443,785 @@ main, section.hero-search, section.categories-showcase, section.products {
     .product-gallery-swiper .swiper-button-prev::after {
         font-size: 16px !important;
     }
+}
+
+/* ================================================= */
+/* === BANNER DE ELITE "TOP SELECCIÓN" === */
+/* Banner horizontal único que rompe la cuadrícula */
+/* ================================================= */
+
+/* Contenedor principal que sincroniza Banner + Grid */
+.main-content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    /* Degradado muy suave para que el Banner Elite flote */
+    background: linear-gradient(to bottom, #f1f5f9, #f8fafc);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-radius: 20px;
+}
+
+/* Responsive para el contenedor principal */
+@media (max-width: 768px) {
+    .main-content-wrapper {
+        padding: 20px 20px;
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content-wrapper {
+        padding: 15px 15px;
+    }
+}
+
+/* Contenedor del Banner Elite - Ocupa todo el ancho */
+.elite-banner-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin-bottom: 3rem;
+    box-sizing: border-box;
+}
+
+/* === SLIDER CONTAINER PARA MÚLTIPLES BANNERS === */
+.elite-slider-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto 40px;
+    height: 450px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(212, 175, 55, 0.3);
+}
+
+/* Slides con transición de fundido */
+.elite-banner-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out; /* Transición sedosa de 800ms */
+    display: flex;
+    pointer-events: none;
+}
+
+.elite-banner-slide.active {
+    opacity: 1;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* Flechas de navegación minimalistas */
+.elite-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: white;
+    font-size: 1.4rem;
+}
+
+.elite-slider-nav:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(0, 193, 171, 0.5);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.elite-slider-nav.prev {
+    left: 15px;
+}
+
+.elite-slider-nav.next {
+    right: 15px;
+}
+
+/* Indicadores de progreso estilo Instagram */
+.elite-progress-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+}
+
+.elite-progress-bar {
+    width: 60px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.elite-progress-bar:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.elite-progress-bar .progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #00c1ab, #4ade80);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+}
+
+.elite-progress-bar.active .progress-fill {
+    animation: progressFill 5s linear forwards;
+}
+
+.elite-progress-bar.completed .progress-fill {
+    width: 100%;
+}
+
+@keyframes progressFill {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* Actualizar animación para 6 segundos */
+.elite-progress-bar.active .progress-fill {
+    animation: progressFill 6s linear forwards;
+}
+
+/* Pausar animación al hacer hover */
+.elite-slider-wrapper:hover .elite-progress-bar.active .progress-fill {
+    animation-play-state: paused;
+}
+
+/* === SOPORTE DE VIDEO PARA BANNER DE ELITE === */
+.elite-banner-media {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Video de fondo estilo cine */
+.elite-video-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+/* Contenedor de imagen o video */
+.elite-banner-image,
+.elite-banner-video-container {
+    position: relative;
+    width: 50% !important;
+    height: 100% !important;
+    min-height: 350px;
+    overflow: hidden;
+}
+
+/* Overlay para videos con botón flotante */
+.elite-video-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 5;
+}
+
+.elite-video-overlay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    align-self: flex-start;
+}
+
+.elite-video-overlay-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* === TAG PATROCINADO === */
+.sponsored-tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sponsored-tag i {
+    font-size: 1rem;
+    color: #fbbf24;
+}
+
+/* Tag alternativo para contenido orgánico */
+.organic-tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(0, 193, 171, 0.2);
+    backdrop-filter: blur(5px);
+    color: #00c1ab;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(0, 193, 171, 0.3);
+}
+
+/* Indicador de video reproduciéndose */
+.video-playing-indicator {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    z-index: 10;
+}
+
+.video-playing-indicator i {
+    color: #ef4444;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Banner Elite - Diseño horizontal con imagen izquierda - PROPORCIÓN REVISTA DE LUJO */
+.elite-banner {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-height: 450px !important; /* Limitamos la altura para que se vea contenido abajo */
+    min-height: 350px !important;
+    margin-bottom: 40px !important;
+    background: linear-gradient(135deg, #0a192f 0%, #112240 100%) !important; /* Un azul más suave */
+    border-radius: 20px !important;
+    overflow: hidden;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(212, 175, 55, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.elite-banner:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 25px 70px rgba(0, 0, 0, 0.35),
+        0 0 0 2px rgba(212, 175, 55, 0.5),
+        0 0 30px rgba(212, 175, 55, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Sección de imagen - 50% del ancho para proporción equilibrada */
+.elite-banner-image {
+    position: relative;
+    width: 50% !important;
+    height: 100% !important;
+    min-height: 350px;
+    overflow: hidden;
+}
+
+.elite-banner-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.elite-banner:hover .elite-banner-image img {
+    transform: scale(1.05);
+}
+
+/* Degradado sobre la imagen */
+.elite-banner-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(10, 25, 47, 0.8));
+    pointer-events: none;
+}
+
+/* Sección de contenido - 50% del ancho para proporción equilibrada */
+.elite-banner-content {
+    width: 50% !important;
+    padding: 50px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Estira el contenido de arriba a abajo */
+    text-align: left;
+    position: relative;
+    z-index: 2;
+}
+
+/* Badge VERIFICADO/TOP dorado */
+.elite-badge-gold {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 25%, #d4af37 50%, #aa8c2c 75%, #d4af37 100%);
+    background-size: 200% 200%;
+    animation: goldShimmer 3s ease-in-out infinite;
+    color: #1a1a2e;
+    padding: 0.6rem 1.4rem;
+    border-radius: 2rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 
+        0 4px 15px rgba(212, 175, 55, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.elite-badge-gold i {
+    font-size: 1.4rem;
+}
+
+@keyframes goldShimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Precio destacado - ENORME e impactante */
+.elite-banner-price {
+    font-size: 3.5rem !important;
+    font-weight: 800;
+    color: #00c1ab;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 15px rgba(0, 193, 171, 0.4);
+    line-height: 1.1;
+}
+
+/* Título del anuncio - DESTACADO */
+.elite-banner-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Ubicación */
+.elite-banner-location {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.elite-banner-location i {
+    color: #00c1ab;
+}
+
+/* Atributos del producto - Grid de 2 columnas elegante */
+.elite-banner-attributes {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas de datos técnicos */
+    gap: 15px;
+    margin: 20px 0;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.elite-attribute {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.8rem 1.2rem;
+    border-radius: 0.8rem;
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.elite-attribute:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(0, 193, 171, 0.3);
+}
+
+.elite-attribute i {
+    color: #00c1ab;
+    font-size: 1.3rem;
+}
+
+/* Avatar del vendedor */
+.elite-banner-seller {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.elite-seller-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--color-primario);
+    overflow: hidden;
+}
+
+.elite-seller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.elite-seller-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.elite-seller-name {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.elite-seller-rating {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.elite-seller-rating i {
+    color: #fbbf24;
+}
+
+/* Botón de contacto - GRANDE y prominente */
+.elite-banner-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #00c1ab 0%, #0d9488 100%);
+    color: #ffffff;
+    padding: 1.5rem 3rem;
+    border-radius: 1.2rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 25px rgba(0, 193, 171, 0.5);
+    align-self: flex-start;
+    margin-top: auto;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.elite-banner-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 40px rgba(0, 193, 171, 0.6);
+    background: linear-gradient(135deg, #0d9488 0%, #00c1ab 100%);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.elite-banner-btn i {
+    font-size: 1.6rem;
+}
+
+/* Etiqueta "Top Selección" encima del banner */
+.elite-banner-label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+}
+
+.elite-label-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.elite-label-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, rgba(212, 175, 55, 0.5), transparent);
+}
+
+/* Responsive para Banner Elite */
+@media (max-width: 992px) {
+    .elite-banner {
+        min-height: 320px;
+        max-height: 400px;
+    }
+    
+    .elite-banner-image {
+        width: 50% !important;
+    }
+    
+    .elite-banner-content {
+        width: 50% !important;
+        padding: 30px !important;
+    }
+    
+    .elite-banner-price {
+        font-size: 2.8rem !important;
+    }
+    
+    .elite-banner-title {
+        font-size: 2rem;
+    }
+    
+    .elite-banner-attributes {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .elite-banner-container {
+        padding: 0 1rem;
+    }
+    
+    .elite-banner {
+        flex-direction: column;
+        min-height: auto;
+        max-height: none;
+    }
+    
+    .elite-banner-image {
+        width: 100% !important;
+        min-height: 200px;
+    }
+    
+    .elite-banner-image::after {
+        width: 100%;
+        height: 40%;
+        top: auto;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(10, 25, 47, 1), transparent);
+    }
+    
+    .elite-banner-content {
+        width: 100% !important;
+        padding: 20px !important;
+    }
+    
+    .elite-badge-gold {
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .elite-banner-price {
+        font-size: 2.4rem !important;
+    }
+    
+    .elite-banner-title {
+        font-size: 1.8rem;
+    }
+    
+    .elite-banner-location {
+        font-size: 1.3rem;
+    }
+    
+    .elite-banner-attributes {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .elite-attribute {
+        font-size: 1.2rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    .elite-banner-btn {
+        width: 100%;
+        padding: 1.2rem 2rem;
+        font-size: 1.6rem;
+    }
+}
+
+/* Efecto de brillo animado en el borde */
+.elite-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: eliteShine 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes eliteShine {
+    0% { left: -100%; }
+    50%, 100% { left: 150%; }
+}
+
+/* Badge de urgencia para banner elite */
+.elite-badge-urgent {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Badge de vendido */
+.elite-badge-sold {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.elite-badge-sold i {
+    color: #4ade80;
+}
+
+/* ========================================================= */
+/* LIMPIEZA DE ESTRUCTURA: ELIMINAR ESPACIOS INTERNOS */
+/* ========================================================= */
+
+/* 1. Limpiamos el carrusel de CUALQUIER espacio interno */
+.row-carousel, 
+.row-carousel .swiper, 
+.row-carousel .swiper-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+}
+
+/* 2. Forzamos a que el SLIDE ocupe todo su espacio sin márgenes */
+.row-carousel .swiper-slide {
+    padding: 0 !important;
+    margin-right: 25px !important; /* Mantenemos solo la separación entre tarjetas */
+    display: flex !important;
+    justify-content: center !important;
+}
+
+/* 3. La Tarjeta: Aseguramos que no tenga 'muros' internos */
+.row-carousel .ad-card {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+}
+
+/* 4. La Imagen: El toque final para que toque los bordes */
+.row-carousel .ad-card .image-container,
+.row-carousel .ad-card .product-swiper,
+.row-carousel .ad-card img {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 5. El margen del texto */
+.row-carousel .ad-card .content {
+    padding: 15px 20px 20px 20px !important;
 }
