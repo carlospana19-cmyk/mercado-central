@@ -194,7 +194,7 @@ if (ad.featured_plan === "top") {
                 // ✅ Guardar el id del anuncio en un atributo data
                 const dataAdId = `data-ad-id="${ad.id}" data-is-sold="${ad.is_sold ? 'true' : 'false'}"`;
                 
-                // Avatar del vendedor - Solo mostrar si tiene foto
+                // Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
                 const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
                 const vendorPhoto = vendorProfile?.url_foto_perfil;
                 const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
@@ -206,10 +206,13 @@ if (ad.featured_plan === "top") {
                     ? `<span class="vendor-rating"><i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})</span>`
                     : '';
                 
-                const vendorAvatar = vendorPhoto ? `<div class="vendor-avatar" title="${vendorName}">
-                    <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-                    <span class="vendor-name-tooltip">${vendorName}${starsDisplay ? '<br>' + starsDisplay : ''}</span>
-                </div>` : '';
+                // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
+                const vendorAvatar = vendorPhoto 
+                    ? `<div class="vendor-avatar has-image" title="${vendorName}">
+                        <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
+                        <span class="vendor-name-tooltip">${vendorName}${starsDisplay ? '<br>' + starsDisplay : ''}</span>
+                    </div>` 
+                    : `<div class="vendor-avatar" title="${vendorName}"></div>`;
 
                 // ✅ Agregar data-category para filtrado en tiempo real
                 const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
@@ -355,17 +358,15 @@ if (ad.featured_plan === "top") {
                             <div class="elite-banner-attributes">
                                 ${eliteAttributes}
                             </div>
-                            ${vendorPhoto ? `
                             <div class="elite-banner-seller">
-                                <div class="elite-seller-avatar">
-                                    <img src="${vendorPhoto}" alt="${vendorName}">
+                                <div class="elite-seller-avatar ${vendorPhoto ? 'has-image' : ''}">
+                                    ${vendorPhoto ? `<img src="${vendorPhoto}" alt="${vendorName}">` : ''}
                                 </div>
                                 <div class="elite-seller-info">
                                     <span class="elite-seller-name">${vendorName}</span>
                                     <span class="elite-seller-rating">${starsDisplay}</span>
                                 </div>
                             </div>
-                            ` : ''}
                             <a href="detalle-producto.html?id=${ad.id}&chat=true" class="elite-banner-btn" onclick="event.stopPropagation();">
                                 <i class="fas fa-comment-dots"></i>
                                 Contactar

@@ -19,8 +19,9 @@ body {
     background-color: #ffffff !important;
     border-radius: 20px !important; /* El radio elegido */
     overflow: hidden !important;    /* ESTO CORTA LO QUE SOBRA */
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important; /* Todas la misma altura */
     position: relative;
     border: none !important; /* Sin borde para evitar espacios visuales */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
@@ -616,6 +617,9 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* Los estilos principales están en el COMBO MAESTRO arriba */
 .box {
     transition: all 0.4s;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important; /* Todas la misma altura */
 }
 .box:hover {
     transform: translateY(-1rem);
@@ -659,10 +663,12 @@ main, section.hero-search, section.categories-showcase, section.products {
 .box .content {
     width: 100%;
     padding: 15px;
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 0;
     box-sizing: border-box;
+    flex-grow: 1 !important; /* Esto obliga a la tarjeta a estirarse para que todos los botones queden abajo */
+    justify-content: space-between !important;
 }
 /* 1. Estilos del Precio: CLAVE para el diseño de Bienes Raíces. */
 .box .content .price-row {
@@ -671,6 +677,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 8px;
+    min-height: 60px !important; /* ESPACIO RESERVADO PARA EL AVATAR - aunque no haya foto */
 }
 
 .box .content .price-row .price {
@@ -778,7 +785,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     font-weight: 700;
     background: var(--color-primario); /* Turquesa */
     color: var(--color-blanco);
-    margin-top: auto;
+    margin-top: auto !important; /* SIEMPRE AL FONDO - como soldados alineados */
     align-self: stretch;
     flex-shrink: 0;
     border: none;
@@ -892,6 +899,24 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 .vendor-avatar:hover .vendor-name-tooltip {
     opacity: 1;
+}
+
+/* ============================================
+   AVATAR - INVISIBLE PERO CON ESPACIO RESERVADO
+   (Cuando no hay foto, el hueco se queda vacío)
+   ============================================ */
+
+/* Por defecto, el avatar es invisible pero ocupa espacio */
+.vendor-avatar {
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+/* SOLO cuando hay imagen, se muestra */
+.vendor-avatar.has-image {
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* --- MEDIA QUERY PARA MÓVILES --- */
@@ -2071,6 +2096,19 @@ main, section.hero-search, section.categories-showcase, section.products {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* Avatar elite: invisible por defecto pero con espacio reservado */
+.elite-seller-avatar {
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+/* SOLO cuando hay imagen, se muestra */
+.elite-seller-avatar.has-image {
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .elite-seller-info {

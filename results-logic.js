@@ -786,14 +786,17 @@ if (ad.featured_plan === "top") {
         const soldClass = ad.is_sold ? 'card-sold' : '';
         const soldBadgeResults = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
         
-        // ✅ Avatar del vendedor - Solo mostrar si tiene foto
+        // ✅ Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
         const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
         const vendorPhoto = vendorProfile?.url_foto_perfil;
         const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
-        const vendorAvatar = vendorPhoto ? `<div class="vendor-avatar" title="${vendorName}">
-            <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-            <span class="vendor-name-tooltip">${vendorName}</span>
-        </div>` : '';
+        // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
+        const vendorAvatar = vendorPhoto 
+            ? `<div class="vendor-avatar has-image" title="${vendorName}">
+                <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
+                <span class="vendor-name-tooltip">${vendorName}</span>
+            </div>` 
+            : `<div class="vendor-avatar" title="${vendorName}"></div>`;
 
 return `
         <div class="property-card card ${cardExtraClass} ${soldClass}" style="${ad.is_sold ? 'cursor: default;' : 'cursor: pointer;'}">
