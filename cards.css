@@ -36,33 +36,35 @@
 
 /* --- Tarjeta principal (property-card) --- */
 /* Bloque maestro para tarjetas en todo el sitio */
+/* REJILLA DE IMPACTO: Todas las tarjetas idénticas */
 .property-card {
   border: none;
   background: #fff;
   border-radius: 1.6rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  overflow: visible; /* Para que no corte sombras o bordes */
+  overflow: hidden; /* Para que todo se contenga */
   display: flex;
   flex-direction: column;
   width: 100% !important;
   min-width: 280px;
   max-width: 350px;
   margin: 0 auto !important;
-  height: auto;
+  height: 100%; /* Todas la misma altura */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
 
 /* --- Clase ad-card (alias para property-card) --- */
+/* REJILLA DE IMPACTO: Misma altura que property-card */
 .ad-card {
   width: 100% !important;
   min-width: 280px;
-  max-width: 100% !important; /* Cambiado de 350px a 100% */
+  max-width: 100% !important;
   margin: 0 auto !important;
-  height: auto;
+  height: 100%; /* Todas la misma altura */
   display: flex;
   flex-direction: column;
-  overflow: hidden !important; /* Cambiado de visible a hidden */
+  overflow: hidden !important;
 }
 
 .property-card:hover {
