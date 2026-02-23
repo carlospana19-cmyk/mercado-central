@@ -43,13 +43,13 @@
   border-radius: 1.6rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   overflow: hidden; /* Para que todo se contenga */
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   width: 100% !important;
   min-width: 280px;
   max-width: 350px;
   margin: 0 auto !important;
-  height: 100%; /* Todas la misma altura */
+  height: 100% !important; /* Todas la misma altura */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
@@ -134,7 +134,8 @@
   flex-direction: column;
   gap: 0;
   box-sizing: border-box;
-  flex: 1;
+  flex-grow: 1 !important; /* Esto obliga a la tarjeta a estirarse para que todos los botones queden abajo */
+  justify-content: space-between;
 }
 
 .product-card-h .card-content {
@@ -457,4 +458,127 @@ section {
 
 .btn-clear-filters:hover {
   background: #00a896;
+}
+
+/* ================================================= */
+/* === SEGURO DE ALINEACIÓN - ESPACIO RESERVADO PARA AVATAR === */
+/* Esto garantiza que si un usuario no sube foto, la tarjeta no se encoja */
+/* ================================================= */
+
+/* ESPACIO RESERVADO PARA EL AVATAR (Haya o no haya foto) */
+.vendor-avatar-wrapper,
+.price-row {
+    min-height: 60px !important; /* Reservamos el hueco aunque esté vacío */
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+/* Asegurar que el avatar tenga tamaño fijo */
+.vendor-avatar {
+    min-width: 60px;
+    min-height: 60px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   AVATAR - INVISIBLE PERO CON ESPACIO RESERVADO
+   (Cuando no hay foto, el hueco se queda vacío)
+   ============================================ */
+
+/* Por defecto, el avatar es invisible pero ocupa espacio */
+.vendor-avatar {
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+/* SOLO cuando hay imagen, se muestra */
+.vendor-avatar.has-image {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ================================================= */
+/* === CORRECCIÓN BOTÓN PEGADO AL BORDE === */
+/* ================================================= */
+
+/* 1. LA TARJETA: Quitamos el espacio de abajo para que el botón pegue al borde */
+.product-card {
+    border-radius: 20px 20px 0 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 2. EL CONTENIDO (Texto, precio): Les devolvemos su margen */
+.product-card-body {
+    padding: 15px !important;
+    flex-grow: 1 !important;
+}
+
+/* 1. LA TARJETA (El contenedor principal) */
+.box.card, .product-card {
+    padding: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+/* 2. EL CONTENIDO (Texto, título, precio) */
+.box.card .content, 
+.box.card .card-body,
+.product-card .content {
+    padding: 15px !important;
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* SOMBRA QUE SÍ SE VE */
+.box.card, .product-card {
+    background: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #eeeeee !important;
+    transition: all 0.3s ease !important;
+}
+
+/* EFECTO HOVER: Para que el usuario sienta que la tarjeta flota al tocarla */
+.box.card:hover, .product-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 2. EL BOTÓN (Ovalado y Estético) */
+.contact-btn {
+    width: 90% !important;
+    margin: 10px auto !important;
+    border-radius: 50px !important;
+    display: block !important;
+}
+
+/* 3. AJUSTE DE LA IMAGEN */
+.box.card img {
+    border-radius: 20px 20px 0 0 !important;
+    object-fit: cover !important;
+    width: 100% !important;
+}
+
+/* Contenedor de contenido de tarjeta con flexbox para alineación perfecta */
+.box .content,
+.property-details,
+.ad-card .card-body {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-grow: 1 !important;
+    justify-content: space-between !important;
+}
+
+/* El botón de contactar siempre al fondo */
+.btn-contact,
+.btn-contact-card {
+    margin-top: auto !important;
 }
