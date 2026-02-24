@@ -122,53 +122,10 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
                 
                 const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
-// BADGE ESTELAR METÁLICO – versión SVG simple
-let badgeHTML = '';
-let cardExtraClass = '';
-
-const badgeSVG = (colorClass) => `
-<svg class="simple-badge-svg ${colorClass}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <!-- Aro de estrella (12 puntas) -->
-    <path d="M50 2 
-             L63.5 18.5 L84.5 15.5 
-             L87.5 36.5 L100 50 
-             L87.5 63.5 L84.5 84.5 
-             L63.5 81.5 L50 98 
-             L36.5 81.5 L15.5 84.5 
-             L12.5 63.5 L0 50 
-             L12.5 36.5 L15.5 15.5 
-             L36.5 18.5 Z" 
-          class="badge-star-bg"/>
-
-    <!-- Círculo blanco de fondo -->
-    <circle cx="50" cy="50" r="32" 
-            fill="white" 
-            stroke="white" 
-            stroke-width="1"/>
-
-    <!-- Estrella central - SOLO CONTORNO (stroke), sin relleno -->
-    <polygon points="50,28 57,45 75,45 61,56 66,73 50,60 32,70 38,53 25,43 42,43" 
-             class="badge-center-star"
-             fill="none"
-             stroke-width="2.5"
-             stroke-linecap="round"
-             stroke-linejoin="round"/>
-</svg>
-`;
-
-if (ad.featured_plan === "top") {
-  badgeHTML = badgeSVG("diamond-badge");
-  cardExtraClass = "card-top";
-} else if (ad.featured_plan === "destacado") {
-  badgeHTML = badgeSVG("gold-badge");
-  cardExtraClass = "card-destacado";
-} else if (ad.featured_plan === "premium") {
-  badgeHTML = badgeSVG("silver-badge");
-  cardExtraClass = "card-premium";
-} else if (ad.featured_plan === "basico") {
-  badgeHTML = badgeSVG("bronze-badge");
-  cardExtraClass = "card-basico";
-}
+                
+                // ✅ BADGES ELIMINADOS - Ahora usamos section-header como separador elegante
+                let badgeHTML = '';
+                let cardExtraClass = '';
 
                 let urgentBadge = '';
                 if (ad.enhancements && ad.enhancements.is_urgent) {
@@ -397,7 +354,7 @@ if (ad.featured_plan === "top") {
                 <div class="main-content-wrapper">
                     <div class="elite-banner-container">
                         <div class="elite-banner-label">
-                            <span class="elite-label-text"><i class="fas fa-crown"></i> Top Selección</span>
+                            <span class="elite-label-text"><i class="fas fa-crown"></i> Recién Agregado</span>
                             <div class="elite-label-line"></div>
                         </div>
                         <div class="elite-slider-wrapper" id="elite-slider">

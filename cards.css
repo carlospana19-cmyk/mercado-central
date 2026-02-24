@@ -474,97 +474,47 @@ section {
     align-items: center;
 }
 
-/* Asegurar que el avatar tenga tamaño fijo */
-.vendor-avatar {
-    min-width: 60px;
-    min-height: 60px;
-    flex-shrink: 0;
+/* ============================================
+   AVATAR - CAMISA DE FUERZA 48px
+   Prohibido estirarse más allá del círculo
+   ============================================ */
+
+/* 1. EL CONTENEDOR (El círculo) */
+.vendor-avatar.has-image {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important; /* CORTA LOS 240PX SOBRANTES */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #fff !important;
+    padding: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
-/* ============================================
-   AVATAR - INVISIBLE PERO CON ESPACIO RESERVADO
-   (Cuando no hay foto, el hueco se queda vacío)
-   ============================================ */
+/* 2. LA IMAGEN (La que se estira) */
+.vendor-avatar-img {
+    width: 100% !important;
+    height: 100% !important; /* OBLIGA A MEDIR 48PX, NO 240PX */
+    object-fit: cover !important; /* RELLENA EL CÍRCULO SIN DEFORMAR */
+    max-height: 100% !important;
+    display: block !important;
+}
 
 /* Por defecto, el avatar es invisible pero ocupa espacio */
 .vendor-avatar {
     visibility: hidden;
     opacity: 0;
     transition: all 0.3s ease;
-}
-
-/* SOLO cuando hay imagen, se muestra */
-.vendor-avatar.has-image {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* ================================================= */
-/* === CORRECCIÓN BOTÓN PEGADO AL BORDE === */
-/* ================================================= */
-
-/* 1. LA TARJETA: Quitamos el espacio de abajo para que el botón pegue al borde */
-.product-card {
-    border-radius: 20px 20px 0 0 !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* 2. EL CONTENIDO (Texto, precio): Les devolvemos su margen */
-.product-card-body {
-    padding: 15px !important;
-    flex-grow: 1 !important;
-}
-
-/* 1. LA TARJETA (El contenedor principal) */
-.box.card, .product-card {
-    padding: 0 !important;
-    border-radius: 20px 20px 0 0 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-}
-
-/* 2. EL CONTENIDO (Texto, título, precio) */
-.box.card .content, 
-.box.card .card-body,
-.product-card .content {
-    padding: 15px !important;
-    flex-grow: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* SOMBRA QUE SÍ SE VE */
-.box.card, .product-card {
-    background: #ffffff !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-    border: 1px solid #eeeeee !important;
-    transition: all 0.3s ease !important;
-}
-
-/* EFECTO HOVER: Para que el usuario sienta que la tarjeta flota al tocarla */
-.box.card:hover, .product-card:hover {
-    transform: translateY(-5px) !important;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* 2. EL BOTÓN (Ovalado y Estético) */
-.contact-btn {
-    width: 90% !important;
-    margin: 10px auto !important;
-    border-radius: 50px !important;
-    display: block !important;
-}
-
-/* 3. AJUSTE DE LA IMAGEN */
-.box.card img {
-    border-radius: 20px 20px 0 0 !important;
-    object-fit: cover !important;
-    width: 100% !important;
+    min-width: 48px;
+    min-height: 48px;
+    flex-shrink: 0;
 }
 
 /* Contenedor de contenido de tarjeta con flexbox para alineación perfecta */
@@ -581,4 +531,81 @@ section {
 .btn-contact,
 .btn-contact-card {
     margin-top: auto !important;
+}
+
+/* ================================================= */
+/* === BOTÓN DE CONTACTO FULL-WIDTH === */
+/* Botón que toca los bordes de la tarjeta */
+/* ================================================= */
+
+/* 1. LA TARJETA: Quitamos el espacio de abajo para que el botón pegue al borde */
+.product-card,
+.ad-card,
+.box {
+    border-radius: 20px 20px 0 0 !important; /* Arriba óvalo, abajo recto */
+    overflow: hidden !important;
+    padding: 0 !important; /* ELIMINA el margen que hace que el botón flote */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 2. EL CONTENIDO (Texto, precio): Les devolvemos su margen para que no toquen los bordes */
+.property-details,
+.product-card-body,
+.box .content {
+    padding: 15px !important;
+    flex-grow: 1 !important;
+}
+
+/* 3. EL BOTÓN: Lo hacemos el "suelo" de la tarjeta */
+.product-card .contact-btn,
+.ad-card .btn-contact,
+.box .btn-contact {
+    width: 100% !important;   /* Que ocupe todo el ancho de lado a lado */
+    border-radius: 0 !important; /* Totalmente cuadrado abajo */
+    margin: 0 !important;     /* Sin espacios alrededor */
+    padding: 18px !important; /* Que sea alto y profesional */
+}
+
+/* ================================================= */
+/* === TÍTULO ELEGANTE "TOP SELECCIÓN" === */
+/* Diseño de boutique: Línea - Título - Línea */
+/* Versión premium para inversionistas */
+/* ================================================= */
+
+.section-divider-premium {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 60px 0 40px 0; /* Espacio quirúrgico para que respire */
+    gap: 25px;
+}
+
+.line-gold-gradient {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #c5a059 50%, transparent);
+}
+
+.content-gold-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.crown-svg-premium {
+    width: 48px; /* Tamaño impactante como la imagen */
+    height: 48px;
+    filter: drop-shadow(0 4px 5px rgba(0,0,0,0.2));
+}
+
+.text-top-selection {
+    font-size: 26px; /* Grande y autoritario */
+    font-weight: 900;
+    color: #3d3321; /* El tono oscuro elegante de la imagen */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0;
 }
