@@ -1174,12 +1174,13 @@ body {
     font-size: 1.6rem;
 }
 
-/* --- 6. FOOTER COMPLETO --- */
+/* --- 6. FOOTER PREMIUM --- */
 .footer {
-    background-color: var(--color-texto);
+    background-color: #0a192f; /* Azul medianoche elegante */
     color: #a9c1d9;
     padding: 6rem 5% 0;
-  margin-top: auto;
+    margin-top: auto;
+    border-top: 3px solid #c5a059; /* Línea dorada premium */
 }
 
 .footer-contenedor {
@@ -1193,42 +1194,101 @@ body {
 
 .footer-col {
     flex: 1;
-    min-width: 250px;
+    min-width: 220px;
+}
+
+.footer-title {
+    color: #c5a059 !important; /* Dorado para títulos */
+    font-size: 1.6rem !important;
+    margin-bottom: 2rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .footer-col h4 {
-    color: var(--color-blanco);
-    font-size: 1.8rem;
-    margin-bottom: 2.5rem;
-    font-weight: 600;
+    color: #c5a059;
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+    font-weight: 700;
     position: relative;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .footer-col h4::after {
     content: '';
     position: absolute;
     left: 0;
-    bottom: -1rem;
-    background-color: var(--color-primario);
-    height: 3px;
-    width: 50px;
+    bottom: -0.8rem;
+    background-color: #c5a059;
+    height: 2px;
+    width: 40px;
 }
 
-.footer-col p { font-size: 1.5rem; line-height: 1.7; }
+.footer-col p { font-size: 1.4rem; line-height: 1.7; }
 .footer-col ul { list-style: none; }
 .footer-col ul li { margin-bottom: 1rem; }
-.footer-col a { color: #a9c1d9; text-decoration: none; transition: all 0.3s ease; font-size: 1.5rem; }
-.footer-col a:hover { color: var(--color-primario); padding-left: 8px; }
+.footer-col a { color: #a9c1d9; text-decoration: none; transition: all 0.3s ease; font-size: 1.4rem; }
+.footer-col a:hover { color: #c5a059; padding-left: 5px; }
+
+.footer-subtitle {
+    font-size: 1.2rem;
+    color: #7a8a9a;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
 
 .social-links { margin-top: 1rem; }
 .social-links a { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 .social-links i { font-size: 2rem; width: 2.5rem; }
 
+/* App badges placeholder */
+.app-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+.store-badge-placeholder {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.store-badge-placeholder i {
+    font-size: 1.6rem;
+}
+
+/* Payment icons */
+.payment-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.payment-icons i {
+    font-size: 3rem;
+    color: #a9c1d9;
+    transition: color 0.3s ease;
+}
+
+.payment-icons i:hover {
+    color: #c5a059;
+}
+
 .footer-bottom {
     text-align: center;
     padding: 2rem 0;
     margin-top: 4rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(197, 160, 89, 0.3);
 }
 
 /* --- 7. RESPONSIVE DESIGN --- */
