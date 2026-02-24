@@ -265,6 +265,20 @@
 }
 
 /* --- Botón de contacto --- */
+.btn-contact {
+    display: block !important;
+    width: 85% !important;
+    margin: 15px auto !important;
+    padding: 10px 20px !important;
+    background-color: #00BFAE !important;
+    color: white !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    border-radius: 50px !important;
+    border: none !important;
+}
+
 .btn-contact-card,
 .product-card-h .btn-contact {
   background-color: #2da687;
@@ -555,16 +569,6 @@ section {
 .box .content {
     padding: 15px !important;
     flex-grow: 1 !important;
-}
-
-/* 3. EL BOTÓN: Lo hacemos el "suelo" de la tarjeta */
-.product-card .contact-btn,
-.ad-card .btn-contact,
-.box .btn-contact {
-    width: 100% !important;   /* Que ocupe todo el ancho de lado a lado */
-    border-radius: 0 !important; /* Totalmente cuadrado abajo */
-    margin: 0 !important;     /* Sin espacios alrededor */
-    padding: 18px !important; /* Que sea alto y profesional */
 }
 
 /* ================================================= */
