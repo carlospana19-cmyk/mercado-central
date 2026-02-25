@@ -516,6 +516,18 @@ const getVideoEmbedUrl = (videoUrl) => {
 
             // Inicializar carruseles de filas
             initializeRowCarousels();
+            
+            // ✅ Recalcular espacios vacíos al cambiar el tamaño de ventana
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Actualizar Swiper
+                    document.querySelectorAll('.row-carousel').forEach(el => {
+                        if (el.swiper) el.swiper.update();
+                    });
+                }, 250);
+            });
 
             // ✅ Agregar listeners para clicks en tarjetas (delegación de eventos)
             // Limpiar eventos anteriores completamente
@@ -810,10 +822,12 @@ function initializeRowCarousels() {
         const nextBtn = wrapper?.querySelector('.row-nav-next');
         
         const swiperInstance = new Swiper(swiperEl, {
-            slidesPerView: 3,
+            // ✅ CONFIGURACIÓN PARA EVITAR ESPACIOS VACÍOS
+            loop: true,           // Bucle infinito
+            slidesPerView: 'auto', // Ajuste automático
+            loopedSlides: 8,       // Tarjetas de reserva para el bucle
             slidesPerGroup: 1,
-            spaceBetween: 24,
-            loop: false,
+            spaceBetween: 20,       // El espacio lo maneja JS
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
@@ -850,10 +864,11 @@ function initializeRowCarousels() {
         }
         
         const swiperInstance = new Swiper(swiperEl, {
-            slidesPerView: 1,
-            slidesPerGroup: 1,
-            spaceBetween: 20,
-            loop: false,
+            // ✅ CONFIGURACIÓN PARA EVITAR ESPACIOS VACÍOS
+            loop: true,           // Bucle infinito
+            slidesPerView: 'auto', // Ajuste automático
+            loopedSlides: 8,       // Tarjetas de reserva para el bucle
+            spaceBetween: 20,       // El espacio lo maneja JS
             touchMove: true,
             touchRatio: 1,
             resistance: true,
