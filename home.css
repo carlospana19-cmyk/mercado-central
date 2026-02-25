@@ -1394,7 +1394,10 @@ main, section.hero-search, section.categories-showcase, section.products {
     display: flex;
     /* Atacamos la 'funda' del carrusel que es la que está rompiendo el diseño */
     overflow: hidden !important; /* Esto obliga a la funda a respetar la forma */
-    border-radius: 20px !important; /* Le damos la misma curva que a tus tarjetas */
+    border-top-left-radius: 20px !important;  /* Curva arriba izquierda */
+    border-top-right-radius: 20px !important; /* Curva arriba derecha */
+    border-bottom-left-radius: 0px !important;  /* Cuadrada abajo */
+    border-bottom-right-radius: 0px !important; /* Cuadrada abajo */
     background: transparent !important;
 }
 
@@ -1402,7 +1405,10 @@ main, section.hero-search, section.categories-showcase, section.products {
 .row-carousel .ad-card {
     padding: 0 !important;
     overflow: hidden !important;
-    border-radius: 20px !important;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
     border: none !important;
     display: flex;
     flex-direction: column;

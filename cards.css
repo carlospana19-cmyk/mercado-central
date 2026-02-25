@@ -91,40 +91,6 @@
   }
 }
 
-/* --- Imagen de la tarjeta --- */
-.property-image,
-.product-card-h .image-container {
-  width: 100%;
-  height: 220px;
-  position: relative;
-  overflow: hidden;
-  background: #f0f0f0;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0 !important; /* Sin border-radius, el padre lo tiene */
-}
-
-.product-card-h .image-container {
-  width: 200px;
-  border-radius: 0 !important;
-}
-
-.property-image img,
-.product-card-h .image-container img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 0 !important; /* Sin border-radius individual */
-}
-
-.product-card-h .image-container img {
-  border-radius: 0 !important;
-}
-
 /* --- Contenido de la tarjeta --- */
 .property-details,
 .product-card-h .card-content {
@@ -266,17 +232,17 @@
 
 /* --- Botón de contacto --- */
 .btn-contact {
-    display: block !important;
-    width: 85% !important;
-    margin: 15px auto !important;
-    padding: 10px 20px !important;
-    background-color: #00BFAE !important;
-    color: white !important;
-    text-align: center !important;
-    text-decoration: none !important;
-    font-weight: bold !important;
-    border-radius: 50px !important;
-    border: none !important;
+    width: 100% !important; /* Estirado al 100% */
+    margin: 15px 0 0 0 !important; /* Sin márgenes a los lados */
+    padding: 12px;
+    background-color: var(--color-primario);
+    color: white;
+    text-align: center;
+    border-radius: 6px !important; /* Redondeo fino, no ovalado */
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: block;
 }
 
 .btn-contact-card,
@@ -445,7 +411,7 @@ section {
   width: 100%;
   height: 240px; /* Altura actualizada a 240px */
   object-fit: cover; /* Para que la foto no se estire */
-  border-radius: 0 !important; /* Sin border-radius individual */
+  /* border-radius eliminado para permitir simetría desde la tarjeta padre */
 }
 
 .no-results-content p {
@@ -556,7 +522,7 @@ section {
 .product-card,
 .ad-card,
 .box {
-    border-radius: 20px 20px 0 0 !important; /* Arriba óvalo, abajo recto */
+    border-radius: 20px !important; /* Curva en las 4 esquinas */
     overflow: hidden !important;
     padding: 0 !important; /* ELIMINA el margen que hace que el botón flote */
     display: flex !important;
@@ -612,4 +578,232 @@ section {
     letter-spacing: 3px;
     text-transform: uppercase;
     margin: 0;
+}
+
+/* ================================================= */
+/* === ESTABILIZACIÓN DEL ANCHO EN CARRUSELES === */
+/* Evita que las tarjetas se estiren en los carruseles */
+/* ================================================= */
+
+.row-carousel .swiper-slide,
+.row-3-swiper .swiper-slide,
+.row-4-swiper .swiper-slide {
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.swiper-wrapper {
+    display: flex !important;
+}
+
+/* Forzar ancho correcto de tarjetas dentro del carrusel */
+.carousel-row-wrapper .box,
+.carousel-row-wrapper .tarjeta-auto {
+    width: 100% !important;
+    min-width: 280px !important;
+    max-width: 350px !important;
+}
+
+/* ================================================= */
+/* ANTÍDOTO TOTAL: SIMETRÍA Y BOTÓN LARGO */
+/* ================================================= */
+
+/* 1. CURVAS SUPERIORES (SIMETRÍA PERFECTA) */
+/* Este selector es tan largo que ganará a cualquier regla de 0px */
+body .box img, 
+body .tarjeta-auto img, 
+body .product-swiper img, 
+body .property-card img,
+body .product-swiper .swiper-slide img {
+    border-top-left-radius: 20px !important;  /* Curva izquierda */
+    border-top-right-radius: 20px !important; /* Curva derecha (Simetría) */
+    border-bottom-left-radius: 0px !important;  /* Base plana */
+    border-bottom-right-radius: 0px !important; /* Base plana */
+    height: 240px !important; /* Forzamos la altura que tenías */
+    object-fit: cover !important;
+}
+
+/* 2. EL CONTENEDOR (La Tarjeta) */
+/* Forzamos que la tarjeta sea la que mande en las curvas */
+body .box, 
+body .tarjeta-auto, 
+body .property-card {
+    border-radius: 20px !important; 
+    overflow: hidden !important; /* Esto "corta" cualquier esquina que se quiera salir */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* ================================================= */
+/* EL BLOQUE DEFINITIVO: SIMETRÍA Y BOTÓN "FINO" */
+/* ================================================= */
+
+/* 1. LA IMAGEN: Forzamos que sea simétrica arriba y recta abajo */
+html body #results-container .box img, 
+html body #results-container .tarjeta-auto img,
+html body .product-swiper .swiper-slide img,
+html body .property-card .property-image img,
+html body .ad-card img {
+    border-top-left-radius: 20px !important;  /* Redondeado izquierda */
+    border-top-right-radius: 20px !important; /* Redondeado derecha (Simétrico) */
+    border-bottom-left-radius: 0px !important;  /* Cuadrado abajo */
+    border-bottom-right-radius: 0px !important; /* Cuadrada abajo */
+    height: 240px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 2. LA TARJETA: Forzamos la curva general para que el botón luzca bien */
+html body .box, 
+html body .tarjeta-auto, 
+html body .property-card {
+    border-radius: 20px !important;
+    overflow: hidden !important; /* Esto corta la imagen si intenta salirse */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 3. EL BOTÓN: Largo (100%) y Fino (Rectangular 6px) */
+/* ¡ADIÓS AL BOTÓN OVALADO TIPO PÍLDORA! */
+html body .box .btn-contact, 
+html body .tarjeta-auto .btn-ver-detalles,
+html body .tarjeta-auto .btn-contact,
+html body .property-card .btn-contact-card,
+html body .btn-contact {
+    width: 100% !important;           /* Estirado de punta a punta de la letra */
+    margin: 15px 0 0 0 !important;     /* Cero a los lados para que sea largo */
+    padding: 14px 0 !important;        /* Altura elegante */
+    border-radius: 6px !important;     /* ESQUINAS FINAS, NO OVALADO */
+    display: block !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    background-color: var(--color-primario) !important;
+}
+
+/* ================================================= */
+/* SOLUCIÓN FINAL: SIMETRÍA TOTAL Y BOTÓN FINO */
+/* ================================================= */
+
+/* 1. IMAGEN Y CARCASA: Forzamos la simetría arriba */
+/* Usamos html body para que nadie le gane en prioridad */
+html body .box, 
+html body .tarjeta-auto, 
+html body .product-swiper,
+html body .product-swiper .swiper-slide img {
+    border-top-left-radius: 20px !important;  /* Esquina izquierda redonda */
+    border-top-right-radius: 20px !important; /* Esquina derecha redonda (Simetría) */
+    border-bottom-left-radius: 0px !important;  /* Base cuadrada */
+    border-bottom-right-radius: 0px !important; /* Base cuadrada */
+    overflow: hidden !important; /* VITAL: Corta la imagen que intenta salir cuadrada */
+}
+
+/* 2. EL BOTÓN: Largo (100%) y Fino (Rectangular) */
+/* Aquí matamos el estilo "óvalo" de 50px y lo estiramos a la punta de la letra */
+html body .box .btn-contact, 
+html body .tarjeta-auto .btn-ver-detalles,
+html body .tarjeta-auto .btn-contact {
+    width: 100% !important;           /* Estirado total de lado a lado */
+    margin: 15px 0 0 0 !important;     /* Cero a los lados para llegar al borde */
+    padding: 14px 0 !important;        /* Altura elegante */
+    border-radius: 6px !important;     /* ¡RECTANGULAR! Adiós al botón ovalado */
+    display: block !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    box-sizing: border-box !important;
+}
+
+/* 3. ALINEACIÓN: Para que el botón toque la "punta de la letra" */
+html body .box .content, 
+html body .tarjeta-auto .contenido-auto {
+    padding: 15px !important; /* Este margen dicta el inicio y fin del botón */
+}
+
+/* 1. LAS ESQUINAS DE ARRIBA (SIMETRÍA TOTAL) */
+html body #results-container .box img, 
+html body #results-container .tarjeta-auto img,
+html body .product-swiper .swiper-slide img,
+html body .box .image-container img,
+html body .box img {
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    height: 240px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 2. LA TARJETA (El molde) */
+html body .box, html body .tarjeta-auto, html body .property-card {
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 3. EL BOTÓN (RECTANGULAR Y LARGO) */
+html body .box .btn-contact, html body .tarjeta-auto .btn-ver-detalles,
+html body .tarjeta-auto .btn-contact, html body .box a.btn-contact {
+    width: 100% !important;
+    margin: 15px 0 0 0 !important;
+    padding: 14px 0 !important;
+    border-radius: 6px !important;
+    display: block !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    box-sizing: border-box !important;
+}
+
+/* 4. ALINEACIÓN CON EL CONTENIDO */
+html body .box .content, html body .tarjeta-auto .contenido-auto {
+    padding: 15px !important;
+}
+
+/* 1. LA IMAGEN: Forzamos curvas arriba y recto abajo */
+/* Usamos una ruta ultra-específica para "aplastar" el 0 !important */
+html body #results-container .box img, 
+html body #results-container .tarjeta-auto img,
+html body .product-swiper .swiper-slide img,
+html body .box .swiper-slide img {
+    border-top-left-radius: 20px !important;  /* Gemela izquierda */
+    border-top-right-radius: 20px !important; /* Gemela derecha (Simetría) */
+    border-bottom-left-radius: 0px !important; 
+    border-bottom-right-radius: 0px !important;
+    height: 240px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 2. EL CONTENEDOR: Para que la imagen no se "salga" */
+html body .box, 
+html body .tarjeta-auto, 
+html body .property-card {
+    border-radius: 20px !important;
+    overflow: hidden !important; /* OBLIGATORIO: Corta las esquinas de la imagen */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 3. EL BOTÓN: Rectangular "Fino" y Largo */
+/* Matamos el ovalado (píldora) y lo estiramos de punta a punta */
+html body .box .btn-contact, 
+html body .tarjeta-auto .btn-ver-detalles,
+html body .tarjeta-auto .btn-contact {
+    width: 100% !important;           /* Estirado total lateral */
+    margin: 15px 0 0 0 !important;     /* 0 a los lados para que no se encoja */
+    padding: 14px 0 !important;        /* Altura profesional */
+    border-radius: 6px !important;     /* ¡RECTANGULAR! (Adiós al ovalado) */
+    display: block !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    box-sizing: border-box !important;
+}
+
+/* 4. ALINEACIÓN CON EL TEXTO (La "punta de la letra") */
+html body .box .content, 
+html body .tarjeta-auto .contenido-auto {
+    padding: 15px !important; /* Este margen dicta el inicio y fin del botón */
 }
