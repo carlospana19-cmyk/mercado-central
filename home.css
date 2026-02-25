@@ -2452,3 +2452,36 @@ main, section.hero-search, section.categories-showcase, section.products {
 .row-carousel .ad-card .content {
     padding: 15px 20px 20px 20px !important;
 }
+
+/* ===================================================== */
+/* SLIDES DUPLICADOS EN CARRUSEL - EVITAR ESPACIOS VACÍOS */
+/* ===================================================== */
+.row-carousel .swiper-slide-duplicated {
+    /* Asegurar que los slides duplicados sean visibles y ocupen espacio */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ocultar slides duplicados de lectores de pantalla */
+.row-carousel .swiper-slide-duplicated[aria-hidden="true"] {
+    display: block !important;
+}
+
+/* ===================================================== */
+/* LIMPIEZA DEL CONTENEDOR DEL CARRUSEL */
+/* ===================================================== */
+
+/* ATACAMOS AL PADRE (Contenedor externo) */
+.row-carousel {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    overflow: hidden !important; /* Esencial para que no se vea el scroll lateral */
+}
+
+/* ATACAMOS AL RIEL (Donde corren las tarjetas) */
+.row-carousel .swiper-wrapper {
+    display: flex !important;
+    gap: 0 !important; /* IMPORTANTE: El gap lo debe manejar Swiper, no el CSS */
+    padding: 0 !important;
+}
