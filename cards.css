@@ -613,3 +613,599 @@ section {
     text-transform: uppercase;
     margin: 0;
 }
+
+/* ================================================= */
+/* ARREGLO DE BOTÓN OVALADO -> RECTANGULAR (INDEX)   */
+/* ================================================= */
+
+.row-carousel .btn-contact, 
+.row-carousel .btn-ver-detalles, 
+.row-carousel .btn-contact-card {
+    /* 1. Cambiamos la forma: de óvalo a rectángulo fino */
+    border-radius: 6px !important; 
+    
+    /* 2. Aseguramos que sea bloque para que ocupe su lugar */
+    display: block !important;
+    width: 100% !important;
+    
+    /* 3. Padding equilibrado (arriba/abajo y lados) */
+    padding: 12px 0 !important;
+    
+    /* 4. Quitamos cualquier borde extra que lo ensanche */
+    border: none !important;
+    
+    /* 5. Fuente Poppins para que se vea pro */
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important; /* Opcional: le da un look más serio */
+    letter-spacing: 0.5px !important;
+}
+
+/* ================================================= */
+/* AJUSTE CARROUSEL: BOTÓN MINÚSCULAS Y ESPACIO TOP  */
+/* ================================================= */
+
+/* 1. EL BOTÓN: Adiós a las mayúsculas y al óvalo */
+.row-carousel .btn-contact, 
+.row-carousel .btn-ver-detalles, 
+.row-carousel .btn-contact-card {
+    /* Mantenemos el look rectangular fino */
+    border-radius: 6px !important; 
+    padding: 12px 0 !important;
+    
+    /* text-transform: none para respetar como lo escribas en el HTML */
+    text-transform: none !important; 
+    font-weight: 600 !important;
+}
+
+/* 2. ARREGLAR "ARRIBA": El espacio entre foto y texto */
+.row-carousel .property-details, 
+.row-carousel .content,
+.row-carousel .card-body {
+    padding-top: 20px !important; /* Empujamos el texto hacia abajo de la foto */
+    padding-bottom: 15px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important; /* Espacio entre título, precio y ubicación */
+}
+
+/* Aseguramos que la imagen no robe espacio de más */
+.row-carousel .swiper-slide img {
+    border-radius: 20px 20px 0 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* ================================================= */
+/* EL AJUSTE MAESTRO PARA EL BOTÓN */
+/* ================================================= */
+
+/* Atacamos directamente la estructura del carrusel */
+body .box .content .btn-contact,
+.row-carousel .box .content .btn-contact,
+.row-carousel .btn-contact {
+    /* 1. FORMA: De óvalo a rectángulo fino */
+    border-radius: 6px !important; 
+    
+    /* 2. ANCHO: De 85% a total (punta a punta) */
+    width: 100% !important;
+    max-width: 100% !important;
+    
+    /* 3. TEXTO: Solo la primera en mayúscula (nada de gritos) */
+    text-transform: capitalize !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    
+    /* 4. POSICIÓN: Aseguramos que se quede abajo */
+    margin: 15px 0 0 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 50px !important; /* Altura cómoda para el dedo */
+}
+
+/* ================================================= */
+/* AJUSTE PARA LA LETRA DEL BOTÓN (INDEX) */
+/* ================================================= */
+
+body .box .content .btn-contact,
+.row-carousel .box .content .btn-contact,
+.row-carousel .btn-contact {
+    /* 1. Tamaño de letra (Aumentado para que resalte) */
+    font-size: 1.15rem !important; 
+    
+    /* 2. Grosor (Para que no se vea flaca la letra) */
+    font-weight: 700 !important;
+    
+    /* 3. Espaciado (Para que la palabra respire) */
+    letter-spacing: 0.5px !important;
+    
+    /* 4. Alineación (Aseguramos que el texto esté centrado) */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    /* 5. Altura del botón (Para que la letra grande quepa bien) */
+    padding: 14px 0 !important;
+    text-transform: none !important; /* Mantiene la "C" mayúscula y resto minúscula */
+}
+
+/* ================================================= */
+/* CSS LIMPIO PARA CARRUSEL Y RESULTADOS             */
+/* ================================================= */
+
+/* 1. CARRUSEL: Solo arriba redondo, abajo cuadrado */
+.row-carousel .swiper-slide {
+    border-radius: 20px 20px 0 0 !important;  /* Arriba redondo, abajo cuadrado */
+    overflow: hidden !important;
+    /* NO definir width aquí - dejar que el grid lo maneje */
+}
+
+/* 2. TARJETAS: Responsivas, sin anchos fijos conflictivos */
+.property-card, 
+.box, 
+.tarjeta-auto {
+    width: 100% !important;           /* Ocupa todo el espacio disponible */
+    min-width: 300px !important;       /* Mínimo razonable */
+    max-width: 380px !important;       /* Máximo para pantallas grandes */
+    flex: 0 0 auto !important;       /* No forzar tamaño fijo */
+    border-radius: 20px 20px 0 0 !important;  /* Coincide con el slide */
+    background: #fff;
+    margin: 0 !important;
+}
+
+/* 3. RESULTADOS: Grid unificado y responsivo */
+#results-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 2rem !important;
+    width: 100% !important;
+    padding: 2rem !important;
+    box-sizing: border-box !important;
+}
+
+/* 4. IMAGEN: Siempre arriba redonda, abajo cuadrada */
+.property-card img,
+.box img,
+.tarjeta-auto img {
+    border-radius: 20px 20px 0 0 !important;
+    object-fit: cover !important;
+}
+
+/* ================================================= */
+/* SOLUCIÓN DEFINITIVA: CARRUSEL SIN ÓVALOS          */
+/* ================================================= */
+
+/* 1. CONTENEDOR SLIDE: Solo arriba redondo */
+html body .row-carousel .swiper-slide {
+    border-radius: 20px 20px 0 0 !important;  /* SOLO ARRIBA */
+    overflow: hidden !important;
+    width: 100% !important;                    /* No forzar 380px */
+    max-width: 380px !important;               /* Máximo, no fijo */
+}
+
+/* 2. IMAGEN DENTRO DEL SLIDE: Cuadrada o arriba redonda */
+html body .row-carousel .swiper-slide img,
+html body .box .swiper-slide img,
+html body .ad-card img,
+html body .property-card img {
+    border-radius: 0 0 0 0 !important;         /* CUADRADA - se adapta al contenedor */
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    width: 100% !important;
+    height: 240px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 3. LA TARJETA (ad-card, box): Solo arriba redonda */
+html body .ad-card,
+html body .box,
+html body .property-card {
+    border-radius: 20px 20px 0 0 !important;  /* SOLO ARRIBA */
+    overflow: hidden !important;
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: 380px !important;
+    margin: 0 !important;
+}
+
+/* 4. RESULTADOS: Grid limpio */
+html body #results-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 2rem !important;
+    width: 100% !important;
+    padding: 2rem !important;
+    box-sizing: border-box !important;
+}
+
+/* ================================================= */
+/* EL CÓDIGO "GRITANTE" PARA EL BOTÓN */
+/* ================================================= */
+
+/* SELECTOR ULTRA-ESPECÍFICO PARA GANARLE A CUALQUIER OTRA REGLA */
+html body#index-page .products .box-container .box .content a.btn-contact {
+    /* 1. TAMAÑO DE LETRA: 22px es imposible de ignorar */
+    font-size: 22px !important; 
+    
+    /* 2. GROSOR: Black (el más pesado) */
+    font-weight: 800 !important;
+    
+    /* 3. ALTURA DEL BOTÓN: Para que la letra no choque con los bordes */
+    padding: 18px 0 !important;
+    min-height: 60px !important;
+    
+    /* 4. ASEGURAR VISIBILIDAD */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    
+    /* 5. FUENTE: Forzamos Poppins de nuevo */
+    font-family: 'Poppins', sans-serif !important;
+    line-height: 1 !important;
+}
+
+/* Si usas la clase btn-contact-card en resultados, aplícalo también: */
+#results-container .btn-contact-card {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    padding: 18px 0 !important;
+}
+
+/* ================================================= */
+/* ELIMINAR ETIQUETA "VERIFICADO" DEL BANNER         */
+/* ================================================= */
+
+/* Atacamos el badge, la etiqueta o cualquier div que diga verificado */
+.verified-badge, 
+.badge-verificado, 
+.status-verificado, 
+.etiqueta-verificado,
+.check-verificado,
+[class*="verificado"], 
+[class*="verified"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Si es un icono de check dentro del banner de imágenes */
+.box .image-container i.fa-check-circle,
+.property-card .image-container .verified-icon {
+    display: none !important;
+}
+
+/* ================================================= */
+/* ELIMINAR ETIQUETA DORADA (ELITE BADGE) DEL BANNER */
+/* ================================================= */
+
+/* Atacamos directamente la clase que encontramos en el inspector */
+#index-page .elite-badge-gold,
+.elite-banner-content .elite-badge-gold {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* ================================================= */
+/* SISTEMA DE BADGES PREMIUM (BRONCE, PLATA, ORO, DIAMANTE) */
+/* ================================================= */
+
+.badge-premium {
+    position: absolute;
+    top: 15px;
+    left: 15px; /* O right: 15px si prefieres */
+    z-index: 10;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+}
+
+/* 1. BRONCE (Estrella) */
+.badge-premium.bronze {
+    background: linear-gradient(135deg, #cd7f32, #a0522d);
+}
+
+/* 2. PLATA (Estrella) */
+.badge-premium.silver {
+    background: linear-gradient(135deg, #bdc3c7, #7f8c8d);
+}
+
+/* 3. ORO (Corona) */
+.badge-premium.gold {
+    background: linear-gradient(135deg, #d4af37, #f1c40f);
+    animation: brillo-oro 2s infinite;
+}
+
+/* 4. DIAMANTE / VIOLETA (Corona o Diamante) */
+.badge-premium.diamond {
+    background: linear-gradient(135deg, #8e44ad, #d062d8); /* Violeta Diamante */
+    box-shadow: 0 0 15px rgba(142, 68, 173, 0.6);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Animación de brillo para los niveles Top */
+@keyframes brillo-oro {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+    100% { filter: brightness(1); }
+}
+
+/* ================================================= */
+/* RE-DISEÑO DE BACHES EXISTENTES (CROWN SYSTEM)     */
+/* ================================================= */
+
+/* Buscamos la clase que ya existía (usualmente .badge o .status) */
+.box .badge, 
+.property-card .status, 
+.ad-card .label-premium {
+    position: absolute !important;
+    top: 15px !important;
+    left: 15px !important;
+    z-index: 20 !important;
+    padding: 6px 12px !important;
+    border-radius: 4px !important; /* Mantengo tu formato original si era recto */
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+
+/* --- COLORES POR CATEGORÍA --- */
+
+/* 1. BRONCE */
+.badge.bronze, .status.bronce {
+    background: linear-gradient(135deg, #a8673a, #633926) !important;
+    border-left: 3px solid #ffbc8f !important;
+}
+
+/* 2. PLATA */
+.badge.silver, .status.plata {
+    background: linear-gradient(135deg, #bdc3c7, #2c3e50) !important;
+    border-left: 3px solid #ecf0f1 !important;
+}
+
+/* 3. ORO */
+.badge.gold, .status.oro {
+    background: linear-gradient(135deg, #d4af37, #f1c40f, #d4af37) !important;
+    background-size: 200% auto !important;
+    color: #1a1a1a !important; /* Texto oscuro para que resalte en el oro */
+    border-left: 3px solid #fff !important;
+    animation: shine 3s infinite linear !important;
+}
+
+/* 4. DIAMANTE (EL VIOLETA TOP) */
+.badge.diamond, .status.diamante, .status.elite {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe, #6c5ce7) !important;
+    background-size: 200% auto !important;
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.5) !important;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+    animation: shine 3s infinite linear !important;
+}
+
+/* Efecto de brillo metálico */
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+/* ================================================= */
+/* REAJUSTE DE BOTÓN: MÁS PEQUEÑO PERO "ESTIRADO"   */
+/* ================================================= */
+
+/* Usamos el mismo selector fuerte para asegurar que gane */
+html body#index-page .products .box-container .box .content a.btn-contact,
+#results-container .btn-contact-card {
+    /* 1. TAMAÑO: Bajamos la intensidad (de 22px a 19px) */
+    font-size: 19px !important;
+
+    /* 2. EL SECRETO: "Estirar" la letra (Letter Spacing) */
+    /* Esto separa los caracteres C o n t a c t a r */
+    letter-spacing: 1.5px !important; 
+
+    /* 3. PESO: Un poco menos grueso para que se vea más nítido */
+    font-weight: 700 !important; 
+
+    /* 4. ALTURA: Ajustamos el relleno para que no quede tan alto el botón */
+    padding: 14px 0 !important;
+    min-height: 50px !important;
+
+    /* Mantenemos la estructura central */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: 'Poppins', sans-serif !important;
+    text-transform: none !important; /* Respetamos la mayúscula inicial */
+}
+
+/* ================================================= */
+/* SINCRONIZACIÓN DE COLOR: INDEX -> RESULTADOS      */
+/* ================================================= */
+
+/* Aplicamos el color exacto del Index (#00BFAE) a los botones de resultados */
+#results-container .btn-contact-card, 
+#results-container .btn-contact,
+#results-container .btn-ver-detalles {
+    /* 1. EL COLOR: El turquesa exacto que te gusta del Index */
+    background-color: #00BFAE !important;
+    background: #00BFAE !important; /* Por si hay algún degradado viejo */
+    
+    /* 2. EL TEXTO: Blanco y con el efecto "estirado" que pediste */
+    color: #ffffff !important;
+    font-size: 18px !important;
+    letter-spacing: 1.2px !important; /* Letra estirada elegante */
+    font-weight: 700 !important;
+    text-transform: none !important; /* C mayúscula, resto minúscula */
+    
+    /* 3. LIMPIEZA TOTAL: Quitamos cualquier sombra o borde que ensucie el tono */
+    border: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    
+    /* 4. FORMA: Rectangular fino como el Index */
+    border-radius: 6px !important;
+    padding: 12px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
+/* Efecto al pasar el mouse (igual de limpio) */
+#results-container .btn-contact-card:hover, 
+#results-container .btn-contact:hover {
+    background-color: #00a896 !important; /* Un tono un poquito más oscuro */
+    color: #ffffff !important;
+}
+
+/* ================================================= */
+/* AJUSTE DE ESPACIADO: RESULTADOS CON AIRE         */
+/* ================================================= */
+
+/* 1. EL CONTENEDOR (El espacio entre tarjetas) */
+#results-container {
+    display: grid !important;
+    /* Evita que se amontonen: mínimo 320px por tarjeta */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; 
+    
+    /* Aumentamos el espacio: 40px abajo y 30px a los lados */
+    gap: 40px 30px !important; 
+    
+    /* Margen a los bordes de la pantalla para que no toquen las paredes */
+    padding: 40px 20px !important; 
+    justify-items: center !important;
+}
+
+/* 2. DEFINICIÓN DE CADA TARJETA (Para que no se toquen) */
+#results-container .property-card, 
+#results-container .box, 
+#results-container .ad-card {
+    /* Sombra más suave pero profunda para separar visualmente */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    
+    /* Aseguramos que no se ensanchen de más */
+    width: 100% !important;
+    max-width: 350px !important;
+    
+    /* Un borde muy sutil para definir el límite de la tarjeta */
+    border: 1px solid #f0f0f0 !important;
+    
+    /* Transición suave para que al pasar el mouse se note cuál eliges */
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* 3. EFECTO AL PASAR EL MOUSE (Opcional, ayuda a leer) */
+#results-container .property-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
+    border-color: #00BFAE !important; /* El color de tu marca */
+}
+
+/* ================================================= */
+/* CAMBIO DE TEXTO: "CONTACTAR AHORA" -> "CONTACTAR" */
+/* ================================================= */
+
+#results-container .btn-contact-card, 
+#results-container .btn-contact {
+    /* 1. Escondemos el texto original (Contactar ahora) */
+    font-size: 0 !important; 
+    
+    /* Mantenemos el estilo de botón que ya teníamos */
+    background-color: #00BFAE !important;
+    border-radius: 6px !important;
+    padding: 14px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+}
+
+/* 2. Inyectamos el texto nuevo (Solo "Contactar") */
+#results-container .btn-contact-card::before,
+#results-container .btn-contact::before {
+    content: "Contactar" !important; /* El nuevo texto */
+    
+    /* 3. Le devolvemos el tamaño y el estilo del Index */
+    font-size: 18px !important; 
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.2px !important; /* Letra estirada elegante */
+    text-transform: none !important;
+    visibility: visible !important;
+}
+
+/* ================================================= */
+/* ELIMINACIÓN DE MARCOS TURQUESA Y BORDES          */
+/* ================================================= */
+
+/* 1. Quitamos el borde por completo de las tarjetas */
+#results-container .property-card, 
+#results-container .box, 
+#results-container .ad-card {
+    border: none !important; 
+    outline: none !important;
+    /* Dejamos una sombra muy suave y gris (nada de turquesa) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 2. Quitamos el marco turquesa que aparecía en el HOVER */
+#results-container .property-card:hover, 
+#results-container .box:hover, 
+#results-container .ad-card:hover {
+    border: none !important;
+    border-color: transparent !important;
+    /* Sombra neutra al resaltar */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 3. Aseguramos que el contenido interno no tenga bordes raros */
+#results-container .content, 
+#results-container .property-details {
+    border: none !important;
+}
+
+/* ================================================= */
+/* ATRIBUTOS UNIVERSALES (ESTILO ORIGINAL INDEX)    */
+/* ================================================= */
+
+.card-attributes {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    padding: 10px 15px !important;
+    border-top: 1px solid #f2f2f2 !important;
+    margin-top: auto !important; /* Empuja los atributos hacia abajo */
+}
+
+.attr-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    /* COLOR Y FUENTE IGUAL AL INDEX */
+    color: #444444 !important; 
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 13px !important; /* Tamaño estándar del index */
+}
+
+/* Iconos en color neutro (Gris oscuro/acero) */
+.attr-item i {
+    color: #777777 !important; 
+    font-size: 14px !important;
+}
+
+.attr-item span {
+    font-weight: 500 !important;
+}
