@@ -1,5 +1,5 @@
 import { supabase } from './supabase-client.js';
-import { generateAttributesHTML } from './utils-attributes.js';
+import { generateAttributesHTML, UIComponents } from './UIComponents.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
 import { generateLikeButtonHTML, initializeAllCardLikes, setupLikesObserver } from './likes-logic.js';
 
@@ -910,16 +910,27 @@ return `
     };
     container.addEventListener('click', container._propertyImageListener);
     
-    // ✅ Evento delegado SOLO para botón Contactar
+    // ✅ Evento unificado para botones Contactar y tarjetas
     container.addEventListener('click', (e) => {
+      // Si hace click en el botón de contactar
       const contactLink = e.target.closest('.btn-contact-card');
-      if (!contactLink) return;
-
-      e.preventDefault();
-      const contactId = contactLink.dataset.contactId;
-
-      if (contactId) {
-        window.location.href = `detalle-producto.html?id=${contactId}`;
+      if (contactLink) {
+        e.preventDefault();
+        const contactId = contactLink.dataset.contactId;
+        if (contactId) {
+          window.location.href = `detalle-producto.html?id=${contactId}`;
+        }
+        return;
+      }
+      
+      // Si hace click en una tarjeta, redirigir al detalle
+      const card = e.target.closest('.property-card, .ad-card, .box');
+      if (card) {
+        const adId = card.dataset.id;
+        if (adId) {
+          e.preventDefault();
+          window.location.href = `detalle-producto.html?id=${adId}`;
+        }
       }
     });
 

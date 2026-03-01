@@ -1,3 +1,5 @@
+/* NOTA: Las reglas de .property-card, .property-image y .btn-contact están en cards.css */
+
 /* Cuadros vacíos para alinear la última fila de atributos de inmueble */
 .spec-item-empty {
   background: transparent !important;
@@ -1488,23 +1490,8 @@ body {
   padding: 2.5rem;
   border-radius: 1rem;
   box-shadow: var(--sombra-suave);
-  position: sticky; /* Hacemos que el sidebar se quede fijo al hacer scroll */
-  top: 100px; /* Separado del navbar */
-}
-
-.results-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-}
-
-#results-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  width: 100%;
-  flex: 1;
+  position: sticky;
+  top: 100px;
 }
 
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
@@ -1538,8 +1525,7 @@ body {
 }
 
 /* 3. Asegurar que el carrusel y la imagen llenen el contenedor */
-.tarjeta-auto .product-swiper,
-.property-image .tarjeta-auto {
+.tarjeta-auto .product-swiper {
   width: 100%;
   height: 100%;
 }
@@ -1548,11 +1534,6 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-.property-image .tarjeta-auto .swiper {
-  width: 100%;
-  height: 100%;
 }
 
 .tarjeta-auto .swiper-wrapper,
@@ -1768,11 +1749,6 @@ body {
     gap: 1.5rem;
     padding: 2rem 1.5%;
   }
-  
-  #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
 }
 
 @media (max-width: 900px) {
@@ -1788,21 +1764,11 @@ body {
     max-width: 100%;
     display: none;
   }
-  
-  #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-  }
 }
 
 @media (max-width: 640px) {
   .results-inner-wrapper {
     padding: 1rem 2%;
-  }
-  
-  #results-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
   }
   
   .box, .tarjeta-auto {
@@ -2538,18 +2504,9 @@ body {
     letter-spacing: normal !important;
 }
 
-/* Reset general para todas las tarjetas */
-.property-card * {
-    letter-spacing: normal !important;
-    word-spacing: normal !important;
-}
+/* Reset general para todas las tarjetas - Eliminado para permitir herencia de cards.css */
 
-/* Si el problema persiste, forzar valores específicos */
-.property-details {
-    letter-spacing: 0 !important;
-    word-spacing: 0 !important;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-}
+/* Reglas de fuentes eliminadas - ahora controladas por cards.css */
 
 /* CORREGIR LAYOUT DE RESULTADOS - Los estilos ahora están en results.css */
 /* Comentado para permitir que results.css controle el diseño responsive */
@@ -2567,19 +2524,6 @@ body {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 25px !important;
-}
-
-#results-container.grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-}
-*/
-
-/* Asegurar que las tarjetas ocupen todo el ancho */
-.property-card {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
 }
 
 
@@ -3137,7 +3081,7 @@ body#pagina-login {
 /* ===== OPTIMIZACIÓN COMPLETA PARA MÓVILES ===== */
 @media (max-width: 768px) {
     /* Tarjetas responsivas */
-    .box, .property-card {
+    .box {
         border-radius: 8px;
         overflow: hidden;
     }
@@ -3152,17 +3096,7 @@ body#pagina-login {
         display: none;
     }
 
-    #results-container {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        width: 100%;
-        padding: 0 1rem;
-    }
-
-    .box .image-container,
-    .property-image {
-        height: 180px;
-    }
+    /* Eliminadas reglas de height fijo para property-image - ahora controladas por cards.css */
 
     .box .content, .property-details {
         padding: 12px !important;
@@ -3220,7 +3154,7 @@ body#pagina-login {
     }
 
     /* Botones más grandes para móvil */
-    .btn-contact, .btn {
+    .btn {
         padding: 0.8rem 1.2rem;
         font-size: 1rem;
         border-radius: 6px;
@@ -3299,16 +3233,12 @@ body#pagina-login {
     .results-container-flex {
         gap: 1rem;
     }
-
-    .property-card {
-        margin-bottom: 1rem;
-    }
+    
 }
 
 @media (max-width: 480px) {
     /* Ultra responsive para screens muy pequeños */
-    .box .image-container,
-    .property-image {
+    .box .image-container {
         height: 150px;
     }
 
@@ -3326,13 +3256,6 @@ body#pagina-login {
         display: none;
     }
 
-    #results-container {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        width: 100%;
-        padding: 0 0.8rem;
-    }
-
     .box h3, .property-title {
         font-size: 1.6rem !important;
     }
@@ -3345,7 +3268,7 @@ body#pagina-login {
         padding: 0.8rem;
     }
 
-    .btn-contact, .btn {
+    .btn {
         width: 100%;
         padding: 0.7rem 1rem;
     }

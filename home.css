@@ -1,61 +1,95 @@
-/* ================================================= */
-/* === ESTILOS ESPECÍFICOS PARA HOME.CSS (index.html) === */
-/* ================================================= */
+/* RESET DE ESTRUCTURA - DOMINIO TOTAL */
+#index-page .main-content-wrapper {
+    max-width: 1400px !important;
+    width: 95% !important;
+    margin: 0 auto !important;
+    padding: 20px 0 !important;
+    background: transparent !important;
+}
 
-/* Fondo del body con profundidad elegante */
-body {
-    background-color: #f8fafc !important; /* El fondo "nube" que da elegancia */
-    margin: 0;
-    padding: 0;
+/* ELIMINAMOS EL LÍMITE DE CUALQUIER CONTENEDOR INTERMEDIO */
+#index-page .container,
+#index-page .container-fluid {
+    max-width: 1400px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 95% !important;
+}
+
+/* ASEGURAMOS QUE LAS FILAS NO TENGAN MÁRGENES NEGATIVOS */
+#index-page .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    display: block !important;
+}
+
+/* EL GRID: 3 Columnas perfectas de 380px */
+#index-page #products .ads-row.row-3-cols, 
+.row-3-cols {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 380px)) !important;
+    gap: 30px !important;
+    justify-content: center !important;
+    max-width: 100% !important;
+    margin: 40px auto !important;
 }
 
 /* ================================================= */
-/* === COMBO MAESTRO PARA TARJETAS === */
-/* El padre manda, la imagen se adapta */
+/* === ESTRUCTURA MAESTRA DE TARJETAS (HOME) === */
 /* ================================================= */
 
-/* 1. El padre (la tarjeta) tiene que mandar */
-.ad-card, .property-card, .box {
+/* 1. Limpieza de Contenedores */
+#index-page #products .main-content-wrapper {
+    max-width: 1350px !important;
+    width: 95% !important;
+    margin: 40px auto !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+/* 2. La Cuadrícula de 3 Columnas Real */
+#index-page #products .ads-row.row-3-cols {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+/* 3. La Tarjeta: UN SOLA REGLA */
+#index-page #products .property-card {
+    width: 100% !important;
+    max-width: 380px !important;
+    min-height: 480px !important;
+    margin: 0 auto !important;
     background-color: #ffffff !important;
-    border-radius: 20px !important; /* El radio elegido */
-    overflow: hidden !important;    /* ESTO CORTA LO QUE SOBRA */
+    border-radius: 20px !important;
     display: flex !important;
     flex-direction: column !important;
-    height: 100% !important; /* Todas la misma altura */
     position: relative;
-    border: none !important; /* Sin borde para evitar espacios visuales */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-    width: 380px !important; /* Ancho actualizado para más presencia */
-    min-width: 380px !important;
-    max-width: 380px !important;
-    gap: 0 !important; /* Sin espacio entre elementos hijos */
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
 }
 
-/* 1.5 Asegurar que el contenedor de la foto no tenga espacios */
-.ad-card .card-image-container, 
-.property-card .card-image-container,
-.ad-card .image-container,
-.property-card .image-container,
-.box .image-container {
+/* Contenedor de la cuadrícula en Home */
+#index-page #products .box-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 60px !important;
     width: 100% !important;
-    padding: 0 !important;   /* Elimina cualquier espacio interno */
-    margin: 0 !important;    /* Elimina márgenes externos */
-    line-height: 0 !important; /* Evita un espacio pequeño abajo de la foto */
-    overflow: hidden !important;
-    flex-shrink: 0 !important; /* Evita que se comprima */
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* 2. La imagen tiene que adaptarse - Full-Bleed */
-.ad-card img, .property-card img, .box img {
-    width: 100% !important;   /* Ocupa todo el ancho disponible */
-    height: 240px !important;  /* Alto ajustado */
-    object-fit: cover !important; /* Evita que la foto se estire */
-    display: block !important;
-    border-radius: 0 !important; /* El redondeado lo da el padre */
-}
-
-.card {
-  position: relative;
+/* ASEGURAMOS QUE EL CARRUSEL NO SE CORTE NI SE MUEVA */
+#index-page .carousel-row-wrapper {
+    position: relative !important;
+    width: 100vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    overflow: visible !important;
 }
 
 /* --- HERO SECTION --- */
@@ -296,7 +330,9 @@ body {
 @media (min-width: 768px) {
     .search-form-container {
         display: grid !important;
-        grid-template-columns: 2fr 1.5fr 1.5fr auto;
+        grid-template-columns: 1fr 1fr 1fr auto !important;
+        align-items: center !important;
+        gap: 15px !important;
     }
 }
 
@@ -494,10 +530,42 @@ body {
 }
 
 /* ================================================= */
+/* === CARRUSEL INFINITO - ESTILOS CRÍTICOS === */
+/* Asegura que las tarjetas no se encojan y el contenedor no deje huecos */
+/* ================================================= */
+
+/* AJUSTE MAESTRO PARA CARRUSEL INFINITO */
+.carousel-track {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-behavior: smooth !important;
+    gap: 25px !important;
+    padding: 20px 10px !important;
+    align-items: stretch !important;
+}
+
+.carousel-track .property-card {
+    flex: 0 0 350px !important;
+    width: 350px !important;
+    max-width: 350px !important;
+}
+
+/* Ocultar barra de scroll */
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-track {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* ================================================= */
 /* === SECTION-HEADER: Separador elegante de secciones === */
 /* Línea fina con corona y título centrado */
 /* ================================================= */
 .section-header {
+    margin: 60px 0 30px 0 !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -520,6 +588,88 @@ body {
 
 .header-icon {
     font-size: 18px;
+    max-width: 30px !important;
+    height: auto !important;
+}
+
+.header-icon i, 
+.header-icon svg {
+    font-size: 24px !important;
+}
+
+/* Corona SVG premium */
+.crown-svg-premium {
+    width: 60px !important;
+    height: auto !important;
+    max-width: 60px !important;
+}
+
+/* ========================================================= */
+/* === TOP SELECCIÓN PREMIUM: CORONA CENTRADA CON LÍNEAS === */
+/* ========================================================= */
+
+/* 1. Contenedor Maestro: Centrado total y espacio elegante */
+.top-seleccion-premium {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 20px !important;
+    margin: 60px 0 10px 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 40px !important; /* EMPUJA LA CORONA HACIA LA DERECHA */
+    width: 100% !important;
+    max-width: 1350px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 2. El Contenido Central (Corona + Texto) */
+.top-seleccion-premium .header-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important; /* Aire fino para que no se pegue al texto */
+    flex-shrink: 0 !important;
+}
+
+/* 3. La Corona Dorada */
+.top-seleccion-premium .crown-svg-premium {
+    font-size: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    color: #d4af37 !important;
+    margin: 0 !important;
+    display: inline-block !important;
+}
+
+.top-seleccion-premium .crown-svg-premium svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+/* 4. El Título */
+.top-seleccion-premium .header-title {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #1a202c !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    margin: 0 !important;
+}
+
+/* 5. Las Líneas Divisorias Doradas */
+.top-seleccion-premium .header-line {
+    flex-grow: 1 !important;
+    height: 2px !important;
+    background-color: #d4af37 !important;
+}
+
+.top-seleccion-premium .line-left {
+    background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.8)) !important;
+}
+
+.top-seleccion-premium .line-right {
+    background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.8)) !important;
 }
 
 .header-title {
@@ -576,12 +726,19 @@ body {
 .row-2-cols,
 .row-3-cols {
   display: grid !important;
-  /* Subimos a 380px para que se vean más anchas y potentes */
-  grid-template-columns: repeat(3, 380px) !important;
-  gap: 30px !important;
-  justify-content: center !important;
+  /* Creamos 3 columnas de mínimo 320px. Si no caben, saltan abajo automáticamente */
+  grid-template-columns: repeat(3, minmax(320px, 1fr)) !important;
+  gap: 25px !important;
+  justify-items: center !important;
   margin: 40px auto !important;
-  max-width: 100% !important; /* Se ajusta al contenedor padre de 1200px */
+  max-width: 1300px !important;
+}
+
+/* Forzamos que la tarjeta no se achique de más */
+html body .property-card {
+    width: 100% !important;
+    max-width: 360px !important;
+    min-height: 450px !important;
 }
 
 .row-4-cols {
@@ -601,7 +758,7 @@ body {
   }
   
   /* Tarjetas fluidas en pantallas medianas */
-  .ad-card, .property-card, .box {
+  .ad-card, .box {
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -635,7 +792,7 @@ body {
     max-width: 100% !important;
   }
   
-  .ad-card, .property-card, .box {
+  .ad-card, .box {
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -1045,34 +1202,36 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* --- ESTILOS PARA CARRUSEL DE PRODUCTOS --- */
 .product-swiper {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    overflow: hidden !important;
     position: relative;
-    margin: 0 !important;
     padding: 0 !important;
 }
 
 .product-swiper .swiper-wrapper {
-    margin: 0 !important;
-    padding: 0 !important;
+    display: flex !important;
+    transition-timing-function: linear;
 }
 
-.product-swiper .swiper-slide {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f5f5f5;
-    margin: 0 !important;
-    padding: 0 !important;
+/* LÍNEA 1238 - ANCHO AUTO PARA CARRUSEL FINITO */
+#index-page .product-swiper .swiper-slide {
+    width: auto !important;
+    flex-shrink: 0 !important;
+    margin-right: 25px !important;
+    margin-left: 0 !important;
+    margin-bottom: 30px !important;
+    display: flex !important;
+    flex-direction: column;
 }
 
-.product-swiper .swiper-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* LÍNEA 1214: ACTUALIZACIÓN DE POTENCIA MÁXIMA */
+#index-page .product-swiper .swiper-slide img,
+#index-page .ad-card .image-container img {
+    width: 100% !important;
+    height: 280px !important;
+    object-fit: cover !important;
+    min-width: 100% !important;
     display: block !important;
-    margin: 0 !important;
-    padding: 0 !important;
 }
 
 /* Overlay para permitir deslizamiento sobre iframes de video */
@@ -1176,7 +1335,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 .featured-swiper .swiper-wrapper {
-  width: 100% !important;
+  width: auto !important;
   box-sizing: border-box;
 }
 
@@ -1360,7 +1519,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     margin-left: -50vw !important;
     margin-right: -50vw !important;
     overflow: hidden;
-    padding: 20px 0;
+    padding: 20px 40px !important; /* padding-left y padding-right de 40px */
     margin-bottom: 3rem;
 }
 
@@ -1373,6 +1532,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 .row-carousel .swiper-wrapper {
+    width: auto !important;
     display: flex;
     gap: 20px !important;
     padding: 0 5% !important; /* Solo padding horizontal, sin espacio arriba */
@@ -1385,10 +1545,11 @@ main, section.hero-search, section.categories-showcase, section.products {
     padding: 0 50px !important; /* Esto crea el espacio para que las flechas vivan sin tapar las tarjetas */
 }
 
-/* 3. El slide con ancho exacto - el CSS manda sobre el JS */
+/* 3. El slide con ancho automático - el CSS manda sobre el JS */
 .row-carousel .swiper-slide {
-    width: 380px !important;    /* Definimos el tamaño aquí para que Swiper no invente */
-    margin-right: 0 !important; /* El Swiper maneja el espacio con spaceBetween */
+    width: auto !important;    /* Ajuste automático */
+    flex-shrink: 0;
+    margin: 0 12px !important; /* Margen lateral en lugar de spaceBetween */
     padding: 0 !important;
     height: auto;
     display: flex;
@@ -1692,11 +1853,15 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* Contenedor del Banner Elite - Ocupa todo el ancho */
 .elite-banner-container {
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
-    margin-bottom: 3rem;
-    box-sizing: border-box;
+    width: 100vw !important;
+    position: relative !important;
+    left: 50% !important;
+    right: 50% !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
+    padding: 0 !important;
+    margin-top: -30px !important;
+    margin-bottom: 40px !important;
 }
 
 /* === SLIDER CONTAINER PARA MÚLTIPLES BANNERS === */
@@ -1760,11 +1925,11 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 .elite-slider-nav.prev {
-    left: 15px;
+    left: 40px !important;
 }
 
 .elite-slider-nav.next {
-    right: 15px;
+    right: 40px !important;
 }
 
 /* Indicadores de progreso estilo Instagram */
@@ -1955,23 +2120,77 @@ main, section.hero-search, section.categories-showcase, section.products {
     50% { opacity: 0.5; }
 }
 
-/* Banner Elite - Diseño horizontal con imagen izquierda - PROPORCIÓN REVISTA DE LUJO */
+/* ELIMINAMOS CUALQUIER CAPA QUE ENSUCIE */
+.elite-banner::after, 
+.elite-banner::before {
+    display: none !important;
+}
+
+/* 1. EL BANNER: Azul profundo del pie de página */
 .elite-banner {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    max-height: 450px !important; /* Limitamos la altura para que se vea contenido abajo */
-    min-height: 350px !important;
-    margin-bottom: 40px !important;
-    background: linear-gradient(135deg, #0a192f 0%, #112240 100%) !important; /* Un azul más suave */
-    border-radius: 20px !important;
-    overflow: hidden;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(212, 175, 55, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    position: relative;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    background: #0a192f !important;
+    width: 100% !important;
+    min-height: 450px !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    border: none !important;
+}
+
+/* 2. EFECTO DE FUNDIDO PARA LA IMAGEN */
+.elite-banner-image {
+    width: 55% !important;
+    position: relative !important;
+}
+
+.elite-banner-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 35%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, #0a192f) !important;
+    z-index: 2;
+}
+
+.elite-banner-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* 3. CONTENIDO: Contraste Máximo */
+.elite-banner-content {
+    width: 45% !important;
+    padding: 60px 10% 60px 40px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    background: #0a192f !important;
+}
+
+.elite-banner-price {
+    color: #00c1ab !important;
+    font-size: 4.5rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 5px !important;
+    letter-spacing: -1px !important;
+}
+
+.elite-banner-title {
+    color: #ffffff !important;
+    font-size: 2.2rem !important;
+    line-height: 1.2 !important;
+}
+
+.elite-banner-image, .elite-banner-content {
+    width: 50% !important;
+}
+
+/* Ajuste para que el texto respire */
+.elite-banner-content {
+    padding: 40px !important;
+    justify-content: center !important;
 }
 
 .elite-banner:hover {
@@ -2225,7 +2444,8 @@ main, section.hero-search, section.categories-showcase, section.products {
     align-items: center;
     gap: 0.8rem;
     margin-bottom: 1rem;
-    padding-left: 0.5rem;
+    margin-left: 1.5rem; /* Separar la corona del borde izquierdo */
+    padding-left: 1rem;
 }
 
 .elite-label-text {
@@ -2484,4 +2704,496 @@ main, section.hero-search, section.categories-showcase, section.products {
     display: flex !important;
     gap: 0 !important; /* IMPORTANTE: El gap lo debe manejar Swiper, no el CSS */
     padding: 0 !important;
+}
+
+/* ===================================================== */
+/* AMPLIACIÓN DE TARJETAS - Contenedor y Grid */
+/* ===================================================== */
+
+/* 1. ROMPEMOS EL CONTENEDOR FANTASMA */
+#index-page .main-content-wrapper,
+#index-page .recently-added-container,
+#index-page #products .container {
+    max-width: 1400px !important;
+    width: 95% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+/* 2. EL GRID QUE NO PUEDEN DETENER */
+#index-page .ads-row.row-3-cols,
+#index-page .recently-added-grid,
+#index-page div[class*="row-3-cols"] {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+    width: 100% !important;
+    margin: 30px 0 !important;
+}
+
+/* 3. LA TARJETA GIGANTE (ESTILO ENCUENTRA24) */
+#index-page .ad-card, 
+#index-page .property-card,
+#index-page .box {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 520px !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+/* 4. LA FOTO DE REVISTA */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    height: 280px !important;
+    width: 100% !important;
+}
+
+/* ===================================================== */
+/* TOQUE DE MIDAS - Mejora del contenido de tarjetas */
+/* ===================================================== */
+
+/* 1. EL CONTENEDOR DE TEXTO: Espaciado de lujo */
+#index-page .ad-card .content,
+#index-page .property-card .content {
+    padding: 20px 25px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+/* 2. EL PRECIO: Que salte a la vista */
+#index-page .ad-card .price,
+#index-page .property-card .price {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    color: #1a202c !important;
+    margin-bottom: 5px !important;
+}
+
+/* 3. TRANSFORMACIÓN DEL BOTÓN CONTACTAR */
+#index-page .ad-card .contact-link,
+#index-page .ad-card a[href*="contact"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #00c1ab !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    margin-top: 15px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    text-transform: uppercase !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 1px !important;
+}
+
+#index-page .ad-card .contact-link:hover {
+    background: #00a896 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 5px 15px rgba(0, 193, 171, 0.3) !important;
+}
+
+/* ===================================================== */
+/* OPERACIÓN EXTERMINIO DE FANTASMAS - Selectores Triple Fuerza */
+/* ===================================================== */
+
+/* 1. Forzamos el contenedor de texto a tener aire */
+#index-page .recently-added-grid .ad-card .content,
+#index-page #products .ads-row .ad-card .content {
+    padding: 25px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+/* 2. El botón turquesa "Elite" - TRANSFORMACIÓN TOTAL */
+#index-page .ad-card .content a.contact-link,
+#index-page .ad-card .content a[href*="contact"],
+#index-page .recently-added-grid .ad-card a {
+    all: unset !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #00c1ab !important;
+    color: #ffffff !important;
+    width: 100% !important;
+    padding: 14px 0 !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 14px !important;
+    letter-spacing: 1px !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 3. Efecto de éxito al pasar el mouse */
+#index-page .ad-card .content a:hover {
+    background-color: #00a896 !important;
+    box-shadow: 0 8px 20px rgba(0, 193, 171, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ===================================================== */
+/* LLAVE MAESTRA - Selectores Ultra-Específicos */
+/* ===================================================== */
+
+/* LÍNEA 2844: ELIMINAMOS EL PADDING DE LA TARJETA (PARA LA FOTO) */
+#index-page .ad-card,
+#index-page .property-card {
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    border: 1px solid #e0e6ed !important;
+}
+
+/* LÍNEA 2860: LE DAMOS EL AIRE SOLO AL TEXTO */
+#index-page .property-details {
+    padding: 22px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+/* 1. FORZAMOS EL CONTENEDOR DE LA TARJETA */
+#index-page .property-card .property-details,
+#index-page .ad-card .property-details {
+    padding: 0px !important;
+    gap: 5px !important;
+    align-items: stretch !important;
+}
+
+/* 2. EL BOTÓN "CONTACTAR": Transformación Real */
+#index-page .property-card .property-details a.btn-contact,
+#index-page .ad-card .property-details a.btn-contact,
+#index-page a[href*="contact"].btn-contact {
+    display: flex !important;
+    visibility: visible !important;
+    background-color: #00c1ab !important;
+    color: #ffffff !important;
+    width: 100% !important;
+    padding: 14px 0 !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    justify-content: center !important;
+    margin-top: 10px !important;
+    box-shadow: 0 4px 15px rgba(0, 193, 171, 0.3) !important;
+}
+
+/* 3. EL PRECIO */
+#index-page .property-details .price {
+    font-size: 2rem !important;
+    color: #0a192f !important;
+    font-weight: 850 !important;
+}
+
+/* ===================================================== */
+/* IMAGEN INFINITA - Ajuste de fotos en tarjetas */
+/* ===================================================== */
+
+/* 1. RESETEAMOS EL CONTENEDOR DE LA FOTO */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 280px !important;
+    overflow: hidden !important;
+    display: block !important;
+}
+
+/* 2. LA IMAGEN: Expansión absoluta */
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+    transform: none !important;
+}
+
+/* 3. AJUSTE DE LA TARJETA */
+#index-page .ad-card,
+#index-page .property-card {
+    padding: 0 !important;
+}
+
+/* ===================================================== */
+/* UNIFICACIÓN FORZADA POR SELECTOR DE RUTA COMPLETA */
+/* ===================================================== */
+
+/* 1. Tarjetas de ARRIBA (Top Selección) */
+#index-page .top-seleccion .ad-card,
+#index-page .top-seleccion .property-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+}
+
+/* 2. Tarjetas de ABAJO (Recién Agregado) */
+#index-page .recently-added-grid .ad-card,
+#index-page .recently-added-grid .property-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+}
+
+/* 3. EL CONTENEDOR QUE LAS IGUALA */
+#index-page .ads-row.row-3-cols,
+#index-page .recently-added-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+}
+
+/* ===================================================== */
+/* LA APLANADORA - Filas Estáticas */
+/* ===================================================== */
+
+/* 1. SELECCIONAMOS LAS DOS PRIMERAS FILAS ESTÁTICAS */
+#index-page #products .ads-row:nth-child(1),
+#index-page #products .ads-row:nth-child(2),
+#index-page .featured-products-container .ads-row {
+    max-width: 1400px !important;
+    width: 95% !important;
+    margin: 0 auto 40px auto !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+}
+
+/* 2. MATAMOS EL PADDING DE LAS COLUMNAS */
+#index-page .ads-row .col-md-4,
+#index-page .ads-row .col-lg-4,
+#index-page .ads-row [class*="col-"] {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* 3. IMAGEN AL 100% SIN MARGENES */
+#index-page .ads-row .ad-card .image-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#index-page .ads-row .ad-card .image-container img {
+    width: 100% !important;
+    height: 280px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* ===================================================== */
+/* ESTRUCTURA DE BLOQUES REAL */
+/* ===================================================== */
+
+/* 1. ASEGURAMOS QUE CADA SECCIÓN SEA UN BLOQUE INDEPENDIENTE */
+#index-page .featured-products-container,
+#index-page .recently-added-container,
+#index-page #products .ads-row-wrapper {
+    display: block !important;
+    clear: both !important;
+    width: 100% !important;
+    margin-bottom: 50px !important;
+}
+
+/* 2. RE-ESTRUCTURAMOS LAS FILAS ESTÁTICAS */
+#index-page .ads-row.row-3-cols,
+#index-page .recently-added-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+}
+
+/* 3. ARREGLO DE IMAGEN (EL BORDE BLANCO) */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 280px !important;
+    overflow: hidden !important;
+}
+
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+/* ===================================================== */
+/* ARREGLO FINAL DE FILAS - home.css al final */
+/* ===================================================== */
+
+/* 1. SEPARACIÓN DE BLOQUES PRINCIPALES */
+#index-page .featured-products-container,
+#index-page .recently-added-container,
+#index-page #products .ads-row-wrapper {
+    display: block !important;
+    clear: both !important;
+    width: 100% !important;
+    margin-bottom: 60px !important;
+    float: none !important;
+}
+
+/* 2. NIVELACIÓN DE LAS TARJETAS (FILAS DE 3) */
+#index-page .ads-row.row-3-cols,
+#index-page .recently-added-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+}
+
+/* 3. IMAGEN TOTAL (Adiós bordes blancos) */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 280px !important;
+}
+
+#index-page .ad-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* ===================================================== */
+/* PLAN DE CHOQUE FINAL - Anulación Total de Fantasmas */
+/* ===================================================== */
+
+/* 1. ANULACIÓN TOTAL DE LOS "FANTASMAS" INTERNOS DE HOME.CSS */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container,
+#index-page .product-swiper .swiper-slide {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: 280px !important;
+    overflow: hidden !important;
+}
+
+/* 2. FORZAMOS QUE LA IMAGEN IGNORE LAS LÍNEAS 1215-1217 */
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img,
+#index-page .product-swiper .swiper-slide img {
+    all: unset !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+/* ===================================================== */
+/* PRUEBA DE FUEGO - Verificar selectores */
+/* ===================================================== */
+
+/* PRUEBA DE CONTROL TOTAL */
+#index-page .ad-card,
+#index-page .property-card {
+    border: 5px solid red !important;
+    background-color: yellow !important;
+}
+
+/* FORZAMOS EL ANCHO DE LA IMAGEN DESDE LA RAÍZ */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    min-width: 100% !important;
+    width: 100% !important;
+    background-color: blue !important;
+}
+
+/* ===================================================== */
+/* AJUSTE FINAL - Eliminar espacio blanco */
+/* ===================================================== */
+
+/* FUERZA BRUTA ESTRUCTURAL */
+#index-page .ad-card,
+#index-page .property-card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ESTO ES LO QUE ESTIRA LA IMAGEN SI O SI */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    height: 280px !important;
+    min-width: 100% !important;
+    flex: 0 0 280px !important;
+}
+
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+}
+
+/* ===================================================== */
+/* SOLUCIÓN QUIRÚRGICA - Romper el candado */
+/* ===================================================== */
+
+/* 1. ORGANIZAMOS EL CONTENEDOR PARA QUE ACEPTE 3 COLUMNAS */
+#index-page .ads-row.row-3-cols,
+#index-page .recently-added-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 25px !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    padding: 20px 0 !important;
+}
+
+/* 2. AJUSTE DE LA TARJETA PARA QUE NO SE DESBORDE */
+#index-page .ad-card,
+#index-page .property-card {
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 3. REPASO DE LA IMAGEN */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    height: 280px !important;
+    overflow: hidden !important;
+}
+
+#index-page .ad-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
 }

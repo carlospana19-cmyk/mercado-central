@@ -1,9 +1,8 @@
 // home-logic.js - VERSIÓN DE DIAGNÓSTICO
 
 import { supabase } from './supabase-client.js';
-import { generateAttributesHTML } from './utils-attributes.js';
+import { generateAttributesHTML, UIComponents } from './UIComponents.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
-import { UIComponents } from './UIComponents.js';
 import { getSellerReviewStats } from './reviews-logic.js';
 
 export function initializeHomePage() {
@@ -121,7 +120,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
                 const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
                 
-                const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
+                const cardClass = 'property-card';
                 
                 // ✅ BADGES ELIMINADOS - Ahora usamos section-header como separador elegante
                 let badgeHTML = '';
@@ -175,14 +174,14 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
 
                 return `
-                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory} style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory}>
                        ${badgeHTML}
                          ${urgentBadge}
                          ${soldBadgeHome}
                          <div class="card-actions">
                             ${generateLikeButtonHTML(ad.id, 0, false)}
                          </div>
-                         <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
+                         <div class="property-image ${ad.is_sold ? 'image-sold' : ''}">
                             <div class="swiper product-swiper" id="swiper-${ad.id}">
                                 <div class="swiper-wrapper">
                                     ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe><div class="swiper-edge-left"></div><div class="swiper-edge-right"></div></div>` : ''}
@@ -193,15 +192,12 @@ const getVideoEmbedUrl = (videoUrl) => {
                                 <div class="swiper-pagination"></div>
                             </div>
                         </div>
-                        <div class="content ${ad.is_sold ? 'content-sold' : ''}">
-                            <div class="price-row">
-                                <div class="price">${priceFormatted}</div>
-                                ${vendorAvatar}
-                            </div>
-                            <h3>${ad.titulo}</h3>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}</div>
-                            <div class="description">${ad.descripcion || ''}</div>
-                            ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
+                        <div class="property-details ${ad.is_sold ? 'content-sold' : ''}">
+                            <span class="property-price">${priceFormatted}</span>
+                            ${vendorAvatar}
+                            <h3 class="property-title">${ad.titulo}</h3>
+                            <p class="property-location"><i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}</p>
+                            <div class="property-specs">${generateAttributesHTML(ad.atributos_clave, ad.categoria)}</div>
                             ${profilePhotoHTML}
                             <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>
                         </div>
@@ -233,7 +229,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const vendorStats = vendorId ? (sellerStatsMap[vendorId] || { total_reviews: 0, average_rating: 0 }) : { total_reviews: 0, average_rating: 0 };
                 const starsDisplay = vendorStats.total_reviews > 0 
                     ? `<i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})`
-                    : '<span style="color: rgba(255,255,255,0.5);">Sin reseñas</span>';
+                    : '<span class="no-reviews">Sin reseñas</span>';
                 
                 // Atributos del producto
                 const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria);
@@ -296,7 +292,7 @@ const getVideoEmbedUrl = (videoUrl) => {
 
                 return `
                 <div class="elite-banner-slide ${activeClass}" data-slide-index="${index}" data-has-video="${isVideo}">
-                    <div class="elite-banner ${soldClass}" style="${soldPointer}" data-ad-id="${ad.id}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                    <div class="elite-banner ${soldClass}" data-ad-id="${ad.id}">
                         ${sponsoredTag}
                         ${organicTag}
                         ${urgentBadge}
@@ -475,7 +471,42 @@ const getVideoEmbedUrl = (videoUrl) => {
             document.querySelectorAll('.product-swiper').forEach(swiperEl => {
                 const slides = swiperEl.querySelectorAll('.swiper-slide').length;
                 const swiper = new Swiper(swiperEl, {
-                    loop: slides > 1,
+                    // ✅ CARRUSEL FINITO: 4 exactas en desktop, auto en móvil
+                    slidesPerView: 'auto',
+                    slidesPerGroup: 1,
+                    spaceBetween: 20,
+                    loop: false,
+                    centeredSlides: false,
+                    rewind: false,
+                    watchOverflow: true,
+                    breakpoints: {
+                        0: {
+                            slidesPerView: 'auto',
+                            slidesPerGroup: 1,
+                            spaceBetween: 15,
+                        },
+                        480: {
+                            slidesPerView: 2,
+                            slidesPerGroup: 2,
+                            spaceBetween: 18,
+                        },
+                        768: {
+                            slidesPerView: 3,
+                            slidesPerGroup: 3,
+                            spaceBetween: 20,
+                        },
+                        1200: {
+                            slidesPerView: 4,
+                            slidesPerGroup: 4,
+                            spaceBetween: 24,
+                        },
+                        1400: {
+                            slidesPerView: 4,
+                            slidesPerGroup: 4,
+                            spaceBetween: 24,
+                        }
+                    },
+                    watchSlidesProgress: true,
                     navigation: {
                         nextEl: swiperEl.querySelector('.swiper-button-next'),
                         prevEl: swiperEl.querySelector('.swiper-button-prev'),
@@ -485,8 +516,6 @@ const getVideoEmbedUrl = (videoUrl) => {
                         clickable: true,
                         dynamicBullets: true,
                     },
-                    slidesPerView: 1,
-                    spaceBetween: 0,
                     speed: 400,
                     preloadImages: true,
                     updateOnImagesReady: true,
@@ -538,15 +567,24 @@ const getVideoEmbedUrl = (videoUrl) => {
             
             // El botón Contactar ahora es un enlace directo con href.
             // No necesitamos JavaScript para redirigir - el navegador lo hace automáticamente.
-            // Solo prevenimos la propagación para evitar conflictos con otros elementos.
-            
+            // EventListener unificado para clicks en el contenedor de tarjetas
             container._cardClickListener = (e) => {
-                // Solo responder al botón de contactar
+                // Si hace click en el botón de contactar, dejar que el href funcione normalmente
                 const btnContact = e.target.closest('.btn-contact');
-                if (!btnContact) return;
+                if (btnContact) {
+                    console.log('Click en Contactar - ID:', btnContact.getAttribute('data-ad-id'));
+                    return; // No prevenimos el comportamiento
+                }
                 
-                // No prevenimos el comportamiento por defecto - dejamos que el href funcione
-                console.log('Click en Contactar - ID:', btnContact.getAttribute('data-ad-id'));
+                // Si hace click en una tarjeta, redirigir al detalle
+                const card = e.target.closest('.property-card, .ad-card, .box, .elite-banner');
+                if (card) {
+                    const adId = card.dataset.adId || card.dataset.id;
+                    if (adId) {
+                        e.preventDefault();
+                        window.location.href = `detalle-producto.html?id=${adId}`;
+                    }
+                }
             };
             
             container.addEventListener('click', container._cardClickListener, false);
@@ -698,10 +736,11 @@ function initializeHeroCarousel() {
         }
 
         window.heroSwiper = new Swiper('.hero-swiper', {
-            loop: true,
+            loop: false,
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,
+                stopOnLastSlide: true,
             },
             pagination: {
                 el: '.swiper-pagination',
@@ -745,8 +784,8 @@ function initializeFeaturedCarousel() {
     if (!featuredSwiper) return;
     
     const swiperInstance = new Swiper('.featured-swiper', {
-        slidesPerView: 2,
-        slidesPerGroup: 2,
+        slidesPerView: 'auto',
+        slidesPerGroup: 1,
         spaceBetween: 24,
         loop: false,
         navigation: {
@@ -759,13 +798,13 @@ function initializeFeaturedCarousel() {
         },
         breakpoints: {
             0: {
-                slidesPerView: 1,
+                slidesPerView: 'auto',
                 slidesPerGroup: 1,
                 spaceBetween: 16,
             },
             900: {
-                slidesPerView: 2,
-                slidesPerGroup: 2,
+                slidesPerView: 'auto',
+                slidesPerGroup: 1,
                 spaceBetween: 24,
             }
         },
@@ -822,27 +861,26 @@ function initializeRowCarousels() {
         const nextBtn = wrapper?.querySelector('.row-nav-next');
         
         const swiperInstance = new Swiper(swiperEl, {
-            // ✅ CONFIGURACIÓN PARA EVITAR ESPACIOS VACÍOS
-            loop: true,           // Bucle infinito
-            slidesPerView: 'auto', // Ajuste automático
-            loopedSlides: 8,       // Tarjetas de reserva para el bucle
+            // ✅ CARRUSEL FINITO CON AUTO
+            loop: false,
+            slidesPerView: 'auto',
             slidesPerGroup: 1,
-            spaceBetween: 20,       // El espacio lo maneja JS
+            spaceBetween: 20,
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
             },
             breakpoints: {
                 0: {
-                    slidesPerView: 1,
+                    slidesPerView: 'auto',
                     spaceBetween: 16,
                 },
                 768: {
-                    slidesPerView: 2,
+                    slidesPerView: 'auto',
                     spaceBetween: 20,
                 },
                 1024: {
-                    slidesPerView: 3,
+                    slidesPerView: 'auto',
                     spaceBetween: 24,
                 }
             }
@@ -864,11 +902,10 @@ function initializeRowCarousels() {
         }
         
         const swiperInstance = new Swiper(swiperEl, {
-            // ✅ CONFIGURACIÓN PARA EVITAR ESPACIOS VACÍOS
-            loop: true,           // Bucle infinito
-            slidesPerView: 'auto', // Ajuste automático
-            loopedSlides: 8,       // Tarjetas de reserva para el bucle
-            spaceBetween: 20,       // El espacio lo maneja JS
+            // ✅ CARRUSEL FINITO CON AUTO
+            loop: false,
+            slidesPerView: 'auto',
+            spaceBetween: 20,
             touchMove: true,
             touchRatio: 1,
             resistance: true,
@@ -886,11 +923,11 @@ function initializeRowCarousels() {
             },
             breakpoints: {
                 640: {
-                    slidesPerView: 2,
+                    slidesPerView: 'auto',
                     spaceBetween: 20,
                 },
                 1100: {
-                    slidesPerView: 3,
+                    slidesPerView: 'auto',
                     spaceBetween: 20,
                 }
             }
@@ -1108,4 +1145,43 @@ export function updateHeroForCategory(categoryName) {
     if (window.updateHeroCarousel) {
         window.updateHeroCarousel(categoryName);
     }
+}
+
+/**
+ * Mueve el carrusel de forma infinita
+ * @param {string} direction - 'next' o 'prev'
+ * @param {string} trackId - ID del contenedor de las tarjetas
+ */
+export function navigateCarousel(direction, trackId) {
+    const track = document.getElementById(trackId);
+    if (!track) {
+        console.warn(`No se encontró el elemento con ID: ${trackId}`);
+        return;
+    }
+    
+    const scrollAmount = track.clientWidth; // Desplazamiento por vista
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    
+    if (direction === 'next') {
+        // Si estamos al final, vuelve al principio
+        if (track.scrollLeft >= maxScroll - 10) { 
+            track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    } else {
+        // Si estamos al inicio (flecha izquierda), ve al final
+        if (track.scrollLeft <= 10) {
+            track.scrollTo({ left: maxScroll, behavior: 'smooth' });
+        } else {
+            track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    }
+}
+
+// Hacer la función disponible globalmente para uso en onclick
+export function initCarouselNavigation() {
+    // Asignar la función al objeto window para uso global
+    window.navigateCarousel = navigateCarousel;
+    console.log('Navegación de carrusel inicializada');
 }
