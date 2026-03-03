@@ -855,7 +855,7 @@ return `
                         </div>
             
             <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
-                Contactar ahora
+                Contactar
             </button>
                 </div>
         </div>

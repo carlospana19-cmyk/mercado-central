@@ -23,16 +23,6 @@
     display: block !important;
 }
 
-/* EL GRID: 3 Columnas perfectas de 380px */
-#index-page #products .ads-row.row-3-cols, 
-.row-3-cols {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 380px)) !important;
-    gap: 30px !important;
-    justify-content: center !important;
-    max-width: 100% !important;
-    margin: 40px auto !important;
-}
 
 /* ================================================= */
 /* === ESTRUCTURA MAESTRA DE TARJETAS (HOME) === */
@@ -47,14 +37,6 @@
     display: block !important;
 }
 
-/* 2. La Cuadrícula de 3 Columnas Real */
-#index-page #products .ads-row.row-3-cols {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 30px !important;
-    width: 100% !important;
-    justify-content: center !important;
-}
 
 /* 3. La Tarjeta: UN SOLA REGLA */
 #index-page #products .property-card {
@@ -73,24 +55,26 @@
 
 /* Contenedor de la cuadrícula en Home */
 #index-page #products .box-container {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 60px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-/* ASEGURAMOS QUE EL CARRUSEL NO SE CORTE NI SE MUEVA */
-#index-page .carousel-row-wrapper {
-    position: relative !important;
-    width: 100vw !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
-    overflow: visible !important;
+/* Productos sin espacios laterales */
+#index-page #products {
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
 }
+
+/* ================================================= */
+/* CARRUSEL - ESTILO UNIFICADO */
+/* Duplicado eliminado - ver línea 1509 */
+/* ================================================= */
 
 /* --- HERO SECTION --- */
 /* 1. CONTENEDOR MAESTRO */
@@ -536,18 +520,21 @@
 
 /* AJUSTE MAESTRO PARA CARRUSEL INFINITO */
 .carousel-track {
-    display: flex !important;
-    overflow-x: auto !important;
-    scroll-behavior: smooth !important;
-    gap: 25px !important;
-    padding: 20px 10px !important;
-    align-items: stretch !important;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 25px;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
 }
 
 .carousel-track .property-card {
-    flex: 0 0 350px !important;
-    width: 350px !important;
-    max-width: 350px !important;
+    flex: 0 0 auto;
+    width: 350px;
+    max-width: 350px;
+    scroll-snap-align: start;
 }
 
 /* Ocultar barra de scroll */
@@ -565,12 +552,11 @@
 /* Línea fina con corona y título centrado */
 /* ================================================= */
 .section-header {
-    margin: 60px 0 30px 0 !important;
+    margin: 0 0 20px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
-    margin: 40px 0 20px 0; /* Espacio para que respire el diseño */
     width: 100%;
 }
 
@@ -1283,7 +1269,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* === CARRUSEL DE TARJETAS TOP/DESTACADO === */
 .featured-carousel-wrapper {
-  margin-bottom: 3rem;
+  margin-bottom: 0;
   position: relative;
   overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
   padding: 20px 70px; /* Espacio para flechas y sombras */
@@ -1509,27 +1495,115 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* ================================================= */
 /* === ESTILOS PARA CARRUSELES DE FILAS === */
 /* ================================================= */
+/* CARRUSEL - ESTILO UNIFICADO */
+/* ================================================= */
 
-/* 1. El contenedor del carrusel debe ignorar los márgenes del padre */
+/* Contenedor principal del carrusel */
 .carousel-row-wrapper {
-    width: 100vw !important; /* Ocupa todo el ancho de la ventana */
     position: relative;
+    width: 100vw;
     left: 50%;
-    right: 50%;
-    margin-left: -50vw !important;
-    margin-right: -50vw !important;
-    overflow: hidden;
-    padding: 20px 40px !important; /* padding-left y padding-right de 40px */
-    margin-bottom: 3rem;
+    transform: translateX(-50%);
+    margin: 0;
+    overflow: visible;
+    padding: 0;
+    margin-bottom: 0;
 }
 
-/* 2. La fila de tarjetas con padding para que respire */
+/* Versión con #index-page para mayor especificidad */
+#index-page .carousel-row-wrapper {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    overflow: visible;
+    padding: 0;
+}
+
+/* Fila de tarjetas del carrusel */
 .row-carousel {
     width: 100%;
-    overflow: visible !important;
-    position: relative; /* Contenedor principal para que las flechas tengan de donde agarrarse */
-    padding: 0 50px; /* Creamos un 'pasillo' para las flechas en los lados */
+    overflow: visible;
+    position: relative;
+    padding: 0 50px;
 }
+
+/* Responsive para tablet */
+@media (max-width: 1024px) {
+    .carousel-row-wrapper,
+    #index-page .carousel-row-wrapper {
+        width: 100vw;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0 20px;
+    }
+    
+    .row-nav-prev,
+    .row-nav-next {
+        display: none;
+    }
+}
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .carousel-row-wrapper,
+    #index-page .carousel-row-wrapper {
+        width: 100vw;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0 10px;
+    }
+}
+
+/* Responsive para móvil pequeño */
+@media (max-width: 480px) {
+    .carousel-row-wrapper,
+    #index-page .carousel-row-wrapper {
+        padding: 0 10px;
+    }
+}
+
+/* ================================================= */
+/* PRODUCTOS - RESPONSIVE */
+/* ================================================= */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    #index-page #products {
+        padding: 0 20px;
+    }
+    
+    #index-page #products .box-container {
+        padding: 0 20px;
+    }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    #index-page #products {
+        padding: 0 10px;
+    }
+    
+    #index-page #products .box-container {
+        padding: 0 10px;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    #index-page #products {
+        padding: 0 10px;
+    }
+    
+    #index-page #products .box-container {
+        padding: 0 10px;
+    }
+}
+
+/* ================================================= */
+/* CARRUSEL - ESTILO UNIFICADO Y OPTIMIZADO */
+/* ================================================= */
 
 .row-carousel .swiper-wrapper {
     width: auto !important;
@@ -1694,58 +1768,9 @@ main, section.hero-search, section.categories-showcase, section.products {
     font-weight: 900;
 }
 
-/* Responsive para carruseles de filas */
-@media (max-width: 1024px) {
-    .carousel-row-wrapper {
-        width: 100vw !important;
-        margin-left: -50vw !important;
-        margin-right: -50vw !important;
-        left: 50%;
-        right: 50%;
-    }
-    
-    /* Ocultar flechas en tablet y móvil */
-    .row-nav-prev,
-    .row-nav-next {
-        display: none !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .carousel-row-wrapper {
-        width: 100vw !important;
-        margin-left: -50vw !important;
-        margin-right: -50vw !important;
-        left: 50%;
-        right: 50%;
-        padding: 0 10px;
-    }
-    
-    /* Paginación para carruseles en móvil */
-    .row-carousel-pagination {
-        position: relative;
-        margin-top: 15px;
-        text-align: center;
-    }
-    
-    .row-carousel-pagination .swiper-pagination-bullet {
-        width: 8px;
-        height: 8px;
-        background: #ccc;
-        opacity: 1;
-        margin: 0 4px;
-    }
-    
-    .row-carousel-pagination .swiper-pagination-bullet-active {
-        background: var(--color-primario, #00bfae);
-    }
-}
-
-@media (max-width: 480px) {
-    .carousel-row-wrapper {
-        padding: 0 10px;
-    }
-}
+/* ================================================= */
+/* CARRUSEL - MEDIA QUERIES YA UNIFICADOS ARRIBA (líneas 1523-1552) */
+/* ================================================= */
 
 /* ================================================= */
 /* === FLECHAS DEL CARRUSEL EN DETALLE PRODUCTO === */
@@ -1853,15 +1878,13 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* Contenedor del Banner Elite - Ocupa todo el ancho */
 .elite-banner-container {
-    width: 100vw !important;
-    position: relative !important;
-    left: 50% !important;
-    right: 50% !important;
-    margin-left: -50vw !important;
-    margin-right: -50vw !important;
-    padding: 0 !important;
-    margin-top: -30px !important;
-    margin-bottom: 40px !important;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0;
+    margin-top: -30px;
+    margin-bottom: 40px;
 }
 
 /* === SLIDER CONTAINER PARA MÚLTIPLES BANNERS === */
@@ -2172,15 +2195,15 @@ main, section.hero-search, section.categories-showcase, section.products {
 .elite-banner-price {
     color: #00c1ab !important;
     font-size: 4.5rem !important;
-    font-weight: 800 !important;
-    margin-bottom: 5px !important;
+    font-weight: 500 !important;
+    margin-bottom: 10px !important;
     letter-spacing: -1px !important;
 }
 
 .elite-banner-title {
     color: #ffffff !important;
-    font-size: 2.2rem !important;
-    line-height: 1.2 !important;
+    font-size: 2.5rem !important;
+    line-height: 2.2 !important;
 }
 
 .elite-banner-image, .elite-banner-content {
@@ -2246,48 +2269,20 @@ main, section.hero-search, section.categories-showcase, section.products {
     z-index: 2;
 }
 
-/* Badge VERIFICADO/TOP dorado */
+/* Badge VERIFICADO/TOP dorado - OCULTO */
 .elite-badge-gold {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 25%, #d4af37 50%, #aa8c2c 75%, #d4af37 100%);
-    background-size: 200% 200%;
-    animation: goldShimmer 3s ease-in-out infinite;
-    color: #1a1a2e;
-    padding: 0.6rem 1.4rem;
-    border-radius: 2rem;
-    font-size: 1.2rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 
-        0 4px 15px rgba(212, 175, 55, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.elite-badge-gold i {
-    font-size: 1.4rem;
-}
-
-@keyframes goldShimmer {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    display: none !important;
 }
 
 /* Precio destacado - ENORME e impactante */
 .elite-banner-price {
-    font-size: 3.5rem !important;
+    font-size: 5.5rem !important;
     font-weight: 800;
     color: #00c1ab;
     margin-bottom: 0.5rem;
     text-shadow: 0 2px 15px rgba(0, 193, 171, 0.4);
     line-height: 1.1;
-}
+}s
 
 /* Título del anuncio - DESTACADO */
 .elite-banner-title {
@@ -2318,7 +2313,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* Atributos del producto - Grid de 2 columnas elegante */
 .elite-banner-attributes {
-    display: grid;
+    display: none;
     grid-template-columns: 1fr 1fr; /* Dos columnas de datos técnicos */
     gap: 15px;
     margin: 20px 0;
@@ -2422,8 +2417,8 @@ main, section.hero-search, section.categories-showcase, section.products {
     text-decoration: none;
     transition: all 0.3s ease;
     box-shadow: 0 6px 25px rgba(0, 193, 171, 0.5);
-    align-self: flex-start;
-    margin-top: auto;
+    align-self: center;
+    margin-top: 20px;
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -2489,71 +2484,6 @@ main, section.hero-search, section.categories-showcase, section.products {
     .elite-banner-attributes {
         grid-template-columns: 1fr;
         gap: 10px;
-    }
-}
-
-@media (max-width: 768px) {
-    .elite-banner-container {
-        padding: 0 1rem;
-    }
-    
-    .elite-banner {
-        flex-direction: column;
-        min-height: auto;
-        max-height: none;
-    }
-    
-    .elite-banner-image {
-        width: 100% !important;
-        min-height: 200px;
-    }
-    
-    .elite-banner-image::after {
-        width: 100%;
-        height: 40%;
-        top: auto;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(10, 25, 47, 1), transparent);
-    }
-    
-    .elite-banner-content {
-        width: 100% !important;
-        padding: 20px !important;
-    }
-    
-    .elite-badge-gold {
-        top: 1rem;
-        right: 1rem;
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
-    }
-    
-    .elite-banner-price {
-        font-size: 2.4rem !important;
-    }
-    
-    .elite-banner-title {
-        font-size: 1.8rem;
-    }
-    
-    .elite-banner-location {
-        font-size: 1.3rem;
-    }
-    
-    .elite-banner-attributes {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-    
-    .elite-attribute {
-        font-size: 1.2rem;
-        padding: 0.6rem 1rem;
-    }
-    
-    .elite-banner-btn {
-        width: 100%;
-        padding: 1.2rem 2rem;
-        font-size: 1.6rem;
     }
 }
 
@@ -2693,7 +2623,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* ATACAMOS AL PADRE (Contenedor externo) */
 .row-carousel {
-    width: 100% !important;
+    width: 108% !important;
     padding: 0 !important;
     margin: 0 auto !important;
     overflow: hidden !important; /* Esencial para que no se vea el scroll lateral */
@@ -2868,7 +2798,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* 1. FORZAMOS EL CONTENEDOR DE LA TARJETA */
 #index-page .property-card .property-details,
 #index-page .ad-card .property-details {
-    padding: 0px !important;
+    padding: 20px !important;
     gap: 5px !important;
     align-items: stretch !important;
 }
@@ -2879,17 +2809,27 @@ main, section.hero-search, section.categories-showcase, section.products {
 #index-page a[href*="contact"].btn-contact {
     display: flex !important;
     visibility: visible !important;
-    background-color: #00c1ab !important;
-    color: #ffffff !important;
-    width: 100% !important;
-    padding: 14px 0 !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    text-transform: uppercase !important;
-    text-decoration: none !important;
-    justify-content: center !important;
-    margin-top: 10px !important;
-    box-shadow: 0 4px 15px rgba(0, 193, 171, 0.3) !important;
+    background-color: #2da687;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 2rem 1.8rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 193, 171, 0.3);
+}
+
+#index-page .property-card .property-details a.btn-contact:hover,
+#index-page .ad-card .property-details a.btn-contact:hover,
+#index-page a[href*="contact"].btn-contact:hover {
+    background-color: #1a8a6a;
 }
 
 /* 3. EL PRECIO */
@@ -2950,25 +2890,14 @@ main, section.hero-search, section.categories-showcase, section.products {
     margin: 0 !important;
 }
 
-/* 3. EL CONTENEDOR QUE LAS IGUALA */
-#index-page .ads-row.row-3-cols,
-#index-page .recently-added-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 30px !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-}
 
-/* ===================================================== */
-/* LA APLANADORA - Filas Estáticas */
 /* ===================================================== */
 
 /* 1. SELECCIONAMOS LAS DOS PRIMERAS FILAS ESTÁTICAS */
 #index-page #products .ads-row:nth-child(1),
 #index-page #products .ads-row:nth-child(2),
 #index-page .featured-products-container .ads-row {
-    max-width: 1400px !important;
+    max-width: 2400px !important;
     width: 95% !important;
     margin: 0 auto 40px auto !important;
     display: grid !important;
@@ -3013,16 +2942,6 @@ main, section.hero-search, section.categories-showcase, section.products {
     margin-bottom: 50px !important;
 }
 
-/* 2. RE-ESTRUCTURAMOS LAS FILAS ESTÁTICAS */
-#index-page .ads-row.row-3-cols,
-#index-page .recently-added-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 30px !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-}
-
 /* 3. ARREGLO DE IMAGEN (EL BORDE BLANCO) */
 #index-page .ad-card .image-container,
 #index-page .property-card .image-container {
@@ -3056,15 +2975,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     float: none !important;
 }
 
-/* 2. NIVELACIÓN DE LAS TARJETAS (FILAS DE 3) */
-#index-page .ads-row.row-3-cols,
-#index-page .recently-added-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 30px !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-}
+/* 2. NIVELACIÓN DE LAS TARJETAS (FILAS DE 3) - ELIMINADA - Duplicada de línea 2706 */
 
 /* 3. IMAGEN TOTAL (Adiós bordes blancos) */
 #index-page .ad-card .image-container,
@@ -3162,17 +3073,6 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* SOLUCIÓN QUIRÚRGICA - Romper el candado */
 /* ===================================================== */
 
-/* 1. ORGANIZAMOS EL CONTENEDOR PARA QUE ACEPTE 3 COLUMNAS */
-#index-page .ads-row.row-3-cols,
-#index-page .recently-added-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 25px !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-    padding: 20px 0 !important;
-}
 
 /* 2. AJUSTE DE LA TARJETA PARA QUE NO SE DESBORDE */
 #index-page .ad-card,

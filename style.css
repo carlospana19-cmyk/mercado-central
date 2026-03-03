@@ -849,116 +849,196 @@ body {
 /* ========================================
    ESTILOS PARA DEPORTES Y HOBBIES
    ======================================== */
-.sports-details {
+.sports-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.sports-details span {
-    display: flex;
+.sports-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-.sports-details i {
-    color: #222;
-    font-size: 1.6rem;
+.sports-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA MASCOTAS
    ======================================== */
-.pets-details {
+.pets-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details,
+.sports-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.pets-details span {
-    display: flex;
+.pets-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span,
+.sports-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-.pets-details i {
-    color: #222;
-    font-size: 1.6rem;
+.pets-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA SERVICIOS
    ======================================== */
-.services-details {
+.services-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details,
+.sports-details,
+.pets-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.services-details span {
-    display: flex;
+.services-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span,
+.sports-details span,
+.pets-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-.services-details i {
-    color: #222;
-    font-size: 1.6rem;
+.services-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA NEGOCIOS
    ======================================== */
-.business-details {
+.business-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details,
+.sports-details,
+.pets-details,
+.services-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.business-details span {
-    display: flex;
+.business-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span,
+.sports-details span,
+.pets-details span,
+.services-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-.business-details i {
-    color: #222;
-    font-size: 1.6rem;
+.business-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i,
+.services-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA COMUNIDAD
    ======================================== */
-.community-details {
+.community-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details,
+.sports-details,
+.pets-details,
+.services-details,
+.business-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.community-details span {
-    display: flex;
+.community-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span,
+.sports-details span,
+.pets-details span,
+.services-details span,
+.business-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-.community-details i {
-    color: #222;
-    font-size: 1.6rem;
+.community-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i,
+.services-details i,
+.business-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* === ESTILOS UNIFICADOS PARA TODOS LOS DETALLES DE CATEGORÍAS === */
@@ -1063,44 +1143,52 @@ body {
   }
 }
 /* --- FIN AJUSTE ALINEACIÓN ATRIBUTOS INMUEBLE --- */
-.home-furniture-details {
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: var(--color-gris);
-    margin-bottom: 1rem;
-}
-
-.home-furniture-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.home-furniture-details i {
-    color: #222;
-    font-size: 1.6rem;
-} /* Cierre de .home-furniture-details i */
-
-/* Moda y Belleza - Mismo estilo */
-.fashion-details {
+.home-furniture-details,
+.fashion-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details,
+.sports-details,
+.pets-details,
+.services-details,
+.business-details,
+.community-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.fashion-details span {
-    display: flex;
+.home-furniture-details span,
+.fashion-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span,
+.sports-details span,
+.pets-details span,
+.services-details span,
+.business-details span,
+.community-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-.fashion-details i {
-    color: #222;
-    font-size: 1.6rem;
+.home-furniture-details i,
+.fashion-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i,
+.services-details i,
+.business-details i,
+.community-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 .box .btn-contact {
   display: block;
@@ -1497,7 +1585,7 @@ body {
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
 .filters-sidebar h3 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 1rem; }
 .filter-group { margin-bottom: 2rem; }
-.filter-group label { font-weight: 600; font-size: 1.6rem; display: block; margin-bottom: 1rem; }
+.filter-group label { font-weight: 600; font-size: 2.0rem; display: block; margin-bottom: 1rem; }
 .filter-group input[type="number"] { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.4rem; }
 #subcategory-filter-container .subcategory-label { display: block; margin-bottom: 0.8rem; cursor: pointer; }
 .btn-apply-filters { width: 100%; padding: 1.5rem; background: var(--color-secundario); color: var(--color-blanco); border: none; border-radius: .5rem; font-size: 1.6rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
@@ -1746,7 +1834,7 @@ body {
 @media (max-width: 1400px) {
   .results-inner-wrapper {
     grid-template-columns: max-content 1fr;
-    gap: 1.5rem;
+    gap: 4rem;
     padding: 2rem 1.5%;
   }
 }
@@ -2016,7 +2104,7 @@ body {
 
 .gallery-main img#main-product-image {
     width: 100%;
-    height: 400px;
+    height: 500px;
     object-fit: cover;
     display: block;
     transition: opacity 0.2s ease;
