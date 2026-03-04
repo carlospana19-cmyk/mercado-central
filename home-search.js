@@ -43,9 +43,12 @@ async function loadDynamicStats() {
 
     // Contar usuarios registrados usando una función RPC segura
     let usersCount = 0;
+    let usersError = null;  // Definir fuera del try para que esté disponible después
     try {
-      const { data: usersData, error: usersError } = await supabase
+      const { data: usersData, error: error } = await supabase
         .rpc('get_users_count');
+
+      usersError = error;
 
       if (!usersError && usersData !== null) {
         usersCount = usersData;
@@ -167,7 +170,7 @@ function filterBySearchTerm(searchTerm) {
  * Aplica los filtros combinados (categoría + búsqueda) a las tarjetas
  */
 function applyFilters() {
-  const cards = document.querySelectorAll('.card');
+  const cards = document.querySelectorAll('.box');
   let visibleCount = 0;
   
   cards.forEach(card => {
@@ -256,7 +259,7 @@ export function clearAllFilters() {
   });
   
   // Mostrar todas las tarjetas
-  document.querySelectorAll('.card').forEach(card => {
+  document.querySelectorAll('.box').forEach(card => {
     card.style.display = '';
     card.classList.remove('card-hidden');
   });

@@ -798,13 +798,13 @@ function initializeFeaturedCarousel() {
         },
         breakpoints: {
             0: {
-                slidesPerView: 'auto',
+                slidesPerView: 1,
                 slidesPerGroup: 1,
                 spaceBetween: 16,
             },
             900: {
-                slidesPerView: 'auto',
-                slidesPerGroup: 1,
+                slidesPerView: 2,
+                slidesPerGroup: 2,
                 spaceBetween: 24,
             }
         },
@@ -872,15 +872,15 @@ function initializeRowCarousels() {
             },
             breakpoints: {
                 0: {
-                    slidesPerView: 'auto',
+                    slidesPerView: 1,
                     spaceBetween: 16,
                 },
                 768: {
-                    slidesPerView: 'auto',
+                    slidesPerView: 2,
                     spaceBetween: 20,
                 },
                 1024: {
-                    slidesPerView: 'auto',
+                    slidesPerView: 3,
                     spaceBetween: 24,
                 }
             }
@@ -903,13 +903,14 @@ function initializeRowCarousels() {
         
         const swiperInstance = new Swiper(swiperEl, {
             // ✅ CARRUSEL FINITO CON AUTO
-            loop: false,
-            slidesPerView: 'auto',
-            spaceBetween: 20,
+            slidesPerView: 1.2,
+            slidesPerGroup: 1,
+            spaceBetween: 15,
+            loop: true,
+            resistanceRatio: 0,
             touchMove: true,
             touchRatio: 1,
             resistance: true,
-            resistanceRatio: 0.85,
             grabCursor: true,
             centeredSlides: false,
             navigation: {
@@ -922,13 +923,13 @@ function initializeRowCarousels() {
                 dynamicBullets: false,
             },
             breakpoints: {
-                640: {
-                    slidesPerView: 'auto',
-                    spaceBetween: 20,
+                768: {
+                    slidesPerView: 2.2,
+                    spaceBetween: 20
                 },
-                1100: {
-                    slidesPerView: 'auto',
-                    spaceBetween: 20,
+                1024: {
+                    slidesPerView: 4.2,
+                    spaceBetween: 25
                 }
             }
         });

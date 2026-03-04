@@ -169,18 +169,6 @@ label,
     gap: 6px;
 }
 
-.form-group select, .form-group input, .form-group textarea {
-    width: 100%;
-    padding: 1.6rem;
-    font-size: 1.8rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    background-color: #ffffff;
-    transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-}
-
 .form-group select:hover,
 .form-group input:hover,
 .form-group textarea:hover {
@@ -1101,20 +1089,6 @@ main.container.publish-wizard {
     font-size: 1.2rem;
 }
 
-label {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin-bottom: 6px;
-}
-
-input, select, textarea {
-    font-size: 1rem;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccd1d9;
-    margin-bottom: 18px;
-}
 
 .form-group small { /* Estilo para el texto de ayuda general */
     font-size: 0.9rem; /* Ajustado para un tamaño consistente */
@@ -1293,20 +1267,6 @@ body {
     padding-bottom: 6px;
 }
 
-/* === Inputs y textos === */
-label {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #2e3b55;
-}
-
-input, select, textarea {
-    font-size: 0.95rem;
-    border: 1px solid #ccd1d9;
-    border-radius: 8px;
-    padding: 12px 14px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
 
 input:focus, select:focus, textarea:focus {
     outline: none;

@@ -604,6 +604,7 @@ select {
     transition: all 0.3s ease;
     background: #ffffff;
     font-family: 'Poppins', sans-serif !important;
+    margin-bottom: 18px;
 }
 
 input[type="text"]:focus,

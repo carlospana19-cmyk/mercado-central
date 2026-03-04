@@ -67,6 +67,88 @@
   }
 }
 
+/* Grid responsivo para resultados */
+@media (max-width: 992px) {
+  #results-container,
+  .results-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  #results-container,
+  .results-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 15px;
+  }
+}
+
+/* Optimización completa para móviles - Tarjetas */
+@media (max-width: 768px) {
+  /* Tarjetas responsivas */
+  .box, .property-card {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Imagen en móvil */
+  .property-image,
+  .box .image-container {
+    height: 180px;
+  }
+
+  /* Detalles de tarjeta en móvil */
+  .property-details,
+  .box .content {
+    padding: 12px !important;
+  }
+
+  /* Títulos en móvil */
+  .property-title,
+  .box h3 {
+    font-size: 1.8rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Precios en móvil */
+  .property-price,
+  .box .price {
+    font-size: 2rem !important;
+    color: #008080 !important;
+  }
+
+  /* Ubicación en móvil */
+  .property-location,
+  .box .location {
+    font-size: 1.2rem !important;
+    color: #777 !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Ocultar descripción en móvil */
+  .property-description,
+  .box .description {
+    display: none !important;
+  }
+
+  /* Solo mostrar 3 atributos en móvil */
+  .property-details span:nth-child(n+4),
+  .box .property-details span:nth-child(n+4) {
+    display: none !important;
+  }
+
+  /* Atributos en móvil */
+  .property-details {
+    gap: 0.6rem !important;
+    margin-bottom: 8px !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    font-weight: 500 !important;
+  }
+}
+
 /* --- Imagen de la tarjeta --- */
 .property-image,
 .product-card-h .image-container {
@@ -493,16 +575,6 @@ section {
     flex-shrink: 0;
 }
 
-/* Contenedor de contenido de tarjeta con flexbox para alineación perfecta */
-.box .content,
-.property-details,
-.ad-card .card-body {
-    display: flex !important;
-    flex-direction: column !important;
-    flex-grow: 1 !important;
-    justify-content: space-between !important;
-}
-
 /* El botón de contactar siempre al fondo */
 .btn-contact,
 .btn-contact-card {
@@ -523,14 +595,6 @@ section {
     padding: 0 !important; /* ELIMINA el margen que hace que el botón flote */
     display: flex !important;
     flex-direction: column !important;
-}
-
-/* 2. EL CONTENIDO (Texto, precio): Les devolvemos su margen para que no toquen los bordes */
-.property-details,
-.product-card-body,
-.box .content {
-    padding: 15px !important;
-    flex-grow: 1 !important;
 }
 
 /* 3. EL BOTÓN: Lo hacemos el "suelo" de la tarjeta */
@@ -584,4 +648,27 @@ section {
     letter-spacing: 3px;
     text-transform: uppercase;
     margin: 0;
+}
+
+/* AJUSTE MÓVIL: Solo para pantallas menores a 768px */
+@media (max-width: 768px) {
+    .row-carousel .swiper-slide {
+        width: 85% !important; /* Fuerza a la tarjeta a ser ancha */
+    }
+
+    .ad-card {
+        min-width: unset !important; /* Quitamos restricciones de PC */
+        max-width: 100% !important;
+        margin: 0 auto;
+    }
+
+    /* Ocultamos flechas en móvil para ganar espacio (se usa el dedo) */
+    .row-nav-prev, .row-nav-next {
+        display: none !important;
+    }
+    
+    /* Ajuste de imagen para que no se vea aplastada */
+    .card-image-container {
+        height: 200px !important;
+    }
 }
