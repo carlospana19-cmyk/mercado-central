@@ -225,7 +225,7 @@
 /* --- Precio --- */
 .property-price,
 .product-card-h .card-content .card-price {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #353636;
   letter-spacing: -0.2px;
@@ -454,19 +454,20 @@ section {
     scroll-padding: 25px !important;
 }
 
-/* 3. Primera tarjeta sin margen extra - el padding del contenedor ya da espacio */
-.ad-card:first-child, 
-.property-card:first-child,
-.box:first-child,
-.tarjeta-auto:first-child {
-    margin-left: 0 !important;
+/* 3. Todas las tarjetas tienen el mismo margen */
+.ad-card, 
+.property-card,
+.box,
+.tarjeta-auto {
+    margin: 0 !important;
 }
 
-/* 4. Asegurar que la tarjeta no se deforme - Actualizado a 380px */
+/* 4. Asegurar que la tarjeta no se deforme - Ancho flexible para grid */
 .ad-card, .property-card, .box, .tarjeta-auto {
-    flex: 0 0 380px !important; /* Ancho fijo de 380px */
-    width: 380px !important;
-    min-width: 380px !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 280px !important;
+    max-width: 100% !important;
     margin: 0 !important; /* Sin márgenes que causen choques */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
     overflow: hidden !important;
@@ -537,24 +538,7 @@ section {
    Prohibido estirarse más allá del círculo
    ============================================ */
 
-/* 1. EL CONTENEDOR (El círculo) */
-.vendor-avatar.has-image {
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    border-radius: 50% !important;
-    overflow: hidden !important; /* CORTA LOS 240PX SOBRANTES */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: #fff !important;
-    padding: 0 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+
 
 /* 2. LA IMAGEN (La que se estira) */
 .vendor-avatar-img {

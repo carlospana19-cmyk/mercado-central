@@ -25,7 +25,7 @@ export function initializeHomePage() {
             // ✅ CARGAR ANUNCIOS TOP Y DESTACADO PRIMERO (para fila de 2 columnas)
             let { data: premiumAds, error: premiumError } = await supabase
                 .from('anuncios')
-                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil)')
+                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
                 .in('featured_plan', ['top', 'destacado'])
                 .order('fecha_publicacion', { ascending: false })
                 .limit(20); // Aumentado para tener más tarjetas en el carrusel
@@ -35,7 +35,7 @@ export function initializeHomePage() {
             // ✅ CARGAR RESTO DE ANUNCIOS (premium, basico) para otras filas
             let { data: regularAds, error } = await supabase
                 .from('anuncios')
-                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil)')
+                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
                 .in('featured_plan', ['premium', 'basico'])
                 .order('fecha_publicacion', { ascending: false })
                 .limit(10);
@@ -48,7 +48,7 @@ export function initializeHomePage() {
                 console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios.');
                 const { data: adsWithoutFilter, error: error2 } = await supabase
                     .from('anuncios')
-                    .select('*, profiles(id, nombre_negocio, url_foto_perfil)')
+                    .select('*, profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
                     .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
                     .order('fecha_publicacion', { ascending: false })
                     .limit(15);
@@ -154,6 +154,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
                 const vendorPhoto = vendorProfile?.url_foto_perfil;
                 const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
+                const vendorFullName = vendorProfile?.nombre_completo || '';
                 const vendorId = vendorProfile?.id;
                 
                 // ✅ Obtener estadísticas de reseñas del vendedor
@@ -193,8 +194,11 @@ const getVideoEmbedUrl = (videoUrl) => {
                             </div>
                         </div>
                         <div class="property-details ${ad.is_sold ? 'content-sold' : ''}">
-                            <span class="property-price">${priceFormatted}</span>
-                            ${vendorAvatar}
+                            <div class="property-seller-name">${ad.contact_name || vendorFullName || vendorName || 'Usuario Verificado'}</div>
+                            <div class="property-price-and-tag">
+                                <span class="property-price">${priceFormatted}</span>
+                                ${vendorAvatar}
+                            </div>
                             <h3 class="property-title">${ad.titulo}</h3>
                             <p class="property-location"><i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}</p>
                             <div class="property-specs">${generateAttributesHTML(ad.atributos_clave, ad.categoria)}</div>
@@ -372,6 +376,14 @@ const getVideoEmbedUrl = (videoUrl) => {
                 // Los anuncios que se mostraron en el slider no se repiten en el grid
                 adIndex = eliteAds.length;
                 
+                // Título de sección para Anuncios Destacados (ENCIMA del primer grid)
+                adsHTML += `
+                <div class="section-header-golden">
+                    <div class="header-line-golden"></div>
+                    <h2 class="header-title-golden">ANUNCIOS DESTACADOS</h2>
+                    <div class="header-line-golden"></div>
+                </div>`;
+
                 // Los siguientes anuncios TOP/Destacado en grid de 3 columnas
                 if (topDestacadoAds.length > eliteAds.length) {
                     const row1Ads = topDestacadoAds.slice(adIndex, adIndex + 3);
@@ -398,12 +410,23 @@ const getVideoEmbedUrl = (videoUrl) => {
                 adIndex += row2Ads.length;
             }
 
+            // Título de sección para Anuncios Destacados (debajo del grid) - ELIMINADO, ya está arriba
+
             // Fila 3: Carrusel de 4 columnas para anuncios TOP/Destacado restantes + Premium
             const remainingTopDestacado = topDestacadoAds.slice(adIndex);
             const combinedAdsForRow3 = [...remainingTopDestacado, ...premiumAdsFiltered];
 
             if (combinedAdsForRow3.length > 0) {
                 const row3Ads = combinedAdsForRow3.slice(0, Math.min(8, combinedAdsForRow3.length));
+                
+                // Título para el carrusel de vehículos
+                adsHTML += `
+                <div class="section-header-golden">
+                    <div class="header-line-golden"></div>
+                    <h2 class="header-title-golden">ANUNCIOS DESTACADOS VEHÍCULOS</h2>
+                    <div class="header-line-golden"></div>
+                </div>`;
+                
                 adsHTML += `
                 <div class="carousel-row-wrapper">
                     <div class="swiper row-carousel row-4-swiper" id="row-carousel-3">
@@ -427,6 +450,15 @@ const getVideoEmbedUrl = (videoUrl) => {
 
             let rowCounter = 4;
             let basicoIndex = 0;
+            
+            // Título para el carrusel de inmuebles
+            adsHTML += `
+            <div class="section-header-golden">
+                <div class="header-line-golden"></div>
+                <h2 class="header-title-golden">ANUNCIOS DESTACADOS INMUEBLES</h2>
+                <div class="header-line-golden"></div>
+            </div>`;
+
             while (basicoIndex < remainingBasicoAds.length) {
                 const rowAds = remainingBasicoAds.slice(basicoIndex, Math.min(basicoIndex + 8, remainingBasicoAds.length));
                 adsHTML += `
@@ -472,8 +504,8 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const slides = swiperEl.querySelectorAll('.swiper-slide').length;
                 const swiper = new Swiper(swiperEl, {
                     // ✅ CARRUSEL FINITO: 4 exactas en desktop, auto en móvil
-                    slidesPerView: 'auto',
-                    slidesPerGroup: 1,
+                    slidesPerView: 4,
+                    slidesPerGroup: 4,
                     spaceBetween: 20,
                     loop: false,
                     centeredSlides: false,
@@ -481,7 +513,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                     watchOverflow: true,
                     breakpoints: {
                         0: {
-                            slidesPerView: 'auto',
+                            slidesPerView: 1.2,
                             slidesPerGroup: 1,
                             spaceBetween: 15,
                         },
@@ -786,7 +818,7 @@ function initializeFeaturedCarousel() {
     const swiperInstance = new Swiper('.featured-swiper', {
         slidesPerView: 'auto',
         slidesPerGroup: 1,
-        spaceBetween: 24,
+        spaceBetween: 12,
         loop: false,
         navigation: {
             nextEl: '.featured-next',
@@ -865,7 +897,7 @@ function initializeRowCarousels() {
             loop: false,
             slidesPerView: 'auto',
             slidesPerGroup: 1,
-            spaceBetween: 20,
+            spaceBetween: 12,
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
@@ -873,15 +905,15 @@ function initializeRowCarousels() {
             breakpoints: {
                 0: {
                     slidesPerView: 1,
-                    spaceBetween: 16,
+                    spaceBetween: 12,
                 },
                 768: {
                     slidesPerView: 2,
-                    spaceBetween: 20,
+                    spaceBetween: 12,
                 },
                 1024: {
                     slidesPerView: 3,
-                    spaceBetween: 24,
+                    spaceBetween: 12,
                 }
             }
         });
@@ -902,17 +934,13 @@ function initializeRowCarousels() {
         }
         
         const swiperInstance = new Swiper(swiperEl, {
-            // ✅ CARRUSEL FINITO CON AUTO
-            slidesPerView: 1.2,
+            // ✅ CARRUSEL FINITO - Sin loop, muestra todos los slides
+            slidesPerView: 'auto',
             slidesPerGroup: 1,
-            spaceBetween: 15,
-            loop: true,
-            resistanceRatio: 0,
-            touchMove: true,
-            touchRatio: 1,
-            resistance: true,
-            grabCursor: true,
+            spaceBetween: 12,
+            loop: false,
             centeredSlides: false,
+            watchOverflow: true,
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
@@ -923,12 +951,20 @@ function initializeRowCarousels() {
                 dynamicBullets: false,
             },
             breakpoints: {
+                480: {
+                    slidesPerView: 1,
+                    spaceBetween: 12
+                },
                 768: {
-                    slidesPerView: 2.2,
-                    spaceBetween: 20
+                    slidesPerView: 2,
+                    spaceBetween: 12
                 },
                 1024: {
-                    slidesPerView: 4.2,
+                    slidesPerView: 3,
+                    spaceBetween: 20
+                },
+                1400: {
+                    slidesPerView: 4,
                     spaceBetween: 25
                 }
             }

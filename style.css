@@ -1466,15 +1466,6 @@ body {
   clear: both;
 }
 
-.categories-horizontal-bar {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-around; /* Distribuye el espacio uniformemente */
-  align-items: center;
-  flex-wrap: wrap; /* Permite que se ajuste en pantallas pequeñas */
-  gap: 1rem;
-}
 
 .category-item {
   display: flex;
@@ -2461,12 +2452,6 @@ body {
     }
 }
 
-/* Estilos para las filas de anuncios personalizados */
-.ads-row {
-  display: grid;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem; /* Espacio entre filas */
-}
 
 .ads-row:last-child {
   margin-bottom: 0;
@@ -2476,9 +2461,6 @@ body {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.row-3-cols {
-  grid-template-columns: repeat(3, 1fr);
-}
 
 /* Responsive para móviles */
 @media (max-width: 768px) {
@@ -2888,16 +2870,16 @@ body#pagina-login {
    ============================================ */
 .vendor-avatar {
     position: relative;
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    max-width: 56px !important;
+    max-height: 56px !important;
     flex-shrink: 0;
     border-radius: 50% !important;
     background: white;
-    border: 3px solid var(--color-primario);
+    border: none;
     overflow: hidden !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     cursor: pointer;
@@ -2914,13 +2896,6 @@ body#pagina-login {
     box-shadow: 0 6px 20px rgba(0, 191, 174, 0.3);
 }
 
-.vendor-avatar-img {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
-}
 
 .vendor-name-tooltip {
     position: absolute;
@@ -3333,13 +3308,13 @@ body#pagina-login {
 
     /* Avatar del vendedor */
     .vendor-avatar {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
     }
 
     .vendor-avatar-img {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
     }
 
     .logo-text {

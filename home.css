@@ -1,11 +1,4 @@
-/* RESET DE ESTRUCTURA - DOMINIO TOTAL */
-#index-page .main-content-wrapper {
-    max-width: 1400px !important;
-    width: 95% !important;
-    margin: 0 auto !important;
-    padding: 20px 0 !important;
-    background: transparent !important;
-}
+
 
 /* ELIMINAMOS EL LÍMITE DE CUALQUIER CONTENEDOR INTERMEDIO */
 #index-page .container,
@@ -30,11 +23,13 @@
 
 /* 1. Limpieza de Contenedores */
 #index-page #products .main-content-wrapper {
-    max-width: 1350px !important;
-    width: 95% !important;
+    max-width: 3000px !important;
+    width: 100% !important;
     margin: 40px auto !important;
     padding: 0 !important;
     display: block !important;
+    background: transparent !important;
+    border-radius: 20px;
 }
 
 
@@ -57,7 +52,7 @@
 #index-page #products .box-container {
     display: flex;
     flex-direction: column;
-    gap: 0px;
+    gap: 20px;
     width: 100%;
     max-width: 100%;
     margin: 0;
@@ -69,6 +64,8 @@
     padding: 0;
     width: 100%;
     max-width: 100%;
+    background: var(--color-fondo);
+    margin: 0;
 }
 
 /* ================================================= */
@@ -176,7 +173,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important; /* CAMBIO CLAVE: Centrado total */
-    min-height: 550px !important;       /* Asegura que el contenedor tenga espacio */
+    min-height: 350px !important;       /* Asegura que el contenedor tenga espacio */
     padding-top: 60px !important;       /* El "empuje" para bajar título y buscador */
     text-align: center !important;
     width: 100% !important;
@@ -272,6 +269,19 @@
     text-align: center;
     color: #ffffff !important;
     text-shadow: 0 2px 10px rgba(0,0,0,0.8) !important; /* Sombra fuerte para legibilidad */
+}
+
+.elite-banner-container {
+  margin-top: 0;
+  margin-bottom: 60px;
+}
+
+.destacados {
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-texto);
 }
 
 /* 4. TÍTULO QUE RESALTA */
@@ -435,15 +445,40 @@
 }
 
 .categories-horizontal-bar {
-  max-width: 1200px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important; /* 3 columnas iguales */
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 2rem !important;
-  padding: 0 20px !important;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 0 20px;
+}
+
+/* Tablet: 4 columnas */
+@media (max-width: 992px) {
+  .categories-horizontal-bar {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Mobile: 3 columnas */
+@media (max-width: 768px) {
+  .categories-horizontal-bar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 0 15px;
+  }
+}
+
+/* Very small: 2 columnas */
+@media (max-width: 480px) {
+  .categories-horizontal-bar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+  }
 }
 
 .category-item h3 {
@@ -518,14 +553,6 @@
   font-weight: 600;
 }
 
-/* --- SECCIÓN DE PRODUCTOS --- */
-.products {
-  padding: 4rem 2%;
-  background: var(--color-fondo);
-  max-width: 100%;
-  width: 100%;
-  margin: 0;
-}
 
 /* ================================================= */
 /* === CARRUSEL INFINITO - ESTILOS CRÍTICOS === */
@@ -696,13 +723,6 @@
   clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%);
 }
 
-/* === CONTENEDOR PRINCIPAL DE TARJETAS === */
-.box-container {
-    width: 100%;
-    max-width: 100% !important;
-    margin: 0;
-    padding: 0;
-}
 
 /* Asegurar que las tarjetas ocupen todo el ancho */
 .ads-row .box {
@@ -710,12 +730,34 @@
     max-width: none !important;
 }
 
-/* Estilos para las filas de anuncios personalizados */
-.ads-row {
-  display: grid;
-  gap: 2rem;
-  margin-bottom: 2rem; /* Espacio entre filas */
-  width: 100%;
+/* Título de sección dorado para Anuncios Destacados */
+.section-header-golden {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px auto 5px auto;
+    width: 95%;
+    max-width: 1200px;
+}
+
+.header-title-golden {
+    font-size: 20px;
+    font-weight: 700;
+    color: #D4AF37 !important; /* Dorado */
+    font-family: 'Poppins', sans-serif;
+    white-space: nowrap;
+    letter-spacing: 1px;
+}
+
+.header-line-golden {
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.8));
+}
+
+.header-line-golden:last-child {
+    background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.8));
 }
 
 .ads-row:last-child {
@@ -974,40 +1016,10 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* --- AVATAR DEL VENDEDOR EN TARJETA --- */
 /* CAMISA DE FUERZA 48px - Prohibido estirarse */
-.vendor-avatar {
-    position: relative;
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    border-radius: 50% !important;
-    background: white;
-    border: 3px solid var(--color-primario);
-    overflow: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-    flex-shrink: 0;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-}
 
 .vendor-avatar:hover {
     transform: scale(1.15);
     box-shadow: 0 6px 20px rgba(0, 191, 174, 0.3);
-}
-
-.vendor-avatar-img {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
 }
 
 .vendor-name-tooltip {
@@ -1424,44 +1436,26 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* CARRUSEL - ESTILO UNIFICADO */
 /* ================================================= */
 
-/* Contenedor principal del carrusel */
-.carousel-row-wrapper {
-    position: relative;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    overflow: visible;
-    padding: 0;
-    margin-bottom: 0;
-}
 
 /* Versión con #index-page para mayor especificidad */
 #index-page .carousel-row-wrapper {
     position: relative;
-    width: 100vw;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    overflow: visible;
+    width: 100%;
+    left: auto;
+    transform: none;
+    margin: -20px 0 50px 0 !important;
+    overflow: visible !important;
     padding: 0;
 }
 
-/* Fila de tarjetas del carrusel */
-.row-carousel {
-    width: 100%;
-    overflow: visible;
-    position: relative;
-    padding: 0 50px;
-}
 
 /* Responsive para tablet */
 @media (max-width: 1024px) {
     .carousel-row-wrapper,
     #index-page .carousel-row-wrapper {
-        width: 100vw;
-        left: 50%;
-        transform: translateX(-50%);
+        width: 100%;
+        left: auto;
+        transform: none;
         padding: 0 20px;
     }
     
@@ -1475,9 +1469,9 @@ main, section.hero-search, section.categories-showcase, section.products {
 @media (max-width: 768px) {
     .carousel-row-wrapper,
     #index-page .carousel-row-wrapper {
-        width: 100vw;
-        left: 50%;
-        transform: translateX(-50%);
+        width: 100%;
+        left: auto;
+        transform: none;
         padding: 0 10px;
     }
 }
@@ -1532,40 +1526,61 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* ================================================= */
 
 .row-carousel .swiper-wrapper {
-    width: auto !important;
-    display: flex;
-    gap: 20px !important;
-    padding: 0 5% !important; /* Solo padding horizontal, sin espacio arriba */
+    width: 100% !important;
+    display: flex !important;
+    gap: 15px !important;
+    padding: 0 !important;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    justify-content: flex-start !important;
 }
 
 /* Añadimos un margen interno al carrusel para que las tarjetas no choquen con las flechas */
 .row-carousel .swiper {
-    padding: 0 50px !important; /* Esto crea el espacio para que las flechas vivan sin tapar las tarjetas */
+    padding: 0 !important;
+    overflow: visible !important;
 }
 
-/* 3. El slide con ancho automático - el CSS manda sobre el JS */
+/* 3. El slide con ancho fijo para que coincida con el grid */
 .row-carousel .swiper-slide {
-    width: auto !important;    /* Ajuste automático */
-    flex-shrink: 0;
-    margin: 0 12px !important; /* Margen lateral en lugar de spaceBetween */
+    width: 24% !important;
+    flex-shrink: 0 !important;
+    margin: 0 8px !important;
     padding: 0 !important;
-    height: auto;
-    display: flex;
-    /* Atacamos la 'funda' del carrusel que es la que está rompiendo el diseño */
-    overflow: hidden !important; /* Esto obliga a la funda a respetar la forma */
-    border-top-left-radius: 20px !important;  /* Curva arriba izquierda */
-    border-top-right-radius: 20px !important; /* Curva arriba derecha */
-    border-bottom-left-radius: 0px !important;  /* Cuadrada abajo */
-    border-bottom-right-radius: 0px !important; /* Cuadrada abajo */
+    height: auto !important;
+    display: flex !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
     background: transparent !important;
 }
 
-/* 4. RESET TOTAL DEL CONTENEDOR */
-.row-carousel .ad-card {
+/* Tablet: 2 columnas */
+@media (max-width: 1024px) {
+    .row-carousel .swiper-slide {
+        width: 48% !important;
+    }
+}
+
+/* Mobile: 1 columna */
+@media (max-width: 768px) {
+    .row-carousel .swiper-slide {
+        width: 85% !important;
+        margin: 0 8px !important;
+    }
+}
+
+/* 4. RESET TOTAL DEL CONTENEDOR - La tarjeta dentro del slide */
+.row-carousel .ad-card,
+.row-carousel .property-card,
+.row-carousel .box {
+    width: 100% !important;
+    max-width: 100% !important;
     padding: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     border-top-left-radius: 20px !important;
     border-top-right-radius: 20px !important;
     border-bottom-left-radius: 0px !important;
@@ -1776,17 +1791,6 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* Banner horizontal único que rompe la cuadrícula */
 /* ================================================= */
 
-/* Contenedor principal que sincroniza Banner + Grid */
-.main-content-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px;
-    /* Degradado muy suave para que el Banner Elite flote */
-    background: linear-gradient(to bottom, #f1f5f9, #f8fafc);
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border-radius: 20px;
-}
 
 /* Responsive para el contenedor principal */
 @media (max-width: 768px) {
@@ -1810,7 +1814,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     transform: translateX(-50%);
     padding: 0;
     margin-top: -30px;
-    margin-bottom: 40px;
+    margin-bottom: 100px;
 }
 
 /* === SLIDER CONTAINER PARA MÚLTIPLES BANNERS === */
@@ -2557,13 +2561,13 @@ main, section.hero-search, section.categories-showcase, section.products {
 .row-carousel .swiper-wrapper {
     padding: 0 !important;
     margin: 0 !important;
-    gap: 0 !important;
+    gap: 15px !important;
 }
 
 /* 2. Forzamos a que el SLIDE ocupe todo su espacio sin márgenes */
 .row-carousel .swiper-slide {
     padding: 0 !important;
-    margin-right: 25px !important; /* Mantenemos solo la separación entre tarjetas */
+    margin: 0 5px !important; /* Margen reducido */
     display: flex !important;
     justify-content: center !important;
 }
@@ -2574,7 +2578,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 20px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
 }
 
 /* 4. La Imagen: El toque final para que toque los bordes */
@@ -2612,7 +2616,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* ATACAMOS AL PADRE (Contenedor externo) */
 .row-carousel {
-    width: 108% !important;
+    width: 100% !important;
     padding: 0 !important;
     margin: 0 auto !important;
     overflow: hidden !important; /* Esencial para que no se vea el scroll lateral */
@@ -2621,7 +2625,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* ATACAMOS AL RIEL (Donde corren las tarjetas) */
 .row-carousel .swiper-wrapper {
     display: flex !important;
-    gap: 0 !important; /* IMPORTANTE: El gap lo debe manejar Swiper, no el CSS */
+    gap: 13px !important;
     padding: 0 !important;
 }
 
@@ -2629,16 +2633,6 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* AMPLIACIÓN DE TARJETAS - Contenedor y Grid */
 /* ===================================================== */
 
-/* 1. ROMPEMOS EL CONTENEDOR FANTASMA */
-#index-page .main-content-wrapper,
-#index-page .recently-added-container,
-#index-page #products .container {
-    max-width: 1400px !important;
-    width: 95% !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    display: block !important;
-}
 
 /* Additional home-specific styles from style.css */
 #index-page .ad-card, 
@@ -2776,7 +2770,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     border: none;
     border-radius: 5px;
     padding: 2rem 1.8rem;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -2861,9 +2855,9 @@ main, section.hero-search, section.categories-showcase, section.products {
 #index-page .row-4-cols {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  width: 100%;
-  margin: 30px auto;
+  gap: 20px !important;
+  width: 95%;
+  margin: 10px auto 20px auto !important;
   max-width: 2400px;
 }
 
