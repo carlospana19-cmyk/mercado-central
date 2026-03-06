@@ -245,7 +245,7 @@ async function loadAndFilterResults() {
 
     let queryBuilder = supabase
       .from('anuncios')
-      .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)', { count: 'exact' })
+      .select('*, imagenes(url_imagen), profiles(nombre_negocio, nombre_completo, url_foto_perfil)', { count: 'exact' })
       // Prioridad: premium y destacados activos primero
       .order('featured_plan', { ascending: false })
       .order('featured_until', { ascending: false, nullsFirst: false })
@@ -430,54 +430,29 @@ function displayFilteredProducts(ads) {
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
         const categoria = ad.categoria ? ad.categoria.toLowerCase() : '';
         
-        // SISTEMA DE DESTACADOS: Badges con estrellas
-// BADGE ESTELAR METÁLICO – versión SVG simple
-let badgeHTML = '';
-let cardExtraClass = '';
+        // SISTEMA DE DESTACADOS: Badges con coronas
+        let cardExtraClass = '';
 
-const badgeSVG = (colorClass) => `
-<svg class="simple-badge-svg ${colorClass}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <!-- Aro de estrella (12 puntas) -->
-    <path d="M50 2 
-             L63.5 18.5 L84.5 15.5 
-             L87.5 36.5 L100 50 
-             L87.5 63.5 L84.5 84.5 
-             L63.5 81.5 L50 98 
-             L36.5 81.5 L15.5 84.5 
-             L12.5 63.5 L0 50 
-             L12.5 36.5 L15.5 15.5 
-             L36.5 18.5 Z" 
-          class="badge-star-bg"/>
-
-    <!-- Círculo blanco de fondo -->
-    <circle cx="50" cy="50" r="32" 
-            fill="white" 
-            stroke="white" 
-            stroke-width="1"/>
-
-    <!-- Estrella central - SOLO CONTORNO (stroke), sin relleno -->
-    <polygon points="50,28 57,45 75,45 61,56 66,73 50,60 32,70 38,53 25,43 42,43" 
-             class="badge-center-star"
-             fill="none"
-             stroke-width="2.5"
-             stroke-linecap="round"
-             stroke-linejoin="round"/>
-</svg>
-`;
-
-if (ad.featured_plan === "top") {
-  badgeHTML = badgeSVG("diamond-badge");
-  cardExtraClass = "card-top";
-} else if (ad.featured_plan === "destacado") {
-  badgeHTML = badgeSVG("gold-badge");
-  cardExtraClass = "card-destacado";
-} else if (ad.featured_plan === "premium") {
-  badgeHTML = badgeSVG("silver-badge");
-  cardExtraClass = "card-premium";
-} else if (ad.featured_plan === "basico") {
-  badgeHTML = badgeSVG("bronze-badge");
-  cardExtraClass = "card-basico";
-}
+        // === LÓGICA DE BADGES CON CORONAS SEGÚN EL PLAN ===
+        const plan = ad.featured_plan ? ad.featured_plan.toLowerCase() : 'free';
+        let crownBadgeHTML = '';
+        
+        if (plan === 'basico') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-bronze"></i></div>`;
+            cardExtraClass = 'card-basico';
+        } else if (plan === 'premium') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-silver"></i></div>`;
+            cardExtraClass = 'card-premium';
+        } else if (plan === 'top') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
+            cardExtraClass = 'card-top';
+        } else if (plan === 'destacado') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
+            cardExtraClass = 'card-destacado';
+        } else if (plan === 'elite') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-gem crown-diamond"></i></div>`;
+            cardExtraClass = 'card-elite';
+        }
         
         // Badge de urgente con ícono de reloj
         let urgentBadge = '';
@@ -788,6 +763,7 @@ if (ad.featured_plan === "top") {
         
         // ✅ Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
         const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
+        const vendorFullName = vendorProfile?.nombre_completo || '';
         const vendorPhoto = vendorProfile?.url_foto_perfil;
         const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
         // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
@@ -800,7 +776,7 @@ if (ad.featured_plan === "top") {
 
 return `
         <div class="property-card card ${cardExtraClass} ${soldClass}" style="${ad.is_sold ? 'cursor: default;' : 'cursor: pointer;'}">
-                ${badgeHTML}
+                ${crownBadgeHTML}
                 ${urgentBadge}
                 ${soldBadgeResults}
                 <div class="card-actions">
@@ -836,7 +812,7 @@ return `
         
                 <div class="property-details">
                         <div class="property-header">
-                                <div class="property-seller-name">${ad.contact_name || 'Usuario Verificado'}</div>
+                                <div class="property-seller-name">${ad.contact_name || vendorFullName || 'Usuario Verificado'}</div>
                                 <div class="property-price-and-tag">
                                         <span class="property-price">${priceFormatted}</span>
                                         ${ad.enhancements && ad.enhancements.is_urgent ? '<span class="tag-oportunidad">Oportunidad</span>' : ''}
@@ -850,9 +826,13 @@ return `
                                 <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
                         </div>
             
-                        <div class="property-attributes">
-                ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
-                        </div>
+                        ${(() => {
+                            const attrHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
+                            // Solo creamos el contenedor si attrHTML tiene contenido real
+                            return attrHTML && attrHTML !== '' && attrHTML !== '<span></span>' 
+                                ? `<div class="property-attributes">${attrHTML}</div>` 
+                                : ''; 
+                        })()}
             
             <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
                 Contactar

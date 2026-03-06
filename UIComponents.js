@@ -54,6 +54,7 @@ export const UIComponents = {
         const attributes = ad.atributos_clave || {};
         const category = ad.categoria || '';
         const categoria = category.toLowerCase();
+        const subcategory = ad.subcategoria || attributes.subcategoria || '';
         let detailsHTML = '';
 
         // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
@@ -78,19 +79,18 @@ export const UIComponents = {
             }
         }
 
-        // --- ELECTRÓNICA ---
+        // --- ELECTRÓNICA (Iconos más tecnológicos y precisos) ---
         const electronicsSubcats = ["celulares y teléfonos", "computadoras", "consolas y videojuegos", "audio y video", "fotografía", "electrónica"];
         if (electronicsSubcats.some(subcat => categoria.includes(subcat))) {
             let details = [];
-            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
-            if (attributes.modelo) details.push(`<span><i class="fas fa-mobile-alt"></i> ${attributes.modelo}</span>`);
-            if (attributes.almacenamiento) details.push(`<span><i class="fas fa-hdd"></i> ${attributes.almacenamiento} GB</span>`);
-            if (attributes.memoria_ram) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.memoria_ram} GB RAM</span>`);
+
+            if (attributes.marca) details.push(`<span><i class="fas fa-cube"></i> ${attributes.marca}</span>`); // Cubo 3D en lugar de etiqueta
+            if (attributes.modelo) details.push(`<span><i class="fas fa-laptop-code"></i> ${attributes.modelo}</span>`); // Laptop moderna
+            if (attributes.almacenamiento) details.push(`<span><i class="fas fa-database"></i> ${attributes.almacenamiento} GB</span>`); // Base de datos (más pro)
+            if (attributes.memoria_ram) details.push(`<span><i class="fas fa-memory"></i> ${attributes.memoria_ram} GB RAM</span>`); // Chip de memoria real
             if (attributes.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.procesador}</span>`);
-            if (attributes.tipo_computadora) details.push(`<span><i class="fas fa-laptop"></i> ${attributes.tipo_computadora}</span>`);
-            if (attributes.plataforma) details.push(`<span><i class="fas fa-gamepad"></i> ${attributes.plataforma}</span>`);
-            if (attributes.condicion) details.push(`<span><i class="fas fa-star"></i> ${attributes.condicion}</span>`);
-            if (attributes.tipo_articulo) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.tipo_articulo}</span>`);
+            if (attributes.condicion) details.push(`<span><i class="fas fa-award"></i> ${attributes.condicion}</span>`); // Medalla/Premio en lugar de estrella
+
             if (details.length > 0) {
                 detailsHTML += `<div class="electronics-details">${details.slice(0, 3).join('')}</div>`;
             }
@@ -124,20 +124,16 @@ export const UIComponents = {
             }
         }
 
-        // --- MODA Y BELLEZA ---
-        const fashionSubcats = ["ropa de mujer", "ropa de hombre", "ropa de niños", "calzado", "bolsos y carteras", "accesorios", "joyería y relojes", "salud y belleza", "moda y belleza"];
-        if (fashionSubcats.some(subcat => categoria.includes(subcat))) {
+        // --- MODA Y BELLEZA (Iconos de estilo) ---
+        if (categoria.includes('moda') || categoria.includes('belleza') || categoria.includes('ropa')) {
             let details = [];
-            if (attributes.tipo_prenda) details.push(`<span><i class="fas fa-tshirt"></i> ${attributes.tipo_prenda}</span>`);
-            if (attributes.tipo_calzado) details.push(`<span><i class="fas fa-shoe-prints"></i> ${attributes.tipo_calzado}</span>`);
-            if (attributes.tipo_bolso) details.push(`<span><i class="fas fa-shopping-bag"></i> ${attributes.tipo_bolso}</span>`);
-            if (attributes.tipo_accesorio) details.push(`<span><i class="fas fa-glasses"></i> ${attributes.tipo_accesorio}</span>`);
-            if (attributes.tipo_joya) details.push(`<span><i class="fas fa-gem"></i> ${attributes.tipo_joya}</span>`);
-            if (attributes.tipo_producto) details.push(`<span><i class="fas fa-spray-can"></i> ${attributes.tipo_producto}</span>`);
-            if (attributes.talla) details.push(`<span><i class="fas fa-ruler"></i> Talla ${attributes.talla}</span>`);
-            if (attributes.talla_calzado) details.push(`<span><i class="fas fa-ruler"></i> Talla ${attributes.talla_calzado}</span>`);
-            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
-            if (attributes.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.condicion}</span>`);
+            
+            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`); // Etiqueta de marca
+            if (attributes.talla) details.push(`<span><i class="fas fa-tshirt"></i> Talla: ${attributes.talla}</span>`); // Prenda de ropa
+            if (attributes.color) details.push(`<span><i class="fas fa-palette"></i> ${attributes.color}</span>`); // Paleta de colores
+            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`); // Diamante de calidad
+            if (attributes.edad) details.push(`<span><i class="fas fa-child"></i> Edad: ${attributes.edad}</span>`); // Para ropa de niños
+            
             if (details.length > 0) {
                 detailsHTML += `<div class="fashion-details">${details.slice(0, 3).join('')}</div>`;
             }
@@ -158,16 +154,32 @@ export const UIComponents = {
             }
         }
 
-        // --- MASCOTAS ---
-        const petsSubcats = ["Perros", "Gatos", "Aves", "Peces", "Otros Animales", "Accesorios para Mascotas"];
-        if (attributes.subcategoria && petsSubcats.includes(attributes.subcategoria)) {
+        // --- MASCOTAS (Iconos dinámicos y amigables) ---
+        if (categoria.includes('mascota') || categoria.includes('animales')) {
             let details = [];
-            if (attributes.tipo_anuncio) details.push(`<span><i class="fas fa-paw"></i> ${attributes.tipo_anuncio}</span>`);
-            if (attributes.tipo_accesorio) details.push(`<span><i class="fas fa-bone"></i> ${attributes.tipo_accesorio}</span>`);
-            if (attributes.raza) details.push(`<span><i class="fas fa-dog"></i> ${attributes.raza}</span>`);
-            if (attributes.edad_mascota) details.push(`<span><i class="fas fa-birthday-cake"></i> ${attributes.edad_mascota}</span>`);
-            if (attributes.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attributes.genero}</span>`);
-            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+            
+            // Magia: Cambiamos el icono principal dependiendo de si es perro, gato o ave
+            let iconMascota = '<i class="fas fa-paw"></i>'; // Huella por defecto
+            if (subcategory) {
+                const sub = subcategory.toLowerCase();
+                if (sub.includes('perro')) iconMascota = '<i class="fas fa-dog"></i>';
+                else if (sub.includes('gato')) iconMascota = '<i class="fas fa-cat"></i>';
+                else if (sub.includes('ave') || sub.includes('pájaro')) iconMascota = '<i class="fas fa-dove"></i>';
+                else if (sub.includes('pez') || sub.includes('peces')) iconMascota = '<i class="fas fa-fish"></i>';
+            }
+
+            if (attributes.raza) details.push(`<span>${iconMascota} ${attributes.raza}</span>`);
+            if (attributes.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attributes.genero}</span>`); // Símbolo de género
+            
+            // Validamos si la edad ya trae texto para no duplicar la palabra "años"
+            if (attributes.edad_mascota) {
+                const edad = attributes.edad_mascota;
+                const textoEdad = isNaN(edad) ? edad : `${edad} años`;
+                details.push(`<span><i class="fas fa-birthday-cake"></i> ${textoEdad}</span>`); 
+            }
+            
+            if (attributes.tipo_anuncio) details.push(`<span><i class="fas fa-bullhorn"></i> ${attributes.tipo_anuncio}</span>`);
+
             if (details.length > 0) {
                 detailsHTML += `<div class="pets-details">${details.slice(0, 3).join('')}</div>`;
             }
@@ -185,26 +197,40 @@ export const UIComponents = {
             }
         }
 
-        // --- NEGOCIOS ---
+        // --- NEGOCIOS (Iconos corporativos y serios) ---
         const businessSubcats = ["Equipos para Negocios", "Maquinaria para Negocios", "Negocios en Venta"];
         if (attributes.subcategoria && businessSubcats.includes(attributes.subcategoria)) {
             let details = [];
-            if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-briefcase"></i> ${attributes.tipo_negocio}</span>`);
-            if (attributes.tipo_equipo) details.push(`<span><i class="fas fa-cogs"></i> ${attributes.tipo_equipo}</span>`);
-            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
-            if (attributes.modelo) details.push(`<span><i class="fas fa-barcode"></i> ${attributes.modelo}</span>`);
-            if (attributes.años_operacion) details.push(`<span><i class="fas fa-calendar-check"></i> ${attributes.años_operacion}</span>`);
-            if (attributes.incluye) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.incluye}</span>`);
-            if (attributes.razon_venta) details.push(`<span><i class="fas fa-info-circle"></i> ${attributes.razon_venta}</span>`);
-            if (attributes.condicion) details.push(`<span><i class="fas fa-star"></i> ${attributes.condicion}</span>`);
+            
+            if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-building"></i> ${attributes.tipo_negocio}</span>`); // Edificio corporativo
+            if (attributes.razon_venta) details.push(`<span><i class="fas fa-handshake"></i> ${attributes.razon_venta}</span>`); // Apretón de manos
+            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`); // Diamante (Calidad/Condición)
+            
             if (details.length > 0) {
                 detailsHTML += `<div class="business-details">${details.slice(0, 3).join('')}</div>`;
             }
         }
 
-        // Si no hay atributos específicos, usar el método original de APP_CONFIG
-        if (!detailsHTML) {
-            detailsHTML = this._renderAttributesFallback(ad);
+        // --- COMUNIDAD, CLASES Y EVENTOS (Iconos dinámicos) ---
+        const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
+        if (attributes.subcategoria && communitySubcats.includes(attributes.subcategoria)) {
+            let details = [];
+            
+            if (attributes.tipo_evento) details.push(`<span><i class="fas fa-ticket-alt"></i> ${attributes.tipo_evento}</span>`); // Ticket de entrada
+            if (attributes.tipo_actividad) details.push(`<span><i class="fas fa-user-friends"></i> ${attributes.tipo_actividad}</span>`); // Grupo de personas
+            if (attributes.tipo_clase) details.push(`<span><i class="fas fa-book-reader"></i> ${attributes.tipo_clase}</span>`); // Persona leyendo
+            if (attributes.nivel) details.push(`<span><i class="fas fa-layer-group"></i> ${attributes.nivel}</span>`); // Capas/Niveles
+            if (attributes.modalidad) details.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`); // Globo terráqueo (Online/Global)
+            if (attributes.fecha_evento) details.push(`<span><i class="far fa-calendar-check"></i> ${attributes.fecha_evento}</span>`); // Calendario con check
+            
+            if (details.length > 0) {
+                detailsHTML += `<div class="community-details">${details.slice(0, 3).join('')}</div>`;
+            }
+        }
+
+        // Si hay atributos pero no coincidieron con ninguna categoría, devolvemos vacío
+        if (detailsHTML === '') {
+            return '';
         }
 
         return detailsHTML;
@@ -268,7 +294,7 @@ export const UIComponents = {
             }
         });
 
-        return html || '<span><i class="fas fa-info-circle"></i> Ver detalles</span>';
+        return html || '';
     }
 };
 
@@ -277,6 +303,11 @@ export const UIComponents = {
  * Función que era exportada por utils-attributes.js
  */
 export function generateAttributesHTML(attributes, category, subcategory) {
+    // 1. SI NO HAY ATRIBUTOS, NO DEVOLVEMOS NADA (tarjeta limpia)
+    if (!attributes || Object.keys(attributes).length === 0) {
+        return '';
+    }
+
     // Crear un objeto "ad" falso para usar el método unificado
     const ad = {
         atributos_clave: attributes,

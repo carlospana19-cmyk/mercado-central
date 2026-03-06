@@ -49,8 +49,7 @@ export const STRIPE_PLANS = {
             'Acceso a 25000+ compradores',
             'Estadísticas en tiempo real',
             'Reposicionamiento cada hora',
-            'Promoción en redes sociales',
-            'Soporte prioritario 24/7'
+            'Promoción en redes sociales'
         ]
     }
 };

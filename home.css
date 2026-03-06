@@ -339,7 +339,7 @@
   align-items: center;
   background: var(--color-blanco);
   border-radius: .5rem;
-  padding: 0 1.5rem;
+  padding: 0.5rem;
 }
 
 .search-field i {
@@ -1626,29 +1626,12 @@ main, section.hero-search, section.categories-showcase, section.products {
 .row-nav-next {
     position: absolute;
     background: rgba(255, 255, 255, 0.9) !important;
-    width: 45px !important;
-    height: 100% !important;        /* Ocupan todo el alto de la tarjeta */
-    border: 1px solid #ddd;
-    cursor: pointer;
-    z-index: 100;
-    top: 0 !important;              /* Desde el borde superior */
-    transform: none !important;      /* Sin centrado vertical */
-    transition: all 0.3s ease;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #333 !important;
     font-size: 18px;
 }
 
 .row-nav-prev {
     left: 0 !important;             /* Pegada al borde izquierdo */
     border-radius: 0 12px 12px 0 !important; /* Curva solo hacia adentro */
-}
-
-.row-nav-next {
-    right: 0 !important;            /* Pegada al borde derecho */
-    border-radius: 12px 0 0 12px !important; /* Curva solo hacia adentro */
 }
 
 .row-nav-prev:hover,
@@ -3207,4 +3190,91 @@ main, section.hero-search, section.categories-showcase, section.products {
         font-size: 1.5rem !important;
         padding-left: 10px;
     }
+}
+
+/* =========================================================
+   BADGES DE PLANES (CORONAS: Bronce, Plata, Oro, Diamante)
+   ========================================================= */
+
+/* Estilo base para todas las coronas en las tarjetas */
+.plan-badge-icon {
+    font-size: 1.2rem !important;
+    margin-right: 5px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+/* Badge base para los planes */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Badge Básico - Bronce */
+.badge-basico {
+    background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+    color: #fff;
+}
+
+/* Badge Premium - Plata */
+.badge-premium {
+    background: linear-gradient(135deg, #c0c0c0, #808080);
+    color: #333;
+}
+
+/* Badge Top - Oro */
+.badge-top {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #333;
+}
+
+/* Badge Elite - Diamante */
+.badge-elite {
+    background: linear-gradient(135deg, #b9f2ff, #4682b4);
+    color: #fff;
+}
+
+/* 1. PLAN BÁSICO: Corona de Bronce */
+.crown-bronze {
+    color: #cd7f32 !important;
+}
+
+/* 2. PLAN PREMIUM: Corona de Plata */
+.crown-silver {
+    color: #847b7b !important;
+}
+
+/* 3. PLAN TOP/DESTACADO: Corona de Oro */
+.crown-gold {
+    color: #ffb906 !important;
+}
+
+/* 4. PLAN ELITE/MÁXIMO: Corona de Diamante */
+.crown-diamond {
+    color: #b9f2ff !important;
+    text-shadow: 1px 1px 0px #4682b4, -1px -1px 0px #ffffff !important;
+    filter: drop-shadow(0 0 6px rgba(185, 242, 255, 0.8)) !important;
+}
+
+/* Contenedor para la corona sobre la imagen (sin fondo) */
+.card-crown-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 100 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajuste del icono de la corona */
+.card-crown-badge i {
+    font-size: 2.2rem !important;
+    margin: 0 !important;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
 }

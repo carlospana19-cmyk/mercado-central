@@ -163,8 +163,6 @@ html {
 
 body {
   background: var(--color-fondo);
-  color: var(--color-texto);
-  font-size: 1.6rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -851,27 +849,6 @@ body {
 /* ========================================
    ESTILOS PARA DEPORTES Y HOBBIES
    ======================================== */
-.sports-details,
-.vehicle-details,
-.real-estate-details,
-.electronics-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
-
-.sports-details span,
-.vehicle-details span,
-.real-estate-details span,
-.electronics-details span {
-    display: flex !important;
-    align-items: center;
-    gap: 0.3rem;
-}
 
 .sports-details i,
 .vehicle-details i,
@@ -884,29 +861,6 @@ body {
 /* ========================================
    ESTILOS PARA MASCOTAS
    ======================================== */
-.pets-details,
-.vehicle-details,
-.real-estate-details,
-.electronics-details,
-.sports-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
-
-.pets-details span,
-.vehicle-details span,
-.real-estate-details span,
-.electronics-details span,
-.sports-details span {
-    display: flex !important;
-    align-items: center;
-    gap: 0.3rem;
-}
 
 .pets-details i,
 .vehicle-details i,
@@ -920,31 +874,6 @@ body {
 /* ========================================
    ESTILOS PARA SERVICIOS
    ======================================== */
-.services-details,
-.vehicle-details,
-.real-estate-details,
-.electronics-details,
-.sports-details,
-.pets-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
-
-.services-details span,
-.vehicle-details span,
-.real-estate-details span,
-.electronics-details span,
-.sports-details span,
-.pets-details span {
-    display: flex !important;
-    align-items: center;
-    gap: 0.3rem;
-}
 
 .services-details i,
 .vehicle-details i,
@@ -959,33 +888,6 @@ body {
 /* ========================================
    ESTILOS PARA NEGOCIOS
    ======================================== */
-.business-details,
-.vehicle-details,
-.real-estate-details,
-.electronics-details,
-.sports-details,
-.pets-details,
-.services-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
-
-.business-details span,
-.vehicle-details span,
-.real-estate-details span,
-.electronics-details span,
-.sports-details span,
-.pets-details span,
-.services-details span {
-    display: flex !important;
-    align-items: center;
-    gap: 0.3rem;
-}
 
 .business-details i,
 .vehicle-details i,
@@ -1001,36 +903,6 @@ body {
 /* ========================================
    ESTILOS PARA COMUNIDAD
    ======================================== */
-.community-details,
-.vehicle-details,
-.real-estate-details,
-.electronics-details,
-.sports-details,
-.pets-details,
-.services-details,
-.business-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
-
-.community-details span,
-.vehicle-details span,
-.real-estate-details span,
-.electronics-details span,
-.sports-details span,
-.pets-details span,
-.services-details span,
-.business-details span {
-    display: flex !important;
-    align-items: center;
-    gap: 0.3rem;
-}
-
 .community-details i,
 .vehicle-details i,
 .real-estate-details i,
@@ -1045,16 +917,6 @@ body {
 
 /* === ESTILOS UNIFICADOS PARA TODOS LOS DETALLES DE CATEGORÍAS === */
 
-/* Inmuebles - Mismo estilo que vehículos */
-.real-estate-details {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
 
 /* Electrónica - Mismo estilo que otras categorías */
 .electronics-details {
@@ -1158,7 +1020,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem !important;
-    font-size: 1.3rem !important;
+    font-size: 1.4rem !important;
     color: #444 !important;
     margin-bottom: 8px !important;
     font-weight: 500 !important;
@@ -1176,7 +1038,7 @@ body {
 .community-details span {
     display: flex !important;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.7rem;
 }
 
 .home-furniture-details i,
@@ -1190,7 +1052,7 @@ body {
 .business-details i,
 .community-details i {
     color: #666 !important;
-    font-size: 1.1rem !important;
+    font-size: 1.9rem !important;
 }
 .box .btn-contact {
   display: block;
@@ -2538,7 +2400,7 @@ body {
 
 /* Nuevos estilos para la estructura de la tarjeta */
 .property-seller-name {
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
     margin-bottom: 5px;
 }
@@ -3154,6 +3016,90 @@ body#pagina-login {
 .btn-close-modal:hover {
     color: #333;
     transform: rotate(90deg);
+}
+
+/* =========================================================
+   BADGES DE PLANES (CORONAS: Bronce, Plata, Oro, Diamante)
+   ========================================================= */
+
+/* Contenedor para la corona sobre la imagen (con fondo blanco) */
+.card-crown-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 100 !important;
+    background-color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* Ajuste del icono de la corona */
+.card-crown-badge i {
+    font-size: 2.2rem !important;
+    margin: 0 !important;
+}
+
+/* Badge base para los planes */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Badge Básico - Bronce */
+.badge-basico {
+    background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+    color: #fff;
+}
+
+/* Badge Premium - Plata */
+.badge-premium {
+    background: linear-gradient(135deg, #c0c0c0, #808080);
+    color: #333;
+}
+
+/* Badge Top - Oro */
+.badge-top {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #333;
+}
+
+/* Badge Elite - Diamante */
+.badge-elite {
+    background: linear-gradient(135deg, #b9f2ff, #4682b4);
+    color: #fff;
+}
+
+/* 1. PLAN BÁSICO: Corona de Bronce */
+.crown-bronze {
+    color: #cd7f32 !important;
+}
+
+/* 2. PLAN PREMIUM: Corona de Plata */
+.crown-silver {
+    color: #847b7b !important;
+}
+
+/* 3. PLAN TOP/DESTACADO: Corona de Oro */
+.crown-gold {
+    color: #ffb906 !important;
+}
+
+/* 4. PLAN ELITE/MÁXIMO: Corona de Diamante */
+.crown-diamond {
+    color: #b9f2ff !important;
+    text-shadow: 1px 1px 0px #4682b4, -1px -1px 0px #ffffff !important;
+    filter: drop-shadow(0 0 6px rgba(185, 242, 255, 0.8)) !important;
 }
 
 /* Responsivo */

@@ -343,7 +343,7 @@ main.container.publish-wizard {
 }
 
 .upload-limit {
-    font-size: 0.85rem;
+    font-size: 1.2rem;
     color: #4b5563; /* Gris más oscuro y legible */
     background: #f3f4f6;
     padding: 4px 12px;
@@ -433,14 +433,14 @@ main.container.publish-wizard {
 }
 
 .drop-area i {
-    font-size: 3rem;
+    font-size: 5rem;
     color: #00bfae;
     margin-bottom: 15px;
     transition: all 0.3s ease;
 }
 
 .drop-area p {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     color: #374151;
     font-weight: 500;
     margin: 0;

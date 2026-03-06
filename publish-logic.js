@@ -930,79 +930,85 @@ function showCommunityFields() {
                     </div>
                     <div class="plans-container">
                         <div class="plan-option plan-free" data-plan="gratis">
-                            <h3>Gratis</h3>
-                            <p class="plan-price">$0</p>
+                            <div class="plan-badge">Recomendado</div>
+                            <h3>GRATIS</h3>
+                            <p class="plan-price">$0.00</p>
                             <ul class="plan-features">
-                                <li>✓ 2 fotos</li>
-                                <li>✓ 1 anuncio activo</li>
+                                <li>✓ Hasta 3 fotos</li>
+                                <li>✓ Publicación inmediata</li>
+                                <li>✓ Acceso a 500+ compradores</li>
                                 <li>✓ 30 días de vigencia</li>
-                                <li>✗ Sin galería de fotos</li>
-                                <li>✗ Sin videos</li>
                             </ul>
                             <button class="btn-plan btn-plan-free" data-plan="gratis">
-                                Crear Cuenta Gratis
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-basico" data-plan="basico">
                             <div class="plan-badge">Popular</div>
-                            <h3>Básico</h3>
-                            <p class="plan-price">$5.99<span>/mes</span></p>
+                            <h3>BÁSICO</h3>
+                            <p class="plan-price">$5.00</p>
                             <ul class="plan-features">
-                                <li>✓ 5 fotos</li>
-                                <li>✓ 3 anuncios activos</li>
-                                <li>✓ 60 días de vigencia</li>
-                                <li>✓ Galería de fotos básica</li>
-                                <li>✗ Sin videos</li>
+                                <li>✓ Hasta 5 fotos</li>
+                                <li>✓ Destaca sobre anuncios gratis</li>
+                                <li>✓ Acceso a 2000+ compradores</li>
+                                <li>✓ Reposicionamiento diario</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="basico">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-premium" data-plan="premium">
-                            <h3>Premium</h3>
-                            <p class="plan-price">$9.99<span>/mes</span></p>
+                            <div class="plan-badge">Best Seller</div>
+                            <h3>PREMIUM</h3>
+                            <p class="plan-price">$10.00</p>
                             <ul class="plan-features">
-                                <li>✓ 10 fotos</li>
-                                <li>✓ 5 anuncios activos</li>
-                                <li>✓ 90 días de vigencia</li>
-                                <li>✓ Galería completa</li>
-                                <li>✓ Videos incluidos</li>
+                                <li>✓ Hasta 10 fotos + carrusel</li>
+                                <li>✓ Destacado en resultados</li>
+                                <li>✓ Acceso a 5000+ compradores</li>
+                                <li>✓ Estadísticas básicas</li>
+                                <li>✓ Reposicionamiento cada 6 horas</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="premium">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-destacado" data-plan="destacado">
-                            <h3>Destacado</h3>
-                            <p class="plan-price">$14.99<span>/mes</span></p>
+                            <h3>DESTACADO</h3>
+                            <p class="plan-price">$20.00</p>
                             <ul class="plan-features">
-                                <li>✓ 15 fotos</li>
-                                <li>✓ 10 anuncios activos</li>
-                                <li>✓ 180 días de vigencia</li>
-                                <li>✓ Galería + Carrusel</li>
-                                <li>✓ Videos + Vivo</li>
+                                <li>✓ Hasta 15 fotos + carrusel</li>
+                                <li>✓ Posición premium en búsquedas</li>
+                                <li>✓ Acceso a 10000+ compradores</li>
+                                <li>✓ Estadísticas detalladas</li>
+                                <li>✓ Reposicionamiento cada 3 horas</li>
+                                <li>✓ 1 video HD</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="destacado">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-top" data-plan="top">
-                            <div class="plan-badge">Premium</div>
-                            <h3>Top</h3>
-                            <p class="plan-price">$19.99<span>/mes</span></p>
+                            <div class="plan-badge">Máxima Visibilidad</div>
+                            <h3>TOP</h3>
+                            <p class="plan-price">$25.00</p>
                             <ul class="plan-features">
-                                <li>✓ 20 fotos</li>
-                                <li>✓ 15 anuncios activos</li>
-                                <li>✓ 365 días de vigencia</li>
-                                <li>✓ Todas las características</li>
-                                <li>✓ Soporte prioritario</li>
+                                <li>✓ Hasta 20 fotos + 2 videos</li>
+                                <li>✓ Posición top en todas búsquedas</li>
+                                <li>✓ Acceso a 25000+ compradores</li>
+                                <li>✓ Estadísticas en tiempo real</li>
+                                <li>✓ Reposicionamiento cada hora</li>
+                                <li>✓ Promoción en redes sociales</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="top">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
                     </div>
@@ -1405,14 +1411,32 @@ function showCommunityFields() {
     coverImageInput.addEventListener('change', function() {
         const file = this.files[0];
         const coverImageError = document.getElementById('cover-image-error');
+        const coverPreviewContainer = document.getElementById('cover-image-preview');
+        const coverPreviewImg = document.getElementById('cover-preview-img');
+        
         if (file) {
             coverImageName.textContent = file.name;
+            
+            // Mostrar previsualización de la imagen
+            if (coverPreviewContainer && coverPreviewImg) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    coverPreviewImg.src = e.target.result;
+                    coverPreviewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+            
             // Ocultar mensaje de error si hay imagen
             if (coverImageError) {
                 coverImageError.style.display = 'none';
             }
         } else {
             coverImageName.textContent = 'Ningún archivo seleccionado.';
+            // Ocultar previsualización
+            if (coverPreviewContainer) {
+                coverPreviewContainer.style.display = 'none';
+            }
         }
     });
 

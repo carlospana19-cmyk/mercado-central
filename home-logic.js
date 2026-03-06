@@ -126,6 +126,20 @@ const getVideoEmbedUrl = (videoUrl) => {
                 let badgeHTML = '';
                 let cardExtraClass = '';
 
+                // === LÓGICA DE BADGES CON CORONAS SEGÚN EL PLAN ===
+                const plan = ad.featured_plan ? ad.featured_plan.toLowerCase() : 'free';
+                let crownBadgeHTML = '';
+                
+                if (plan === 'basico') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-bronze"></i></div>`;
+                } else if (plan === 'premium') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-silver"></i></div>`;
+                } else if (plan === 'top' || plan === 'destacado') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
+                } else if (plan === 'elite') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-gem crown-diamond"></i></div>`;
+                }
+
                 let urgentBadge = '';
                 if (ad.enhancements && ad.enhancements.is_urgent) {
                     urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
@@ -176,7 +190,7 @@ const getVideoEmbedUrl = (videoUrl) => {
 
                 return `
                     <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory}>
-                       ${badgeHTML}
+                       ${crownBadgeHTML}
                          ${urgentBadge}
                          ${soldBadgeHome}
                          <div class="card-actions">
@@ -201,7 +215,13 @@ const getVideoEmbedUrl = (videoUrl) => {
                             </div>
                             <h3 class="property-title">${ad.titulo}</h3>
                             <p class="property-location"><i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}</p>
-                            <div class="property-specs">${generateAttributesHTML(ad.atributos_clave, ad.categoria)}</div>
+                            ${(() => {
+                                const attrHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
+                                // Solo creamos el contenedor si attrHTML tiene contenido real
+                                return attrHTML && attrHTML !== '' && attrHTML !== '<span></span>' 
+                                    ? `<div class="property-specs">${attrHTML}</div>` 
+                                    : ''; 
+                            })()}
                             ${profilePhotoHTML}
                             <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>
                         </div>
@@ -236,7 +256,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                     : '<span class="no-reviews">Sin reseñas</span>';
                 
                 // Atributos del producto
-                const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria);
+                const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
                 // Extraer solo los spans de atributos para el banner
                 const attributeMatches = attributesHTML.match(/<span[^>]*>.*?<\/span>/g) || [];
                 const eliteAttributes = attributeMatches.slice(0, 4).map(attr => {
