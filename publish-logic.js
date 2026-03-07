@@ -4,6 +4,7 @@ import { supabase } from './supabase-client.js';
 import { districtsByProvince } from './config-locations.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
 import { APP_CONFIG } from './AppConfig.js';
+import mapsIntegration from './google-maps-integration.js';
 
 // =====================================================
 // GUARDIÁN DE PUBLICACIÓN - Validación de Sesión
@@ -310,7 +311,7 @@ export async function initializePublishPage() {
     const galleryPreviewContainer = document.getElementById('gallery-preview-container');
     const contactName = document.getElementById('contact-name');
     const contactEmail = document.getElementById('contact-email');
-    const nextBtns = form.querySelectorAll('.next-btn, #continue-to-details'); // Botón para ir a Detalles
+    const nextBtns = form.querySelectorAll('.next-btn'); // Botones de siguiente en otros pasos
     const backBtns = form.querySelectorAll('.back-btn');
 
     let allCategories = [];
@@ -993,24 +994,6 @@ function showCommunityFields() {
                                 Seleccionar
                             </button>
                         </div>
-
-                        <div class="plan-option plan-top" data-plan="top">
-                            <div class="plan-badge">Máxima Visibilidad</div>
-                            <h3>TOP</h3>
-                            <p class="plan-price">$25.00</p>
-                            <ul class="plan-features">
-                                <li>✓ Hasta 20 fotos + 2 videos</li>
-                                <li>✓ Posición top en todas búsquedas</li>
-                                <li>✓ Acceso a 25000+ compradores</li>
-                                <li>✓ Estadísticas en tiempo real</li>
-                                <li>✓ Reposicionamiento cada hora</li>
-                                <li>✓ Promoción en redes sociales</li>
-                                <li>✓ 30 días de vigencia</li>
-                            </ul>
-                            <button class="btn-plan btn-plan-paid" data-plan="top">
-                                Seleccionar
-                            </button>
-                        </div>
                     </div>
                     <button class="btn-close-modal" id="closePlanModal">✕</button>
                 </div>
@@ -1369,6 +1352,65 @@ function showCommunityFields() {
     }
 
     // --- LÓGICA DE UBICACIÓN ---
+    // Variable para controlar si el mapa ya está inicializado
+    let mapInitialized = false;
+    let currentProvince = '';
+
+    // Función para inicializar y mostrar el mapa
+    async function initializeAndShowMap(province) {
+        const mapContainer = document.getElementById('map-container');
+        currentProvince = province;
+        
+        try {
+            // Cargar la API de Google Maps si no está cargada
+            if (!mapInitialized) {
+                await mapsIntegration.loadMapsAPI();
+                mapsIntegration.initMap('province-map', {
+                    zoom: 10
+                });
+                mapInitialized = true;
+            }
+            
+            // Mostrar la provincia en el mapa
+            mapsIntegration.showProvinceOnMap(province);
+            
+            // Mostrar el contenedor del mapa
+            if (mapContainer) {
+                mapContainer.style.display = 'block';
+            }
+            
+            console.log('Mapa mostrado para:', province);
+        } catch (error) {
+            console.error('Error al mostrar el mapa:', error);
+        }
+    }
+
+    // Función para mostrar el distrito en el mapa
+    async function showDistrictOnMap() {
+        const provinceSelect = document.getElementById('province-step4');
+        const districtSelect = document.getElementById('district-step4');
+        
+        if (!provinceSelect || !districtSelect) return;
+        
+        const province = provinceSelect.value;
+        const district = districtSelect.value;
+        
+        if (district && province) {
+            try {
+                if (!mapInitialized) {
+                    await mapsIntegration.loadMapsAPI();
+                    mapsIntegration.initMap('province-map', { zoom: 10 });
+                    mapInitialized = true;
+                }
+                
+                mapsIntegration.showDistrictOnMap(province, district);
+                console.log('Mapa mostrado para:', district, province);
+            } catch (error) {
+                console.error('Error al mostrar el distrito:', error);
+            }
+        }
+    }
+
     // Función para manejar cambio de provincia (compartida)
     function handleProvinceChange(selectElement, districtGroupEl, districtSelectEl) {
         const province = selectElement.value;
@@ -1388,6 +1430,17 @@ function showCommunityFields() {
             districtGroupEl.style.display = 'none';
             districtSelectEl.innerHTML = '';
         }
+        
+        // === MOSTRAR EL MAPA CUANDO SE SELECCIONA UNA PROVINCIA ===
+        const mapContainer = document.getElementById('map-container');
+        if (province) {
+            initializeAndShowMap(province);
+        } else {
+            if (mapContainer) {
+                mapContainer.style.display = 'none';
+            }
+            mapsIntegration.hideMap();
+        }
     }
 
     // Event listener para provincia del Paso 2
@@ -1404,41 +1457,171 @@ function showCommunityFields() {
         });
     }
 
+    // Event listener para botón de ubicación actual
+    const getLocationBtn = document.getElementById('get-current-location');
+    if (getLocationBtn) {
+        getLocationBtn.addEventListener('click', async function() {
+            const mapContainer = document.getElementById('map-container');
+            
+            // Mostrar indicador de carga
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+            this.disabled = true;
+
+            try {
+                await mapsIntegration.showCurrentLocation();
+                
+                // Mostrar el contenedor del mapa
+                if (mapContainer) {
+                    mapContainer.style.display = 'block';
+                }
+                
+                console.log('Ubicación actual mostrada');
+            } catch (error) {
+                let message = 'No se pudo obtener tu ubicación.';
+                
+                // Mensajes más específicos según el error
+                if (error.message.includes('denied') || error.message.includes('denegado')) {
+                    message = 'Permiso de ubicación denegado. Por favor permite el acceso en tu navegador.';
+                } else if (error.message.includes('unavailable') || error.message.includes('disponible')) {
+                    message = 'Tu ubicación no está disponible. Verifica tu conexión a internet.';
+                } else if (error.message.includes('timeout') || error.message.includes('tiempo')) {
+                    message = 'Tiempo de espera agotado. Intenta de nuevo.';
+                } else if (error.message.includes('soportada') || error.message.includes('soportado')) {
+                    message = 'Tu navegador no soporta geolocalización.';
+                }
+                
+                alert(message);
+                console.error('Error de geolocalización:', error);
+            } finally {
+                // Restaurar botón
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }
+        });
+    }
+
+    // Event listener para distrito del Paso 4 (unificado)
+    if (districtSelectStep4) {
+        districtSelectStep4.addEventListener('change', function() {
+            showDistrictOnMap();
+        });
+    }
+
     // REMOVER EVENT LISTENER DUPLICADO si existe
     // Verificar que no haya otro addEventListener llamando a showElectronicsFields
 
     // --- EVENT LISTENERS PARA SUBIDA DE IMÁGENES ---
-    coverImageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        const coverImageError = document.getElementById('cover-image-error');
-        const coverPreviewContainer = document.getElementById('cover-image-preview');
-        const coverPreviewImg = document.getElementById('cover-preview-img');
+    // Cover Image Preview - Usando querySelector y debug más detallado
+    function initCoverImagePreview() {
+        console.log('=== Cover Image Preview Init ===');
         
-        if (file) {
-            coverImageName.textContent = file.name;
+        // Función interna para configurar el preview
+        function setupCoverPreview() {
+            const coverImgInput = document.getElementById('cover-image-input');
+            const coverImgName = document.getElementById('cover-image-name');
+            const coverPrevContainer = document.querySelector('#cover-image-preview');
+            const coverPrevImg = document.querySelector('#cover-preview-img');
             
-            // Mostrar previsualización de la imagen
-            if (coverPreviewContainer && coverPreviewImg) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    coverPreviewImg.src = e.target.result;
-                    coverPreviewContainer.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+            console.log('coverImgInput:', coverImgInput);
+            console.log('coverImgName:', coverImgName);
+            console.log('coverPrevContainer:', coverPrevContainer);
+            console.log('coverPrevImg:', coverPrevImg);
+            
+            if (!coverImgInput) {
+                console.warn('cover-image-input not found, retrying...');
+                return false;
             }
             
-            // Ocultar mensaje de error si hay imagen
-            if (coverImageError) {
-                coverImageError.style.display = 'none';
+            if (!coverPrevImg || !coverPrevContainer) {
+                console.warn('Preview elements missing - checking DOM...');
+                const allPreviews = document.querySelectorAll('[id*="preview"]');
+                console.log('Elements with "preview" in ID:', allPreviews);
+                return false;
             }
-        } else {
-            coverImageName.textContent = 'Ningún archivo seleccionado.';
-            // Ocultar previsualización
-            if (coverPreviewContainer) {
-                coverPreviewContainer.style.display = 'none';
+            
+            // Evitar agregar múltiples event listeners
+            if (coverImgInput.dataset.listenerAdded === 'true') {
+                console.log('Listener already added');
+                return true;
             }
+            
+            coverImgInput.addEventListener('change', function() {
+                const file = this.files[0];
+                const coverImageError = document.getElementById('cover-image-error');
+                
+                console.log('Cover image change event fired. File:', file ? file.name : 'none');
+                
+                if (file) {
+                    coverImgName.textContent = file.name;
+                    
+                    // Mostrar previsualización de la imagen
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        console.log('FileReader loaded, setting preview src');
+                        console.log('Image data length:', e.target.result.length);
+                        coverPrevImg.src = e.target.result;
+                        coverPrevImg.style.cssText = 'display: inline-block !important; max-width: 250px !important; max-height: 180px !important; width: auto !important; height: auto !important;';
+                        coverPrevContainer.style.cssText = 'display: block !important; margin-top: 15px; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 2px dashed #00bfae;';
+                        
+                        // Ocultar placeholder
+                        const placeholder = document.getElementById('cover-preview-placeholder');
+                        if (placeholder) placeholder.style.display = 'none';
+                        
+                        console.log('Preview should now be visible');
+                    };
+                    reader.onerror = function() {
+                        console.error('Error reading file');
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Ocultar mensaje de error si hay imagen
+                    if (coverImageError) {
+                        coverImageError.style.display = 'none';
+                    }
+                } else {
+                    coverImgName.textContent = 'Ningún archivo seleccionado.';
+                    coverPrevImg.style.display = 'none';
+                    coverPrevContainer.style.display = 'none';
+                    
+                    // Mostrar placeholder
+                    const placeholder = document.getElementById('cover-preview-placeholder');
+                    if (placeholder) placeholder.style.display = 'block';
+                }
+            });
+            
+            coverImgInput.dataset.listenerAdded = 'true';
+            console.log('Cover image listener added successfully');
+            return true;
         }
-    });
+        
+        // Intentar inmediatamente
+        if (setupCoverPreview()) {
+            console.log('Cover preview initialized immediately');
+            return;
+        }
+        
+        // Retry con intervalo si los elementos no existen aún
+        let retries = 0;
+        const maxRetries = 10;
+        const retryInterval = setInterval(() => {
+            retries++;
+            console.log('Retry attempt:', retries);
+            if (setupCoverPreview() || retries >= maxRetries) {
+                clearInterval(retryInterval);
+                if (retries >= maxRetries) {
+                    console.error('Max retries reached for cover preview');
+                }
+            }
+        }, 500); // Reintentar cada 500ms
+    }
+    
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCoverImagePreview);
+    } else {
+        initCoverImagePreview();
+    }
 
     // =======================================================
     // === BLOQUE DE GESTOR DE IMÁGENES (VERSIÓN FINAL) ===
@@ -1473,11 +1656,10 @@ function showCommunityFields() {
         const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
 
         const limits = {
-            'free': 3,
-            'basico': 5,
-            'premium': 10,
-            'destacado': 15,
-            'top': 20
+            'free': 5,
+            'basico': 10,
+            'premium': 15,
+            'destacado': 20
         };
         const maxAllowed = limits[selectedPlan];
 
@@ -1519,7 +1701,23 @@ function showCommunityFields() {
         // Abrir selector de archivos al hacer clic
         galleryDropArea.addEventListener('click', () => galleryImagesInput.click());
 
+        // VALIDACIÓN ANTES DE AGREGAR - Bloquear si excede el límite
         galleryImagesInput.addEventListener('change', function(e) {
+            const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+            const limits = {'free': 5, 'basico': 10, 'premium': 15, 'destacado': 20};
+            const maxAllowed = limits[selectedPlan];
+            const filesSelected = this.files.length;
+            const currentImagesCount = galleryFiles.length;
+            const totalAfterAdd = currentImagesCount + filesSelected;
+            
+            // BLOQUEO COMPLETO si excede
+            if (totalAfterAdd > maxAllowed) {
+                alert(`❌ LÍMITE EXCEDIDO\n\nPlan ${selectedPlan.toUpperCase()}: máximo ${maxAllowed} fotos\nYa tienes: ${currentImagesCount} fotos\nIntentas agregar: ${filesSelected} fotos\n\nNo se pueden agregar más fotos. Por favor selecciona un plan superior o reduce las fotos.`);
+                this.value = ''; // Limpiar input
+                return; // NO llamar a addFiles
+            }
+            
+            // Si pasa la validación, agregar archivos
             addFiles(e.target.files);
             e.target.value = null; // Resetear para poder seleccionar el mismo archivo de nuevo
         });
@@ -1559,11 +1757,10 @@ function showCommunityFields() {
             
             // Límites por plan
             const limits = {
-                'free': 3,
-                'basico': 5,
-                'premium': 10,
-                'destacado': 15,
-                'top': 20
+                'free': 5,
+                'basico': 10,
+                'premium': 15,
+                'destacado': 20
             };
             
             const maxAllowed = limits[selectedPlan];
@@ -1604,27 +1801,48 @@ function showCommunityFields() {
     // TAMBIÉN actualizar límite cuando cambia el plan
     function updateImageLimit() {
         const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
-        const limits = {'free': 3, 'basico': 5, 'premium': 10, 'destacado': 15, 'top': 20};
+        const limits = {'free': 5, 'basico': 10, 'premium': 15, 'destacado': 20};
         const maxFiles = limits[selectedPlan];
         
         const imageInput = document.getElementById('gallery-images-input'); // Changed from 'images'
         if (imageInput) {
             imageInput.setAttribute('max', maxFiles);
-            
-            // Mostrar límite visualmente
-            let limitText = document.querySelector('.image-limit-info');
-            if (!limitText) {
-                limitText = document.createElement('p');
-                limitText.className = 'image-limit-info';
-                imageInput.parentElement.appendChild(limitText);
-            }
-            limitText.innerHTML = `📸 Límite: ${maxFiles} fotos (Plan ${selectedPlan})`;
         }
+        
+        // Actualizar texto del contenedor de subida de imágenes (comentado - el límite se muestra en las tarjetas de plan)
+        // const uploadLimitElement = document.getElementById('gallery-upload-limit');
+        // if (uploadLimitElement) {
+        //     uploadLimitElement.textContent = `Máximo ${maxFiles} imágenes, JPG o PNG`;
+        // }
     }
 
-    // Llamar cuando cambie el plan
+    // Llamar cuando cambie el plan - Actualizar límites Y navegar al paso 2
     document.querySelectorAll('input[name="plan"]').forEach(radio => {
-        radio.addEventListener('change', updateImageLimit);
+        radio.addEventListener('change', async function() {
+            // Actualizar límite de imágenes
+            updateImageLimit();
+            
+            // Navegar automáticamente al paso 2 (Detalles) al seleccionar un plan
+            console.log("🔍 Plan seleccionado, verificando autenticación...");
+            let user = null;
+            try {
+                const { data: { user: sessionUser } } = await supabase.auth.getUser();
+                user = sessionUser;
+            } catch (err) {
+                console.log("⚠️ Error al verificar sesión:", err.message);
+                user = null;
+            }
+            
+            if (!user) {
+                // Si no está autenticado, mostrar modal de login
+                console.log("📋 Mostrando modal de login...");
+                showLoginRequiredModal();
+            } else {
+                // Si está autenticado, continuar al paso 2 (Detalles)
+                console.log("✅ Usuario autenticado, yendo al paso 2...");
+                navigateToStep(2);
+            }
+        });
     });
 
     // --- EVENT LISTENERS PARA BOTONES DE NAVEGACIÓN ---
@@ -1761,16 +1979,16 @@ form.addEventListener('submit', async (e) => {
     const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free';
     const videoUrl = document.getElementById('video-url')?.value || '';
 
-    // Permitir video solo en planes Destacado y Top
-    if (videoUrl && selectedPlan !== 'destacado' && selectedPlan !== 'top') {
-        alert('Los planes Destacado y TOP permiten agregar videos. Por favor, selecciona uno de estos planes.');
+    // Permitir video solo en planes Destacado
+    if (videoUrl && selectedPlan !== 'destacado') {
+        alert('El plan Destacado permite agregar videos. Por favor, selecciona este plan.');
         publishButton.disabled = false;
         publishButton.textContent = 'Publicar Anuncio';
         return;
     }
 
     // ✅ VALIDAR URL DE VIDEO (YouTube o Vimeo)
-    if (videoUrl && (selectedPlan === 'destacado' || selectedPlan === 'top')) {
+    if (videoUrl && selectedPlan === 'destacado') {
         const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)\//;
         const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\//;
         
@@ -1858,8 +2076,8 @@ form.addEventListener('submit', async (e) => {
                 user_id: currentUser.id,
                 url_portada: coverPublicUrl,
                 url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
-                url_video: (selectedPlan === 'destacado' || selectedPlan === 'top') ? formData.get('video_url') : null,
-                publicar_redes: selectedPlan === 'top' ? (formData.get('publicar_redes') ? true : false) : false,
+                url_video: selectedPlan === 'destacado' ? formData.get('video_url') : null,
+                publicar_redes: selectedPlan === 'destacado' ? (formData.get('publicar_redes') ? true : false) : false,
                 fecha_publicacion: new Date().toISOString()
             };
 
@@ -1893,8 +2111,6 @@ form.addEventListener('submit', async (e) => {
             //     diasDeVigencia = VIGENCIA_PREMIUM_DIAS;
             // } else if (selectedPlan === 'destacado') {
             //     diasDeVigencia = VIGENCIA_DESTACADO_DIAS;
-            // } else if (selectedPlan === 'top') {
-            //     diasDeVigencia = VIGENCIA_TOP_DIAS;
             // }
 
             const fechaExpiracion = new Date();
@@ -2191,8 +2407,8 @@ form.addEventListener('submit', async (e) => {
         
         // Desplazar a la sección de planes automáticamente después de cargar
         setTimeout(() => {
-            // Navegar automáticamente a la sección de planes (Step 4)
-            navigateToStep(4);
+            // Navegar automáticamente a la sección de detalles (Step 2)
+            navigateToStep(2);
             
             // Preseleccionar el plan gratis
             const freePlanCard = document.querySelector('.plan-card-h[data-plan="gratis"]');
@@ -2230,16 +2446,46 @@ planCards.forEach(card => {
         // ✅ Guardar plan seleccionado en sessionStorage (para usuarios registrados)
         sessionStorage.setItem('selectedPlan', selectedPlan);
 
-        // --- Lógica de navegación (para todos los usuarios) ---
-        setTimeout(() => {
-            const step3 = document.getElementById('step-3');
-            const step4 = document.getElementById('step-4');
+        // --- LIMPIAR IMÁGENES AL CAMBIAR DE PLAN ---
+        // Limpiar imagen de portada
+        const coverImageInput = document.getElementById('cover-image-input');
+        if (coverImageInput) {
+            coverImageInput.value = ''; // Limpiar el input file
+            const coverPreview = document.getElementById('cover-image-preview');
+            if (coverPreview) coverPreview.innerHTML = ''; // Limpiar preview
+            const coverImageName = document.getElementById('cover-image-name');
+            if (coverImageName) coverImageName.textContent = 'No se ha seleccionado imagen';
+        }
+        
+        // Limpiar galería de imágenes
+        const galleryImagesInput = document.getElementById('gallery-images-input');
+        if (galleryImagesInput) {
+            galleryImagesInput.value = ''; // Limpiar el input file
+            const galleryPreviewContainer = document.getElementById('gallery-preview-container');
+            if (galleryPreviewContainer) galleryPreviewContainer.innerHTML = ''; // Limpiar previews
+        }
+        console.log('✅ Imágenes limpiadas al cambiar de plan');
+        // ----------------------------------------------
 
-            if (step3 && step4) {
-                console.log("Agente 11: Navegando a step-4.");
-                navigateToStep(4); // Call the robust navigation function
+        // --- Lógica de navegación al paso 2 (Detalles) ---
+        setTimeout(() => {
+            const step2 = document.getElementById('step-2');
+            
+            if (step2) {
+                console.log("Agente 11: Navegando a step-2 (Detalles).");
+                // Verificar autenticación antes de navegar
+                supabase.auth.getUser().then(({ data: { user } }) => {
+                    if (user) {
+                        navigateToStep(2); // Navegar al paso de Detalles
+                    } else {
+                        showLoginRequiredModal(); // Mostrar modal de login
+                    }
+                }).catch(err => {
+                    console.log("⚠️ Error al verificar sesión:", err.message);
+                    showLoginRequiredModal();
+                });
             } else {
-                console.error("Error: No se encontraron #step-3 o #step-4.");
+                console.error("Error: No se encontró #step-2.");
             }
         }, 300); // Reducimos un poco el tiempo para una sensación más rápida.
 
@@ -2272,7 +2518,7 @@ planCards.forEach(card => {
 const updatePlanRestrictions = (selectedPlan) => {
     console.log('🔍 DEBUG: updatePlanRestrictions called with plan:', selectedPlan);
 
-    // ESTANDARIZAR EL VALOR DEL PLAN A MINÚSCULAS para que coincida con 'destacado' y 'top'
+    // RESTRICCIONES DE PLANES (Destacado)
     const planValue = selectedPlan.toLowerCase();
     console.log('🔍 DEBUG: planValue (lowercase):', planValue);
 
@@ -2280,7 +2526,7 @@ const updatePlanRestrictions = (selectedPlan) => {
     const videoFields = document.querySelectorAll('.plan-video-feature');
     console.log('🔍 DEBUG: Found videoFields:', videoFields.length);
 
-    const enableVideo = (planValue === 'destacado' || planValue === 'top');
+    const enableVideo = planValue === 'destacado';
     const disableVideo = !enableVideo;
     console.log('🔍 DEBUG: enableVideo:', enableVideo, 'disableVideo:', disableVideo);
 
@@ -2292,11 +2538,11 @@ const updatePlanRestrictions = (selectedPlan) => {
         if (input) input.disabled = disableVideo;
     });
 
-    // 2. RESTRICCIÓN PARA CAMPOS TOP (Publicación en Redes Sociales)
+    // 2. RESTRICCIÓN PARA CAMPOS de Publicación en Redes Sociales
     const topFields = document.querySelectorAll('.plan-top-feature');
     console.log('🔍 DEBUG: Found topFields:', topFields.length);
 
-    const disableTop = planValue !== 'top'; // Solo se habilita si es el plan 'top'
+    const disableTop = planValue !== 'destacado'; // Solo se habilita si es el plan 'destacado'
     console.log('🔍 DEBUG: disableTop (true if not top):', disableTop);
 
     topFields.forEach(div => {
@@ -2311,8 +2557,8 @@ const updatePlanRestrictions = (selectedPlan) => {
     const destacadoFields = document.querySelectorAll('.plan-destacado-feature');
     console.log('🔍 DEBUG: Found destacadoFields:', destacadoFields.length);
 
-    // Habilitado si el plan es 'destacado' O 'top'
-    const enableDestacado = (planValue === 'destacado' || planValue === 'top');
+    // Habilitado si el plan es 'destacado'
+    const enableDestacado = planValue === 'destacado';
     const disableDestacado = !enableDestacado;
     console.log('🔍 DEBUG: enableDestacado:', enableDestacado, 'disableDestacado:', disableDestacado);
 
@@ -2345,9 +2591,40 @@ document.querySelectorAll('input[name="plan"]').forEach(radio => {
         console.log('Plan cambiado a:', this.value);
         updatePlanRestrictions(this.value);
         
-        // Navegar automáticamente al paso 4
+        // --- LIMPIAR IMÁGENES AL CAMBIAR DE PLAN ---
+        // Limpiar imagen de portada
+        const coverImageInput = document.getElementById('cover-image-input');
+        if (coverImageInput) {
+            coverImageInput.value = ''; // Limpiar el input file
+            const coverPreview = document.getElementById('cover-image-preview');
+            if (coverPreview) coverPreview.innerHTML = ''; // Limpiar preview
+            const coverImageName = document.getElementById('cover-image-name');
+            if (coverImageName) coverImageName.textContent = 'No se ha seleccionado imagen';
+        }
+        
+        // Limpiar galería de imágenes
+        const galleryImagesInput = document.getElementById('gallery-images-input');
+        if (galleryImagesInput) {
+            galleryImagesInput.value = ''; // Limpiar el input file
+            const galleryPreviewContainer = document.getElementById('gallery-preview-container');
+            if (galleryPreviewContainer) galleryPreviewContainer.innerHTML = ''; // Limpiar previews
+        }
+        console.log('✅ Imágenes limpiadas al cambiar de plan');
+        // ----------------------------------------------
+        
+        // Navegar automáticamente al paso 2 (Detalles)
         setTimeout(() => {
-            navigateToStep(4);
+            // Verificar autenticación antes de navegar
+            supabase.auth.getUser().then(({ data: { user } }) => {
+                if (user) {
+                    navigateToStep(2); // Navegar al paso de Detalles
+                } else {
+                    showLoginRequiredModal(); // Mostrar modal de login
+                }
+            }).catch(err => {
+                console.log("⚠️ Error al verificar sesión:", err.message);
+                showLoginRequiredModal();
+            });
         }, 500);
     });
 });
@@ -2356,4 +2633,5 @@ document.querySelectorAll('input[name="plan"]').forEach(radio => {
 // 2. Enlazar a la carga inicial de la página (para el plan preseleccionado)
 const initialPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
 updatePlanRestrictions(initialPlan);
+updateImageLimit();
 }

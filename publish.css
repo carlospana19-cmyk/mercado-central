@@ -219,50 +219,79 @@
 .plan-top { border: 3px solid #9b59b6; /* púrpura */ }
 
 /* ========================================== */
-/* NUEVOS ESTILOS: PLANS CONTAINER HORIZONTAL */
+/* NUEVOS ESTILOS: PLANS PROFESIONALES */
 /* ========================================== */
 
 .plans-container-horizontal {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin: 30px 0;
-    padding: 0;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin: 30px auto;
+    padding: 0 20px;
+    max-width: 1400px;
+    justify-content: center;
+    align-items: stretch;
 }
 
-/* Tarjeta de plan horizontal */
+/* Tarjeta de plan profesional */
 .plan-card-h {
-    display: grid;
-    grid-template-columns: 200px 1fr 150px;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 20px;
-    border-radius: 12px;
-    border: 2px solid #e0e0e0;
+    padding: 35px 25px;
+    border-radius: 20px;
+    border: 2px solid #e8e8e8;
     background: #ffffff;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    min-width: 260px;
+    max-width: 300px;
+    width: 100%;
+}
+
+.plan-card-h::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--color-primario), var(--color-acento));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .plan-card-h:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    border-color: #ccc;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primario);
+}
+
+.plan-card-h:hover::before {
+    opacity: 1;
 }
 
 .plan-card-h.selected {
     border-color: var(--color-primario);
-    background: linear-gradient(135deg, rgba(41, 128, 185, 0.05) 0%, #ffffff 100%);
-    box-shadow: 0 4px 16px rgba(41, 128, 185, 0.2);
+    background: linear-gradient(180deg, #f8fffe 0%, #ffffff 100%);
+    box-shadow: 0 8px 30px rgba(0, 191, 174, 0.25);
 }
 
 .plan-card-h.selected::before {
+    opacity: 1;
+}
+
+.plan-card-h.selected::after {
     content: '✓';
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 24px;
-    height: 24px;
+    top: 15px;
+    right: 15px;
+    width: 28px;
+    height: 28px;
     background: var(--color-primario);
     color: white;
     border-radius: 50%;
@@ -270,260 +299,283 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 191, 174, 0.4);
 }
 
-/* Estilos específicos por plan */
-.gratis-plan {
-    border-color: #00bfae;
-    background: linear-gradient(135deg, #f0fffe 0%, #ffffff 100%);
-}
-
-.basico-plan {
-    border-color: #cd7f32;
-    background: linear-gradient(135deg, #fff8f3 0%, #ffffff 100%);
-}
-
-.premium-plan {
-    border-color: #c0c0c0;
-    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
-    box-shadow: 0 4px 16px rgba(192, 192, 192, 0.25);
-}
-
-.destacado-plan {
-    border-color: #ffd700;
-    background: linear-gradient(135deg, #fffef0 0%, #ffffff 100%);
-    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.25);
-}
-
-.top-plan {
-    border-color: #9b59b6;
-    background: linear-gradient(135deg, #faf7ff 0%, #ffffff 100%);
-    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.25);
-}
-
-/* Sección superior (precio y nombre) */
-.plan-top-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    position: relative;
-}
-
+/* Badge de recomendados */
 .plan-badge-label {
-    position: static;
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 800;
-    padding: 4px 10px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-    background: #e8e8e8;
-    color: #555;
-    width: fit-content;
-    line-height: 1;
+    display: none !important;
 }
 
 .premium-badge {
-    background: #c0c0c0;
-    color: #fff;
-    margin-left: 40px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.premium-plan .plan-top-section {
+    margin-top: 0px;
 }
 
 .destacado-badge {
-    background: #ffd700;
-    color: #333;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .top-badge {
-    background: #9b59b6;
-    color: #fff;
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    box-shadow: 0 2px 10px rgba(236, 72, 153, 0.3);
+    margin-left: auto;
+    margin-right: auto;
 }
 
+/* Título del plan */
 .plan-title-h {
-    font-size: 1.8rem;
+    font-size: 2.6rem;
     font-weight: 800;
-    margin: 0 0 8px 0;
-    color: #2c3e50;
+    margin: 0 0 12px 0;
+    color: #4b4b50;
     text-transform: uppercase;
     letter-spacing: 1px;
+    text-align: center;
+    width: 100%;
 }
 
+/* Precio */
 .plan-price-h {
-    font-size: 2.2rem;
+    font-size: 3rem;
     font-weight: 900;
-    color: #00bfae;
+    color: #1a1a2e;
+    margin: 15px 0 8px 0;
     line-height: 1;
-    margin: 8px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.plan-price-h span {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #666;
 }
 
 .plan-duration-h {
-    font-size: 0.85rem;
-    color: #999;
-    margin: 0;
-    text-transform: uppercase;
+    font-size: 1.1rem;
+    color: #888;
+    margin: 0 0 25px 0;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
 }
 
-/* Sección del medio (beneficios) */
+/* Beneficios */
 .plan-middle-section {
-    display: flex;
-    justify-content: flex-start;
-    padding-left: 0;
+    margin: 15px 0 25px 0;
+    width: 100%;
 }
 
 .benefits-list-h {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 16px;
+    text-align: left;
 }
 
 .benefits-list-h li {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #666;
+    font-size: 1.2rem;
+    color: #000000;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
-.benefits-list-h i {
+.benefits-list-h li:last-child {
+    border-bottom: none;
+}
+
+.benefits-list-h li i {
     color: #00bfae;
-    font-size: 1rem;
+    font-size: 1.1rem;
     flex-shrink: 0;
 }
 
-/* Sección inferior (botón) */
+/* Botón seleccionar */
 .plan-bottom-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-top: auto;
+    width: 100%;
 }
 
 .plan-select-h {
-    display: flex;
+    display: block;
     width: 100%;
-    cursor: pointer;
 }
 
-.plan-select-h input[type="radio"] {
+.plan-select-h input {
     display: none;
 }
 
 .plan-button-h {
     display: block;
     width: 100%;
-    padding: 12px 20px;
-    background: #00bfae;
-    color: white;
-    border: 2px solid #00bfae;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 1.2rem;
     font-weight: 700;
-    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    white-space: nowrap;
-}
-
-.plan-select-h input[type="radio"]:checked + .plan-button-h {
-    background: #fff;
-    color: #00bfae;
-    box-shadow: inset 0 0 0 2px #00bfae;
+    background: linear-gradient(135deg, #008f88, #e9ecef);
+    color: #1a1a2e;
+    border: 2px solid #dee2e6;
 }
 
 .plan-card-h:hover .plan-button-h {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.plan-card-h.selected .plan-button-h {
+    background: linear-gradient(135deg, var(--color-primario), #00a89a);
+    color: white;
+    border-color: var(--color-primario);
+    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.4);
+}
+
+/* Estilos específicos por plan */
+.gratis-plan {
+    border-color: #e8e8e8;
+}
+
+.gratis-plan:hover {
+    border-color: #00bfae;
+}
+
+.basico-plan {
+    border-color: #e8e8e8;
+}
+
+.basico-plan:hover {
+    border-color: #00bfae;
+}
+
+.premium-plan {
+    border-color: #e8e8e8;
+}
+
+.premium-plan:hover {
+    border-color: #6366f1;
+}
+
+.destacado-plan {
+    border-color: #e8e8e8;
+}
+
+.destacado-plan:hover {
+    border-color: #f59e0b;
+}
+
+.top-plan {
+    border-color: #e8e8e8;
+}
+
+.top-plan:hover {
+    border-color: #ec4899;
+}
+
+/* ==================== CONTENEDOR DEL MAPA ==================== */
+.map-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.map-container h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.map-container h4 i {
+    color: #00bfae;
+}
+
+.map-visible {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Botón para cerrar el mapa */
+.map-close-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.map-close-btn:hover {
+    background: #f0f0f0;
+    color: #333;
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-    .plan-card-h {
-        grid-template-columns: 150px 1fr 130px;
-        gap: 15px;
-        padding: 16px;
-    }
-
-    .plan-title-h {
-        font-size: 1.5rem;
-    }
-
-    .plan-price-h {
-        font-size: 1.8rem;
-    }
-
-    .benefits-list-h {
-        grid-template-columns: 1fr;
-        gap: 6px 12px;
-    }
-
-    .benefits-list-h li {
-        font-size: 0.85rem;
+@media (max-width: 1100px) {
+    .plans-container-horizontal {
+        justify-content: center;
     }
 }
 
-@media (max-width: 768px) {
-    .plan-card-h {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .plan-top-section {
-        flex-direction: row;
-        justify-content: space-between;
+@media (max-width: 600px) {
+    .plans-container-horizontal {
+        flex-direction: column;
         align-items: center;
     }
-
-    .plan-title-h {
-        font-size: 1.4rem;
-    }
-
-    .plan-price-h {
-        font-size: 1.6rem;
-    }
-
-    .benefits-list-h {
-        grid-template-columns: 1fr;
-        font-size: 0.8rem;
-    }
-
-    .plan-button-h {
-        padding: 10px 16px;
-        font-size: 0.9rem;
+    
+    .plan-card-h {
+        padding: 25px 20px;
+        max-width: 350px;
+        width: 100%;
     }
 }
 
-@media (max-width: 480px) {
-    .plan-card-h {
-        padding: 12px;
-    }
+.plan-price-h {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #252626;
+    line-height: 1;
+    margin: 8px 0;
+}
 
-    .plan-top-section {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .plan-title-h {
-        font-size: 1.2rem;
-    }
-
-    .plan-price-h {
-        font-size: 1.4rem;
-    }
-
-    .benefits-list-h {
-        grid-template-columns: 1fr;
-        gap: 4px 8px;
-    }
-
-    .benefits-list-h li {
-        font-size: 0.75rem;
-    }
+.plan-duration-h {
+    font-size: 0.99rem;
+    color: #393434;
+    margin: 0;
+    text-transform: uppercase;
 }
 
 /* ===== MEJORAS EN FORMULARIO PASO 4 ===== */
@@ -639,7 +691,6 @@ label {
 .price-input-wrapper {
     display: flex;
     align-items: center;
-    border: 2px solid #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -657,7 +708,7 @@ label {
     background: #f8f9fa;
     color: #2c3e50;
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 2.5rem;
     border-right: 2px solid #e0e0e0;
 }
 
@@ -695,8 +746,7 @@ label {
 /* Sección de términos */
 .terms-agreement {
     padding: 16px;
-    background: linear-gradient(135deg, #fff9e6 0%, #fffef5 100%);
-    border-left: 5px solid #f39c12;
+    background: linear-gradient(135deg, #ffffff 0%, #fffef5 100%);
     border-radius: 10px;
     margin-top: 12px;
     transition: all 0.3s ease;
@@ -729,9 +779,9 @@ label {
 }
 
 .terms-agreement a {
-    color: #00bfae;
+    color: #3c4141;
     text-decoration: none;
-    border-bottom: 2px solid #00bfae;
+    border-bottom: 2px solid #3c4141;
     font-weight: 600;
     transition: all 0.2s ease;
 }
@@ -811,15 +861,6 @@ textarea::placeholder {
 
 /* ===== SECTION BLOCKS - CONTENEDORES CON BORDE TURQUEZA ===== */
 
-.section-block {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    border-left: 5px solid #00bfae;
-    transition: all 0.3s ease;
-}
-
 .section-block:hover {
     box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
 }
@@ -832,7 +873,6 @@ textarea::placeholder {
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 3px solid #00bfae;
     padding-bottom: 8px;
 }
 
@@ -848,7 +888,6 @@ textarea::placeholder {
     padding: 24px;
     border-radius: 12px;
     margin-bottom: 12px;
-    border-left: 5px solid #00bfae;
     transition: all 0.3s ease;
 }
 

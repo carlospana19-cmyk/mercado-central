@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
+    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me https://www.google.com https://maps.google.com; child-src 'self' https://wa.me https://www.google.com https://maps.google.com; script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://maps.googleapis.com;">
     <title>Publicar Anuncio - Mercado Central</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -64,15 +64,16 @@
     
     <div class="plans-container-horizontal">
         <!-- Plan GRATIS -->
-        <div class="plan-card-h gratis-plan">
+        <div class="plan-card-h gratis-plan tall">
             <div class="plan-top-section">
+                <div class="plan-badge-label" style="visibility:hidden">-</div>
                 <h3 class="plan-title-h">GRATIS</h3>
                 <div class="plan-price-h">$0.00</div>
                 <p class="plan-duration-h">30 días</p>
             </div>
             <div class="plan-middle-section">
                 <ul class="benefits-list-h">
-                    <li><i class="fas fa-check-circle"></i> Hasta 3 fotos</li>
+                    <li><i class="fas fa-check-circle"></i> Hasta 5 fotos</li>
                     <li><i class="fas fa-check-circle"></i> Publicación inmediata</li>
                     <li><i class="fas fa-check-circle"></i> Acceso a 500+ compradores</li>
                 </ul>
@@ -86,16 +87,16 @@
         </div>
 
         <!-- Plan BÁSICO -->
-        <div class="plan-card-h basico-plan">
+        <div class="plan-card-h basico-plan tall">
             <div class="plan-top-section">
                 <div class="plan-badge-label">RECOMENDADO</div>
                 <h3 class="plan-title-h">BÁSICO</h3>
-                <div class="plan-price-h">$5.00</div>
+                <div class="plan-price-h">$10.00</div>
                 <p class="plan-duration-h">30 días</p>
             </div>
             <div class="plan-middle-section">
                 <ul class="benefits-list-h">
-                    <li><i class="fas fa-check-circle"></i> Hasta 5 fotos</li>
+                    <li><i class="fas fa-check-circle"></i> Hasta 10 fotos</li>
                     <li><i class="fas fa-check-circle"></i> Destaca sobre anuncios gratis</li>
                     <li><i class="fas fa-check-circle"></i> Acceso a 2000+ compradores</li>
                     <li><i class="fas fa-check-circle"></i> Reposicionamiento diario</li>
@@ -110,16 +111,16 @@
         </div>
 
         <!-- Plan PREMIUM -->
-        <div class="plan-card-h premium-plan">
+        <div class="plan-card-h premium-plan tall">
             <div class="plan-top-section">
                 <div class="plan-badge-label premium-badge">POPULAR</div>
                 <h3 class="plan-title-h">PREMIUM</h3>
-                <div class="plan-price-h">$10.00</div>
+                <div class="plan-price-h">$20.00</div>
                 <p class="plan-duration-h">30 días</p>
             </div>
             <div class="plan-middle-section">
                 <ul class="benefits-list-h">
-                    <li><i class="fas fa-check-circle"></i> Hasta 10 fotos + carrusel</li>
+                    <li><i class="fas fa-check-circle"></i> Hasta 15 fotos + carrusel</li>
                     <li><i class="fas fa-check-circle"></i> Destacado en resultados</li>
                     <li><i class="fas fa-check-circle"></i> Acceso a 5000+ compradores</li>
                     <li><i class="fas fa-check-circle"></i> Estadísticas básicas</li>
@@ -135,16 +136,16 @@
         </div>
 
         <!-- Plan DESTACADO -->
-        <div class="plan-card-h destacado-plan">
+        <div class="plan-card-h destacado-plan tall featured">
             <div class="plan-top-section">
                 <div class="plan-badge-label destacado-badge">BEST SELLER</div>
                 <h3 class="plan-title-h">DESTACADO</h3>
-                <div class="plan-price-h">$20.00</div>
+                <div class="plan-price-h">$30.00</div>
                 <p class="plan-duration-h">30 días</p>
             </div>
             <div class="plan-middle-section">
                 <ul class="benefits-list-h">
-                    <li><i class="fas fa-check-circle"></i> Hasta 15 fotos + carrusel</li>
+                    <li><i class="fas fa-check-circle"></i> Hasta 20 fotos + carrusel</li>
                     <li><i class="fas fa-check-circle"></i> Posición premium en búsquedas</li>
                     <li><i class="fas fa-check-circle"></i> Acceso a 10000+ compradores</li>
                     <li><i class="fas fa-check-circle"></i> Estadísticas detalladas</li>
@@ -159,41 +160,12 @@
                 </label>
             </div>
         </div>
-
-        <!-- Plan TOP -->
-        <div class="plan-card-h top-plan">
-            <div class="plan-top-section">
-                <div class="plan-badge-label top-badge">MÁXIMA VISIBILIDAD</div>
-                <h3 class="plan-title-h">TOP</h3>
-                <div class="plan-price-h">$25.00</div>
-                <p class="plan-duration-h">30 días</p>
-            </div>
-            <div class="plan-middle-section">
-                <ul class="benefits-list-h">
-                    <li><i class="fas fa-check-circle"></i> Hasta 20 fotos + 2 videos</li>
-                    <li><i class="fas fa-check-circle"></i> Posición top en todas búsquedas</li>
-                    <li><i class="fas fa-check-circle"></i> Acceso a 25000+ compradores</li>
-                    <li><i class="fas fa-check-circle"></i> Estadísticas en tiempo real</li>
-                    <li><i class="fas fa-check-circle"></i> Reposicionamiento cada hora</li>
-                    <li><i class="fas fa-check-circle"></i> Promoción en redes sociales</li>
-                    <li><i class="fas fa-check-circle"></i> Soporte prioritario 24/7</li>
-                </ul>
-            </div>
-            <div class="plan-bottom-section">
-                <label class="plan-select-h">
-                    <input type="radio" name="plan" value="top">
-                    <span class="plan-button-h">Seleccionar</span>
-                </label>
-            </div>
-        </div>
     </div>
 
     <div class="final-step-actions">
-        <div class="btn-group">
-            <button type="button" class="btn btn-primary" id="continue-to-details">
-                Continuar a Detalles <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
+    </div>
+
+    <div class="final-step-actions">
     </div>
 </div>
 
@@ -240,6 +212,9 @@
                                         <option value="Darién">Darién</option>
                                         <option value="Bocas del Toro">Bocas del Toro</option>
                                     </select>
+                                    <button type="button" id="get-current-location" class="get-location-btn" style="margin-top: 8px; background: linear-gradient(135deg, #00bfae, #00a896); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                                        <i class="fas fa-crosshairs"></i> Mi ubicación actual
+                                    </button>
                                 </div>
                                 <div class="form-group" id="district-group-step4" style="display: none;">
                                     <label for="district-step4">Distrito / Corregimiento</label>
@@ -251,6 +226,12 @@
                             <div class="form-group">
                                 <label for="address-step4">Dirección o Sector Específico</label>
                                 <input type="text" id="address-step4" name="direccion_especifica" placeholder="Ej: El Cangrejo, Bella Vista">
+                            </div>
+                            
+                            <!-- Contenedor del Mapa de Google -->
+                            <div id="map-container" class="map-container" style="display: none; margin-top: 20px;">
+                                <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;"><i class="fas fa-map"></i> Ubicación en el mapa</h4>
+                                <div id="province-map" style="width: 100%; height: 350px; border-radius: 8px; border: 2px solid #e0e0e0;"></div>
                             </div>
                         </div>
 
@@ -634,7 +615,7 @@
                     <div class="right-column">
                         <div class="section-block video-block">
                             <div class="form-group restricted-field plan-video-feature">
-                                <label for="video-url">URL de Video (Youtube o Vimeo) - Planes Destacado y TOP</label>
+                                <label for="video-url">URL de Video (Youtube o Vimeo) - Planes Destacado</label>
                                 <input type="text" id="video-url" name="video_url" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
                                 <small class="form-text text-muted">Añade un vídeo de hasta 60 segundos para el carrusel.</small>
                             </div>
@@ -642,7 +623,7 @@
                             <div class="form-group restricted-field plan-top-feature">
                                 <label>
                                     <input type="checkbox" id="publicar-redes" name="publicar_redes"> 
-                                    Publicación Automática en Redes Sociales (Exclusivo TOP)
+                                    Publicación Automática en Redes Sociales (Exclusivo Destacado)
                                 </label>
                                 <small class="form-text text-muted">Tu anuncio será publicado semanalmente en nuestras redes (Facebook/Instagram).</small>
                             </div>
@@ -696,8 +677,10 @@
                                     <span id="cover-image-name" class="file-name">Ningún archivo seleccionado.</span>
                                 </div>
                                 <!-- Contenedor para previsualización de imagen de portada -->
-                                <div id="cover-image-preview" class="cover-preview-container" style="display: none; margin-top: 15px;">
-                                    <img id="cover-preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover; border: 2px solid #ddd;">
+                                <div id="cover-image-preview" class="cover-preview-container" style="margin-top: 15px; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 2px dashed #dee2e6; display: none;">
+                                    <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Vista previa:</p>
+                                    <img id="cover-preview-img" src="" alt="Preview" style="max-width: 250px !important; max-height: 180px !important; width: auto !important; height: auto !important; border-radius: 10px !important; object-fit: cover !important; border: 3px solid #00bfae !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; display: inline-block !important; margin: 0 auto !important;">
+                                    <p id="cover-preview-placeholder" style="font-size: 13px; color: #999; margin-top: 10px;">Selecciona una imagen para ver la vista previa</p>
                                 </div>
                                 <p id="cover-image-error" class="error-message" style="color: #e74c3c; font-size: 14px; display: none; margin-top: 8px;">
                                     <i class="fas fa-exclamation-circle"></i> Por favor, sube una foto de portada para tu anuncio.
@@ -714,7 +697,7 @@
                                         </div>
                                         <p class="upload-text"><strong>Arrastra tus fotos aquí</strong></p>
                                         <p class="upload-subtext">o haz clic para buscarlas</p>
-                                        <span class="upload-limit">Máximo 10 archivos, JPG o PNG</span>
+                                        <span class="upload-limit" id="gallery-upload-limit">Sube tus fotos aquí</span>
                                     </div>
                                 </div>
                                 <div id="gallery-preview-container" class="gallery-preview-container">
