@@ -1,11 +1,34 @@
 // AppConfig.js - LA ÚNICA FUENTE DE VERDAD
 export const APP_CONFIG = {
     PLAN_LIMITS: {
-        'free': { maxFotos: 3, label: 'Básico (Gratis)' },
-        'basico': { maxFotos: 5, label: 'Bronce' },
-        'premium': { maxFotos: 10, label: 'Premium' },
-        'destacado': { maxFotos: 15, label: 'Destacado' },
-        'top': { maxFotos: 20, label: 'Top' }
+        'free': { 
+            maxFotos: 5, 
+            price: 0,
+            label: 'Gratis',
+            hasVideo: false,
+            priority: 0 
+        },
+        'basico': { 
+            maxFotos: 10, 
+            price: 10,
+            label: 'Básico',
+            hasVideo: false,
+            priority: 1 
+        },
+        'premium': { 
+            maxFotos: 15, 
+            price: 20,
+            label: 'Premium',
+            hasVideo: false,
+            priority: 2 
+        },
+        'destacado': { 
+            maxFotos: 20, 
+            price: 30,
+            label: 'Destacado',
+            hasVideo: true,
+            priority: 3 
+        }
     },
     // Define aquí qué atributos necesita cada categoría principal (ID de config-categories)
     CATEGORY_ATTRIBUTES: {

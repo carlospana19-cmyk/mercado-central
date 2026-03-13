@@ -1,6 +1,98 @@
 import { supabase } from './supabase-client.js';
 import { ReviewModal, hasUserReviewedSeller, getSellerReviews, getSellerReviewStats, generateReviewStatsHTML, generateReviewHTML } from './reviews-logic.js';
 
+// Tu API Key de Google Maps
+const MAPS_API_KEY_DETALLE = 'AIzaSyBijfhc6uDfEfzAreBjH_tJpYpc1yDvFas';
+
+// ============================================
+// FUNCIÓN: Esperar a que Google Maps esté listo (Poller)
+// ============================================
+function waitForGoogleMaps() {
+    return new Promise((resolve) => {
+        if (window.google && window.google.maps && window.google.maps.Map) {
+            resolve();
+        } else {
+            const checkInterval = setInterval(() => {
+                if (window.google && window.google.maps && window.google.maps.Map) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 100); // Revisa cada 100ms
+        }
+    });
+}
+
+// ============================================
+// FUNCIÓN: Cargar mapa de solo lectura en detalle del producto
+// ============================================
+async function loadProductMap(lat, lng, address) {
+    const mapContainer = document.getElementById('mapa-detalles');
+    const navigateBtn = document.getElementById('btn-navegar-maps');
+    
+    if (!mapContainer) {
+        console.warn('Contenedor del mapa no encontrado');
+        return;
+    }
+
+    // Configurar botón de navegación
+    if (navigateBtn) {
+        navigateBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    }
+
+    // Cargar Google Maps API si no está disponible
+    if (!window.google || !window.google.maps) {
+        await loadGoogleMapsScriptDetalle();
+    }
+
+    // Esperar a que Google Maps esté listo
+    await waitForGoogleMaps();
+
+    // Crear el mapa de solo lectura (usando API clásica)
+    const map = new window.google.maps.Map(mapContainer, {
+        center: { lat: lat, lng: lng },
+        zoom: 15,
+        mapId: 'DEMO_MAP_ID',
+        disableDefaultUI: true,
+        gestureHandling: 'none',
+        zoomControl: false,
+        scrollwheel: false,
+        disableDoubleClickZoom: true
+    });
+
+    // Crear marcador verde usando AdvancedMarkerElement
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    
+    const marker = new AdvancedMarkerElement({
+        position: { lat: lat, lng: lng },
+        map: map,
+        title: address || 'Ubicación del producto'
+    });
+
+    console.log('Mapa de detalles cargado en:', lat, lng);
+}
+
+// ============================================
+// FUNCIÓN: Cargar script de Google Maps
+// ============================================
+function loadGoogleMapsScriptDetalle() {
+    return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps) {
+            resolve();
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.defer = true;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY_DETALLE}&loading=async&language=es`;
+        
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Error al cargar Google Maps'));
+        
+        document.head.appendChild(script);
+    });
+}
+
 // ============================================
 // FUNCIÓN AUXILIAR: Convertir rutas de imágenes a URLs completas
 // ============================================
@@ -25,6 +117,9 @@ const convertToFullUrl = (imagePath) => {
 // product-detail-logic.js (VERSIÓN CON GALERÍA Y MEJOR MANEJO DE ERRORES)
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Poner esto apenas inicia la carga de la página de detalle
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    
     console.log('Iniciando carga del detalle del producto...');
 
     const params = new URLSearchParams(window.location.search);
@@ -109,11 +204,10 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     // Verificar que los elementos del DOM existan
     const productNameEl = document.getElementById('product-name');
     const productPriceEl = document.getElementById('product-price');
-    const productLocationEl = document.getElementById('product-location');
     const productDescriptionEl = document.getElementById('product-description');
     const galleryWrapperEl = document.getElementById('gallery-wrapper');
 
-    if (!productNameEl || !productPriceEl || !productLocationEl || !productDescriptionEl || !galleryWrapperEl) {
+    if (!productNameEl || !productPriceEl || !productDescriptionEl || !galleryWrapperEl) {
         console.error('Elementos del DOM no encontrados');
         displayError('Error al cargar la interfaz del producto.');
         return;
@@ -123,8 +217,16 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
 
     // Rellenar datos de texto
     productNameEl.textContent = ad.titulo;
-    productPriceEl.textContent = `$${ad.precio}`;
-    productLocationEl.textContent = ad.ubicacion || 'No especificada';
+    
+    // Establecer mensaje por defecto en el textarea de contacto
+    const mensajeInput = document.getElementById('message-input');
+    if (mensajeInput && ad.titulo) {
+        mensajeInput.value = `Hola, estoy interesado en tu anuncio: ${ad.titulo}. ¿Sigue disponible?`;
+    }
+    
+    // Formatear precio con moneda panameña (B/.) y dos decimales
+    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+    productPriceEl.textContent = priceFormatted;
     productDescriptionEl.textContent = ad.descripcion;
 
     // Mostrar visitas
@@ -136,25 +238,8 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     // Mostrar información de contacto del vendedor
     loadSellerContactInfo(ad);
 
-    // Si viene con parámetro chat=true, hacer scroll al formulario de contacto
-    if (openChat) {
-        setTimeout(() => {
-            const contactFormSection = document.querySelector('.contact-form-section');
-            const messageTextarea = document.querySelector('#contact-form textarea[name="message"]');
-            
-            if (contactFormSection) {
-                contactFormSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                console.log('Scroll al formulario de contacto realizado');
-            }
-            
-            if (messageTextarea) {
-                setTimeout(() => {
-                    messageTextarea.focus();
-                    console.log('Focus en el textarea de mensaje');
-                }, 500);
-            }
-        }, 800);
-    }
+    // Eliminado: el scroll/focus al formulario de contacto causaba salto no deseado
+    // Ya no se hace scroll automático cuando viene de "Contactar"
 
     // Configurar botón de reseñas
     setupReviewButton(ad);
@@ -300,6 +385,18 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         }
     } catch (error) {
         console.error('Error en lógica de edición:', error);
+    }
+
+    // --- MAPA DE UBICACIÓN DEL PRODUCTO ---
+    if (ad.latitud && ad.longitud) {
+        // Mostrar la sección del mapa
+        const mapSection = document.getElementById('product-location-section');
+        if (mapSection) {
+            mapSection.style.display = 'block';
+        }
+
+        // Cargar Google Maps API y mostrar el mapa
+        await loadProductMap(ad.latitud, ad.longitud, ad.ubicacion);
     }
 }
 
@@ -1061,9 +1158,28 @@ async function loadSellerContactInfo(ad) {
         // Obtener información del usuario vendedor desde la tabla profiles
         const { data: sellerProfile, error } = await supabase
             .from('profiles')
-            .select('telefono, email')
+            .select('telefono, email, nombre_negocio, nombre_completo')
             .eq('id', ad.user_id)
             .single();
+
+        // ✅ Actualizar título del contacto con el nombre del vendedor
+        const contactTitleEl = document.querySelector('.contact-seller-box h3');
+        if (contactTitleEl) {
+            // Título estático limpio
+            contactTitleEl.innerHTML = `<i class="fas fa-comments"></i> Contactar al Vendedor`;
+        }
+
+        // ✅ Añadir nombre del vendedor debajo del título con estilo prominence
+        const existingBadge = document.querySelector('.contact-seller-box .seller-name-badge');
+        if (!existingBadge && sellerProfile) {
+            const sellerName = sellerProfile?.nombre_negocio || sellerProfile?.nombre_completo || 'Usuario Verificado';
+            const nameBadge = document.createElement('div');
+            nameBadge.className = 'seller-name-badge';
+            nameBadge.innerHTML = `<i class="fas fa-user"></i> ${sellerName}`;
+            if (contactTitleEl && contactTitleEl.parentNode) {
+                contactTitleEl.parentNode.insertBefore(nameBadge, contactTitleEl.nextSibling);
+            }
+        }
 
         if (error) {
             console.warn('Error al obtener información del vendedor:', error);
@@ -1267,7 +1383,7 @@ async function loadSellerReviewsSection(sellerId) {
         if (stats.total_reviews > 0) {
             statsContainer.innerHTML = generateReviewStatsHTML(stats);
         } else {
-            statsContainer.innerHTML = '<p class="no-reviews">Este vendedor aún no tiene reseñas.</p>';
+            statsContainer.innerHTML = '<p class="no-reviews"><i class="far fa-star" style="color: #4a6fa5; margin-right: 8px;"></i>Este vendedor aún no tiene reseñas. <strong>¡Sé el primero en calificarlo!</strong></p>';
         }
         
         // Generar lista de reseñas
@@ -1286,3 +1402,11 @@ async function loadSellerReviewsSection(sellerId) {
         section.style.display = 'none';
     }
 }
+
+// --- FORZAR LA PANTALLA ARRIBA AL CARGAR LOS DETALLES ---
+window.addEventListener('load', () => {
+    // Un pequeño retraso de 150ms para ganarle a Google Maps y a la Galería
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 150);
+});

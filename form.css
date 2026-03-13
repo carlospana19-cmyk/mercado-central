@@ -24,16 +24,15 @@ label,
     background: #ffffff;
     padding: 25px;
     border-radius: 12px 12px 0 0; /* Redondeado arriba, plano abajo */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.15); /* Sombra suave permanente */
     margin-bottom: 0; /* Sin margen para unir con el siguiente bloque */
-    border: 2px solid #e0e0e0;
+    border: 2px solid #00bfae; /* Borde verde activo permanente */
     border-bottom: none; /* Sin borde inferior */
     transition: all 0.3s ease;
 }
 
 .classification-location-block:hover {
-    border-color: #00bfae;
-    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 191, 174, 0.25); /* Sombra más intensa en hover */
 }
 
 /* Título de sección para el bloque unificado */
@@ -43,7 +42,6 @@ label,
     color: #2c3e50;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 3px solid #00bfae;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -167,18 +165,6 @@ label,
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-.form-group select, .form-group input, .form-group textarea {
-    width: 100%;
-    padding: 1.6rem;
-    font-size: 1.8rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    background-color: #ffffff;
-    transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
 }
 
 .form-group select:hover,
@@ -309,8 +295,8 @@ main.container.publish-wizard {
 
 /* 2. Estilos para la zona de "Arrastrar y Soltar" (Drop Area) - Diseño Minimalista */
 .images-block .upload-zone {
-    border: 2px dashed #d1d5db !important; /* Gris suave */
-    background: #f9fafb !important; /* Fondo muy claro */
+    border: 2px dashed #00bfae !important; /* Borde turquesa permanente */
+    background: #f0fdfa !important; /* Fondo turquesa muy suave */
     border-radius: 16px !important;
     padding: 40px 20px !important;
     text-align: center;
@@ -319,16 +305,16 @@ main.container.publish-wizard {
 }
 
 .images-block .upload-zone:hover {
-    background-color: #f0fdfa !important; /* Turquesa muy suave */
+    background-color: #e6fff9 !important; /* Turquesa más intenso en hover */
     border: 2px solid #00bfae !important; /* Borde sólido resaltado */
     transform: translateY(-2px); /* Pequeño levante */
-    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.2); /* Sombra más intensa */
 }
 
 .images-block .upload-zone.dragover {
     border-color: #00bfae !important;
-    background: #e6fff9 !important;
-    box-shadow: 0 4px 20px rgba(0, 191, 174, 0.15);
+    background: #b2f5ea !important;
+    box-shadow: 0 6px 25px rgba(0, 191, 174, 0.25);
 }
 
 .upload-icon i {
@@ -355,7 +341,7 @@ main.container.publish-wizard {
 }
 
 .upload-limit {
-    font-size: 0.85rem;
+    font-size: 1.2rem;
     color: #4b5563; /* Gris más oscuro y legible */
     background: #f3f4f6;
     padding: 4px 12px;
@@ -428,31 +414,32 @@ main.container.publish-wizard {
 
 /* Estilos legacy para compatibilidad */
 .drop-area {
-    border: 2px dashed #d1d5db;
+    border: 2px dashed #00bfae; /* Borde turquesa permanente */
     border-radius: 16px;
     padding: 40px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #f9fafb;
+    background: #f0fdfa; /* Fondo turquesa muy suave */
     margin-top: 1rem;
     position: relative;
 }
 
 .drop-area:hover {
     border-color: #00bfae;
-    background: #f0fdfa;
+    background: #e6fff9;
+    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.2); /* Sombra más intensa */
 }
 
 .drop-area i {
-    font-size: 3rem;
+    font-size: 5rem;
     color: #00bfae;
     margin-bottom: 15px;
     transition: all 0.3s ease;
 }
 
 .drop-area p {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     color: #374151;
     font-weight: 500;
     margin: 0;
@@ -1101,20 +1088,6 @@ main.container.publish-wizard {
     font-size: 1.2rem;
 }
 
-label {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin-bottom: 6px;
-}
-
-input, select, textarea {
-    font-size: 1rem;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccd1d9;
-    margin-bottom: 18px;
-}
 
 .form-group small { /* Estilo para el texto de ayuda general */
     font-size: 0.9rem; /* Ajustado para un tamaño consistente */
@@ -1150,6 +1123,7 @@ input, select, textarea {
 
 .form-group {
     margin-bottom: 1.2rem;
+    transition: all 0.3s ease; /* Transición suave para el efecto borroso */
 }
 
 .images-row {
@@ -1276,9 +1250,9 @@ body {
 
 /* === Títulos de secciones === */
 .section-title {
-    font-size: 1.9rem;
+    font-size: 2.9rem;
     font-weight: 700;
-    color: #1a1d29;
+    color: #3f4046;
     text-align: center;
     letter-spacing: 0.4px;
     margin-bottom: 25px;
@@ -1293,20 +1267,6 @@ body {
     padding-bottom: 6px;
 }
 
-/* === Inputs y textos === */
-label {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #2e3b55;
-}
-
-input, select, textarea {
-    font-size: 0.95rem;
-    border: 1px solid #ccd1d9;
-    border-radius: 8px;
-    padding: 12px 14px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
 
 input:focus, select:focus, textarea:focus {
     outline: none;

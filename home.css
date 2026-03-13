@@ -1,73 +1,94 @@
+
+
+/* ELIMINAMOS EL LÍMITE DE CUALQUIER CONTENEDOR INTERMEDIO */
+#index-page .container,
+#index-page .container-fluid {
+    max-width: 1400px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 95% !important;
+}
+
+/* ASEGURAMOS QUE LAS FILAS NO TENGAN MÁRGENES NEGATIVOS */
+#index-page .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    display: block !important;
+}
+
+
 /* ================================================= */
-/* === ESTILOS ESPECÍFICOS PARA HOME.CSS (index.html) === */
+/* === ESTRUCTURA MAESTRA DE TARJETAS (HOME) === */
 /* ================================================= */
 
-/* Fondo del body con profundidad elegante */
-body {
-    background-color: #f8fafc !important; /* El fondo "nube" que da elegancia */
+/* 1. Limpieza de Contenedores */
+#index-page #products .main-content-wrapper {
+    max-width: 3000px !important;
+    width: 100% !important;
+    margin: 40px auto !important;
+    padding: 0 !important;
+    display: block !important;
+    background: transparent !important;
+    border-radius: 20px;
+}
+
+
+/* 3. La Tarjeta: UN SOLA REGLA */
+#index-page #products .property-card {
+    width: 100% !important;
+    max-width: 380px !important;
+    height: 100% !important;
+    min-height: 380px !important;
+    margin: 0 auto !important;
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative;
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+}
+
+/* Contenedor de la cuadrícula en Home */
+#index-page #products .box-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
     margin: 0;
     padding: 0;
 }
 
+/* Productos sin espacios laterales */
+#index-page #products {
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    background: var(--color-fondo);
+    margin: 0;
+}
+
 /* ================================================= */
-/* === COMBO MAESTRO PARA TARJETAS === */
-/* El padre manda, la imagen se adapta */
+/* CARRUSEL - ESTILO UNIFICADO */
+/* Duplicado eliminado - ver línea 1509 */
 /* ================================================= */
-
-/* 1. El padre (la tarjeta) tiene que mandar */
-.ad-card, .property-card, .box {
-    background-color: #ffffff !important;
-    border-radius: 20px !important; /* El radio elegido */
-    overflow: hidden !important;    /* ESTO CORTA LO QUE SOBRA */
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important; /* Todas la misma altura */
-    position: relative;
-    border: none !important; /* Sin borde para evitar espacios visuales */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-    width: 380px !important; /* Ancho actualizado para más presencia */
-    min-width: 380px !important;
-    max-width: 380px !important;
-    gap: 0 !important; /* Sin espacio entre elementos hijos */
-}
-
-/* 1.5 Asegurar que el contenedor de la foto no tenga espacios */
-.ad-card .card-image-container, 
-.property-card .card-image-container,
-.ad-card .image-container,
-.property-card .image-container,
-.box .image-container {
-    width: 100% !important;
-    padding: 0 !important;   /* Elimina cualquier espacio interno */
-    margin: 0 !important;    /* Elimina márgenes externos */
-    line-height: 0 !important; /* Evita un espacio pequeño abajo de la foto */
-    overflow: hidden !important;
-    flex-shrink: 0 !important; /* Evita que se comprima */
-}
-
-/* 2. La imagen tiene que adaptarse - Full-Bleed */
-.ad-card img, .property-card img, .box img {
-    width: 100% !important;   /* Ocupa todo el ancho disponible */
-    height: 240px !important;  /* Alto ajustado */
-    object-fit: cover !important; /* Evita que la foto se estire */
-    display: block !important;
-    border-radius: 0 !important; /* El redondeado lo da el padre */
-}
-
-.card {
-  position: relative;
-}
 
 /* --- HERO SECTION --- */
 /* 1. CONTENEDOR MAESTRO */
 .hero-search {
-    height: 550px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    background: linear-gradient(135deg, rgba(0, 191, 174, 0.95), rgba(22, 160, 133, 0.92));
+    min-height: 400px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--color-blanco);
+    padding: 4rem 2rem 100px 2rem;
     position: relative;
     overflow: hidden;
-    background-color: #000; /* Fondo oscuro para que resalte la imagen */
 }
 
 /* Carrusel del Hero - Imagen de fondo */
@@ -153,7 +174,7 @@ body {
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important; /* CAMBIO CLAVE: Centrado total */
-    min-height: 550px !important;       /* Asegura que el contenedor tenga espacio */
+    min-height: 350px !important;       /* Asegura que el contenedor tenga espacio */
     padding-top: 60px !important;       /* El "empuje" para bajar título y buscador */
     text-align: center !important;
     width: 100% !important;
@@ -251,6 +272,19 @@ body {
     text-shadow: 0 2px 10px rgba(0,0,0,0.8) !important; /* Sombra fuerte para legibilidad */
 }
 
+.elite-banner-container {
+  margin-top: 0;
+  margin-bottom: 60px;
+}
+
+.destacados {
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-texto);
+}
+
 /* 4. TÍTULO QUE RESALTA */
 /* 1. ANIMACIÓN DE ENTRADA: Que el Hero "despierte" al cargar */
 /* 3. TÍTULO Y SUBTÍTULO: En su zona segura */
@@ -280,14 +314,13 @@ body {
     backdrop-filter: blur(20px) !important;          /* Máximo efecto cristal */
     -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 100px !important;                 /* Píldora perfecta */
-    padding: 12px 30px !important;
+    border-radius: 10px !important;                 /* Píldora perfecta */
     box-shadow: 0 25px 50px rgba(0,0,0,0.4) !important;
     
     /* CENTRADO MAESTRO */
-    width: 90% !important;
+    width: 100% !important;
     max-width: 950px !important;
-    margin: 40px auto 0 auto !important;        /* Separación del subtítulo */
+    margin: 0px auto 0 auto !important;        /* Separación del subtítulo */
     display: flex !important;
     justify-content: center !important;
     z-index: 20 !important;
@@ -296,7 +329,9 @@ body {
 @media (min-width: 768px) {
     .search-form-container {
         display: grid !important;
-        grid-template-columns: 2fr 1.5fr 1.5fr auto;
+        grid-template-columns: 1fr 1fr 1fr auto !important;
+        align-items: center !important;
+        gap: 15px !important;
     }
 }
 
@@ -305,7 +340,7 @@ body {
   align-items: center;
   background: var(--color-blanco);
   border-radius: .5rem;
-  padding: 0 1.5rem;
+  padding: 0.5rem;
 }
 
 .search-field i {
@@ -322,6 +357,26 @@ body {
   padding: 1.5rem 0;
   font-size: 1.6rem;
   color: var(--color-texto);
+}
+
+/* Prevenir zoom automático en iOS/Android al enfocar inputs */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Contenedores flexibles para el index */
+  #index-page .container,
+  #index-page .container-fluid,
+  #index-page .main-content-wrapper,
+  #index-page #products,
+  #index-page .box-container,
+  #index-page .featured-carousel-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
 }
 
 .btn-search-hero {
@@ -411,15 +466,50 @@ body {
 }
 
 .categories-horizontal-bar {
-    max-width: 1200px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 2rem !important;
-    padding: 0 20px !important;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 0 20px;
+}
+
+/* Tablet: 4 columnas */
+@media (max-width: 992px) {
+  .categories-horizontal-bar {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Mobile: 3 columnas */
+@media (max-width: 768px) {
+  .categories-horizontal-bar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 0 15px;
+  }
+}
+
+/* Very small: 2 columnas */
+@media (max-width: 480px) {
+  .categories-horizontal-bar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+  }
+}
+
+.category-item h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  min-height: 3rem;
+  margin-top: 0.5rem;
+  line-height: 1.2;
 }
 
 .categories-grid-modern {
@@ -484,13 +574,39 @@ body {
   font-weight: 600;
 }
 
-/* --- SECCIÓN DE PRODUCTOS --- */
-.products {
-  padding: 4rem 2%;
-  background: var(--color-fondo);
-  max-width: 100%;
-  width: 100%;
-  margin: 0;
+
+/* ================================================= */
+/* === CARRUSEL INFINITO - ESTILOS CRÍTICOS === */
+/* Asegura que las tarjetas no se encojan y el contenedor no deje huecos */
+/* ================================================= */
+
+/* AJUSTE MAESTRO PARA CARRUSEL INFINITO */
+.carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 25px;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-track .property-card {
+    flex: 0 0 auto;
+    width: 350px;
+    max-width: 350px;
+    scroll-snap-align: start;
+}
+
+/* Ocultar barra de scroll */
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-track {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 /* ================================================= */
@@ -498,11 +614,11 @@ body {
 /* Línea fina con corona y título centrado */
 /* ================================================= */
 .section-header {
+    margin: 0 0 20px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
-    margin: 40px 0 20px 0; /* Espacio para que respire el diseño */
     width: 100%;
 }
 
@@ -520,6 +636,88 @@ body {
 
 .header-icon {
     font-size: 18px;
+    max-width: 30px !important;
+    height: auto !important;
+}
+
+.header-icon i, 
+.header-icon svg {
+    font-size: 24px !important;
+}
+
+/* Corona SVG premium */
+.crown-svg-premium {
+    width: 60px !important;
+    height: auto !important;
+    max-width: 60px !important;
+}
+
+/* ========================================================= */
+/* === TOP SELECCIÓN PREMIUM: CORONA CENTRADA CON LÍNEAS === */
+/* ========================================================= */
+
+/* 1. Contenedor Maestro: Centrado total y espacio elegante */
+.top-seleccion-premium {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 20px !important;
+    margin: 60px 0 10px 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 40px !important; /* EMPUJA LA CORONA HACIA LA DERECHA */
+    width: 100% !important;
+    max-width: 1350px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 2. El Contenido Central (Corona + Texto) */
+.top-seleccion-premium .header-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important; /* Aire fino para que no se pegue al texto */
+    flex-shrink: 0 !important;
+}
+
+/* 3. La Corona Dorada */
+.top-seleccion-premium .crown-svg-premium {
+    font-size: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    color: #d4af37 !important;
+    margin: 0 !important;
+    display: inline-block !important;
+}
+
+.top-seleccion-premium .crown-svg-premium svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+/* 4. El Título */
+.top-seleccion-premium .header-title {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #1a202c !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    margin: 0 !important;
+}
+
+/* 5. Las Líneas Divisorias Doradas */
+.top-seleccion-premium .header-line {
+    flex-grow: 1 !important;
+    height: 2px !important;
+    background-color: #d4af37 !important;
+}
+
+.top-seleccion-premium .line-left {
+    background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.8)) !important;
+}
+
+.top-seleccion-premium .line-right {
+    background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.8)) !important;
 }
 
 .header-title {
@@ -546,13 +744,6 @@ body {
   clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%);
 }
 
-/* === CONTENEDOR PRINCIPAL DE TARJETAS === */
-.box-container {
-    width: 100%;
-    max-width: 100% !important;
-    margin: 0;
-    padding: 0;
-}
 
 /* Asegurar que las tarjetas ocupen todo el ancho */
 .ads-row .box {
@@ -560,86 +751,38 @@ body {
     max-width: none !important;
 }
 
-/* Estilos para las filas de anuncios personalizados */
-.ads-row {
-  display: grid;
-  gap: 2rem;
-  margin-bottom: 2rem; /* Espacio entre filas */
-  width: 100%;
+/* Título de sección dorado para Anuncios Destacados */
+.section-header-golden {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px auto 5px auto;
+    width: 95%;
+    max-width: 1200px;
+}
+
+.header-title-golden {
+    font-size: 20px;
+    font-weight: 700;
+    color: #D4AF37 !important; /* Dorado */
+    font-family: 'Poppins', sans-serif;
+    white-space: nowrap;
+    letter-spacing: 1px;
+}
+
+.header-line-golden {
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.8));
+}
+
+.header-line-golden:last-child {
+    background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.8));
 }
 
 .ads-row:last-child {
   margin-bottom: 0;
-}
-
-/* Fila de 3 columnas - Estándar para tarjetas debajo del banner */
-.row-2-cols,
-.row-3-cols {
-  display: grid !important;
-  /* Subimos a 380px para que se vean más anchas y potentes */
-  grid-template-columns: repeat(3, 380px) !important;
-  gap: 30px !important;
-  justify-content: center !important;
-  margin: 40px auto !important;
-  max-width: 100% !important; /* Se ajusta al contenedor padre de 1200px */
-}
-
-.row-4-cols {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* Responsive para filas */
-@media (max-width: 1200px) {
-  .row-2-cols,
-  .row-3-cols {
-    grid-template-columns: repeat(3, 1fr) !important;
-    max-width: 100% !important;
-  }
-  
-  .row-4-cols {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  /* Tarjetas fluidas en pantallas medianas */
-  .ad-card, .property-card, .box {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-  }
-}
-
-@media (max-width: 992px) {
-  .row-2-cols,
-  .row-3-cols {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 20px !important;
-    max-width: 800px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .row-2-cols,
-  .row-3-cols,
-  .row-4-cols {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 15px !important;
-    max-width: 100% !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .row-2-cols,
-  .row-3-cols,
-  .row-4-cols {
-    grid-template-columns: 1fr !important;
-    max-width: 100% !important;
-  }
-  
-  .ad-card, .property-card, .box {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-  }
 }
 
 /* Additional home-specific styles from style.css */
@@ -753,6 +896,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     align-items: center;
     gap: 0.3rem;
     margin-bottom: 6px;
+    margin-top: auto !important;
     flex-shrink: 0;
     font-weight: 400;
 }
@@ -894,40 +1038,10 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* --- AVATAR DEL VENDEDOR EN TARJETA --- */
 /* CAMISA DE FUERZA 48px - Prohibido estirarse */
-.vendor-avatar {
-    position: relative;
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    border-radius: 50% !important;
-    background: white;
-    border: 3px solid var(--color-primario);
-    overflow: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-    flex-shrink: 0;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-}
 
 .vendor-avatar:hover {
     transform: scale(1.15);
     box-shadow: 0 6px 20px rgba(0, 191, 174, 0.3);
-}
-
-.vendor-avatar-img {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
 }
 
 .vendor-name-tooltip {
@@ -969,18 +1083,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* --- MEDIA QUERY PARA MÓVILES --- */
 @media (max-width: 768px) {
-    /* La cuadrícula de anuncios cambia de 2 columnas a 1 columna */
-    .ads-row {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        margin-bottom: 1.5rem;
-    }
-    /* Asegura que la tarjeta use todo el ancho en móviles */
-    .box {
-        width: 100%; 
-        margin: 0 auto; 
-    }
-    
+    /* Estilos adicionales para móvil (grids en líneas 2914+) */
     .vendor-avatar {
         width: 50px;
         height: 50px;
@@ -1045,34 +1148,36 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* --- ESTILOS PARA CARRUSEL DE PRODUCTOS --- */
 .product-swiper {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    overflow: hidden !important;
     position: relative;
-    margin: 0 !important;
     padding: 0 !important;
 }
 
 .product-swiper .swiper-wrapper {
-    margin: 0 !important;
-    padding: 0 !important;
+    display: flex !important;
+    transition-timing-function: linear;
 }
 
-.product-swiper .swiper-slide {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f5f5f5;
-    margin: 0 !important;
-    padding: 0 !important;
+/* LÍNEA 1238 - ANCHO AUTO PARA CARRUSEL FINITO */
+#index-page .product-swiper .swiper-slide {
+    width: auto !important;
+    flex-shrink: 0 !important;
+    margin-right: 25px !important;
+    margin-left: 0 !important;
+    margin-bottom: 30px !important;
+    display: flex !important;
+    flex-direction: column;
 }
 
-.product-swiper .swiper-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* LÍNEA 1214: ACTUALIZACIÓN DE POTENCIA MÁXIMA */
+#index-page .product-swiper .swiper-slide img,
+#index-page .ad-card .image-container img {
+    width: 100% !important;
+    height: 280px !important;
+    object-fit: cover !important;
+    min-width: 100% !important;
     display: block !important;
-    margin: 0 !important;
-    padding: 0 !important;
 }
 
 /* Overlay para permitir deslizamiento sobre iframes de video */
@@ -1124,7 +1229,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* === CARRUSEL DE TARJETAS TOP/DESTACADO === */
 .featured-carousel-wrapper {
-  margin-bottom: 3rem;
+  margin-bottom: 0;
   position: relative;
   overflow: visible !important; /* Permite que las sombras de tarjetas se vean */
   padding: 20px 70px; /* Espacio para flechas y sombras */
@@ -1176,7 +1281,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 .featured-swiper .swiper-wrapper {
-  width: 100% !important;
+  width: auto !important;
   box-sizing: border-box;
 }
 
@@ -1211,11 +1316,11 @@ main, section.hero-search, section.categories-showcase, section.products {
   visibility: hidden !important;
 }
 
-/* Ocultar las flechas de los carruseles internos (product-swiper) dentro del carrusel destacado */
-.featured-swiper .product-swiper .swiper-button-prev,
+/* Las flechas de los carruseles internos (product-swiper) ahora son visibles */
+/* .featured-swiper .product-swiper .swiper-button-prev,
 .featured-swiper .product-swiper .swiper-button-next {
   display: none !important;
-}
+} */
 
 /* Ocultar la flecha deshabilitada */
 .featured-carousel-wrapper .swiper-button-disabled,
@@ -1288,22 +1393,22 @@ main, section.hero-search, section.categories-showcase, section.products {
 .product-swiper .swiper-button-next,
 .product-swiper .swiper-button-prev {
     background: rgba(0, 0, 0, 0.5);
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     transition: all 0.3s ease;
 }
 
 .product-swiper .swiper-button-next::after,
 .product-swiper .swiper-button-prev::after {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: bold;
 }
 
 .product-swiper .swiper-button-next:hover,
 .product-swiper .swiper-button-prev:hover {
     background: var(--color-primario);
-    transform: scale(1.1);
+    /* Sin transform para que no se mueva */
 }
 
 .product-swiper .swiper-pagination {
@@ -1324,87 +1429,183 @@ main, section.hero-search, section.categories-showcase, section.products {
     height: 10px;
 }
 
-/* Ocultar flechas en móvil, solo mostrar en hover en desktop */
-@media (max-width: 768px) {
-    .product-swiper .swiper-button-next,
-    .product-swiper .swiper-button-prev {
-        display: none;
-    }
-}
-
+/* === FLECHAS VISIBLES EN TARJETAS === */
+/* Hacer las flechas siempre visibles en desktop */
 @media (min-width: 769px) {
     .product-swiper .swiper-button-next,
     .product-swiper .swiper-button-prev {
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        opacity: 1 !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
     }
     
-    .box:hover .swiper-button-next,
-    .box:hover .swiper-button-prev,
-    .tarjeta-auto:hover .swiper-button-next,
-    .tarjeta-auto:hover .swiper-button-prev {
+    /* También mostrar en hover para property-card */
+    .property-card:hover .swiper-button-next,
+    .property-card:hover .swiper-button-prev {
         opacity: 1;
+    }
+}
+
+/* En móvil: ocultar botones y permitir solo navegación táctil (swipe) */
+@media (max-width: 768px) {
+    .product-swiper .swiper-button-next,
+    .product-swiper .swiper-button-prev {
+        display: none !important;
     }
 }
 
 /* ================================================= */
 /* === ESTILOS PARA CARRUSELES DE FILAS === */
 /* ================================================= */
+/* CARRUSEL - ESTILO UNIFICADO */
+/* ================================================= */
 
-/* 1. El contenedor del carrusel debe ignorar los márgenes del padre */
-.carousel-row-wrapper {
-    width: 100vw !important; /* Ocupa todo el ancho de la ventana */
+
+/* Versión con #index-page para mayor especificidad */
+#index-page .carousel-row-wrapper {
     position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw !important;
-    margin-right: -50vw !important;
-    overflow: hidden;
-    padding: 20px 0;
-    margin-bottom: 3rem;
+    width: 100%;
+    left: auto;
+    transform: none;
+    margin: -20px 0 50px 0 !important;
+    overflow: visible !important;
+    padding: 0;
 }
 
-/* 2. La fila de tarjetas con padding para que respire */
-.row-carousel {
-    width: 100%;
-    overflow: visible !important;
-    position: relative; /* Contenedor principal para que las flechas tengan de donde agarrarse */
-    padding: 0 50px; /* Creamos un 'pasillo' para las flechas en los lados */
+
+/* Responsive para tablet */
+@media (max-width: 1024px) {
+    .carousel-row-wrapper,
+    #index-page .carousel-row-wrapper {
+        width: 100%;
+        left: auto;
+        transform: none;
+        padding: 0 20px;
+    }
+    
+    .row-nav-prev,
+    .row-nav-next {
+        display: none;
+    }
 }
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .carousel-row-wrapper,
+    #index-page .carousel-row-wrapper {
+        width: 100%;
+        left: auto;
+        transform: none;
+        padding: 0 10px;
+    }
+}
+
+/* Responsive para móvil pequeño */
+@media (max-width: 480px) {
+    .carousel-row-wrapper,
+    #index-page .carousel-row-wrapper {
+        padding: 0 10px;
+    }
+}
+
+/* ================================================= */
+/* PRODUCTOS - RESPONSIVE */
+/* ================================================= */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    #index-page #products {
+        padding: 0 20px;
+    }
+    
+    #index-page #products .box-container {
+        padding: 0 20px;
+    }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    #index-page #products {
+        padding: 0 10px;
+    }
+    
+    #index-page #products .box-container {
+        padding: 0 10px;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    #index-page #products {
+        padding: 0 10px;
+    }
+    
+    #index-page #products .box-container {
+        padding: 0 10px;
+    }
+}
+
+/* ================================================= */
+/* CARRUSEL - ESTILO UNIFICADO Y OPTIMIZADO */
+/* ================================================= */
 
 .row-carousel .swiper-wrapper {
-    display: flex;
-    gap: 20px !important;
-    padding: 0 5% !important; /* Solo padding horizontal, sin espacio arriba */
+    width: 100% !important;
+    display: flex !important;
+    gap: 15px !important;
+    padding: 0 !important;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    justify-content: flex-start !important;
 }
 
 /* Añadimos un margen interno al carrusel para que las tarjetas no choquen con las flechas */
 .row-carousel .swiper {
-    padding: 0 50px !important; /* Esto crea el espacio para que las flechas vivan sin tapar las tarjetas */
+    padding: 0 !important;
+    overflow: visible !important;
 }
 
-/* 3. El slide con ancho exacto - el CSS manda sobre el JS */
+/* 3. El slide con ancho fijo para que coincida con el grid */
 .row-carousel .swiper-slide {
-    width: 380px !important;    /* Definimos el tamaño aquí para que Swiper no invente */
-    margin-right: 0 !important; /* El Swiper maneja el espacio con spaceBetween */
+    width: 24% !important;
+    flex-shrink: 0 !important;
+    margin: 0 8px !important;
     padding: 0 !important;
-    height: auto;
-    display: flex;
-    /* Atacamos la 'funda' del carrusel que es la que está rompiendo el diseño */
-    overflow: hidden !important; /* Esto obliga a la funda a respetar la forma */
-    border-top-left-radius: 20px !important;  /* Curva arriba izquierda */
-    border-top-right-radius: 20px !important; /* Curva arriba derecha */
-    border-bottom-left-radius: 0px !important;  /* Cuadrada abajo */
-    border-bottom-right-radius: 0px !important; /* Cuadrada abajo */
+    height: auto !important;
+    display: flex !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
     background: transparent !important;
 }
 
-/* 4. RESET TOTAL DEL CONTENEDOR */
-.row-carousel .ad-card {
+/* Tablet: 2 columnas */
+@media (max-width: 1024px) {
+    .row-carousel .swiper-slide {
+        width: 48% !important;
+    }
+}
+
+/* Mobile: 1 columna */
+@media (max-width: 768px) {
+    .row-carousel .swiper-slide {
+        width: 85% !important;
+        margin: 0 8px !important;
+    }
+}
+
+/* 4. RESET TOTAL DEL CONTENEDOR - La tarjeta dentro del slide */
+.row-carousel .ad-card,
+.row-carousel .property-card,
+.row-carousel .box {
+    width: 100% !important;
+    max-width: 100% !important;
     padding: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     border-top-left-radius: 20px !important;
     border-top-right-radius: 20px !important;
     border-bottom-left-radius: 0px !important;
@@ -1450,29 +1651,12 @@ main, section.hero-search, section.categories-showcase, section.products {
 .row-nav-next {
     position: absolute;
     background: rgba(255, 255, 255, 0.9) !important;
-    width: 45px !important;
-    height: 100% !important;        /* Ocupan todo el alto de la tarjeta */
-    border: 1px solid #ddd;
-    cursor: pointer;
-    z-index: 100;
-    top: 0 !important;              /* Desde el borde superior */
-    transform: none !important;      /* Sin centrado vertical */
-    transition: all 0.3s ease;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #333 !important;
     font-size: 18px;
 }
 
 .row-nav-prev {
     left: 0 !important;             /* Pegada al borde izquierdo */
     border-radius: 0 12px 12px 0 !important; /* Curva solo hacia adentro */
-}
-
-.row-nav-next {
-    right: 0 !important;            /* Pegada al borde derecho */
-    border-radius: 12px 0 0 12px !important; /* Curva solo hacia adentro */
 }
 
 .row-nav-prev:hover,
@@ -1533,58 +1717,9 @@ main, section.hero-search, section.categories-showcase, section.products {
     font-weight: 900;
 }
 
-/* Responsive para carruseles de filas */
-@media (max-width: 1024px) {
-    .carousel-row-wrapper {
-        width: 100vw !important;
-        margin-left: -50vw !important;
-        margin-right: -50vw !important;
-        left: 50%;
-        right: 50%;
-    }
-    
-    /* Ocultar flechas en tablet y móvil */
-    .row-nav-prev,
-    .row-nav-next {
-        display: none !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .carousel-row-wrapper {
-        width: 100vw !important;
-        margin-left: -50vw !important;
-        margin-right: -50vw !important;
-        left: 50%;
-        right: 50%;
-        padding: 0 10px;
-    }
-    
-    /* Paginación para carruseles en móvil */
-    .row-carousel-pagination {
-        position: relative;
-        margin-top: 15px;
-        text-align: center;
-    }
-    
-    .row-carousel-pagination .swiper-pagination-bullet {
-        width: 8px;
-        height: 8px;
-        background: #ccc;
-        opacity: 1;
-        margin: 0 4px;
-    }
-    
-    .row-carousel-pagination .swiper-pagination-bullet-active {
-        background: var(--color-primario, #00bfae);
-    }
-}
-
-@media (max-width: 480px) {
-    .carousel-row-wrapper {
-        padding: 0 10px;
-    }
-}
+/* ================================================= */
+/* CARRUSEL - MEDIA QUERIES YA UNIFICADOS ARRIBA (líneas 1523-1552) */
+/* ================================================= */
 
 /* ================================================= */
 /* === FLECHAS DEL CARRUSEL EN DETALLE PRODUCTO === */
@@ -1664,17 +1799,6 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* Banner horizontal único que rompe la cuadrícula */
 /* ================================================= */
 
-/* Contenedor principal que sincroniza Banner + Grid */
-.main-content-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px;
-    /* Degradado muy suave para que el Banner Elite flote */
-    background: linear-gradient(to bottom, #f1f5f9, #f8fafc);
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border-radius: 20px;
-}
 
 /* Responsive para el contenedor principal */
 @media (max-width: 768px) {
@@ -1692,25 +1816,24 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* Contenedor del Banner Elite - Ocupa todo el ancho */
 .elite-banner-container {
-    width: 100%;
-    max-width: 100%;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
     padding: 0;
-    margin-bottom: 3rem;
-    box-sizing: border-box;
+    margin-top: -30px;
+    margin-bottom: 100px;
 }
 
 /* === SLIDER CONTAINER PARA MÚLTIPLES BANNERS === */
 .elite-slider-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto 40px;
-    height: 450px;
-    overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(212, 175, 55, 0.3);
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3),
+              0 0 0 1px rgba(212, 175, 55, 0.3);
 }
 
 /* Slides con transición de fundido */
@@ -1760,11 +1883,11 @@ main, section.hero-search, section.categories-showcase, section.products {
 }
 
 .elite-slider-nav.prev {
-    left: 15px;
+    left: 40px !important;
 }
 
 .elite-slider-nav.next {
-    right: 15px;
+    right: 40px !important;
 }
 
 /* Indicadores de progreso estilo Instagram */
@@ -1955,23 +2078,143 @@ main, section.hero-search, section.categories-showcase, section.products {
     50% { opacity: 0.5; }
 }
 
-/* Banner Elite - Diseño horizontal con imagen izquierda - PROPORCIÓN REVISTA DE LUJO */
+/* ELIMINAMOS CUALQUIER CAPA QUE ENSUCIE */
+.elite-banner::after, 
+.elite-banner::before {
+    display: none !important;
+}
+
+/* 1. EL BANNER: Azul profundo del pie de página */
 .elite-banner {
-    display: flex;
-    flex-direction: row;
+  background: #0a192f;
+  width: 100%;
+  min-height: 450px;
+  display: flex;
+  border: none;
+  flex-direction: row; /* imagen izquierda, texto derecha */
+}
+
+.banner-text {
+  padding: 2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Alias for existing structure */
+.elite-banner-content {
+  padding: 2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Banner para móvil */
+.mobile-banner {
+  display: none; /* base */
+}
+
+@media (max-width: 600px) {
+  .elite-banner-container {
     width: 100%;
-    max-height: 450px !important; /* Limitamos la altura para que se vea contenido abajo */
-    min-height: 350px !important;
-    margin-bottom: 40px !important;
-    background: linear-gradient(135deg, #0a192f 0%, #112240 100%) !important; /* Un azul más suave */
-    border-radius: 20px !important;
-    overflow: hidden;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(212, 175, 55, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    position: relative;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    left: 0;
+    transform: none;
+    margin: 0 auto 20px;
+  }
+
+  .elite-slider-wrapper {
+    height: auto;
+    border-radius: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .elite-banner {
+    background: #0a192f;
+    color: #fff;
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* imagen arriba, texto abajo */
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: none;
+  }
+
+  .elite-banner img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .elite-banner .banner-text,
+  .elite-banner .elite-banner-content {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 1rem;
+  }
+}
+
+/* 2. EFECTO DE FUNDIDO PARA LA IMAGEN */
+.elite-banner-image {
+    width: 55% !important;
+    position: relative !important;
+}
+
+.elite-banner-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 35%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, #0a192f) !important;
+    z-index: 2;
+}
+
+.elite-banner-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* 3. CONTENIDO: Contraste Máximo */
+.elite-banner-content {
+    width: 45% !important;
+    padding: 60px 10% 60px 40px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    background: #0a192f !important;
+}
+
+.elite-banner-price {
+    color: #00c1ab !important;
+    font-size: 4.5rem !important;
+    font-weight: 500 !important;
+    margin-bottom: 10px !important;
+    letter-spacing: -1px !important;
+}
+
+.elite-banner-title {
+    color: #ffffff !important;
+    font-size: 2.5rem !important;
+    line-height: 2.2 !important;
+}
+
+.elite-banner-image, .elite-banner-content {
+    width: 50% !important;
+}
+
+/* Ajuste para que el texto respire */
+.elite-banner-content {
+    padding: 40px !important;
+    justify-content: center !important;
 }
 
 .elite-banner:hover {
@@ -2027,48 +2270,20 @@ main, section.hero-search, section.categories-showcase, section.products {
     z-index: 2;
 }
 
-/* Badge VERIFICADO/TOP dorado */
+/* Badge VERIFICADO/TOP dorado - OCULTO */
 .elite-badge-gold {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 25%, #d4af37 50%, #aa8c2c 75%, #d4af37 100%);
-    background-size: 200% 200%;
-    animation: goldShimmer 3s ease-in-out infinite;
-    color: #1a1a2e;
-    padding: 0.6rem 1.4rem;
-    border-radius: 2rem;
-    font-size: 1.2rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 
-        0 4px 15px rgba(212, 175, 55, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.elite-badge-gold i {
-    font-size: 1.4rem;
-}
-
-@keyframes goldShimmer {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    display: none !important;
 }
 
 /* Precio destacado - ENORME e impactante */
 .elite-banner-price {
-    font-size: 3.5rem !important;
+    font-size: 5.5rem !important;
     font-weight: 800;
     color: #00c1ab;
     margin-bottom: 0.5rem;
     text-shadow: 0 2px 15px rgba(0, 193, 171, 0.4);
     line-height: 1.1;
-}
+}s
 
 /* Título del anuncio - DESTACADO */
 .elite-banner-title {
@@ -2099,7 +2314,7 @@ main, section.hero-search, section.categories-showcase, section.products {
 
 /* Atributos del producto - Grid de 2 columnas elegante */
 .elite-banner-attributes {
-    display: grid;
+    display: none;
     grid-template-columns: 1fr 1fr; /* Dos columnas de datos técnicos */
     gap: 15px;
     margin: 20px 0;
@@ -2203,8 +2418,8 @@ main, section.hero-search, section.categories-showcase, section.products {
     text-decoration: none;
     transition: all 0.3s ease;
     box-shadow: 0 6px 25px rgba(0, 193, 171, 0.5);
-    align-self: flex-start;
-    margin-top: auto;
+    align-self: center;
+    margin-top: 20px;
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -2225,7 +2440,8 @@ main, section.hero-search, section.categories-showcase, section.products {
     align-items: center;
     gap: 0.8rem;
     margin-bottom: 1rem;
-    padding-left: 0.5rem;
+    margin-left: 1.5rem; /* Separar la corona del borde izquierdo */
+    padding-left: 1rem;
 }
 
 .elite-label-text {
@@ -2269,71 +2485,6 @@ main, section.hero-search, section.categories-showcase, section.products {
     .elite-banner-attributes {
         grid-template-columns: 1fr;
         gap: 10px;
-    }
-}
-
-@media (max-width: 768px) {
-    .elite-banner-container {
-        padding: 0 1rem;
-    }
-    
-    .elite-banner {
-        flex-direction: column;
-        min-height: auto;
-        max-height: none;
-    }
-    
-    .elite-banner-image {
-        width: 100% !important;
-        min-height: 200px;
-    }
-    
-    .elite-banner-image::after {
-        width: 100%;
-        height: 40%;
-        top: auto;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(10, 25, 47, 1), transparent);
-    }
-    
-    .elite-banner-content {
-        width: 100% !important;
-        padding: 20px !important;
-    }
-    
-    .elite-badge-gold {
-        top: 1rem;
-        right: 1rem;
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
-    }
-    
-    .elite-banner-price {
-        font-size: 2.4rem !important;
-    }
-    
-    .elite-banner-title {
-        font-size: 1.8rem;
-    }
-    
-    .elite-banner-location {
-        font-size: 1.3rem;
-    }
-    
-    .elite-banner-attributes {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-    
-    .elite-attribute {
-        font-size: 1.2rem;
-        padding: 0.6rem 1rem;
-    }
-    
-    .elite-banner-btn {
-        width: 100%;
-        padding: 1.2rem 2rem;
-        font-size: 1.6rem;
     }
 }
 
@@ -2418,13 +2569,13 @@ main, section.hero-search, section.categories-showcase, section.products {
 .row-carousel .swiper-wrapper {
     padding: 0 !important;
     margin: 0 !important;
-    gap: 0 !important;
+    gap: 15px !important;
 }
 
 /* 2. Forzamos a que el SLIDE ocupe todo su espacio sin márgenes */
 .row-carousel .swiper-slide {
     padding: 0 !important;
-    margin-right: 25px !important; /* Mantenemos solo la separación entre tarjetas */
+    margin: 0 5px !important; /* Margen reducido */
     display: flex !important;
     justify-content: center !important;
 }
@@ -2435,7 +2586,7 @@ main, section.hero-search, section.categories-showcase, section.products {
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 20px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
 }
 
 /* 4. La Imagen: El toque final para que toque los bordes */
@@ -2482,6 +2633,690 @@ main, section.hero-search, section.categories-showcase, section.products {
 /* ATACAMOS AL RIEL (Donde corren las tarjetas) */
 .row-carousel .swiper-wrapper {
     display: flex !important;
-    gap: 0 !important; /* IMPORTANTE: El gap lo debe manejar Swiper, no el CSS */
+    gap: 13px !important;
     padding: 0 !important;
+}
+
+/* ===================================================== */
+/* AMPLIACIÓN DE TARJETAS - Contenedor y Grid */
+/* ===================================================== */
+
+
+/* Additional home-specific styles from style.css */
+#index-page .ad-card, 
+#index-page .property-card,
+#index-page .box {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 520px !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+/* 4. LA FOTO DE REVISTA */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    height: 280px !important;
+    width: 100% !important;
+}
+
+/* ===================================================== */
+/* TOQUE DE MIDAS - Mejora del contenido de tarjetas */
+/* ===================================================== */
+
+/* 1. EL CONTENEDOR DE TEXTO: Espaciado de lujo */
+#index-page .ad-card .content,
+#index-page .property-card .content {
+    padding: 20px 25px 20px 25px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+/* 2. EL PRECIO: Que salte a la vista */
+#index-page .ad-card .price,
+#index-page .property-card .price {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    color: #1a202c !important;
+    margin-bottom: 5px !important;
+}
+
+/* 3. TRANSFORMACIÓN DEL BOTÓN CONTACTAR */
+#index-page .ad-card .contact-link,
+#index-page .ad-card a[href*="contact"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #00c1ab !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    margin-top: 15px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    text-transform: uppercase !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 1px !important;
+}
+
+#index-page .ad-card .contact-link:hover {
+    background: #00a896 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 5px 15px rgba(0, 193, 171, 0.3) !important;
+}
+
+/* ===================================================== */
+/* OPERACIÓN EXTERMINIO DE FANTASMAS - Selectores Triple Fuerza */
+/* ===================================================== */
+
+/* 1. Forzamos el contenedor de texto a tener aire */
+#index-page .recently-added-grid .ad-card .content,
+#index-page #products .ads-row .ad-card .content {
+    padding: 25px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+/* 2. El botón turquesa "Elite" - TRANSFORMACIÓN TOTAL */
+#index-page .ad-card .content a.contact-link,
+#index-page .ad-card .content a[href*="contact"],
+#index-page .recently-added-grid .ad-card a {
+    all: unset !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #00c1ab !important;
+    color: #ffffff !important;
+    width: 100% !important;
+    padding: 14px 0 !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 14px !important;
+    letter-spacing: 1px !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 3. Efecto de éxito al pasar el mouse */
+#index-page .ad-card .content a:hover {
+    background-color: #00a896 !important;
+    box-shadow: 0 8px 20px rgba(0, 193, 171, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ===================================================== */
+/* LLAVE MAESTRA - Selectores Ultra-Específicos */
+/* ===================================================== */
+
+/* LÍNEA 2844: ELIMINAMOS EL PADDING DE LA TARJETA (PARA LA FOTO) */
+#index-page .ad-card,
+#index-page .property-card {
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    border: 1px solid #e0e6ed !important;
+}
+
+/* 2. EL BOTÓN "CONTACTAR": Transformación Real */
+#index-page .property-card .property-details a.btn-contact,
+#index-page .ad-card .property-details a.btn-contact,
+#index-page a[href*="contact"].btn-contact {
+    display: flex !important;
+    visibility: visible !important;
+    background-color: #2da687;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 2rem 1.8rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 193, 171, 0.3);
+}
+
+#index-page .property-card .property-details a.btn-contact:hover,
+#index-page .ad-card .property-details a.btn-contact:hover,
+#index-page a[href*="contact"].btn-contact:hover {
+    background-color: #1a8a6a;
+}
+
+/* 3. EL PRECIO */
+#index-page .property-details .price {
+    font-size: 2rem !important;
+    color: #0a192f !important;
+    font-weight: 850 !important;
+}
+
+/* ===================================================== */
+/* IMAGEN INFINITA - Ajuste de fotos en tarjetas */
+/* ===================================================== */
+
+/* 1. RESETEAMOS EL CONTENEDOR DE LA FOTO */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 280px !important;
+    overflow: hidden !important;
+    display: block !important;
+}
+
+/* 2. LA IMAGEN: Expansión absoluta */
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+    transform: none !important;
+}
+
+/* 3. AJUSTE DE LA TARJETA */
+#index-page .ad-card,
+#index-page .property-card {
+    padding: 0 !important;
+}
+
+/* ===================================================== */
+/* UNIFICACIÓN FORZADA POR SELECTOR DE RUTA COMPLETA */
+/* ===================================================== */
+
+/* 1. Tarjetas de ARRIBA (Top Selección) */
+#index-page .top-seleccion .ad-card,
+#index-page .top-seleccion .property-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+}
+
+/* 2. Tarjetas de ABAJO (Recién Agregado) */
+#index-page .recently-added-grid .ad-card,
+#index-page .recently-added-grid .property-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+}
+
+
+/* ===================================================== */
+
+/* Desktop: 3 columnas */
+#index-page .ads-row.row-3-cols,
+#index-page .row-2-cols,
+#index-page .row-4-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px !important;
+  width: 95%;
+  margin: 10px auto 20px auto !important;
+  max-width: 2400px;
+}
+
+/* Tablet: 2 columnas */
+@media (max-width: 992px) {
+  #index-page .ads-row.row-3-cols,
+  #index-page .row-2-cols,
+  #index-page .row-4-cols {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    max-width: 1200px;
+  }
+}
+
+/* Móvil: 1 columna */
+@media (max-width: 768px) {
+  #index-page .ads-row.row-3-cols,
+  #index-page .row-2-cols,
+  #index-page .row-4-cols {
+    gap: 15px;
+    margin-bottom: 1.5rem;
+    padding: 0 10px;
+    max-width: 100%;
+  }
+
+  #index-page .ads-row.row-3-cols .property-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 12px;
+  }
+  
+  /* Imagen de tarjeta en móvil - tamaño perfecto */
+  #index-page .property-card .property-image,
+  #index-page .property-card .image-container {
+    height: 200px !important;
+    width: 100%;
+  }
+  
+  /* Imagen del carrusel en móvil */
+  #index-page .property-card .property-image img,
+  #index-page .property-card .property-image .swiper-slide img,
+  #index-page .property-card .image-container img {
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+}
+
+/* 2. MATAMOS EL PADDING DE LAS COLUMNAS */
+#index-page .ads-row .col-md-4,
+#index-page .ads-row .col-lg-4,
+#index-page .ads-row [class*="col-"] {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* 3. IMAGEN AL 100% SIN MARGENES */
+#index-page .ads-row .ad-card .image-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#index-page .ads-row .ad-card .image-container img {
+    width: 100% !important;
+    height: 280px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* ===================================================== */
+/* ESTRUCTURA DE BLOQUES REAL */
+/* ===================================================== */
+
+/* 1. ASEGURAMOS QUE CADA SECCIÓN SEA UN BLOQUE INDEPENDIENTE */
+#index-page .featured-products-container,
+#index-page .recently-added-container,
+#index-page #products .ads-row-wrapper {
+    display: block !important;
+    clear: both !important;
+    width: 100% !important;
+    margin-bottom: 50px !important;
+}
+
+/* 3. ARREGLO DE IMAGEN (EL BORDE BLANCO) */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 280px !important;
+    overflow: hidden !important;
+}
+
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+/* ===================================================== */
+/* ARREGLO FINAL DE FILAS - home.css al final */
+/* ===================================================== */
+
+/* 1. SEPARACIÓN DE BLOQUES PRINCIPALES */
+#index-page .featured-products-container,
+#index-page .recently-added-container,
+#index-page #products .ads-row-wrapper {
+    display: block !important;
+    clear: both !important;
+    width: 100% !important;
+    margin-bottom: 60px !important;
+    float: none !important;
+}
+
+/* 2. NIVELACIÓN DE LAS TARJETAS (FILAS DE 3) - ELIMINADA - Duplicada de línea 2706 */
+
+/* 3. IMAGEN TOTAL (Adiós bordes blancos) */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 280px !important;
+}
+
+#index-page .ad-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* ===================================================== */
+/* PLAN DE CHOQUE FINAL - Anulación Total de Fantasmas */
+/* ===================================================== */
+
+/* 1. ANULACIÓN TOTAL DE LOS "FANTASMAS" INTERNOS DE HOME.CSS */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container,
+#index-page .product-swiper .swiper-slide {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: 280px !important;
+    overflow: hidden !important;
+}
+
+/* 2. FORZAMOS QUE LA IMAGEN IGNORE LAS LÍNEAS 1215-1217 */
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img,
+#index-page .product-swiper .swiper-slide img {
+    all: unset !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+/* ===================================================== */
+/* PRUEBA DE FUEGO - Verificar selectores */
+/* ===================================================== */
+
+/* PRUEBA DE CONTROL TOTAL */
+#index-page .ad-card,
+#index-page .property-card {
+    border: 5px solid red !important;
+    background-color: yellow !important;
+}
+
+/* FORZAMOS EL ANCHO DE LA IMAGEN DESDE LA RAÍZ */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    min-width: 100% !important;
+    width: 100% !important;
+    background-color: blue !important;
+}
+
+/* ===================================================== */
+/* AJUSTE FINAL - Eliminar espacio blanco */
+/* ===================================================== */
+
+/* FUERZA BRUTA ESTRUCTURAL */
+#index-page .ad-card,
+#index-page .property-card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ESTO ES LO QUE ESTIRA LA IMAGEN SI O SI */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    height: 280px !important;
+    min-width: 100% !important;
+    flex: 0 0 280px !important;
+}
+
+#index-page .ad-card .image-container img,
+#index-page .property-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+}
+
+/* ===================================================== */
+/* SOLUCIÓN QUIRÚRGICA - Romper el candado */
+/* ===================================================== */
+
+
+/* 2. AJUSTE DE LA TARJETA PARA QUE NO SE DESBORDE */
+#index-page .ad-card,
+#index-page .property-card {
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* 3. REPASO DE LA IMAGEN */
+#index-page .ad-card .image-container,
+#index-page .property-card .image-container {
+    width: 100% !important;
+    height: 280px !important;
+    overflow: hidden !important;
+}
+
+#index-page .ad-card .image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* ======================================================= */
+/* SOLO PARA MÓVILES (No afecta a la versión de PC)        */
+/* ======================================================= */
+@media (max-width: 768px) {
+    /* Contenedor de filas de tarjetas */
+    .carousel-row-wrapper {
+        padding: 0 15px !important;
+    }
+    
+    /* Paginación para carruseles en móvil */
+    .row-carousel-pagination {
+        position: relative;
+        margin-top: 15px;
+        text-align: center;
+    }
+    
+    .row-carousel-pagination .swiper-pagination-bullet {
+        width: 8px;
+        height: 8px;
+        background: #ccc;
+        opacity: 1;
+        margin: 0 4px;
+    }
+    
+    .row-carousel-pagination .swiper-pagination-bullet-active {
+        background: var(--color-primario, #00bfae);
+    }
+    
+    /* Ocultar flechas de navegación en móvil */
+    .row-nav-prev, 
+    .row-nav-next,
+    .product-swiper .swiper-button-next,
+    .product-swiper .swiper-button-prev {
+        display: none !important;
+    }
+    
+    /* Featured swiper en móvil */
+    .featured-swiper {
+        padding: 0 35px;
+    }
+    
+    .featured-swiper .swiper-button-next,
+    .featured-swiper .swiper-button-prev {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .featured-swiper .swiper-button-next:after,
+    .featured-swiper .swiper-button-prev:after {
+        font-size: 14px;
+    }
+    
+    /* Títulos de sección */
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    .ads-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 1rem;
+    }
+    
+    .carousel-row-wrapper {
+        padding: 0 10px;
+    }
+}
+
+/* Ajuste Relámpago: Buscador Compacto */
+@media (max-width: 768px) {
+    .logo-container img {
+        height: 35px !important;
+    }
+
+    /* Ocultamos links innecesarios para el inversionista en móvil */
+    .nav-links {
+        display: none !important; 
+    }
+
+    /* 2. LA "ESFERA" TRASLÚCIDA (EL BUSCADOR) */
+    .hero-content {
+        padding-top: 80px !important;
+    }
+
+    .search-wrapper {
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-radius: 20px !important;
+        padding: 15px !important;
+        width: 90% !important;
+        margin: 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* 3. INPUT Y BOTÓN DENTRO DE LA ESFERA */
+    .search-input-group, .search-button {
+        width: 100% !important;
+        height: 48px !important;
+        margin: 0 !important;
+    }
+
+    .search-input {
+        font-size: 16px !important;
+        padding-left: 40px !important;
+    }
+    
+    /* Otros ajustes para móviles */
+    .box-container, .carousel-row-wrapper {
+        padding: 0 15px !important;
+        overflow: hidden !important;
+    }
+    
+    .section-title {
+        font-size: 1.5rem !important;
+        padding-left: 10px;
+    }
+}
+
+/* =========================================================
+   BADGES DE PLANES (CORONAS: Bronce, Plata, Oro, Diamante)
+   ========================================================= */
+
+/* Estilo base para todas las coronas en las tarjetas */
+.plan-badge-icon {
+    font-size: 1.2rem !important;
+    margin-right: 5px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+/* Badge base para los planes */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Badge Básico - Bronce */
+.badge-basico {
+    background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+    color: #fff;
+}
+
+/* Badge Premium - Plata */
+.badge-premium {
+    background: linear-gradient(135deg, #c0c0c0, #808080);
+    color: #333;
+}
+
+/* Badge Top - Oro */
+.badge-top {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #333;
+}
+
+/* Badge Elite - Diamante */
+.badge-elite {
+    background: linear-gradient(135deg, #b9f2ff, #4682b4);
+    color: #fff;
+}
+
+/* 1. PLAN BÁSICO: Corona de Bronce */
+.crown-bronze {
+    color: #cd7f32 !important;
+}
+
+/* 2. PLAN PREMIUM: Corona de Plata */
+.crown-silver {
+    color: #847b7b !important;
+}
+
+/* 3. PLAN TOP/DESTACADO: Corona de Oro */
+.crown-gold {
+    color: #ffb906 !important;
+}
+
+/* 4. PLAN ELITE/MÁXIMO: Corona de Diamante */
+.crown-diamond {
+    color: #b9f2ff !important;
+    text-shadow: 1px 1px 0px #4682b4, -1px -1px 0px #ffffff !important;
+    filter: drop-shadow(0 0 6px rgba(185, 242, 255, 0.8)) !important;
+}
+
+/* Contenedor para la corona sobre la imagen (sin fondo) */
+.card-crown-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 100 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajuste del icono de la corona */
+.card-crown-badge i {
+    font-size: 2.2rem !important;
+    margin: 0 !important;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
 }

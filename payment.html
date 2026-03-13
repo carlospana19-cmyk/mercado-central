@@ -431,9 +431,9 @@
                     sessionStorage.setItem('selectedPlan', selectedPlan);
                     sessionStorage.setItem('paymentConfirmed', 'true');
                     
-                    // Redirigir a registro o continuación
+                    // Redirigir a publicar.html para continuar con los detalles del anuncio
                     setTimeout(() => {
-                        window.location.href = '/registro.html?plan=' + selectedPlan;
+                        window.location.href = 'publicar.html?step=2';
                     }, 2000);
                 }, 2000);
             } catch (error) {

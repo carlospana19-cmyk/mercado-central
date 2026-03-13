@@ -1,5 +1,5 @@
 import { supabase } from './supabase-client.js';
-import { generateAttributesHTML } from './utils-attributes.js';
+import { generateAttributesHTML, UIComponents, cleanLocationString } from './UIComponents.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
 import { generateLikeButtonHTML, initializeAllCardLikes, setupLikesObserver } from './likes-logic.js';
 
@@ -245,10 +245,8 @@ async function loadAndFilterResults() {
 
     let queryBuilder = supabase
       .from('anuncios')
-      .select('*, imagenes(url_imagen), profiles(nombre_negocio, url_foto_perfil)', { count: 'exact' })
-      // Prioridad: premium y destacados activos primero
-      .order('featured_plan', { ascending: false })
-      .order('featured_until', { ascending: false, nullsFirst: false })
+      .select('*, imagenes(url_imagen), profiles(nombre_negocio, nombre_completo, url_foto_perfil)', { count: 'exact' })
+      // Orden simple por fecha - el ordenamiento jerárquico se hace en frontend
       .order('fecha_publicacion', { ascending: false });
 
     // Filtros existentes (mantener igual)
@@ -273,10 +271,9 @@ async function loadAndFilterResults() {
     if (priceMin) queryBuilder = queryBuilder.gte('precio', priceMin);
     if (priceMax) queryBuilder = queryBuilder.lte('precio', priceMax);
 
-    // Paginación
-    const from = (currentPage - 1) * RESULTS_PER_PAGE;
-    const to = from + RESULTS_PER_PAGE - 1;
-    queryBuilder = queryBuilder.limit(RESULTS_PER_PAGE).range(from, to);
+    // Paginación: Traer todos los resultados relevantes para ordenar correctamente en frontend
+    // Usamos limit(200) para evitar timeout por payload demasiado pesado
+    queryBuilder = queryBuilder.limit(200);
 
     const { data: products, error, count } = await queryBuilder;
 
@@ -286,18 +283,36 @@ async function loadAndFilterResults() {
         return;
     }
 
-    // ORDENAMIENTO POR PRIORIDAD DE PLAN
+    // === ORDENAMIENTO DE JERARQUÍA ANTIBALAS ===
     products.sort((a, b) => {
-        // Primero por prioridad de plan
-        const priorityA = a.plan_priority || 0;
-        const priorityB = b.plan_priority || 0;
+        const planA = a.featured_plan ? a.featured_plan.toString().toLowerCase().trim() : '';
+        const planB = b.featured_plan ? b.featured_plan.toString().toLowerCase().trim() : '';
         
-        if (priorityA !== priorityB) {
-            return priorityB - priorityA; // Mayor prioridad primero
+        // Función que busca la palabra clave real de la base de datos
+        const getPlanWeight = (planStr) => {
+            if (!planStr) return 1;
+            // 4 Puntos (ORO)
+            if (planStr.includes('top') || planStr.includes('destacado') || planStr.includes('oro')) return 4;
+            // 3 Puntos (PLATA) -> ¡Aquí faltaba "premium"!
+            if (planStr.includes('premium') || planStr.includes('plus') || planStr.includes('plata')) return 3;
+            // 2 Puntos (BRONCE)
+            if (planStr.includes('basico') || planStr.includes('básico') || planStr.includes('bronce')) return 2;
+            
+            return 1; // Gratis
+        };
+        
+        const weightA = getPlanWeight(planA);
+        const weightB = getPlanWeight(planB);
+        
+        // 1. Priorizar por peso comercial
+        if (weightA !== weightB) {
+            return weightB - weightA;
         }
-        
-        // Si mismo plan, por fecha
-        return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
+
+        // 2. Desempate por fecha más reciente
+        const dateA = new Date(a.created_at || a.fecha_publicacion || 0);
+        const dateB = new Date(b.created_at || b.fecha_publicacion || 0);
+        return dateB - dateA;
     });
 
     // Load subcategories with counts for filtering
@@ -333,10 +348,20 @@ async function loadAndFilterResults() {
         subcategoriesWithCounts = await Promise.all(countsPromises);
     }
 
-    displayFilteredProducts(products || []);
+    // === PAGINACIÓN EN FRONTEND ===
+    // Calcular paginación basada en los datos ya ordenados
+    const itemsPerPage = RESULTS_PER_PAGE;
+    const totalItems = products ? products.length : 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedProducts = products ? products.slice(startIndex, endIndex) : [];
+
+    // Renderizar los productos paginados
+    displayFilteredProducts(paginatedProducts);
     displaySubcategoryFilters(subcategoriesWithCounts);
-    updateSummary(query, mainCategory, count || 0);
-    displayPaginationControls(count || 0); // Mostrar controles de paginación
+    updateSummary(query, mainCategory, totalItems);
+    displayPaginationControls(totalItems, totalPages); // Mostrar controles de paginación
 }
 
 // --- FUNCIONES DE RENDERIZADO ---
@@ -430,54 +455,29 @@ function displayFilteredProducts(ads) {
         const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
         const categoria = ad.categoria ? ad.categoria.toLowerCase() : '';
         
-        // SISTEMA DE DESTACADOS: Badges con estrellas
-// BADGE ESTELAR METÁLICO – versión SVG simple
-let badgeHTML = '';
-let cardExtraClass = '';
+        // SISTEMA DE DESTACADOS: Badges con coronas
+        let cardExtraClass = '';
 
-const badgeSVG = (colorClass) => `
-<svg class="simple-badge-svg ${colorClass}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <!-- Aro de estrella (12 puntas) -->
-    <path d="M50 2 
-             L63.5 18.5 L84.5 15.5 
-             L87.5 36.5 L100 50 
-             L87.5 63.5 L84.5 84.5 
-             L63.5 81.5 L50 98 
-             L36.5 81.5 L15.5 84.5 
-             L12.5 63.5 L0 50 
-             L12.5 36.5 L15.5 15.5 
-             L36.5 18.5 Z" 
-          class="badge-star-bg"/>
-
-    <!-- Círculo blanco de fondo -->
-    <circle cx="50" cy="50" r="32" 
-            fill="white" 
-            stroke="white" 
-            stroke-width="1"/>
-
-    <!-- Estrella central - SOLO CONTORNO (stroke), sin relleno -->
-    <polygon points="50,28 57,45 75,45 61,56 66,73 50,60 32,70 38,53 25,43 42,43" 
-             class="badge-center-star"
-             fill="none"
-             stroke-width="2.5"
-             stroke-linecap="round"
-             stroke-linejoin="round"/>
-</svg>
-`;
-
-if (ad.featured_plan === "top") {
-  badgeHTML = badgeSVG("diamond-badge");
-  cardExtraClass = "card-top";
-} else if (ad.featured_plan === "destacado") {
-  badgeHTML = badgeSVG("gold-badge");
-  cardExtraClass = "card-destacado";
-} else if (ad.featured_plan === "premium") {
-  badgeHTML = badgeSVG("silver-badge");
-  cardExtraClass = "card-premium";
-} else if (ad.featured_plan === "basico") {
-  badgeHTML = badgeSVG("bronze-badge");
-  cardExtraClass = "card-basico";
-}
+        // === LÓGICA DE BADGES CON CORONAS SEGÚN EL PLAN ===
+        const plan = ad.featured_plan ? ad.featured_plan.toLowerCase() : 'free';
+        let crownBadgeHTML = '';
+        
+        if (plan === 'basico') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-bronze"></i></div>`;
+            cardExtraClass = 'card-basico';
+        } else if (plan === 'premium') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-silver"></i></div>`;
+            cardExtraClass = 'card-premium';
+        } else if (plan === 'top') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
+            cardExtraClass = 'card-top';
+        } else if (plan === 'destacado') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
+            cardExtraClass = 'card-destacado';
+        } else if (plan === 'elite') {
+            crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-gem crown-diamond"></i></div>`;
+            cardExtraClass = 'card-elite';
+        }
         
         // Badge de urgente con ícono de reloj
         let urgentBadge = '';
@@ -788,6 +788,7 @@ if (ad.featured_plan === "top") {
         
         // ✅ Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
         const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
+        const vendorFullName = vendorProfile?.nombre_completo || '';
         const vendorPhoto = vendorProfile?.url_foto_perfil;
         const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
         // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
@@ -800,7 +801,7 @@ if (ad.featured_plan === "top") {
 
 return `
         <div class="property-card card ${cardExtraClass} ${soldClass}" style="${ad.is_sold ? 'cursor: default;' : 'cursor: pointer;'}">
-                ${badgeHTML}
+                ${crownBadgeHTML}
                 ${urgentBadge}
                 ${soldBadgeResults}
                 <div class="card-actions">
@@ -836,26 +837,29 @@ return `
         
                 <div class="property-details">
                         <div class="property-header">
-                                <div class="property-seller-name">${ad.contact_name || 'Usuario Verificado'}</div>
+                                <div class="property-seller-name">${ad.contact_name || vendorFullName || 'Usuario Verificado'}</div>
                                 <div class="property-price-and-tag">
                                         <span class="property-price">${priceFormatted}</span>
                                         ${ad.enhancements && ad.enhancements.is_urgent ? '<span class="tag-oportunidad">Oportunidad</span>' : ''}
                                         ${vendorAvatar}
                                 </div>
+                                <h2 class="property-title">${ad.titulo}</h2>
                                 <div class="property-location">
                                         <i class="fas fa-map-marker-alt"></i>
-                                        ${ad.provincia || 'Panamá'}, ${ad.distrito || ad.ubicacion || 'N/A'}
+                                        ${cleanLocationString(ad.direccion_exacta || (ad.provincia || 'Panamá') + ', ' + (ad.distrito || ad.ubicacion || 'N/A'))}
                                 </div>
-                                <h2 class="property-title">${ad.titulo}</h2>
-                                <p class="property-description">${ad.descripcion ? ad.descripcion.substring(0, 100) + '...' : ''}</p>
                         </div>
             
-                        <div class="property-attributes">
-                ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
-                        </div>
+                        ${(() => {
+                            const attrHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
+                            // Solo creamos el contenedor si attrHTML tiene contenido real
+                            return attrHTML && attrHTML !== '' && attrHTML !== '<span></span>' 
+                                ? `<div class="property-attributes">${attrHTML}</div>` 
+                                : ''; 
+                        })()}
             
             <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
-                Contactar ahora
+                Contactar
             </button>
                 </div>
         </div>
@@ -884,6 +888,12 @@ return `
         },
         slidesPerView: 1,
         autoplay: false,
+        // Habilitar swipe táctil para móviles
+        allowTouchMove: true,
+        touchRatio: 1,
+        touchAngle: 45,
+        grabCursor: true,
+        simulateTouch: true,
       };
 
       // Solo agregar navegación si hay múltiples slides y los elementos existen
@@ -910,17 +920,33 @@ return `
     };
     container.addEventListener('click', container._propertyImageListener);
     
-    // ✅ Evento delegado SOLO para botón Contactar
+    // ✅ Evento unificado para botones Contactar y tarjetas
+    // Solo el botón de contactar debe redirigir a detalles
     container.addEventListener('click', (e) => {
+      // Si hace click en el botón de contactar
       const contactLink = e.target.closest('.btn-contact-card');
-      if (!contactLink) return;
-
-      e.preventDefault();
-      const contactId = contactLink.dataset.contactId;
-
-      if (contactId) {
-        window.location.href = `detalle-producto.html?id=${contactId}`;
+      if (contactLink) {
+        e.preventDefault();
+        const contactId = contactLink.dataset.contactId;
+        if (contactId) {
+          window.location.href = `detalle-producto.html?id=${contactId}`;
+        }
+        return;
       }
+      
+      // Si hace click en el botón de like, permitir que funcione
+      const btnLike = e.target.closest('.like-button, .btn-like');
+      if (btnLike) {
+        return; // No prevenimos el comportamiento
+      }
+      
+      // Si hace click en las flechas del carrusel, permitir que funcionen
+      const carouselNav = e.target.closest('.swiper-button-next, .swiper-button-prev');
+      if (carouselNav) {
+        return;
+      }
+      
+      // La tarjeta en sí ya no es clickeable - solo el botón Contactar debe funcionar
     });
 
     // Inicializar likes en todas las tarjetas
@@ -964,11 +990,12 @@ function displayError(message) {
 }
 
 // --- FUNCIÓN DE PAGINACIÓN ---
-function displayPaginationControls(totalCount) {
+function displayPaginationControls(totalCount, totalPagesParam) {
     const paginationContainer = document.getElementById('pagination-controls');
     if (!paginationContainer) return;
 
-    const totalPages = Math.ceil(totalCount / RESULTS_PER_PAGE);
+    // Usar el parámetro pasado o calcularlo
+    const totalPages = totalPagesParam || Math.ceil(totalCount / RESULTS_PER_PAGE);
     paginationContainer.innerHTML = ''; // Limpiar controles existentes
 
     if (totalPages <= 1) return; // No mostrar paginación si solo hay una página
@@ -980,6 +1007,8 @@ function displayPaginationControls(totalCount) {
     prevButton.addEventListener('click', () => {
         currentPage--;
         loadAndFilterResults();
+        // Scroll hacia arriba al cambiar de página
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     paginationContainer.appendChild(prevButton);
 
@@ -991,6 +1020,8 @@ function displayPaginationControls(totalCount) {
         pageButton.addEventListener('click', () => {
             currentPage = i;
             loadAndFilterResults();
+            // Scroll hacia arriba al cambiar de página
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
         paginationContainer.appendChild(pageButton);
     }
@@ -1002,6 +1033,8 @@ function displayPaginationControls(totalCount) {
     nextButton.addEventListener('click', () => {
         currentPage++;
         loadAndFilterResults();
+        // Scroll hacia arriba al cambiar de página
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     paginationContainer.appendChild(nextButton);
 }

@@ -4,34 +4,13 @@
 /* ================================================= */
 
 /* --- Contenedor de resultados (grid) --- */
-#results-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  padding: 2rem;
-}
-
-/* Esto separa las tarjetas de forma profesional */
+#results-container,
 .results-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-    gap: 15px !important;
-    padding: 15px !important;
-    margin-top: 10px;
-    justify-items: center;
-}
-
-@media (max-width: 992px) {
-  #results-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  #results-container {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  gap: 80px;
+  padding: 20px;
+  justify-content: center;
 }
 
 /* --- Tarjeta principal (property-card) --- */
@@ -42,29 +21,40 @@
   background: #fff;
   border-radius: 1.6rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  overflow: hidden; /* Para que todo se contenga */
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  min-width: 280px;
-  max-width: 350px;
-  margin: 0 auto !important;
-  height: 100% !important; /* Todas la misma altura */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  height: 100%;
+  min-height: 380px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
 
+/* Contenedor de contenido con padding-bottom para respiración */
+.property-card .content,
+.box .content {
+  padding-bottom: 20px !important;
+}
+
+/* Ubicación con margin-top auto para empujar hacia abajo en flexbox */
+.property-card .location,
+.property-location,
+.box .location {
+  margin-top: auto !important;
+}
+
 /* --- Clase ad-card (alias para property-card) --- */
-/* REJILLA DE IMPACTO: Misma altura que property-card */
 .ad-card {
-  width: 100% !important;
-  min-width: 280px;
-  max-width: 100% !important;
-  margin: 0 auto !important;
-  height: 100%; /* Todas la misma altura */
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden !important;
+  overflow: hidden;
 }
 
 .property-card:hover {
@@ -91,6 +81,134 @@
   }
 }
 
+/* Grid responsivo para resultados */
+@media (max-width: 992px) {
+  #results-container,
+  .results-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  #results-container,
+  .results-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 15px;
+  }
+}
+
+/* Optimización completa para móviles - Tarjetas */
+@media (max-width: 768px) {
+  /* Tarjetas responsivas - tamaño perfecto para móvil */
+  .box, .property-card {
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Imagen en móvil - altura optimizada */
+  .property-image,
+  .box .image-container {
+    height: 200px;
+    width: 100%;
+  }
+  
+  /* Asegurar que las imágenes del carrusel ocupen todo el espacio */
+  .property-image .swiper-slide img,
+  .property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Detalles de tarjeta en móvil */
+  .property-details,
+  .box .content {
+    padding: 15px !important;
+  }
+
+  /* Títulos en móvil */
+  .property-title,
+  .box h3 {
+    font-size: 1.6rem !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Precios en móvil */
+  .property-price,
+  .box .price {
+    font-size: 1.8rem !important;
+    color: #008080 !important;
+  }
+
+  /* Ubicación en móvil */
+  .property-location,
+  .box .location {
+    font-size: 1.2rem !important;
+    color: #777 !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Ocultar descripción en móvil */
+  .property-description,
+  .box .description {
+    display: none !important;
+  }
+
+  /* Solo mostrar 3 atributos en móvil */
+  .property-details span:nth-child(n+4),
+  .box .property-details span:nth-child(n+4) {
+    display: none !important;
+  }
+
+  /* Atributos en móvil */
+  .property-details {
+    gap: 0.6rem !important;
+    margin-bottom: 8px !important;
+    font-size: 1.3rem !important;
+    color: #444 !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* --- Imagen de la tarjeta --- */
+.property-image,
+.product-card-h .image-container {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  background: #f0f0f0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 !important; /* Sin border-radius, el padre lo tiene */
+}
+
+.product-card-h .image-container {
+  width: 200px;
+  border-radius: 0 !important;
+}
+
+.property-image img,
+.product-card-h .image-container img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0 !important; /* Sin border-radius individual */
+}
+
+.product-card-h .image-container img {
+  border-radius: 0 !important;
+}
+
 /* --- Contenido de la tarjeta --- */
 .property-details,
 .product-card-h .card-content {
@@ -109,7 +227,7 @@
   justify-content: space-between;
 }
 
-/* --- Título --- */
+/* --- Título con control de 2 líneas y altura homogénea --- */
 .property-title,
 .product-card-h .card-title {
   font-size: 1.8rem;
@@ -119,11 +237,22 @@
   line-height: 1.2;
   letter-spacing: -0.2px;
   word-spacing: normal !important;
+  /* Regla de las 2 líneas - sin puntos suspensivos */
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex-shrink: 0;
+  /* Altura homogénea: mínimo para 2 líneas */
+  min-height: 2.4em;
+}
+
+/* Contenedor del título para mantener altura homogénea */
+.property-details .title-container,
+.product-card-h .card-content .title-container {
+  min-height: 2.4em;
+  display: flex;
+  align-items: flex-start;
 }
 
 .product-card-h .card-title {
@@ -133,9 +262,9 @@
 /* --- Precio --- */
 .property-price,
 .product-card-h .card-content .card-price {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #2da687;
+  color: #353636;
   letter-spacing: -0.2px;
 }
 
@@ -149,7 +278,7 @@
 /* --- Ubicación --- */
 .property-location,
 .product-card-h .card-location {
-  font-size: 16px;
+  font-size: 14px;
   color: #555;
   display: flex;
   align-items: center;
@@ -166,7 +295,7 @@
 
 .property-location i,
 .product-card-h .card-location i {
-  color: #2da687;
+  color: #555;
   margin-right: 8px;
 }
 
@@ -231,28 +360,14 @@
 }
 
 /* --- Botón de contacto --- */
-.btn-contact {
-    width: 100% !important; /* Estirado al 100% */
-    margin: 15px 0 0 0 !important; /* Sin márgenes a los lados */
-    padding: 12px;
-    background-color: var(--color-primario);
-    color: white;
-    text-align: center;
-    border-radius: 6px !important; /* Redondeo fino, no ovalado */
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    display: block;
-}
-
 .btn-contact-card,
 .product-card-h .btn-contact {
   background-color: #2da687;
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 1rem 1.2rem;
-  font-size: 1.4rem;
+  padding: 2rem 1.3rem;
+  font-size: 1.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -376,19 +491,20 @@ section {
     scroll-padding: 25px !important;
 }
 
-/* 3. Primera tarjeta sin margen extra - el padding del contenedor ya da espacio */
-.ad-card:first-child, 
-.property-card:first-child,
-.box:first-child,
-.tarjeta-auto:first-child {
-    margin-left: 0 !important;
+/* 3. Todas las tarjetas tienen el mismo margen */
+.ad-card, 
+.property-card,
+.box,
+.tarjeta-auto {
+    margin: 0 !important;
 }
 
-/* 4. Asegurar que la tarjeta no se deforme - Actualizado a 380px */
+/* 4. Asegurar que la tarjeta no se deforme - Ancho flexible para grid */
 .ad-card, .property-card, .box, .tarjeta-auto {
-    flex: 0 0 380px !important; /* Ancho fijo de 380px */
-    width: 380px !important;
-    min-width: 380px !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 280px !important;
+    max-width: 100% !important;
     margin: 0 !important; /* Sin márgenes que causen choques */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
     overflow: hidden !important;
@@ -411,7 +527,7 @@ section {
   width: 100%;
   height: 240px; /* Altura actualizada a 240px */
   object-fit: cover; /* Para que la foto no se estire */
-  /* border-radius eliminado para permitir simetría desde la tarjeta padre */
+  border-radius: 0 !important; /* Sin border-radius individual */
 }
 
 .no-results-content p {
@@ -459,24 +575,7 @@ section {
    Prohibido estirarse más allá del círculo
    ============================================ */
 
-/* 1. EL CONTENEDOR (El círculo) */
-.vendor-avatar.has-image {
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    border-radius: 50% !important;
-    overflow: hidden !important; /* CORTA LOS 240PX SOBRANTES */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: #fff !important;
-    padding: 0 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+
 
 /* 2. LA IMAGEN (La que se estira) */
 .vendor-avatar-img {
@@ -497,16 +596,6 @@ section {
     flex-shrink: 0;
 }
 
-/* Contenedor de contenido de tarjeta con flexbox para alineación perfecta */
-.box .content,
-.property-details,
-.ad-card .card-body {
-    display: flex !important;
-    flex-direction: column !important;
-    flex-grow: 1 !important;
-    justify-content: space-between !important;
-}
-
 /* El botón de contactar siempre al fondo */
 .btn-contact,
 .btn-contact-card {
@@ -522,19 +611,21 @@ section {
 .product-card,
 .ad-card,
 .box {
-    border-radius: 20px !important; /* Curva en las 4 esquinas */
+    border-radius: 20px 20px 0 0 !important; /* Arriba óvalo, abajo recto */
     overflow: hidden !important;
     padding: 0 !important; /* ELIMINA el margen que hace que el botón flote */
     display: flex !important;
     flex-direction: column !important;
 }
 
-/* 2. EL CONTENIDO (Texto, precio): Les devolvemos su margen para que no toquen los bordes */
-.property-details,
-.product-card-body,
-.box .content {
-    padding: 15px !important;
-    flex-grow: 1 !important;
+/* 3. EL BOTÓN: Lo hacemos el "suelo" de la tarjeta */
+.product-card .contact-btn,
+.ad-card .btn-contact,
+.box .btn-contact {
+    width: 100% !important;   /* Que ocupe todo el ancho de lado a lado */
+    border-radius: 0 !important; /* Totalmente cuadrado abajo */
+    margin: 0 !important;     /* Sin espacios alrededor */
+    padding: 18px !important; /* Que sea alto y profesional */
 }
 
 /* ================================================= */
@@ -580,230 +671,25 @@ section {
     margin: 0;
 }
 
-/* ================================================= */
-/* === ESTABILIZACIÓN DEL ANCHO EN CARRUSELES === */
-/* Evita que las tarjetas se estiren en los carruseles */
-/* ================================================= */
+/* AJUSTE MÓVIL: Solo para pantallas menores a 768px */
+@media (max-width: 768px) {
+    .row-carousel .swiper-slide {
+        width: 85% !important; /* Fuerza a la tarjeta a ser ancha */
+    }
 
-.row-carousel .swiper-slide,
-.row-3-swiper .swiper-slide,
-.row-4-swiper .swiper-slide {
-    width: auto !important;
-    flex-shrink: 0 !important;
-}
+    .ad-card {
+        min-width: unset !important; /* Quitamos restricciones de PC */
+        max-width: 100% !important;
+        margin: 0 auto;
+    }
 
-.swiper-wrapper {
-    display: flex !important;
-}
-
-/* Forzar ancho correcto de tarjetas dentro del carrusel */
-.carousel-row-wrapper .box,
-.carousel-row-wrapper .tarjeta-auto {
-    width: 100% !important;
-    min-width: 280px !important;
-    max-width: 350px !important;
-}
-
-/* ================================================= */
-/* ANTÍDOTO TOTAL: SIMETRÍA Y BOTÓN LARGO */
-/* ================================================= */
-
-/* 1. CURVAS SUPERIORES (SIMETRÍA PERFECTA) */
-/* Este selector es tan largo que ganará a cualquier regla de 0px */
-body .box img, 
-body .tarjeta-auto img, 
-body .product-swiper img, 
-body .property-card img,
-body .product-swiper .swiper-slide img {
-    border-top-left-radius: 20px !important;  /* Curva izquierda */
-    border-top-right-radius: 20px !important; /* Curva derecha (Simetría) */
-    border-bottom-left-radius: 0px !important;  /* Base plana */
-    border-bottom-right-radius: 0px !important; /* Base plana */
-    height: 240px !important; /* Forzamos la altura que tenías */
-    object-fit: cover !important;
-}
-
-/* 2. EL CONTENEDOR (La Tarjeta) */
-/* Forzamos que la tarjeta sea la que mande en las curvas */
-body .box, 
-body .tarjeta-auto, 
-body .property-card {
-    border-radius: 20px !important; 
-    overflow: hidden !important; /* Esto "corta" cualquier esquina que se quiera salir */
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* ================================================= */
-/* EL BLOQUE DEFINITIVO: SIMETRÍA Y BOTÓN "FINO" */
-/* ================================================= */
-
-/* 1. LA IMAGEN: Forzamos que sea simétrica arriba y recta abajo */
-html body #results-container .box img, 
-html body #results-container .tarjeta-auto img,
-html body .product-swiper .swiper-slide img,
-html body .property-card .property-image img,
-html body .ad-card img {
-    border-top-left-radius: 20px !important;  /* Redondeado izquierda */
-    border-top-right-radius: 20px !important; /* Redondeado derecha (Simétrico) */
-    border-bottom-left-radius: 0px !important;  /* Cuadrado abajo */
-    border-bottom-right-radius: 0px !important; /* Cuadrada abajo */
-    height: 240px !important;
-    object-fit: cover !important;
-    display: block !important;
-}
-
-/* 2. LA TARJETA: Forzamos la curva general para que el botón luzca bien */
-html body .box, 
-html body .tarjeta-auto, 
-html body .property-card {
-    border-radius: 20px !important;
-    overflow: hidden !important; /* Esto corta la imagen si intenta salirse */
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* 3. EL BOTÓN: Largo (100%) y Fino (Rectangular 6px) */
-/* ¡ADIÓS AL BOTÓN OVALADO TIPO PÍLDORA! */
-html body .box .btn-contact, 
-html body .tarjeta-auto .btn-ver-detalles,
-html body .tarjeta-auto .btn-contact,
-html body .property-card .btn-contact-card,
-html body .btn-contact {
-    width: 100% !important;           /* Estirado de punta a punta de la letra */
-    margin: 15px 0 0 0 !important;     /* Cero a los lados para que sea largo */
-    padding: 14px 0 !important;        /* Altura elegante */
-    border-radius: 6px !important;     /* ESQUINAS FINAS, NO OVALADO */
-    display: block !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    background-color: var(--color-primario) !important;
-}
-
-/* ================================================= */
-/* SOLUCIÓN FINAL: SIMETRÍA TOTAL Y BOTÓN FINO */
-/* ================================================= */
-
-/* 1. IMAGEN Y CARCASA: Forzamos la simetría arriba */
-/* Usamos html body para que nadie le gane en prioridad */
-html body .box, 
-html body .tarjeta-auto, 
-html body .product-swiper,
-html body .product-swiper .swiper-slide img {
-    border-top-left-radius: 20px !important;  /* Esquina izquierda redonda */
-    border-top-right-radius: 20px !important; /* Esquina derecha redonda (Simetría) */
-    border-bottom-left-radius: 0px !important;  /* Base cuadrada */
-    border-bottom-right-radius: 0px !important; /* Base cuadrada */
-    overflow: hidden !important; /* VITAL: Corta la imagen que intenta salir cuadrada */
-}
-
-/* 2. EL BOTÓN: Largo (100%) y Fino (Rectangular) */
-/* Aquí matamos el estilo "óvalo" de 50px y lo estiramos a la punta de la letra */
-html body .box .btn-contact, 
-html body .tarjeta-auto .btn-ver-detalles,
-html body .tarjeta-auto .btn-contact {
-    width: 100% !important;           /* Estirado total de lado a lado */
-    margin: 15px 0 0 0 !important;     /* Cero a los lados para llegar al borde */
-    padding: 14px 0 !important;        /* Altura elegante */
-    border-radius: 6px !important;     /* ¡RECTANGULAR! Adiós al botón ovalado */
-    display: block !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    box-sizing: border-box !important;
-}
-
-/* 3. ALINEACIÓN: Para que el botón toque la "punta de la letra" */
-html body .box .content, 
-html body .tarjeta-auto .contenido-auto {
-    padding: 15px !important; /* Este margen dicta el inicio y fin del botón */
-}
-
-/* 1. LAS ESQUINAS DE ARRIBA (SIMETRÍA TOTAL) */
-html body #results-container .box img, 
-html body #results-container .tarjeta-auto img,
-html body .product-swiper .swiper-slide img,
-html body .box .image-container img,
-html body .box img {
-    border-top-left-radius: 20px !important;
-    border-top-right-radius: 20px !important;
-    border-bottom-left-radius: 0px !important;
-    border-bottom-right-radius: 0px !important;
-    height: 240px !important;
-    object-fit: cover !important;
-    display: block !important;
-}
-
-/* 2. LA TARJETA (El molde) */
-html body .box, html body .tarjeta-auto, html body .property-card {
-    border-top-left-radius: 20px !important;
-    border-top-right-radius: 20px !important;
-    border-bottom-left-radius: 0px !important;
-    border-bottom-right-radius: 0px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* 3. EL BOTÓN (RECTANGULAR Y LARGO) */
-html body .box .btn-contact, html body .tarjeta-auto .btn-ver-detalles,
-html body .tarjeta-auto .btn-contact, html body .box a.btn-contact {
-    width: 100% !important;
-    margin: 15px 0 0 0 !important;
-    padding: 14px 0 !important;
-    border-radius: 6px !important;
-    display: block !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    box-sizing: border-box !important;
-}
-
-/* 4. ALINEACIÓN CON EL CONTENIDO */
-html body .box .content, html body .tarjeta-auto .contenido-auto {
-    padding: 15px !important;
-}
-
-/* 1. LA IMAGEN: Forzamos curvas arriba y recto abajo */
-/* Usamos una ruta ultra-específica para "aplastar" el 0 !important */
-html body #results-container .box img, 
-html body #results-container .tarjeta-auto img,
-html body .product-swiper .swiper-slide img,
-html body .box .swiper-slide img {
-    border-top-left-radius: 20px !important;  /* Gemela izquierda */
-    border-top-right-radius: 20px !important; /* Gemela derecha (Simetría) */
-    border-bottom-left-radius: 0px !important; 
-    border-bottom-right-radius: 0px !important;
-    height: 240px !important;
-    object-fit: cover !important;
-    display: block !important;
-}
-
-/* 2. EL CONTENEDOR: Para que la imagen no se "salga" */
-html body .box, 
-html body .tarjeta-auto, 
-html body .property-card {
-    border-radius: 20px !important;
-    overflow: hidden !important; /* OBLIGATORIO: Corta las esquinas de la imagen */
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* 3. EL BOTÓN: Rectangular "Fino" y Largo */
-/* Matamos el ovalado (píldora) y lo estiramos de punta a punta */
-html body .box .btn-contact, 
-html body .tarjeta-auto .btn-ver-detalles,
-html body .tarjeta-auto .btn-contact {
-    width: 100% !important;           /* Estirado total lateral */
-    margin: 15px 0 0 0 !important;     /* 0 a los lados para que no se encoja */
-    padding: 14px 0 !important;        /* Altura profesional */
-    border-radius: 6px !important;     /* ¡RECTANGULAR! (Adiós al ovalado) */
-    display: block !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    box-sizing: border-box !important;
-}
-
-/* 4. ALINEACIÓN CON EL TEXTO (La "punta de la letra") */
-html body .box .content, 
-html body .tarjeta-auto .contenido-auto {
-    padding: 15px !important; /* Este margen dicta el inicio y fin del botón */
+    /* Ocultamos flechas en móvil para ganar espacio (se usa el dedo) */
+    .row-nav-prev, .row-nav-next {
+        display: none !important;
+    }
+    
+    /* Ajuste de imagen para que no se vea aplastada */
+    .card-image-container {
+        height: 200px !important;
+    }
 }

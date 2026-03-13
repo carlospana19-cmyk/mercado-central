@@ -1,9 +1,8 @@
 // home-logic.js - VERSIÓN DE DIAGNÓSTICO
 
 import { supabase } from './supabase-client.js';
-import { generateAttributesHTML } from './utils-attributes.js';
+import { generateAttributesHTML, UIComponents, cleanLocationString } from './UIComponents.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
-import { UIComponents } from './UIComponents.js';
 import { getSellerReviewStats } from './reviews-logic.js';
 
 export function initializeHomePage() {
@@ -23,41 +22,35 @@ export function initializeHomePage() {
         }
 
         try {
-            // ✅ CARGAR ANUNCIOS TOP Y DESTACADO PRIMERO (para fila de 2 columnas)
+            // ✅ CARGAR SOLO ANUNCIOS ORO (top y destacado) PARA LA PÁGINA PRINCIPAL
+            // Solo mostramos anuncios Oro en el Index según la nueva estrategia comercial
             let { data: premiumAds, error: premiumError } = await supabase
                 .from('anuncios')
-                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil)')
+                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
                 .in('featured_plan', ['top', 'destacado'])
-                .order('fecha_publicacion', { ascending: false })
-                .limit(20); // Aumentado para tener más tarjetas en el carrusel
+                .order('created_at', { ascending: false })
+                .limit(100); // Límite de 20 anuncios Oro
 
             if (premiumError) throw premiumError;
 
-            // ✅ CARGAR RESTO DE ANUNCIOS (premium, basico) para otras filas
-            let { data: regularAds, error } = await supabase
-                .from('anuncios')
-                .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil)')
-                .in('featured_plan', ['premium', 'basico'])
-                .order('fecha_publicacion', { ascending: false })
-                .limit(10);
-
-            // Combinar: primero TOP/Destacado, luego el resto
-            let ads = [...(premiumAds || []), ...(regularAds || [])];
+            // No cargamos anuncios de otros planes (premium, basico, free) en el Index
+            // Solo anuncios Oro tienen derecho a la portada
+            let ads = premiumAds || [];
 
             // ✅ Si la columna is_sold no existe, intentar sin el filtro
-            if (error && error.code === '42703') {
-                console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios.');
+            if (premiumError && premiumError.code === '42703') {
+                console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios Oro.');
                 const { data: adsWithoutFilter, error: error2 } = await supabase
                     .from('anuncios')
-                    .select('*, profiles(id, nombre_negocio, url_foto_perfil)')
-                    .in('featured_plan', ['top', 'destacado', 'premium', 'basico'])
-                    .order('fecha_publicacion', { ascending: false })
-                    .limit(15);
-                ads = adsWithoutFilter;
-                error = error2;
+                    .select('*, profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
+                    .in('featured_plan', ['top', 'destacado'])
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                ads = adsWithoutFilter || [];
+                premiumError = error2;
             }
 
-            if (error) throw error;
+            if (premiumError) throw premiumError;
 
             console.log("SENSOR 3: Datos recibidos de Supabase:", ads);
 
@@ -116,166 +109,50 @@ const getVideoEmbedUrl = (videoUrl) => {
     return null;
 };
 
-            const generateCardHTML = (ad) => {
-                const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
-                const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
-                const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
-                
-                const cardClass = ad.is_premium ? 'tarjeta-auto' : 'box';
-                
-                // ✅ BADGES ELIMINADOS - Ahora usamos section-header como separador elegante
-                let badgeHTML = '';
-                let cardExtraClass = '';
-
-                let urgentBadge = '';
-                if (ad.enhancements && ad.enhancements.is_urgent) {
-                    urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
-                }
-
-                // Foto de perfil del usuario (si existe)
-                let profilePhotoHTML = '';
-                if (ad.url_foto_perfil) {
-                    profilePhotoHTML = `
-                        <div class="card-seller-info">
-                            <img src="${ad.url_foto_perfil}" alt="Foto de vendedor" class="seller-photo">
-                            <div class="seller-details">
-                                <p class="seller-name">${ad.nombre_negocio || 'Vendedor'}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // ✅ BADGE VENDIDO EN TARJETAS DEL HOME
-                const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
-                const soldClass = ad.is_sold ? 'card-sold' : '';
-                // ✅ Guardar el id del anuncio en un atributo data
-                const dataAdId = `data-ad-id="${ad.id}" data-is-sold="${ad.is_sold ? 'true' : 'false'}"`;
-                
-                // Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
-                const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
-                const vendorPhoto = vendorProfile?.url_foto_perfil;
-                const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
-                const vendorId = vendorProfile?.id;
-                
-                // ✅ Obtener estadísticas de reseñas del vendedor
-                const vendorStats = vendorId ? (sellerStatsMap[vendorId] || { total_reviews: 0, average_rating: 0 }) : { total_reviews: 0, average_rating: 0 };
-                const starsDisplay = vendorStats.total_reviews > 0 
-                    ? `<span class="vendor-rating"><i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})</span>`
-                    : '';
-                
-                // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
-                const vendorAvatar = vendorPhoto 
-                    ? `<div class="vendor-avatar has-image" title="${vendorName}">
-                        <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-                        <span class="vendor-name-tooltip">${vendorName}${starsDisplay ? '<br>' + starsDisplay : ''}</span>
-                    </div>` 
-                    : `<div class="vendor-avatar" title="${vendorName}"></div>`;
-
-                // ✅ Agregar data-category para filtrado en tiempo real
-                const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
-
-                return `
-                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory} style="${ad.is_sold ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
-                       ${badgeHTML}
-                         ${urgentBadge}
-                         ${soldBadgeHome}
-                         <div class="card-actions">
-                            ${generateLikeButtonHTML(ad.id, 0, false)}
-                         </div>
-                         <div class="image-container ${ad.is_sold ? 'image-sold' : ''}">
-                            <div class="swiper product-swiper" id="swiper-${ad.id}">
-                                <div class="swiper-wrapper">
-                                    ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe><div class="swiper-edge-left"></div><div class="swiper-edge-right"></div></div>` : ''}
-                                    ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
-                                </div>
-                                <div class="swiper-button-prev"></div>
-                                <div class="swiper-button-next"></div>
-                                <div class="swiper-pagination"></div>
-                            </div>
-                        </div>
-                        <div class="content ${ad.is_sold ? 'content-sold' : ''}">
-                            <div class="price-row">
-                                <div class="price">${priceFormatted}</div>
-                                ${vendorAvatar}
-                            </div>
-                            <h3>${ad.titulo}</h3>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}</div>
-                            <div class="description">${ad.descripcion || ''}</div>
-                            ${generateAttributesHTML(ad.atributos_clave, ad.categoria)}
-                            ${profilePhotoHTML}
-                            <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>
-                        </div>
-                    </div>`;
-            };
-
-            // === RENDERIZADO POR FILAS REORGANIZADO ===
-
-            // Separar anuncios por tipo
-            const topDestacadoAds = ads.filter(ad => ['top', 'destacado'].includes(ad.featured_plan));
-            const premiumAdsFiltered = ads.filter(ad => ad.featured_plan === 'premium');
-            const basicoAds = ads.filter(ad => ad.featured_plan === 'basico');
-
-            let adIndex = 0;
-
-            // === FUNCIÓN PARA GENERAR SLIDE DE BANNER DE ELITE ===
+            // === FUNCIÓN PARA GENERAR SLIDE DE BANNER ELITE ===
             const generateEliteSlideHTML = (ad, index) => {
                 const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
                 const mainImage = allImages[0] || 'https://via.placeholder.com/800x400?text=Sin+Imagen';
                 const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
                 
-                // Avatar del vendedor
                 const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
                 const vendorPhoto = vendorProfile?.url_foto_perfil;
                 const vendorName = vendorProfile?.nombre_negocio || 'Vendedor';
                 const vendorId = vendorProfile?.id;
                 
-                // Estadísticas de reseñas del vendedor
                 const vendorStats = vendorId ? (sellerStatsMap[vendorId] || { total_reviews: 0, average_rating: 0 }) : { total_reviews: 0, average_rating: 0 };
                 const starsDisplay = vendorStats.total_reviews > 0 
                     ? `<i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})`
-                    : '<span style="color: rgba(255,255,255,0.5);">Sin reseñas</span>';
+                    : '<span class="no-reviews">Sin reseñas</span>';
                 
-                // Atributos del producto
-                const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria);
-                // Extraer solo los spans de atributos para el banner
+                const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
                 const attributeMatches = attributesHTML.match(/<span[^>]*>.*?<\/span>/g) || [];
                 const eliteAttributes = attributeMatches.slice(0, 4).map(attr => {
-                    // Limpiar y adaptar para el estilo del banner
                     return attr.replace(/class="[^"]*"/, 'class="elite-attribute"');
                 }).join('');
                 
-                // Badge de urgencia
                 const urgentBadge = ad.enhancements?.is_urgent 
                     ? '<span class="elite-badge-urgent"><i class="fas fa-bolt"></i> URGENTE</span>' 
                     : '';
                 
-                // Badge de vendido
                 const soldBadge = ad.is_sold 
                     ? '<span class="elite-badge-sold"><i class="fas fa-check-circle"></i> VENDIDO</span>' 
                     : '';
                 
-                // Clase para estado vendido
                 const soldClass = ad.is_sold ? 'elite-banner-sold' : '';
-                const soldPointer = ad.is_sold ? 'pointer-events: none; opacity: 0.85;' : '';
-                
-                // Clase activa para el primer slide
                 const activeClass = index === 0 ? 'active' : '';
                 
-                // === DETECTAR SI ES VIDEO O IMAGEN ===
                 const videoUrl = ad.url_video;
                 const isVideo = videoUrl && (videoUrl.includes('.mp4') || videoUrl.includes('.webm') || videoUrl.includes('.mov'));
                 
-                // Tag de patrocinado (si el anuncio tiene marca de sponsor)
                 const sponsoredTag = ad.is_sponsored 
                     ? '<span class="sponsored-tag"><i class="fas fa-ad"></i> Patrocinado</span>' 
                     : '';
                 
-                // Tag orgánico (para anuncios TOP normales)
                 const organicTag = !ad.is_sponsored && ad.featured_plan === 'top'
                     ? '<span class="organic-tag"><i class="fas fa-check-circle"></i> Verificado</span>'
                     : '';
                 
-                // Media container (video o imagen)
                 let mediaHTML = '';
                 if (isVideo) {
                     mediaHTML = `
@@ -296,7 +173,7 @@ const getVideoEmbedUrl = (videoUrl) => {
 
                 return `
                 <div class="elite-banner-slide ${activeClass}" data-slide-index="${index}" data-has-video="${isVideo}">
-                    <div class="elite-banner ${soldClass}" style="${soldPointer}" data-ad-id="${ad.id}" onclick="window.location.href='detalle-producto.html?id=${ad.id}'">
+                    <div class="elite-banner ${soldClass}" data-ad-id="${ad.id}">
                         ${sponsoredTag}
                         ${organicTag}
                         ${urgentBadge}
@@ -310,7 +187,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                             <h3 class="elite-banner-title">${ad.titulo}</h3>
                             <div class="elite-banner-location">
                                 <i class="fas fa-map-marker-alt"></i>
-                                ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ad.ubicacion || ''}, ${ad.provincia || 'N/A'}
+                                ${cleanLocationString(ad.corregimiento ? ad.corregimiento + ', ' : '' + (ad.distrito || ad.ubicacion || '') + ', ' + (ad.provincia || 'N/A'))}
                             </div>
                             <div class="elite-banner-attributes">
                                 ${eliteAttributes}
@@ -343,13 +220,151 @@ const getVideoEmbedUrl = (videoUrl) => {
                 return indicators;
             };
 
-            // === SLIDER DE BANNERS DE ELITE: Múltiples anuncios TOP con rotación ===
-            if (topDestacadoAds.length > 0) {
-                // Determinar cuántos anuncios TOP mostrar en el slider (máximo 5)
-                const eliteAds = topDestacadoAds.slice(0, Math.min(5, topDestacadoAds.length));
-                const hasMultipleSlides = eliteAds.length > 1;
+            const generateCardHTML = (ad) => {
+                const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
+                const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+                const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
                 
-                // Abrir contenedor principal que sincroniza anchos
+                const cardClass = 'property-card';
+                
+                // ✅ BADGES ELIMINADOS - Ahora usamos section-header como separador elegante
+                let badgeHTML = '';
+                let cardExtraClass = '';
+
+                // === LÓGICA DE BADGES CON CORONAS SEGÚN EL PLAN ===
+                const plan = ad.featured_plan ? ad.featured_plan.toLowerCase() : 'free';
+                let crownBadgeHTML = '';
+                
+                if (plan === 'basico') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-bronze"></i></div>`;
+                } else if (plan === 'premium') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-silver"></i></div>`;
+                } else if (plan === 'top' || plan === 'destacado') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
+                } else if (plan === 'elite') {
+                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-gem crown-diamond"></i></div>`;
+                }
+
+                let urgentBadge = '';
+                if (ad.enhancements && ad.enhancements.is_urgent) {
+                    urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
+                }
+
+                // Foto de perfil del usuario (si existe)
+                let profilePhotoHTML = '';
+                if (ad.url_foto_perfil) {
+                    profilePhotoHTML = `
+                        <div class="card-seller-info">
+                            <img src="${ad.url_foto_perfil}" alt="Foto de vendedor" class="seller-photo">
+                            <div class="seller-details">
+                                <p class="seller-name">${ad.nombre_negocio || 'Vendedor'}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // ✅ BADGE VENDIDO EN TARJETAS DEL HOME
+                const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
+                const soldClass = ad.is_sold ? 'card-sold' : '';
+                // ✅ Guardar el id del anuncio en un atributo data
+                const dataAdId = `data-ad-id="${ad.id}" data-is-sold="${ad.is_sold ? 'true' : 'false'}"`;
+                
+                // Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
+                const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
+                const vendorPhoto = vendorProfile?.url_foto_perfil;
+                const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
+                const vendorFullName = vendorProfile?.nombre_completo || '';
+                const vendorId = vendorProfile?.id;
+                
+                // ✅ Obtener estadísticas de reseñas del vendedor
+                const vendorStats = vendorId ? (sellerStatsMap[vendorId] || { total_reviews: 0, average_rating: 0 }) : { total_reviews: 0, average_rating: 0 };
+                const starsDisplay = vendorStats.total_reviews > 0 
+                    ? `<span class="vendor-rating"><i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})</span>`
+                    : '';
+                
+                // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
+                const vendorAvatar = vendorPhoto 
+                    ? `<div class="vendor-avatar has-image" title="${vendorName}">
+                        <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
+                        <span class="vendor-name-tooltip">${vendorName}${starsDisplay ? '<br>' + starsDisplay : ''}</span>
+                    </div>` 
+                    : `<div class="vendor-avatar" title="${vendorName}"></div>`;
+
+                // ✅ Agregar data-category para filtrado en tiempo real
+                const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
+
+                return `
+                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory}>
+                       ${crownBadgeHTML}
+                         ${urgentBadge}
+                         ${soldBadgeHome}
+                         <div class="card-actions">
+                            ${generateLikeButtonHTML(ad.id, 0, false)}
+                         </div>
+                         <div class="property-image ${ad.is_sold ? 'image-sold' : ''}">
+                            <div class="swiper product-swiper" id="swiper-${ad.id}">
+                                <div class="swiper-wrapper">
+                                    ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe><div class="swiper-edge-left"></div><div class="swiper-edge-right"></div></div>` : ''}
+                                    ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
+                                </div>
+                                <div class="swiper-button-prev"></div>
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        </div>
+                        <div class="property-details ${ad.is_sold ? 'content-sold' : ''}">
+                            <div class="property-seller-name">${ad.contact_name || vendorFullName || vendorName || 'Usuario Verificado'}</div>
+                            <div class="property-price-and-tag">
+                                <span class="property-price">${priceFormatted}</span>
+                                ${vendorAvatar}
+                            </div>
+                            <h3 class="property-title">${ad.titulo}</h3>
+                            <p class="property-location"><i class="fas fa-map-marker-alt"></i> ${cleanLocationString(ad.direccion_exacta || (ad.corregimiento ? ad.corregimiento + ', ' : '') + (ad.distrito || ad.ubicacion || '') + ', ' + (ad.provincia || 'N/A'))}</p>
+                            ${(() => {
+                                const attrHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
+                                // Solo creamos el contenedor si attrHTML tiene contenido real
+                                return attrHTML && attrHTML !== '' && attrHTML !== '<span></span>' 
+                                    ? `<div class="property-specs">${attrHTML}</div>` 
+                                    : ''; 
+                            })()}
+                            ${profilePhotoHTML}
+                            <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>
+                        </div>
+                    </div>`;
+            };
+
+            // --- EL EMBUDO DE CASCADA PERFECTA ---
+
+            // 1. Traemos 100 anuncios de Supabase (o más)
+            const allGoldAds = (premiumAds || []).sort((a, b) => {
+                const dateA = new Date(a.created_at || a.fecha_publicacion || 0);
+                const dateB = new Date(b.created_at || b.fecha_publicacion || 0);
+                return dateB - dateA; // Los más recientes primero
+            });
+
+            // Nivel 1: BANNER PRINCIPAL (Los 5 más recientes)
+            const bannerAds = allGoldAds.slice(0, 5);
+
+            // Nivel 2: CUADRÍCULA DE IMPACTO (Los siguientes 6)
+            const gridAds = allGoldAds.slice(5, 11);
+
+            // Nivel 3: LOS CARRUSELES (A partir del 11 en adelante)
+            const adsForCarousels = allGoldAds.slice(11);
+
+            // Filtramos por categoría
+            const vehiculosAll = adsForCarousels.filter(ad => ['Vehículos', 'Autos', 'Motos'].includes(ad.categoria));
+            const inmueblesAll = adsForCarousels.filter(ad => ['Inmuebles', 'Bienes Raíces'].includes(ad.categoria));
+            const destacadosAll = adsForCarousels.filter(ad => !['Vehículos', 'Autos', 'Motos', 'Inmuebles', 'Bienes Raíces'].includes(ad.categoria));
+
+            // Llenamos los carruseles (MÁXIMO 15)
+            const carruselVehiculos = vehiculosAll.slice(0, 15);
+            const carruselInmuebles = inmueblesAll.slice(0, 15);
+            const carruselDestacados = destacadosAll.slice(0, 15);
+
+            // === RENDER FASE 1: BANNER ELITE ===
+            if (bannerAds.length > 0) {
+                const hasMultipleSlides = bannerAds.length > 1;
+
                 adsHTML += `
                 <div class="main-content-wrapper">
                     <div class="elite-banner-container">
@@ -358,64 +373,50 @@ const getVideoEmbedUrl = (videoUrl) => {
                             <div class="elite-label-line"></div>
                         </div>
                         <div class="elite-slider-wrapper" id="elite-slider">
-                            ${eliteAds.map((ad, index) => generateEliteSlideHTML(ad, index)).join('')}
+                            ${bannerAds.map((ad, index) => generateEliteSlideHTML(ad, index)).join('')}
                             ${hasMultipleSlides ? `
-                                <button class="elite-slider-nav prev" aria-label="Anterior">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="elite-slider-nav next" aria-label="Siguiente">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                                <div class="elite-progress-indicators">
-                                    ${generateProgressIndicators(eliteAds.length)}
-                                </div>
+                                <button class="elite-slider-nav prev" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                                <button class="elite-slider-nav next" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                                <div class="elite-progress-indicators">${generateProgressIndicators(bannerAds.length)}</div>
                             ` : ''}
                         </div>
                     </div>`;
-                
-                // Los anuncios que se mostraron en el slider no se repiten en el grid
-                adIndex = eliteAds.length;
-                
-                // Los siguientes anuncios TOP/Destacado en grid de 3 columnas
-                if (topDestacadoAds.length > eliteAds.length) {
-                    const row1Ads = topDestacadoAds.slice(adIndex, adIndex + 3);
-                    if (row1Ads.length > 0) {
-                        adsHTML += `
-                        <div class="ads-row row-3-cols">
-                            ${row1Ads.map(ad => generateCardHTML(ad)).join('')}
-                        </div>`;
-                        adIndex += row1Ads.length;
-                    }
+            }
+
+            // === RENDER FASE 2: COLUMNAS DE IMPACTO (6 tarjetas) ===
+            if (gridAds && gridAds.length > 0) {
+                // Fila 1 de impacto (3 tarjetas)
+                const row1Ads = gridAds.slice(0, 3);
+                if (row1Ads.length > 0) {
+                    adsHTML += `<div class="ads-row row-3-cols">${row1Ads.map(ad => generateCardHTML(ad)).join('')}</div>`;
                 }
-                
-                // Cerrar contenedor principal
+                // Cerramos el main-content-wrapper si se abrió en el banner
+                if (bannerAds.length > 0) {
+                    adsHTML += `</div>`;
+                }
+
+                // Fila 2 de impacto (3 tarjetas)
+                const row2Ads = gridAds.slice(3, 6);
+                if (row2Ads.length > 0) {
+                    adsHTML += `<div class="ads-row row-3-cols">${row2Ads.map(ad => generateCardHTML(ad)).join('')}</div>`;
+                }
+            } else if (bannerAds.length > 0) {
+                // Si hay banner pero no grid, cerramos el wrapper
                 adsHTML += `</div>`;
             }
 
-            // Fila 2: Grid de 3 columnas para los siguientes anuncios TOP/Destacado
-            if (adIndex < topDestacadoAds.length) {
-                const row2Ads = topDestacadoAds.slice(adIndex, adIndex + 3);
+            // === RENDER CARRUSEL VEHÍCULOS (Máximo 15) ===
+            if (carruselVehiculos.length > 0) {
                 adsHTML += `
-                <div class="ads-row row-3-cols">
-                    ${row2Ads.map(ad => generateCardHTML(ad)).join('')}
-                </div>`;
-                adIndex += row2Ads.length;
-            }
-
-            // Fila 3: Carrusel de 4 columnas para anuncios TOP/Destacado restantes + Premium
-            const remainingTopDestacado = topDestacadoAds.slice(adIndex);
-            const combinedAdsForRow3 = [...remainingTopDestacado, ...premiumAdsFiltered];
-
-            if (combinedAdsForRow3.length > 0) {
-                const row3Ads = combinedAdsForRow3.slice(0, Math.min(8, combinedAdsForRow3.length));
-                adsHTML += `
+                <div class="section-header-golden">
+                    <div class="header-line-golden"></div>
+                    <h2 class="header-title-golden">VEHÍCULOS DESTACADOS</h2>
+                    <div class="header-line-golden"></div>
+                </div>
                 <div class="carousel-row-wrapper">
-                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-3">
-                        <div class="swiper-wrapper">`;
-                row3Ads.forEach(ad => {
-                    adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
-                });
-                adsHTML += `
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-vehiculos">
+                        <div class="swiper-wrapper">
+                            ${carruselVehiculos.map(ad => `<div class="swiper-slide">${generateCardHTML(ad)}</div>`).join('')}
                         </div>
                     </div>
                     <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
@@ -423,91 +424,106 @@ const getVideoEmbedUrl = (videoUrl) => {
                 </div>`;
             }
 
-            // Fila 4+: Carruseles de 4 columnas para anuncios restantes (basico)
-            let remainingBasicoAds = basicoAds;
-            if (combinedAdsForRow3.length > 8) {
-                remainingBasicoAds = [...combinedAdsForRow3.slice(8), ...basicoAds];
-            }
-
-            let rowCounter = 4;
-            let basicoIndex = 0;
-            while (basicoIndex < remainingBasicoAds.length) {
-                const rowAds = remainingBasicoAds.slice(basicoIndex, Math.min(basicoIndex + 8, remainingBasicoAds.length));
+            // === RENDER CARRUSEL INMUEBLES (Máximo 15) ===
+            if (carruselInmuebles.length > 0) {
                 adsHTML += `
+                <div class="section-header-golden">
+                    <div class="header-line-golden"></div>
+                    <h2 class="header-title-golden">BIENES RAÍCES DESTACADOS</h2>
+                    <div class="header-line-golden"></div>
+                </div>
                 <div class="carousel-row-wrapper">
-                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-${rowCounter}">
-                        <div class="swiper-wrapper">`;
-                rowAds.forEach(ad => {
-                    adsHTML += `<div class="swiper-slide">${generateCardHTML(ad)}</div>`;
-                });
-                adsHTML += `
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-inmuebles">
+                        <div class="swiper-wrapper">
+                            ${carruselInmuebles.map(ad => `<div class="swiper-slide">${generateCardHTML(ad)}</div>`).join('')}
                         </div>
                     </div>
                     <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
                     <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
                 </div>`;
-                basicoIndex += rowAds.length;
-                rowCounter++;
             }
+
+            // === RENDER CARRUSEL MÁS DESTACADOS (Máximo 15) ===
+            if (carruselDestacados.length > 0) {
+                adsHTML += `
+                <div class="section-header-golden">
+                    <div class="header-line-golden"></div>
+                    <h2 class="header-title-golden">MÁS DESTACADOS</h2>
+                    <div class="header-line-golden"></div>
+                </div>
+                <div class="carousel-row-wrapper">
+                    <div class="swiper row-carousel row-4-swiper" id="row-carousel-premium">
+                        <div class="swiper-wrapper">
+                            ${carruselDestacados.map(ad => `<div class="swiper-slide">${generateCardHTML(ad)}</div>`).join('')}
+                        </div>
+                    </div>
+                    <button class="row-nav-prev row-nav-4" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button class="row-nav-next row-nav-4" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                </div>`;
+            }
+
             // === FIN: Lógica de renderizado ===
 
             container.innerHTML = adsHTML;
-            
-            // Limpiar cualquier elemento suelto de navegación que pueda haber quedado
-            const parentSection = container.closest('#products');
-            if (parentSection) {
-                const orphanButtons = parentSection.querySelectorAll('button:not(.featured-prev):not(.featured-next):not(.row-nav-prev):not(.row-nav-next):not(.btn-contact)');
-                orphanButtons.forEach(btn => {
-                    if (!btn.closest('.box-container')) {
-                        btn.remove();
-                    }
-                });
-            }
-            
-            console.log("SENSOR 5: HTML de anuncios insertado en el DOM.");
 
-            // ✅ FIJAR: Destruir Swipers previos antes de crear nuevos
+            // Destruir swipers anteriores
             const existingSwipers = window.activeSwipers || [];
             existingSwipers.forEach(swiper => swiper.destroy());
             window.activeSwipers = [];
 
-            // Inicializar Swiper para cada tarjeta
+            // Inicializar Swiper para cada tarjeta (carrusel individual de imágenes)
             document.querySelectorAll('.product-swiper').forEach(swiperEl => {
                 const slides = swiperEl.querySelectorAll('.swiper-slide').length;
-                const swiper = new Swiper(swiperEl, {
-                    loop: slides > 1,
-                    navigation: {
-                        nextEl: swiperEl.querySelector('.swiper-button-next'),
-                        prevEl: swiperEl.querySelector('.swiper-button-prev'),
-                    },
-                    pagination: {
-                        el: swiperEl.querySelector('.swiper-pagination'),
-                        clickable: true,
-                        dynamicBullets: true,
-                    },
-                    slidesPerView: 1,
-                    spaceBetween: 0,
-                    speed: 400,
-                    preloadImages: true,
-                    updateOnImagesReady: true,
-                    touchRatio: 1,
-                    touchAngle: 45,
-                    grabCursor: true,
-                    simulateTouch: true,
-                    resistanceRatio: 0.85,
-                    allowTouchMove: true,
-                    touchStartPreventDefault: false,
-                    touchMoveStopPropagation: true,
-                    preventClicks: false,
-                    preventClicksPropagation: false,
-                });
-                window.activeSwipers.push(swiper);
-                
-                // Prevenir propagación de clicks en flechas del carrusel
-                const nextBtn = swiperEl.querySelector('.swiper-button-next');
-                const prevBtn = swiperEl.querySelector('.swiper-button-prev');
-                if (nextBtn) nextBtn.addEventListener('click', (e) => e.stopPropagation());
-                if (prevBtn) prevBtn.addEventListener('click', (e) => e.stopPropagation());
+                // Solo inicializar si hay más de 1 slide (necesario para carrusel)
+                if (slides > 1) {
+                    const swiper = new Swiper(swiperEl, {
+                        // CARRUSEL INDIVIDUAL: 1 imagen a la vez
+                        slidesPerView: 1,
+                        slidesPerGroup: 1,
+                        spaceBetween: 0,
+                        loop: false,
+                        centeredSlides: false,
+                        rewind: false,
+                        watchOverflow: true,
+                        effect: 'slide', // Efecto de deslizamiento
+                        watchSlidesProgress: true,
+                        // Habilitar swipe táctil para móviles
+                        allowTouchMove: true,
+                        touchRatio: 1,
+                        touchAngle: 45,
+                        grabCursor: true,
+                        simulateTouch: true,
+                        navigation: {
+                            nextEl: swiperEl.querySelector('.swiper-button-next'),
+                            prevEl: swiperEl.querySelector('.swiper-button-prev'),
+                        },
+                        pagination: {
+                            el: swiperEl.querySelector('.swiper-pagination'),
+                            clickable: true,
+                            dynamicBullets: true,
+                        },
+                        speed: 400,
+                        preloadImages: true,
+                        updateOnImagesReady: true,
+                        touchRatio: 1,
+                        touchAngle: 45,
+                        grabCursor: true,
+                        simulateTouch: true,
+                        resistanceRatio: 0.85,
+                        allowTouchMove: true,
+                        touchStartPreventDefault: false,
+                        touchMoveStopPropagation: true,
+                        preventClicks: false,
+                        preventClicksPropagation: false,
+                    });
+                    window.activeSwipers.push(swiper);
+                    
+                    // Prevenir propagación de clicks en flechas del carrusel
+                    const nextBtn = swiperEl.querySelector('.swiper-button-next');
+                    const prevBtn = swiperEl.querySelector('.swiper-button-prev');
+                    if (nextBtn) nextBtn.addEventListener('click', (e) => e.stopPropagation());
+                    if (prevBtn) prevBtn.addEventListener('click', (e) => e.stopPropagation());
+                }
             });
             console.log("SENSOR 6: Swipers inicializados.");
 
@@ -538,15 +554,29 @@ const getVideoEmbedUrl = (videoUrl) => {
             
             // El botón Contactar ahora es un enlace directo con href.
             // No necesitamos JavaScript para redirigir - el navegador lo hace automáticamente.
-            // Solo prevenimos la propagación para evitar conflictos con otros elementos.
-            
+            // Solo prevenimos el comportamiento por defecto si es necesario
             container._cardClickListener = (e) => {
-                // Solo responder al botón de contactar
+                // Si hace click en el botón de contactar, dejar que el href funcione normalmente
                 const btnContact = e.target.closest('.btn-contact');
-                if (!btnContact) return;
+                if (btnContact) {
+                    console.log('Click en Contactar - ID:', btnContact.getAttribute('data-ad-id'));
+                    return; // No prevenimos el comportamiento
+                }
                 
-                // No prevenimos el comportamiento por defecto - dejamos que el href funcione
-                console.log('Click en Contactar - ID:', btnContact.getAttribute('data-ad-id'));
+                // Si hace click en el botón de like, permitir que funcione
+                const btnLike = e.target.closest('.like-button, .btn-like');
+                if (btnLike) {
+                    return; // No prevenimos el comportamiento
+                }
+                
+                // Si hace click en las flechas del carrusel, permitir que funcionen
+                const carouselNav = e.target.closest('.swiper-button-next, .swiper-button-prev');
+                if (carouselNav) {
+                    return;
+                }
+                
+                // Para cualquier otro elemento de la tarjeta, NO redirigir - solo el botón Contactar debe hacerlo
+                // La tarjeta en sí ya no es clickeable
             };
             
             container.addEventListener('click', container._cardClickListener, false);
@@ -558,6 +588,68 @@ const getVideoEmbedUrl = (videoUrl) => {
                 console.log('Likes inicializados correctamente en home');
             } catch (error) {
                 console.error('Error inicializando likes en home:', error);
+            }
+
+            // === INICIALIZAR CARRUSELES DE FILAS ===
+            // Opciones base para los carruseles de 4 columnas (Efecto asomado 1.2 en móvil)
+            const createSwiperOptions = (slideCount) => {
+                const minSlidesForLoop = 5;
+                const shouldLoop = slideCount >= minSlidesForLoop;
+                
+                return {
+                    slidesPerView: 1.2,
+                    spaceBetween: 15,
+                    loop: shouldLoop,
+                    loopAdditionalSlides: shouldLoop ? 3 : 0,
+                    watchOverflow: !shouldLoop,
+                    breakpoints: {
+                        640: { slidesPerView: 2.2, spaceBetween: 20 },
+                        768: { slidesPerView: 3, spaceBetween: 20 },
+                        1024: { slidesPerView: 4, spaceBetween: 25 },
+                    }
+                };
+            };
+
+            // Inicializar Vehículos
+            if (document.querySelector('#row-carousel-vehiculos')) {
+                const vehiculosSwiperEl = document.querySelector('#row-carousel-vehiculos');
+                const vehiculosWrapper = vehiculosSwiperEl.closest('.carousel-row-wrapper');
+                const vehiculosSlides = vehiculosSwiperEl.querySelectorAll('.swiper-slide').length;
+                new Swiper('#row-carousel-vehiculos', {
+                    ...createSwiperOptions(vehiculosSlides),
+                    navigation: {
+                        nextEl: vehiculosWrapper.querySelector('.row-nav-next'),
+                        prevEl: vehiculosWrapper.querySelector('.row-nav-prev'),
+                    }
+                });
+            }
+
+            // Inicializar Bienes Raíces
+            if (document.querySelector('#row-carousel-inmuebles')) {
+                const inmueblesSwiperEl = document.querySelector('#row-carousel-inmuebles');
+                const inmueblesWrapper = inmueblesSwiperEl.closest('.carousel-row-wrapper');
+                const inmueblesSlides = inmueblesSwiperEl.querySelectorAll('.swiper-slide').length;
+                new Swiper('#row-carousel-inmuebles', {
+                    ...createSwiperOptions(inmueblesSlides),
+                    navigation: {
+                        nextEl: inmueblesWrapper.querySelector('.row-nav-next'),
+                        prevEl: inmueblesWrapper.querySelector('.row-nav-prev'),
+                    }
+                });
+            }
+
+            // Inicializar Selección Premium
+            if (document.querySelector('#row-carousel-premium')) {
+                const premiumSwiperEl = document.querySelector('#row-carousel-premium');
+                const premiumWrapper = premiumSwiperEl.closest('.carousel-row-wrapper');
+                const premiumSlides = premiumSwiperEl.querySelectorAll('.swiper-slide').length;
+                new Swiper('#row-carousel-premium', {
+                    ...createSwiperOptions(premiumSlides),
+                    navigation: {
+                        nextEl: premiumWrapper.querySelector('.row-nav-next'),
+                        prevEl: premiumWrapper.querySelector('.row-nav-prev'),
+                    }
+                });
             }
 
             // ✅ INICIALIZAR SLIDER DE BANNERS DE ELITE
@@ -698,10 +790,11 @@ function initializeHeroCarousel() {
         }
 
         window.heroSwiper = new Swiper('.hero-swiper', {
-            loop: true,
+            loop: false,
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,
+                stopOnLastSlide: true,
             },
             pagination: {
                 el: '.swiper-pagination',
@@ -745,9 +838,9 @@ function initializeFeaturedCarousel() {
     if (!featuredSwiper) return;
     
     const swiperInstance = new Swiper('.featured-swiper', {
-        slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 24,
+        slidesPerView: 'auto',
+        slidesPerGroup: 1,
+        spaceBetween: 12,
         loop: false,
         navigation: {
             nextEl: '.featured-next',
@@ -822,12 +915,11 @@ function initializeRowCarousels() {
         const nextBtn = wrapper?.querySelector('.row-nav-next');
         
         const swiperInstance = new Swiper(swiperEl, {
-            // ✅ CONFIGURACIÓN PARA EVITAR ESPACIOS VACÍOS
-            loop: true,           // Bucle infinito
-            slidesPerView: 'auto', // Ajuste automático
-            loopedSlides: 8,       // Tarjetas de reserva para el bucle
+            // ✅ CARRUSEL FINITO CON AUTO
+            loop: false,
+            slidesPerView: 'auto',
             slidesPerGroup: 1,
-            spaceBetween: 20,       // El espacio lo maneja JS
+            spaceBetween: 12,
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
@@ -835,15 +927,15 @@ function initializeRowCarousels() {
             breakpoints: {
                 0: {
                     slidesPerView: 1,
-                    spaceBetween: 16,
+                    spaceBetween: 12,
                 },
                 768: {
                     slidesPerView: 2,
-                    spaceBetween: 20,
+                    spaceBetween: 12,
                 },
                 1024: {
                     slidesPerView: 3,
-                    spaceBetween: 24,
+                    spaceBetween: 12,
                 }
             }
         });
@@ -864,17 +956,13 @@ function initializeRowCarousels() {
         }
         
         const swiperInstance = new Swiper(swiperEl, {
-            // ✅ CONFIGURACIÓN PARA EVITAR ESPACIOS VACÍOS
-            loop: true,           // Bucle infinito
-            slidesPerView: 'auto', // Ajuste automático
-            loopedSlides: 8,       // Tarjetas de reserva para el bucle
-            spaceBetween: 20,       // El espacio lo maneja JS
-            touchMove: true,
-            touchRatio: 1,
-            resistance: true,
-            resistanceRatio: 0.85,
-            grabCursor: true,
+            // ✅ CARRUSEL FINITO - Sin loop, muestra todos los slides
+            slidesPerView: 'auto',
+            slidesPerGroup: 1,
+            spaceBetween: 12,
+            loop: false,
             centeredSlides: false,
+            watchOverflow: true,
             navigation: {
                 nextEl: nextBtn,
                 prevEl: prevBtn,
@@ -885,13 +973,21 @@ function initializeRowCarousels() {
                 dynamicBullets: false,
             },
             breakpoints: {
-                640: {
-                    slidesPerView: 2,
-                    spaceBetween: 20,
+                480: {
+                    slidesPerView: 1,
+                    spaceBetween: 12
                 },
-                1100: {
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 12
+                },
+                1024: {
                     slidesPerView: 3,
-                    spaceBetween: 20,
+                    spaceBetween: 20
+                },
+                1400: {
+                    slidesPerView: 4,
+                    spaceBetween: 25
                 }
             }
         });
@@ -1108,4 +1204,36 @@ export function updateHeroForCategory(categoryName) {
     if (window.updateHeroCarousel) {
         window.updateHeroCarousel(categoryName);
     }
+}
+
+/**
+ * Mueve el carrusel SIN loop - tope con pared
+ * @param {string} direction - 'next' o 'prev'
+ * @param {string} trackId - ID del contenedor de las tarjetas
+ */
+export function navigateCarousel(direction, trackId) {
+    const track = document.getElementById(trackId);
+    if (!track) {
+        console.warn(`No se encontró el elemento con ID: ${trackId}`);
+        return;
+    }
+    
+    // Calcula cuánto deslizar (el ancho visible del contenedor)
+    const scrollAmount = track.clientWidth; 
+    
+    if (direction === 'next') {
+        // Solo avanza. Si topa al final, la función scrollBy simplemente se detiene.
+        // ¡Se acabó el efecto de volver a empezar!
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    } else {
+        // Solo retrocede. Si topa al inicio, se queda ahí.
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    }
+}
+
+// Hacer la función disponible globalmente para uso en onclick
+export function initCarouselNavigation() {
+    // Asignar la función al objeto window para uso global
+    window.navigateCarousel = navigateCarousel;
+    console.log('Navegación de carrusel inicializada');
 }

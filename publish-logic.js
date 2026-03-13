@@ -4,6 +4,7 @@ import { supabase } from './supabase-client.js';
 import { districtsByProvince } from './config-locations.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
 import { APP_CONFIG } from './AppConfig.js';
+import mapsIntegration from './google-maps-integration.js';
 
 // =====================================================
 // GUARDIÁN DE PUBLICACIÓN - Validación de Sesión
@@ -11,6 +12,250 @@ import { APP_CONFIG } from './AppConfig.js';
 
 let currentUser = null;
 let isSessionChecked = false;
+
+// =====================================================
+// VARIABLE GLOBAL PARA TOKEN VALIDADO
+// =====================================================
+let validatedToken = null; // Almacena el token validado exitosamente
+
+// =====================================================
+// FUNCIÓN DE RESTRICCIONES POR PLAN
+// =====================================================
+/**
+ * Actualiza las restricciones del formulario según el plan seleccionado
+ * Solo el plan DESTACADO puede usar: Video, Redes Sociales y Badge Destacado
+ */
+function updatePlanRestrictions(plan) {
+    console.log('Actualizando restricciones para plan:', plan);
+    const isDestacado = plan === 'destacado';
+    
+    // Usar setTimeout para asegurar que el DOM del paso 2 está listo
+    setTimeout(() => {
+        const videoField = document.querySelector('.plan-video-feature');
+        const redesField = document.querySelector('.plan-top-feature');
+        const badgeField = document.querySelector('.plan-destacado-feature');
+        
+        console.log('Elementos encontrados:', { videoField, redesField, badgeField });
+        
+        if (videoField) {
+            const input = videoField.querySelector('input[type="text"]');
+            if (isDestacado) {
+                videoField.style.opacity = '1';
+                videoField.style.filter = 'none';
+                videoField.style.pointerEvents = 'auto';
+                if (input) input.disabled = false;
+            } else {
+                videoField.style.opacity = '0.4';
+                videoField.style.filter = 'blur(1px) grayscale(100%)';
+                videoField.style.pointerEvents = 'none';
+                if (input) { input.disabled = true; input.value = ''; }
+            }
+        }
+        
+        if (redesField) {
+            const checkbox = redesField.querySelector('input[type="checkbox"]');
+            if (isDestacado) {
+                redesField.style.opacity = '1';
+                redesField.style.filter = 'none';
+                redesField.style.pointerEvents = 'auto';
+                if (checkbox) checkbox.disabled = false;
+            } else {
+                redesField.style.opacity = '0.4';
+                redesField.style.filter = 'blur(1px) grayscale(100%)';
+                redesField.style.pointerEvents = 'none';
+                if (checkbox) { checkbox.disabled = true; checkbox.checked = false; }
+            }
+        }
+        
+        if (badgeField) {
+            const checkbox = badgeField.querySelector('input[type="checkbox"]');
+            if (isDestacado) {
+                badgeField.style.opacity = '1';
+                badgeField.style.filter = 'none';
+                badgeField.style.pointerEvents = 'auto';
+                if (checkbox) checkbox.disabled = false;
+            } else {
+                badgeField.style.opacity = '0.4';
+                badgeField.style.filter = 'blur(1px) grayscale(100%)';
+                badgeField.style.pointerEvents = 'none';
+                if (checkbox) { checkbox.disabled = true; checkbox.checked = false; }
+            }
+        }
+    }, 100);
+}
+
+// =====================================================
+// FUNCIÓN PARA MARCAR TOKEN COMO USADO (solo después de guardar anuncio)
+// =====================================================
+async function markTokenAsUsed(tokenData) {
+    if (!tokenData || !tokenData.id) {
+        console.log('No hay token para marcar como usado');
+        return { success: true, message: 'Sin token que marcar' };
+    }
+    
+    try {
+        const { error: tokenUpdateError } = await supabase
+            .from('plan_tokens')
+            .update({
+                usado: true,
+                usado_por: tokenData.usuario_id
+            })
+            .eq('id', tokenData.id);
+        
+        if (tokenUpdateError) {
+            console.error('Error marcando token como usado:', tokenUpdateError);
+            return { success: false, error: tokenUpdateError };
+        }
+        
+        console.log('Token marcado como usado despues de guardar anuncio');
+        return { success: true };
+        
+    } catch (error) {
+        console.error('Error en markTokenAsUsed:', error);
+        return { success: false, error };
+    }
+}
+
+// Exponer al window para acceso desde form-logic.js
+window.markTokenAsUsed = markTokenAsUsed;
+
+// =====================================================
+// FUNCIÓN PARA OBTENER Y SETEAR pendingTokenData EN WINDOW
+// =====================================================
+function setPendingTokenData(data) {
+    window.pendingTokenData = data;
+    console.log('pendingTokenData actualizado en window:', window.pendingTokenData);
+}
+window.setPendingTokenData = setPendingTokenData;
+
+function getPendingTokenData() {
+    return window.pendingTokenData;
+}
+window.getPendingTokenData = getPendingTokenData;
+
+// Exportar para uso interno (módulo)
+export { markTokenAsUsed, validatedToken };
+
+// =====================================================
+// FUNCIÓN DE VALIDACIÓN DE TOKEN PROMOCIONAL
+// =====================================================
+
+/**
+ * Valida un token promocional contra la tabla plan_tokens en Supabase
+ * @param {string} tokenCode - El código del token a validar
+ * @param {string} selectedPlan - El plan que el usuario quiere activar
+ * @returns {Object} - Resultado de la validación {success, message, tokenData}
+ */
+async function validatePromoToken(tokenCode, selectedPlan) {
+    const cleanToken = tokenCode.trim();
+    console.log(`🔎 Validando en Supabase: "${cleanToken}" para plan: ${selectedPlan}`);
+
+    try {
+        // 1. Consulta usando el nombre real de la columna: 'codigo'
+        const { data, error } = await supabase
+            .from('plan_tokens')
+            .select('*')
+            .eq('codigo', cleanToken) 
+            .eq('usado', false);
+
+        if (error) throw error;
+
+        // 2. Si no encuentra nada
+        if (!data || data.length === 0) {
+            console.log("❌ Token no encontrado en la base de datos.");
+            return { success: false, message: '❌ Token inválido o ya utilizado.' };
+        }
+
+        const tokenData = data[0];
+        const planDelToken = tokenData.plan_tipo.toLowerCase();
+        const planSeleccionado = selectedPlan.toLowerCase();
+
+        // 3. Normalizar 'top' a 'destacado'
+        const planNormalizado = planDelToken === 'top' ? 'destacado' : planDelToken;
+
+        // 4. Comparar planes con return explícito
+        if (planNormalizado === planSeleccionado) {
+            console.log("✅ Token validado con éxito!");
+            return { success: true, tokenData: tokenData };
+        } else {
+            return { success: false, message: `Este token es para el plan ${planDelToken}` };
+        }
+    } catch (err) {
+        console.error("❌ Error en la validación:", err);
+        return { success: false, message: 'Error de conexión con la base de datos.' };
+    }
+}
+
+/**
+ * Aplica el token validado: crea el registro en cortesias_aplicadas
+ * NOTA: El token NO se marca como usado aquí. Se marca después de guardar el anuncio.
+ * @param {Object} tokenData - Datos del token validado
+ * @param {string} userId - ID del usuario
+ * @param {string} selectedPlan - Plan seleccionado
+ * @returns {Object} - Resultado de la operación {success, message}
+ */
+async function applyValidatedToken(tokenData, userId, selectedPlan) {
+    try {
+        // 1. Determinar la fecha de inicio y fin del plan
+        const startDate = new Date();
+        const durationDays = tokenData.duracion_dias || 30;
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + durationDays);
+        
+        // 2. Crear el registro en cortesias_aplicadas
+        const { data, error } = await supabase
+            .from('cortesias_aplicadas')
+            .insert([
+                {
+                    user_id: userId,
+                    plan_tipo: selectedPlan,
+                    metodo: 'token',
+                    activo: true,
+                    fecha_fin: endDate.toISOString()
+                }
+            ])
+            .select();
+
+        if (error) {
+            console.error('❌ Error al crear cortesía:', error);
+            return { success: false, message: 'Error al aplicar el token.' };
+        }
+        
+        // 3. Guardar datos del token PENDIENTE (NO marcar como usado aún)
+        // Se marcará como usado SOLO después de que el anuncio se guarde exitosamente
+        setPendingTokenData({
+            id: tokenData.id,
+            usuario_id: userId,
+            cortesia: data ? data[0] : null
+        });
+        
+        console.log('Token aplicado (pendiente de confirmar). Se marcara como usado despues de guardar el anuncio.');
+        
+        return { 
+            success: true, 
+            message: '✅ Token aplicado. Tu plan está activo. El token se confirmará al publicar.',
+            cortesia: data
+        };
+        
+    } catch (error) {
+        console.error('❌ Error aplicando token:', error);
+        return { success: false, message: '❌ Error al aplicar el token. Por favor, contacta al administrador.' };
+    }
+}
+
+/**
+ * Muestra el mensaje de estado del token en la tarjeta específica
+ */
+function showTokenMessageInCard(message, isSuccess = false, planType) {
+    const messageEl = document.querySelector(`.plan-token-message[data-plan="${planType}"]`);
+    if (!messageEl) return;
+    
+    messageEl.textContent = message;
+    messageEl.style.display = 'block';
+    messageEl.style.background = isSuccess ? 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)' : 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+    messageEl.style.color = isSuccess ? '#155724' : '#721c24';
+    messageEl.style.border = isSuccess ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
+}
 
 /**
  * Verifica si hay un usuario autenticado antes de permitir publicar
@@ -226,7 +471,41 @@ function validateImageCount(plan) {
 }
 
 export async function initializePublishPage() {
+    // === VERIFICAR SI VIENE DEL PAGO (step=2) ===
+    const urlParams = new URLSearchParams(window.location.search);
+    const stepParam = urlParams.get('step');
+    const paymentConfirmed = sessionStorage.getItem('paymentConfirmed');
+    
+    // Si viene del pago con step=2, navegar directamente al paso 2
+    if (stepParam === '2' && paymentConfirmed) {
+        console.log('Llegando desde pago confirmado, navegando al paso 2...');
+        
+        // Verificar si hay un plan seleccionado guardado
+        const savedPlan = sessionStorage.getItem('selectedPlan');
+        if (savedPlan) {
+            // Seleccionar el radio button del plan
+            const planRadio = document.querySelector('input[name="plan"][value="' + savedPlan + '"]');
+            if (planRadio) {
+                planRadio.checked = true;
+            }
+            // Aplicar restricciones según el plan guardado
+            setTimeout(() => {
+                updatePlanRestrictions(savedPlan);
+            }, 100);
+        }
+    }
+    
     const form = document.getElementById('ad-form');
+    if (!form) return;
+    
+    // Si viene del pago, navegar al paso 2 despues de un pequeno delay
+    if (stepParam === '2' && paymentConfirmed) {
+        setTimeout(() => {
+            navigateToStep(2);
+            // Limpiar el flag de pago confirmado
+            sessionStorage.removeItem('paymentConfirmed');
+        }, 100);
+    }
     if (!form) return;
     
     // =====================================================
@@ -280,8 +559,6 @@ export async function initializePublishPage() {
     const districtGroupStep4 = document.getElementById('district-group-step4');
     const districtSelect = document.getElementById('district');
     const districtSelectStep4 = document.getElementById('district-step4');
-    const addressInput = document.getElementById('address');
-    const addressInputStep4 = document.getElementById('address-step4');
     
     const vehicleDetails = document.getElementById('vehicle-details');
     const realestateDetails = document.getElementById('realestate-details');
@@ -310,34 +587,80 @@ export async function initializePublishPage() {
     const galleryPreviewContainer = document.getElementById('gallery-preview-container');
     const contactName = document.getElementById('contact-name');
     const contactEmail = document.getElementById('contact-email');
-    const nextBtns = form.querySelectorAll('.next-btn, #continue-to-details'); // Botón para ir a Detalles
+    const nextBtns = form.querySelectorAll('.next-btn'); // Botones de siguiente en otros pasos
     const backBtns = form.querySelectorAll('.back-btn');
+    
+    // Manejador para botones "Atrás"
+    backBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const targetStep = btn.dataset.target;
+            if (targetStep) {
+                navigateToStep(parseInt(targetStep));
+            }
+        });
+    });
 
     let allCategories = [];
     let selectedMainCategory = '';
     let selectedSubcategory = '';
     let userInfo = null;
 
+    // --- CARGAR CATEGORÍAS ---
+    await loadAllCategories();
+    
     // --- CONTADORES DE CARACTERES EN TIEMPO REAL ---
+    // Límite estricto de 60 caracteres para el título
+    const TITLE_MAX_LENGTH = 60;
+    const DESCRIPTION_MAX_LENGTH = 1000;
+    
     const titleInput = document.getElementById('title');
     const descriptionInput = document.getElementById('description');
 
     if (titleInput) {
+        // Establecer límite físico en el input
+        titleInput.maxLength = TITLE_MAX_LENGTH;
+        
         titleInput.addEventListener('input', () => {
-            const count = titleInput.value.length;
+            let text = titleInput.value;
+            // Bloqueo de pegado: cortar si excede 60 caracteres
+            if (text.length > TITLE_MAX_LENGTH) {
+                text = text.substring(0, TITLE_MAX_LENGTH);
+                titleInput.value = text;
+            }
+            const count = text.length;
             const charCountElement = titleInput.parentElement.querySelector('.char-count');
             if (charCountElement) {
-                charCountElement.textContent = `(${count}/100)`;
+                charCountElement.textContent = `(${count}/${TITLE_MAX_LENGTH})`;
             }
+        });
+        
+        // También validar al pegar
+        titleInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const currentText = titleInput.value;
+            const newLength = currentText.length + pastedText.length;
+            
+            if (newLength <= TITLE_MAX_LENGTH) {
+                titleInput.value = currentText + pastedText;
+            } else {
+                const remainingChars = TITLE_MAX_LENGTH - currentText.length;
+                titleInput.value = currentText + pastedText.substring(0, remainingChars);
+            }
+            // Disparar evento input para actualizar contador
+            titleInput.dispatchEvent(new Event('input'));
         });
     }
 
     if (descriptionInput) {
+        // Establecer límite físico en el input
+        descriptionInput.maxLength = DESCRIPTION_MAX_LENGTH;
+        
         descriptionInput.addEventListener('input', () => {
             const count = descriptionInput.value.length;
             const charCountElement = descriptionInput.parentElement.querySelector('.char-count');
             if (charCountElement) {
-                charCountElement.textContent = `(${count}/1000)`;
+                charCountElement.textContent = `(${count}/${DESCRIPTION_MAX_LENGTH})`;
             }
         });
     }
@@ -930,79 +1253,67 @@ function showCommunityFields() {
                     </div>
                     <div class="plans-container">
                         <div class="plan-option plan-free" data-plan="gratis">
-                            <h3>Gratis</h3>
-                            <p class="plan-price">$0</p>
+                            <div class="plan-badge">Recomendado</div>
+                            <h3>GRATIS</h3>
+                            <p class="plan-price">$0.00</p>
                             <ul class="plan-features">
-                                <li>✓ 2 fotos</li>
-                                <li>✓ 1 anuncio activo</li>
+                                <li>✓ Hasta 3 fotos</li>
+                                <li>✓ Publicación inmediata</li>
+                                <li>✓ Acceso a 500+ compradores</li>
                                 <li>✓ 30 días de vigencia</li>
-                                <li>✗ Sin galería de fotos</li>
-                                <li>✗ Sin videos</li>
                             </ul>
                             <button class="btn-plan btn-plan-free" data-plan="gratis">
-                                Crear Cuenta Gratis
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-basico" data-plan="basico">
                             <div class="plan-badge">Popular</div>
-                            <h3>Básico</h3>
-                            <p class="plan-price">$5.99<span>/mes</span></p>
+                            <h3>BÁSICO</h3>
+                            <p class="plan-price">$5.00</p>
                             <ul class="plan-features">
-                                <li>✓ 5 fotos</li>
-                                <li>✓ 3 anuncios activos</li>
-                                <li>✓ 60 días de vigencia</li>
-                                <li>✓ Galería de fotos básica</li>
-                                <li>✗ Sin videos</li>
+                                <li>✓ Hasta 5 fotos</li>
+                                <li>✓ Destaca sobre anuncios gratis</li>
+                                <li>✓ Acceso a 2000+ compradores</li>
+                                <li>✓ Reposicionamiento diario</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="basico">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-premium" data-plan="premium">
-                            <h3>Premium</h3>
-                            <p class="plan-price">$9.99<span>/mes</span></p>
+                            <div class="plan-badge">Best Seller</div>
+                            <h3>PREMIUM</h3>
+                            <p class="plan-price">$10.00</p>
                             <ul class="plan-features">
-                                <li>✓ 10 fotos</li>
-                                <li>✓ 5 anuncios activos</li>
-                                <li>✓ 90 días de vigencia</li>
-                                <li>✓ Galería completa</li>
-                                <li>✓ Videos incluidos</li>
+                                <li>✓ Hasta 10 fotos + carrusel</li>
+                                <li>✓ Destacado en resultados</li>
+                                <li>✓ Acceso a 5000+ compradores</li>
+                                <li>✓ Estadísticas básicas</li>
+                                <li>✓ Reposicionamiento cada 6 horas</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="premium">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
 
                         <div class="plan-option plan-destacado" data-plan="destacado">
-                            <h3>Destacado</h3>
-                            <p class="plan-price">$14.99<span>/mes</span></p>
+                            <h3>DESTACADO</h3>
+                            <p class="plan-price">$20.00</p>
                             <ul class="plan-features">
-                                <li>✓ 15 fotos</li>
-                                <li>✓ 10 anuncios activos</li>
-                                <li>✓ 180 días de vigencia</li>
-                                <li>✓ Galería + Carrusel</li>
-                                <li>✓ Videos + Vivo</li>
+                                <li>✓ Hasta 15 fotos + carrusel</li>
+                                <li>✓ Posición premium en búsquedas</li>
+                                <li>✓ Acceso a 10000+ compradores</li>
+                                <li>✓ Estadísticas detalladas</li>
+                                <li>✓ Reposicionamiento cada 3 horas</li>
+                                <li>✓ 1 video HD</li>
+                                <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="destacado">
-                                Comprar Plan
-                            </button>
-                        </div>
-
-                        <div class="plan-option plan-top" data-plan="top">
-                            <div class="plan-badge">Premium</div>
-                            <h3>Top</h3>
-                            <p class="plan-price">$19.99<span>/mes</span></p>
-                            <ul class="plan-features">
-                                <li>✓ 20 fotos</li>
-                                <li>✓ 15 anuncios activos</li>
-                                <li>✓ 365 días de vigencia</li>
-                                <li>✓ Todas las características</li>
-                                <li>✓ Soporte prioritario</li>
-                            </ul>
-                            <button class="btn-plan btn-plan-paid" data-plan="top">
-                                Comprar Plan
+                                Seleccionar
                             </button>
                         </div>
                     </div>
@@ -1156,6 +1467,63 @@ function showCommunityFields() {
         }, 10);
     };
 
+    // --- FUNCIÓN DE RESTRICCIONES DE PLAN (VERSión LIMPIA) ---
+    const updatePlanRestrictions = (planId) => {
+        // 1. Limpieza total del nombre del plan
+        const plan = planId ? planId.toLowerCase().trim() : 'free';
+        console.log('--- VALIDANDO ACCESO PARA PLAN:', plan, '---');
+        
+        // 2. Definir límites (Solo 3 planes oficiales)
+        let maxImages = 5;
+        if (plan === 'basico') maxImages = 10;
+        if (plan === 'premium') maxImages = 15;
+        if (plan === 'destacado') maxImages = 20;
+
+        // 3. Seleccionar el contenedor padre y los campos premium (Video y Redes)
+        const videoBlock = document.querySelector('.video-block');
+        const videoContainer = document.querySelector('.plan-video-feature');
+        const redesContainer = document.querySelector('.plan-top-feature');
+
+        const vipContainers = [videoContainer, redesContainer].filter(el => el !== null);
+
+        // 4. LA REGLA: Solo Destacado muestra estos campos
+        const esDestacado = (plan === 'destacado'); 
+
+        if (esDestacado) {
+            console.log("🔓 MOSTRANDO CAMPOS PARA DESTACADO...");
+            // Mostrar el contenedor padre
+            if (videoBlock) videoBlock.style.display = 'block';
+            // Mostrar cada campo
+            vipContainers.forEach(el => {
+                el.style.display = 'block';
+                el.style.opacity = '1';
+                el.style.filter = 'none';
+                el.style.pointerEvents = 'auto';
+                
+                const inputs = el.querySelectorAll('input, select, textarea');
+                inputs.forEach(i => {
+                    i.disabled = false;
+                    i.removeAttribute('disabled');
+                });
+            });
+        } else {
+            console.log("🔒 OCULTANDO CAMPOS PREMIUM (Solo Destacado)");
+            // Ocultar cada campo
+            vipContainers.forEach(el => {
+                el.style.display = 'none';
+            });
+            // Ocultar el contenedor padre
+            if (videoBlock) videoBlock.style.display = 'none';
+        }
+
+        // 5. Actualizar interfaz de imágenes
+        window.maxAllowedImages = maxImages;
+        const maxImagesText = document.getElementById('max-images-text');
+        if (maxImagesText) {
+            maxImagesText.innerHTML = `Puedes subir hasta <strong>${maxImages}</strong> imágenes con tu plan <strong>${plan.toUpperCase()}</strong>.`;
+        }
+    };
+
     // --- FUNCIÓN DE NAVEGACIÓN (ROBUSTA) ---
     const navigateToStep = (stepNumber) => {
         // Ocultar todos los pasos
@@ -1168,9 +1536,16 @@ function showCommunityFields() {
         
         // SI es paso 2 (Detalles), actualizar restricciones del plan
         if (stepNumber === 2) {
-            const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value;
+            // Primero intentar obtener del sessionStorage, luego del radio button
+            let selectedPlan = sessionStorage.getItem('selectedPlan');
+            if (!selectedPlan) {
+                selectedPlan = document.querySelector('input[name="plan"]:checked')?.value;
+            }
+            console.log('Plan seleccionado para restricciones:', selectedPlan);
             if (selectedPlan) {
-                updatePlanRestrictions(selectedPlan);
+                if (typeof updatePlanRestrictions === 'function') {
+                    updatePlanRestrictions(selectedPlan);
+                }
             }
 
             const titleInput = document.getElementById('title');
@@ -1363,6 +1738,81 @@ function showCommunityFields() {
     }
 
     // --- LÓGICA DE UBICACIÓN ---
+    // Variable para controlar si el mapa ya está inicializado
+    let mapInitialized = false;
+    let currentProvince = '';
+
+    // Función para inicializar y mostrar el mapa
+    async function initializeAndShowMap(province) {
+        const mapContainer = document.getElementById('map-container');
+        currentProvince = province;
+        
+        try {
+            // Cargar la API de Google Maps si no está cargada
+            if (!mapInitialized) {
+                await mapsIntegration.loadMapsAPI();
+                mapsIntegration.initMap('province-map', {
+                    zoom: 10
+                });
+                mapInitialized = true;
+                
+                // Inicializar campo de búsqueda de direcciones
+                await mapsIntegration.initSearchBox('location-search');
+                
+                // Configurar callback para actualizar info de ubicación
+                mapsIntegration.onLocationSelectCallback = (location) => {
+                    mapsIntegration.showLocationInfo(location);
+                };
+            }
+            
+            // Mostrar la provincia en el mapa
+            mapsIntegration.showProvinceOnMap(province);
+            
+            // Mostrar el contenedor del mapa
+            if (mapContainer) {
+                mapContainer.style.display = 'block';
+            }
+            
+            console.log('Mapa mostrado para:', province);
+        } catch (error) {
+            console.error('Error al mostrar el mapa:', error);
+        }
+    }
+
+    // Función para mostrar el distrito en el mapa
+    async function showDistrictOnMap() {
+        const provinceSelect = document.getElementById('province-step4');
+        const districtSelect = document.getElementById('district-step4');
+        
+        if (!provinceSelect || !districtSelect) return;
+        
+        const province = provinceSelect.value;
+        const district = districtSelect.value;
+        
+        if (district && province) {
+            try {
+                if (!mapInitialized) {
+                    await mapsIntegration.loadMapsAPI();
+                    mapsIntegration.initMap('province-map', { zoom: 10 });
+                    mapInitialized = true;
+                    
+                    // Inicializar campo de búsqueda de direcciones
+                    await mapsIntegration.initSearchBox('location-search');
+                    
+                    // Configurar callback para actualizar info de ubicación
+                    mapsIntegration.onLocationSelectCallback = (location) => {
+                        mapsIntegration.showLocationInfo(location);
+                    };
+                }
+                
+                mapsIntegration.showDistrictOnMap(province, district);
+                console.log('Mapa mostrado para:', district, province);
+            } catch (error) {
+                console.error('Error al mostrar el distrito:', error);
+            }
+        }
+    }
+
     // Función para manejar cambio de provincia (compartida)
     function handleProvinceChange(selectElement, districtGroupEl, districtSelectEl) {
         const province = selectElement.value;
@@ -1382,6 +1832,17 @@ function showCommunityFields() {
             districtGroupEl.style.display = 'none';
             districtSelectEl.innerHTML = '';
         }
+        
+        // === MOSTRAR EL MAPA CUANDO SE SELECCIONA UNA PROVINCIA ===
+        const mapContainer = document.getElementById('map-container');
+        if (province) {
+            initializeAndShowMap(province);
+        } else {
+            if (mapContainer) {
+                mapContainer.style.display = 'none';
+            }
+            mapsIntegration.hideMap();
+        }
     }
 
     // Event listener para provincia del Paso 2
@@ -1398,29 +1859,70 @@ function showCommunityFields() {
         });
     }
 
+    // Event listener para distrito del Paso 4 (unificado)
+    if (districtSelectStep4) {
+        districtSelectStep4.addEventListener('change', function() {
+            showDistrictOnMap();
+        });
+    }
+
     // REMOVER EVENT LISTENER DUPLICADO si existe
     // Verificar que no haya otro addEventListener llamando a showElectronicsFields
 
-    // --- EVENT LISTENERS PARA SUBIDA DE IMÁGENES ---
-    coverImageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        const coverImageError = document.getElementById('cover-image-error');
-        if (file) {
-            coverImageName.textContent = file.name;
-            // Ocultar mensaje de error si hay imagen
-            if (coverImageError) {
-                coverImageError.style.display = 'none';
-            }
-        } else {
-            coverImageName.textContent = 'Ningún archivo seleccionado.';
+window.previewCoverImage = function(event) {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById('cover-image-preview');
+    const fileNameSpan = document.getElementById('cover-image-name');
+    const publishBtn = document.getElementById('publish-ad-btn');
+    
+    if (!file) {
+        // Reset: restaurar borde discontinuo verde cuando no hay imagen
+        previewContainer.style.border = '2px dashed #00bfae';
+        previewContainer.style.background = 'transparent';
+        return;
+    }
+    
+    // 1. Actualizar nombre del archivo
+    if (fileNameSpan) fileNameSpan.textContent = file.name;
+    
+    // 2. Validar que sea imagen
+    if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecciona un archivo de imagen válido.');
+        return;
+    }
+    
+    // 3. Crear el preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Quitar borde discontinuo verde y poner gris sólido
+        previewContainer.style.border = '1px solid #ddd';
+        // Fondo transparente o blanco puro
+        previewContainer.style.background = 'transparent';
+        previewContainer.style.padding = '10px';
+        previewContainer.style.display = 'block';
+        previewContainer.innerHTML = `
+            <img src="${e.target.result}" 
+                 style="max-height: 200px; width: auto; display: block; margin: 0 auto; border-radius: 8px; border: 2px dashed #00bfae;">
+        `;
+        
+        // 4. Activar el botón de publicar
+        if (publishBtn) {
+            publishBtn.disabled = false;
+            publishBtn.style.opacity = '1';
+            publishBtn.style.cursor = 'pointer';
         }
-    });
+        console.log('✅ Vista previa de portada cargada con éxito');
+    };
+    reader.readAsDataURL(file);
+};
 
     // =======================================================
     // === BLOQUE DE GESTOR DE IMÁGENES (VERSIÓN FINAL) ===
     // =======================================================
 
     let galleryFiles = [];
+    // Exponer galleryFiles para que form-logic.js pueda acceder
+    window.galleryFiles = galleryFiles;
     // const MAX_FILES = 10; // Ahora se define por el plan
 
     // 1. FUNCIÓN DE RENDERIZADO (CORREGIDA)
@@ -1445,15 +1947,17 @@ function showCommunityFields() {
 
     // 2. FUNCIÓN PARA AÑADIR ARCHIVOS (AHORA VÁLIDA EL LOTE Y CADA ARCHIVO)
     const addFiles = (newFiles) => {
-        // 1. OBTENER PLAN SELECCIONADO Y LÍMITES
-        const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+        // 1. OBTENER PLAN SELECCIONADO - Primero sessionStorage, luego el radio button
+        let selectedPlan = sessionStorage.getItem('selectedPlan');
+        if (!selectedPlan) {
+            selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+        }
 
         const limits = {
-            'free': 3,
-            'basico': 5,
-            'premium': 10,
-            'destacado': 15,
-            'top': 20
+            'free': 5,
+            'basico': 10,
+            'premium': 15,
+            'destacado': 20
         };
         const maxAllowed = limits[selectedPlan];
 
@@ -1495,7 +1999,27 @@ function showCommunityFields() {
         // Abrir selector de archivos al hacer clic
         galleryDropArea.addEventListener('click', () => galleryImagesInput.click());
 
+        // VALIDACIÓN ANTES DE AGREGAR - Bloquear si excede el límite
         galleryImagesInput.addEventListener('change', function(e) {
+            // Obtener plan desde sessionStorage primero
+            let selectedPlan = sessionStorage.getItem('selectedPlan');
+            if (!selectedPlan) {
+                selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+            }
+            const limits = {'free': 5, 'basico': 10, 'premium': 15, 'destacado': 20};
+            const maxAllowed = limits[selectedPlan];
+            const filesSelected = this.files.length;
+            const currentImagesCount = galleryFiles.length;
+            const totalAfterAdd = currentImagesCount + filesSelected;
+            
+            // BLOQUEO COMPLETO si excede
+            if (totalAfterAdd > maxAllowed) {
+                alert(`❌ LÍMITE EXCEDIDO\n\nPlan ${selectedPlan.toUpperCase()}: máximo ${maxAllowed} fotos\nYa tienes: ${currentImagesCount} fotos\nIntentas agregar: ${filesSelected} fotos\n\nNo se pueden agregar más fotos. Por favor selecciona un plan superior o reduce las fotos.`);
+                this.value = ''; // Limpiar input
+                return; // NO llamar a addFiles
+            }
+            
+            // Si pasa la validación, agregar archivos
             addFiles(e.target.files);
             e.target.value = null; // Resetear para poder seleccionar el mismo archivo de nuevo
         });
@@ -1531,15 +2055,17 @@ function showCommunityFields() {
     if (imageInput) {
         imageInput.addEventListener('change', function(e) {
             // Obtener plan seleccionado
-            const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+            let selectedPlan = sessionStorage.getItem('selectedPlan');
+            if (!selectedPlan) {
+                selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+            }
             
             // Límites por plan
             const limits = {
-                'free': 3,
-                'basico': 5,
-                'premium': 10,
-                'destacado': 15,
-                'top': 20
+                'free': 5,
+                'basico': 10,
+                'premium': 15,
+                'destacado': 20
             };
             
             const maxAllowed = limits[selectedPlan];
@@ -1579,757 +2105,249 @@ function showCommunityFields() {
 
     // TAMBIÉN actualizar límite cuando cambia el plan
     function updateImageLimit() {
-        const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
-        const limits = {'free': 3, 'basico': 5, 'premium': 10, 'destacado': 15, 'top': 20};
+        let selectedPlan = sessionStorage.getItem('selectedPlan');
+        if (!selectedPlan) {
+            selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+        }
+        const limits = {'free': 5, 'basico': 10, 'premium': 15, 'destacado': 20};
         const maxFiles = limits[selectedPlan];
         
         const imageInput = document.getElementById('gallery-images-input'); // Changed from 'images'
         if (imageInput) {
             imageInput.setAttribute('max', maxFiles);
-            
-            // Mostrar límite visualmente
-            let limitText = document.querySelector('.image-limit-info');
-            if (!limitText) {
-                limitText = document.createElement('p');
-                limitText.className = 'image-limit-info';
-                imageInput.parentElement.appendChild(limitText);
-            }
-            limitText.innerHTML = `📸 Límite: ${maxFiles} fotos (Plan ${selectedPlan})`;
         }
+        
+        // Actualizar texto del contenedor de subida de imágenes (comentado - el límite se muestra en las tarjetas de plan)
+        // const uploadLimitElement = document.getElementById('gallery-upload-limit');
+        // if (uploadLimitElement) {
+        //     uploadLimitElement.textContent = `Máximo ${maxFiles} imágenes, JPG o PNG`;
+        // }
     }
 
-    // Llamar cuando cambie el plan
-    document.querySelectorAll('input[name="plan"]').forEach(radio => {
-        radio.addEventListener('change', updateImageLimit);
+    // =====================================================
+    // MANEJADOR FINAL DE PLANES Y TOKENS (SIN ERRORES)
+    // =====================================================
+
+    // Inicializacion limpia
+    // La función fue eliminada - ahora el flujo se maneja por el event listener de .plan-select-h
+    document.querySelectorAll('.plan-select-h').forEach(label => {
+        label.addEventListener('click', async (e) => {
+            // Obtener la tarjeta completa
+            const tarjeta = label.closest('.plan-card-h');
+            if (!tarjeta) return;
+            
+            // Obtener el valor del plan desde el input radio dentro de esta tarjeta
+            const radioInput = tarjeta.querySelector('input[name="plan"]');
+            const selectedPlan = radioInput ? radioInput.value : null;
+            
+            if (!selectedPlan) return;
+            
+            console.log('Clic en Seleccionar - Plan:', selectedPlan);
+            
+            // Obtener el token de ESTA tarjeta especifica
+            const tokenInput = tarjeta.querySelector('.plan-token-input');
+            const tokenCode = tokenInput ? tokenInput.value.trim() : '';
+            
+            console.log('Token encontrado:', tokenCode);
+            
+            updateImageLimit();
+            
+            // Obtener usuario autenticado
+            let user = null;
+            try {
+                const { data: { user: sessionUser } } = await supabase.auth.getUser();
+                user = sessionUser;
+            } catch (err) {
+                user = null;
+            }
+            
+            if (!user) {
+                showLoginRequiredModal();
+                return;
+            }
+            
+            // SI ES PLAN FREE -> IR DIRECTO A DETALLES
+            if (selectedPlan === 'free') {
+                console.log('Plan gratuito, yendo al paso 2...');
+                sessionStorage.setItem('selectedPlan', selectedPlan);
+                navigateToStep(2);
+                return;
+            }
+            
+            // SI HAY TOKEN -> VALIDAR Y ACTIVAR
+            if (tokenCode !== '') {
+                console.log('Token detectado:', tokenCode);
+                
+                const buttonSpan = label.querySelector('.plan-button-h');
+                const originalText = buttonSpan ? buttonSpan.textContent : 'Seleccionar';
+                if (buttonSpan) {
+                    buttonSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
+                }
+                
+                const validationResult = await validatePromoToken(tokenCode, selectedPlan);
+                
+                if (!validationResult.success) {
+                    showTokenMessageInCard(validationResult.message, false, selectedPlan);
+                    if (buttonSpan) buttonSpan.textContent = originalText;
+                    return;
+                }
+                
+                console.log('Token valido, aplicando...');
+                showTokenMessageInCard(validationResult.message, true, selectedPlan);
+                
+                const applyResult = await applyValidatedToken(validationResult.tokenData, user.id, selectedPlan);
+                
+                if (!applyResult.success) {
+                    showTokenMessageInCard(applyResult.message, false, selectedPlan);
+                    if (buttonSpan) buttonSpan.textContent = originalText;
+                    return;
+                }
+                
+                console.log('Token aplicado, navigateToStep(2)...');
+                sessionStorage.setItem('selectedPlan', selectedPlan);
+                sessionStorage.setItem('tokenApplied', 'true');
+                sessionStorage.setItem('tokenPlanId', validationResult.tokenData.id);
+                
+                navigateToStep(2);
+                return;
+            }
+            
+            // NO HAY TOKEN Y ES PLAN DE PAGO -> REDIRIGIR A PAGO
+            console.log('Sin token, flujo de pago...');
+            sessionStorage.setItem('selectedPlan', selectedPlan);
+            window.location.href = 'payment.html?plan=' + selectedPlan;
+        });
     });
+    
+    // === FIN MANEJO DE TOKEN === - Actualizar límites Y navegar al paso 2
+    // ELIMINADO: Este event listener interfería con la redirección a payment.html
+    // El flujo correcto ahora es: seleccionar plan -> hacer clic en botón -> (si no token) payment.html
 
     // --- EVENT LISTENERS PARA BOTONES DE NAVEGACIÓN ---
-    nextBtns.forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const currentStep = btn.closest('.form-section');
-            const currentStepNumber = parseInt(currentStep.id.split('-')[1], 10);
+    const continueBtn = document.getElementById('continue-to-details-btn');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', async () => {
+            // Obtener el plan seleccionado
+            const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
             
-            // Validación del Paso 1 (Planes) - Ahora solo verifica que haya un plan seleccionado
-            if (currentStepNumber === 1) {
-                const selectedPlan = document.querySelector('input[name="plan"]:checked');
-                if (selectedPlan) {
-                    // Verificar si el usuario está autenticado antes de ir al paso 2
-                    console.log("🔍 Paso 1: Verificando autenticación...");
-                    let user = null;
-                    try {
-                        const { data: { user: sessionUser } } = await supabase.auth.getUser();
-                        user = sessionUser;
-                    } catch (err) {
-                        console.log("⚠️ Error al verificar sesión:", err.message);
-                        user = null;
-                    }
-                    console.log("👤 Usuario:", user ? user.email : "No autenticado");
-                    
-                    if (!user) {
-                        // Si no está autenticado, mostrar modal de login
-                        console.log("📋 Mostrando modal de login...");
-                        showLoginRequiredModal();
-                    } else {
-                        // Si está autenticado, continuar al paso 2 (Detalles)
-                        console.log("✅ Usuario autenticado, yendo al paso 2...");
-                        navigateToStep(2);
-                    }
-                } else {
-                    alert('Por favor, selecciona un plan para continuar.');
-                }
+            if (!selectedPlanInput) {
+                alert('Por favor, selecciona un plan para continuar.');
+                return;
             }
+            
+            const selectedPlan = selectedPlanInput.value;
+            
+            // Obtener código del token
+            const tokenInput = document.getElementById('promo-token-input');
+            const tokenCode = tokenInput ? tokenInput.value.trim() : '';
+            
+            // Obtener usuario autenticado
+            var user = null;
+            try {
+                const { data: { user: sessionUser } } = await supabase.auth.getUser();
+                user = sessionUser;
+            } catch (err) {
+                console.log('Error al verificar sesion:', err.message);
+                user = null;
+            }
+            
+            if (!user) {
+                showLoginRequiredModal();
+                return;
+            }
+            
+            // Si hay un token ingresado, procesarlo
+            if (tokenCode !== '') {
+                console.log('Token detectado:', tokenCode);
+                
+                // Mostrar indicador de carga
+                continueBtn.disabled = true;
+                continueBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando token...';
+                
+                // Validar el token
+                const validationResult = await validatePromoToken(tokenCode, selectedPlan);
+                
+                if (!validationResult.success) {
+                    showTokenMessage(validationResult.message, false);
+                    continueBtn.disabled = false;
+                    continueBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continuar';
+                    return;
+                }
+                
+                // Token válido - aplicar el token
+                console.log('Token valido, aplicando...');
+                showTokenMessage(validationResult.message, true);
+                
+                const applyResult = await applyValidatedToken(validationResult.tokenData, user.id, selectedPlan);
+                
+                if (!applyResult.success) {
+                    showTokenMessage(applyResult.message, false);
+                    continueBtn.disabled = false;
+                    continueBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continuar';
+                    return;
+                }
+                
+                // Token aplicado exitosamente
+                console.log('Token aplicado, redirigiendo a detalles...');
+                sessionStorage.setItem('selectedPlan', selectedPlan);
+                sessionStorage.setItem('tokenApplied', 'true');
+                sessionStorage.setItem('tokenPlanId', validationResult.tokenData.id);
+                
+                navigateToStep(2);
+                return;
+            }
+            
+            // FLUJO NORMAL SIN TOKEN
+            console.log('Sin token, flujo normal de pago...');
+            
+            sessionStorage.setItem('selectedPlan', selectedPlan);
+            
+            // Si es plan gratuito, ir directo a detalles
+            if (selectedPlan === 'free' || selectedPlan === 'gratis') {
+                console.log('Plan gratuito, yendo al paso 2...');
+                navigateToStep(2);
+                return;
+            }
+            
+            // Si es plan pago, redirigir a payment.html
+            console.log('Plan de pago, redirigiendo a payment...');
+            window.location.href = 'payment.html?plan=' + selectedPlan;
         });
-    });
-
-    backBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetStep = btn.dataset.target;
-            navigateToStep(targetStep);
-        });
-    });
-
-
-
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // =====================================================
-    // VALIDACIÓN DE SESIÓN - GUARDIÁN DE PUBLICACIÓN
-    // =====================================================
-    if (!currentUser || !isSessionChecked) {
-        showLoginRequiredModal();
-        return;
-    }
-    // =====================================================
-    
-    const publishButton = document.getElementById('publish-ad-btn');
-    publishButton.disabled = true;
-    publishButton.textContent = 'Publicando...';
-
-    // --- VALIDACIÓN FINAL ANTES DE ENVIAR ---
-    const title = document.getElementById('title').value.trim();
-    const description = document.getElementById('description').value.trim();
-    const price = document.getElementById('price').value.trim();
-    const category = categorySelectStep4?.value || '';
-    const subcategory = subcategorySelectStep4?.value || '';
-    const province = provinceSelectStep4?.value || '';
-    const district = districtSelectStep4?.value || '';
-    const coverImageFile = coverImageInput.files[0];
-    const termsAgreement = document.getElementById('terms-agreement');
-
-    // Validaciones mejoradas
-    if (!title || title.length < 10) {
-        alert('El título debe tener al menos 10 caracteres.');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
     }
 
-    if (!description || description.length < 30) {
-        alert('La descripción debe tener al menos 30 caracteres para mejor visibilidad.');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    }
-
-    if (!price || parseFloat(price) < 1) {
-        alert('Por favor, ingresa un precio válido.');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    }
-
-    // ✅ VALIDACIÓN VISUAL DE IMAGEN DE PORTADA
-    const coverImageError = document.getElementById('cover-image-error');
-    if (!coverImageFile) {
-        // Mostrar mensaje de error en rojo
-        if (coverImageError) {
-            coverImageError.style.display = 'block';
-            coverImageError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        alert('Por favor, sube una foto de portada para tu anuncio.');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    } else {
-        // Ocultar mensaje de error si hay imagen
-        if (coverImageError) {
-            coverImageError.style.display = 'none';
-        }
-    }
-
-    if (!category || !province || !district) {
-        alert('Por favor, completa todos los campos obligatorios (Categoría y Ubicación).');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    }
-
-    if (!termsAgreement || !termsAgreement.checked) {
-        alert('Debes aceptar los Términos y Condiciones para continuar.');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    }
-
-    // ✅ VALIDAR VIDEOS SEGÚN PLAN
-    const selectedPlanInput = document.querySelector('input[name="plan"]:checked');
-    const selectedPlan = selectedPlanInput ? selectedPlanInput.value : 'free';
-    const videoUrl = document.getElementById('video-url')?.value || '';
-
-    // Permitir video solo en planes Destacado y Top
-    if (videoUrl && selectedPlan !== 'destacado' && selectedPlan !== 'top') {
-        alert('Los planes Destacado y TOP permiten agregar videos. Por favor, selecciona uno de estos planes.');
-        publishButton.disabled = false;
-        publishButton.textContent = 'Publicar Anuncio';
-        return;
-    }
-
-    // ✅ VALIDAR URL DE VIDEO (YouTube o Vimeo)
-    if (videoUrl && (selectedPlan === 'destacado' || selectedPlan === 'top')) {
-        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)\//;
-        const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\//;
-        
-        if (!youtubeRegex.test(videoUrl) && !vimeoRegex.test(videoUrl)) {
-            alert('Por favor, ingresa una URL válida de YouTube o Vimeo.');
-            publishButton.disabled = false;
-            publishButton.textContent = 'Publicar Anuncio';
-            return;
-        }
-    }
-
-    // Obtener nombres de categoría y subcategoría
-    const categoryName = categorySelectStep4?.options[categorySelectStep4.selectedIndex]?.text || '';
-    const subcategoryName = subcategorySelectStep4?.value || ''; // Ya es el nombre
-
-    try {
-        // =====================================================
-        // VERIFICACIÓN DUAL: Verificar si el perfil existe
-        // =====================================================
-        console.log('🔍 Verificando perfil del usuario...');
-        
-        const { data: existingProfile, error: profileCheckError } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', currentUser.id)
-            .single();
-        
-        if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-            // Error diferente a "no encontrado"
-            console.error('Error verificando perfil:', profileCheckError);
-            throw new Error('Error de sincronización de cuenta. Por favor, intenta cerrar e iniciar sesión de nuevo.');
-        }
-        
-        if (!existingProfile) {
-            // El perfil no existe, crear automáticamente
-            console.log('⚠️ Perfil no encontrado, creando automáticamente...');
-            
-            const { error: createProfileError } = await supabase
-                .from('profiles')
-                .insert({
-                    id: currentUser.id,
-                    email: currentUser.email,
-                    nombre_negocio: currentUser.email.split('@')[0],
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                });
-            
-            if (createProfileError) {
-                console.error('Error creando perfil:', createProfileError);
-                throw new Error('Error de sincronización de cuenta. Por favor, intenta cerrar e iniciar sesión de nuevo.');
-            }
-            
-            console.log('✅ Perfil creado exitosamente');
-        } else {
-            console.log('✅ Perfil verificado correctamente');
-        }
-        // =====================================================
-        
-        if (!coverImageFile) throw new Error("La imagen de portada es obligatoria.");
-
-            const coverFileName = `${currentUser.id}/cover-${Date.now()}-${coverImageFile.name}`;
-            let { error: coverUploadError } = await supabase.storage.from('imagenes_anuncios').upload(coverFileName, coverImageFile);
-            if (coverUploadError) throw coverUploadError;
-            
-            const { data: { publicUrl: coverPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(coverFileName);
-
-            // Subir imágenes de galería
-            const uploadedGalleryUrls = [];
-            for (const file of galleryFiles) {
-                const galleryFileName = `${currentUser.id}/gallery-${Date.now()}-${file.name}`;
-                const { error: galleryUploadError } = await supabase.storage.from('imagenes_anuncios').upload(galleryFileName, file);
-                if (galleryUploadError) throw galleryUploadError;
-                const { data: { publicUrl: galleryPublicUrl } } = supabase.storage.from('imagenes_anuncios').getPublicUrl(galleryFileName);
-                uploadedGalleryUrls.push(galleryPublicUrl);
-            }
-
-            const formData = new FormData(form);
-            const adData = {
-                titulo: document.getElementById('title').value,
-                descripcion: formData.get('descripcion'),
-                precio: parseFloat(formData.get('precio')),
-                categoria: categoryName,
-                provincia: formData.get('provincia'),
-                distrito: formData.get('distrito'),
-                user_id: currentUser.id,
-                url_portada: coverPublicUrl,
-                url_galeria: uploadedGalleryUrls, // Nuevo campo con las imágenes de galería
-                url_video: (selectedPlan === 'destacado' || selectedPlan === 'top') ? formData.get('video_url') : null,
-                publicar_redes: selectedPlan === 'top' ? (formData.get('publicar_redes') ? true : false) : false,
-                fecha_publicacion: new Date().toISOString()
-            };
-
-            // --- ATRIBUTOS UNIFICADOS (TODAS las categorías van a JSONB) ---
-            adData.atributos_clave = buildUnifiedAttributesJSON(formData, categoryName, subcategoryName);
-
-            // DIAGNÓSTICO: Hacer global para debugging
-            window.atributos_clave = adData.atributos_clave;
-            console.log('🌐 Variable global window.atributos_clave asignada:', window.atributos_clave);
-
-            // ==================================================================
-            // === INICIO: LÓGICA PARA PLANES Y MEJORAS ===
-            // ==================================================================
-
-            // 1. Ya obtuvimos el plan seleccionado en validaciones previas
-            // (no necesita re-lectura, ya lo tenemos en selectedPlan)
-
-            // 2. Calcular la fecha de expiración del plan
-            const VIGENCIA_GRATIS_DIAS = 30;
-            const VIGENCIA_BASICO_DIAS = 30;
-            const VIGENCIA_PREMIUM_DIAS = 30;
-            const VIGENCIA_DESTACADO_DIAS = 30;
-            const VIGENCIA_TOP_DIAS = 30;
-
-            let diasDeVigencia = 30; // Todos los planes 30 días
-
-            // ELIMINAR o COMENTAR cualquier lógica que cambie los días según el plan
-            // if (selectedPlan === 'basico') {
-            //     diasDeVigencia = VIGENCIA_BASICO_DIAS;
-            // } else if (selectedPlan === 'premium') {
-            //     diasDeVigencia = VIGENCIA_PREMIUM_DIAS;
-            // } else if (selectedPlan === 'destacado') {
-            //     diasDeVigencia = VIGENCIA_DESTACADO_DIAS;
-            // } else if (selectedPlan === 'top') {
-            //     diasDeVigencia = VIGENCIA_TOP_DIAS;
-            // }
-
-            const fechaExpiracion = new Date();
-            fechaExpiracion.setDate(fechaExpiracion.getDate() + diasDeVigencia);
-
-            // 3. Los "enhancements" (add-ons opcionales) han sido eliminados.
-
-            // 4. Añadir los datos del plan al objeto principal del anuncio
-            adData.featured_plan = selectedPlan;
-            adData.plan_priority = APP_CONFIG.PLAN_LIMITS[selectedPlan].priority; // AGREGAR
-            adData.max_images = APP_CONFIG.PLAN_LIMITS[selectedPlan].maxFotos; // AGREGAR
-            // adData.enhancements = enhancements; // Eliminado: ya no hay enhancements
-
-            // ==================================================================
-            // === FIN: LÓGICA PARA PLANES Y MEJORAS ===
-            // ==================================================================
-        
-            const { data: newAd, error: adInsertError } = await supabase
-                .from('anuncios')
-                .insert(adData)
-                .select()
-            .single();
-
-            if (adInsertError) throw adInsertError;
-
-            alert('¡Anuncio publicado con éxito!');
-            window.location.href = 'panel-unificado.html';
-
-        } catch (error) {
-            console.error('Error al publicar el anuncio:', error);
-            alert(`Error: ${error.message}`);
-            publishButton.disabled = false;
-            publishButton.textContent = 'Publicar Anuncio';
-        }
-});
-
-    // --- FUNCIÓN PARA CONSTRUIR JSON DE ELECTRÓNICA ---
-    function buildElectronicsJSON(formData) {
-        console.log('🔵 === BUILD ELECTRONICS JSON INICIADO ===');
-
-        const json = {
-            subcategoria: selectedSubcategory
-        };
-
-        const fields = electronicsSubcategories[selectedSubcategory];
-        console.log('🔵 Subcategoría:', selectedSubcategory);
-        console.log('🔵 Campos esperados:', fields);
-
-        // Mostrar TODOS los datos del FormData
-        console.log('🔵 FormData completo:');
-        for (let pair of formData.entries()) {
-            console.log(`   ${pair[0]}: "${pair[1]}"`);
-        }
-
-        if (fields) {
-            console.log('🔵 Procesando campos:');
-            fields.forEach(field => {
-                const value = formData.get(field);
-                console.log(`   → "${field}" = "${value}" (${value ? 'OK' : 'VACÍO'})`);
-                if (value) {
-                    json[field] = value;
-                }
-            });
-        }
-
-        console.log('🔵 JSON FINAL:', JSON.stringify(json, null, 2));
-        console.log('🔵 === BUILD ELECTRONICS JSON TERMINADO ===');
-        return json;
-    }
-
-    // --- FUNCIÓN PARA CONSTRUIR JSON DE HOGAR Y MUEBLES ---
-    function buildHomeFurnitureJSON(formData) {
-        const json = {
-            subcategoria: selectedSubcategory
-        };
-
-        const fields = homeFurnitureSubcategories[selectedSubcategory];
-        if (fields) {
-            fields.forEach(field => {
-                const value = formData.get(field);
-                if (value) {
-                    json[field] = value;
-                }
-            });
-        }
-
-        return json;
-    }
-
-    // ✅ FUNCIÓN UNIFICADA PARA TODAS LAS CATEGORÍAS
-    function buildUnifiedAttributesJSON(formData, mainCategory, subcategory) {
-        // ✅ LOGS AL INICIO (AGREGAR ESTAS 5 LÍNEAS)
-        console.log('🔵 === INICIO buildUnifiedAttributesJSON ===');
-        console.log('🔵 mainCategory:', mainCategory);
-        console.log('🔵 mainCategory.toLowerCase():', mainCategory.toLowerCase());
-        console.log('🔵 subcategory:', subcategory);
-        console.log('🔵 ¿Incluye "inmueble"?', mainCategory.toLowerCase().includes('inmueble'));
-
-        // DIAGNÓSTICO: Mostrar todos los campos del formData
-        console.log('📋 FormData entries:');
-        for (let [key, value] of formData.entries()) {
-            console.log(`   ${key}: "${value}"`);
-        }
-
-        const json = {};
-        
-        // Agregar subcategoría si existe
-        if (subcategory) {
-            json.subcategoria = subcategory;
-        }
-        
-        // --- VEHÍCULOS ---
-        if (mainCategory.toLowerCase().includes('vehículo') ||
-            mainCategory.toLowerCase().includes('auto') ||
-            mainCategory.toLowerCase().includes('carro')) {
-
-            const vehicleFields = [
-                'marca', 'modelo', 'anio', 'kilometraje', 'transmision', 'combustible',
-                'color', 'puertas', 'vidrios', 'rines', 'tapiz', 'direccion', 'frenos', 'airbags', 'estado'
-            ];
-            vehicleFields.forEach(field => {
-                const value = formData.get(field);
-                if (value) {
-                    json[field] = (field === 'anio' || field === 'kilometraje' || field === 'puertas')
-                        ? parseInt(value)
-                        : value;
-                }
-            });
-        }
-        
-        // --- INMUEBLES ---
-        if (mainCategory.toLowerCase().includes('inmueble') ||
-            mainCategory.toLowerCase().includes('casa') ||
-            mainCategory.toLowerCase().includes('apartamento')) {
-            console.log('🟢 ENTRÓ AL BLOQUE DE INMUEBLES');
-            // Campos numéricos
-            const realEstateFields = [
-                'm2', 'habitaciones', 'baños', 'piso', 'estacionamiento', 'anio_construccion'
-            ];
-            realEstateFields.forEach(field => {
-                const value = formData.get(field);
-                if (value !== null && value !== undefined && value !== "") {
-                    json[field] = parseInt(value);
-                }
-            });
-            // Campos select
-            const selectFields = [
-                'amueblado', 'ascensor', 'jardin', 'piscina', 'tipo_propiedad',
-                'estado_conservacion', 'calefaccion', 'aire_acondicionado',
-                'seguridad', 'orientacion', 'mascotas', 'gimnasio'
-            ];
-            selectFields.forEach(field => {
-                const value = formData.get(field);
-                if (value) {
-                    json[field] = value;
-                }
-            });
-            // Campos adicionales de texto
-            const textFields = [
-                'area' // Para compatibilidad con versiones anteriores
-            ];
-            textFields.forEach(field => {
-                const value = formData.get(field);
-                if (value) {
-                    json[field] = value;
-                }
-            });
-        }
-        
-        // --- ELECTRÓNICA ---
-        if (mainCategory.toLowerCase().includes('electrónica')) {
-            const subcategoryConfig = categoryFieldConfigs['electrónica']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-        
-        // --- HOGAR Y MUEBLES ---
-        if (mainCategory.toLowerCase().includes('hogar') ||
-            mainCategory.toLowerCase().includes('mueble')) {
-            const subcategoryConfig = categoryFieldConfigs['hogar y muebles']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        // --- MODA Y BELLEZA ---
-        if (mainCategory.toLowerCase().includes('moda') ||
-            mainCategory.toLowerCase().includes('belleza') ||
-            mainCategory.toLowerCase().includes('ropa')) {
-            const subcategoryConfig = categoryFieldConfigs['moda y belleza']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        console.log(' JSON FINAL:', json);
-        // --- DEPORTES Y HOBBIES ---
-        if (mainCategory.toLowerCase().includes('deporte') ||
-            mainCategory.toLowerCase().includes('hobbies')) {
-            const subcategoryConfig = categoryFieldConfigs['deportes y hobbies']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        // --- MASCOTAS ---
-        if (mainCategory.toLowerCase().includes('mascota')) {
-            const subcategoryConfig = categoryFieldConfigs['mascotas']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        // --- SERVICIOS ---
-        if (mainCategory.toLowerCase().includes('servicio')) {
-            const subcategoryConfig = categoryFieldConfigs['servicios']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        // --- NEGOCIOS ---
-        if (mainCategory.toLowerCase().includes('negocio')) {
-            const subcategoryConfig = categoryFieldConfigs['negocios']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        // --- COMUNIDAD ---
-        if (mainCategory.toLowerCase().includes('comunidad')) {
-            const subcategoryConfig = categoryFieldConfigs['comunidad']?.[subcategory];
-            if (subcategoryConfig) {
-                Object.entries(subcategoryConfig).forEach(([fieldName, fieldConfig]) => {
-                    const value = formData.get(fieldName);
-                    if (value) {
-                        json[fieldName] = fieldConfig.type === 'number' ? parseInt(value) : value;
-                    }
-                });
-            }
-        }
-
-        console.log(' JSON FINAL:', json);
-        console.log('🔵 === FIN buildUnifiedAttributesJSON ===');
-        return Object.keys(json).length > 0 ? json : null;
-    }
-
-    // --- INICIALIZACIÓN ---
-    loadAllCategories();
-    getUserInfo();
-
-    // --- VERIFICAR PLAN PRESELECCIONADO (DESPUÉS DEL REGISTRO) ---
-    const selectedPlanFromSession = sessionStorage.getItem('selectedPlan');
-    const afterRegisterAction = sessionStorage.getItem('afterRegisterAction');
-    
-    if (selectedPlanFromSession === 'gratis' && afterRegisterAction === 'continuePlan') {
-        console.log("✅ Plan gratis preseleccionado después del registro");
-        
-        // Desplazar a la sección de planes automáticamente después de cargar
-        setTimeout(() => {
-            // Navegar automáticamente a la sección de planes (Step 4)
-            navigateToStep(4);
-            
-            // Preseleccionar el plan gratis
-            const freePlanCard = document.querySelector('.plan-card-h[data-plan="gratis"]');
-            if (freePlanCard) {
-                freePlanCard.classList.add('selected');
-                console.log("✅ Plan gratis preseleccionado visualmente");
-            }
-            
-            // Limpiar sessionStorage
-            sessionStorage.removeItem('afterRegisterAction');
-        }, 500);
-    }
-
-// --- INICIO: NAVEGACIÓN AUTOMÁTICA DE PLANES v2 (AGENTE 11) ---
-
-console.log("Agente 11: Ejecutando script de navegación v2 (por clic en tarjeta).");
-
-
-const planCards = document.querySelectorAll('.plan-card-h');
-console.log(`Agente 11: Se encontraron ${planCards.length} tarjetas de plan.`);
-
-// ✅ PLAN_LIMITS_V2 removida - usar PLAN_LIMITS centralizado
-planCards.forEach(card => {
-    card.addEventListener('click', function(e) {
-        const radio = this.querySelector('input[type="radio"]');
-        if (!radio) {
-            console.error("Error: No se encontró un radio button dentro de la tarjeta clickeada.");
-            return;
-        }
-
-        radio.checked = true;
-        const selectedPlan = radio.value;
-        console.log(`Agente 11: Clic detectado en tarjeta. Plan seleccionado: ${selectedPlan}.`);
-
-        // ✅ Guardar plan seleccionado en sessionStorage (para usuarios registrados)
-        sessionStorage.setItem('selectedPlan', selectedPlan);
-
-        // --- Lógica de navegación (para todos los usuarios) ---
-        setTimeout(() => {
-            const step3 = document.getElementById('step-3');
-            const step4 = document.getElementById('step-4');
-
-            if (step3 && step4) {
-                console.log("Agente 11: Navegando a step-4.");
-                navigateToStep(4); // Call the robust navigation function
-            } else {
-                console.error("Error: No se encontraron #step-3 o #step-4.");
-            }
-        }, 300); // Reducimos un poco el tiempo para una sensación más rápida.
-
-        // --- Lógica para actualizar los límites de fotos ---
-        const limits = APP_CONFIG.PLAN_LIMITS[selectedPlan];
-        if (!limits) {
-            console.error(`Error: No se encontraron límites para el plan "${selectedPlan}".`);
-            return;
-        }
-
-        const maxFiles = limits.maxFotos;
-        const fileInput = document.getElementById('gallery-images-input');
-        if (fileInput) {
-            fileInput.setAttribute('data-max-files', maxFiles);
-
-            const helpTextContainer = fileInput.closest('.drop-area') || fileInput.parentElement;
-            let existingHelpText = helpTextContainer.querySelector('.help-text');
-
-            if (existingHelpText) {
-                existingHelpText.remove();
-            }
-
-            // Texto de límite eliminado - ahora se muestra en el cuadro de carga
-        }
-    });
-});
-
-/* === FUNCIÓN CORREGIDA Y FINAL PARA GESTIONAR LA RESTRICCIÓN VISUAL === */
-
-const updatePlanRestrictions = (selectedPlan) => {
-    console.log('🔍 DEBUG: updatePlanRestrictions called with plan:', selectedPlan);
-
-    // ESTANDARIZAR EL VALOR DEL PLAN A MINÚSCULAS para que coincida con 'destacado' y 'top'
-    const planValue = selectedPlan.toLowerCase();
-    console.log('🔍 DEBUG: planValue (lowercase):', planValue);
-
-    // 1. RESTRICCIÓN PARA CAMPOS DE VIDEO (Destacado y Top)
-    const videoFields = document.querySelectorAll('.plan-video-feature');
-    console.log('🔍 DEBUG: Found videoFields:', videoFields.length);
-
-    const enableVideo = (planValue === 'destacado' || planValue === 'top');
-    const disableVideo = !enableVideo;
-    console.log('🔍 DEBUG: enableVideo:', enableVideo, 'disableVideo:', disableVideo);
-
-    videoFields.forEach(div => {
-        div.style.opacity = disableVideo ? '0.4' : '1';
-        div.style.pointerEvents = disableVideo ? 'none' : 'auto';
-
-        const input = div.querySelector('input, select, textarea');
-        if (input) input.disabled = disableVideo;
-    });
-
-    // 2. RESTRICCIÓN PARA CAMPOS TOP (Publicación en Redes Sociales)
-    const topFields = document.querySelectorAll('.plan-top-feature');
-    console.log('🔍 DEBUG: Found topFields:', topFields.length);
-
-    const disableTop = planValue !== 'top'; // Solo se habilita si es el plan 'top'
-    console.log('🔍 DEBUG: disableTop (true if not top):', disableTop);
-
-    topFields.forEach(div => {
-        div.style.opacity = disableTop ? '0.4' : '1';
-        div.style.pointerEvents = disableTop ? 'none' : 'auto';
-
-        const input = div.querySelector('input, select, textarea');
-        if (input) input.disabled = disableTop;
-    });
-
-    // 3. RESTRICCIÓN PARA EL BADGE DESTACADO
-    const destacadoFields = document.querySelectorAll('.plan-destacado-feature');
-    console.log('🔍 DEBUG: Found destacadoFields:', destacadoFields.length);
-
-    // Habilitado si el plan es 'destacado' O 'top'
-    const enableDestacado = (planValue === 'destacado' || planValue === 'top');
-    const disableDestacado = !enableDestacado;
-    console.log('🔍 DEBUG: enableDestacado:', enableDestacado, 'disableDestacado:', disableDestacado);
-
-    destacadoFields.forEach(div => {
-        console.log('🔍 DEBUG: Processing destacadoField:', div);
-        div.style.opacity = disableDestacado ? '0.4' : '1';
-        div.style.pointerEvents = disableDestacado ? 'none' : 'auto';
-
-        const input = div.querySelector('input, select, textarea');
-        console.log('🔍 DEBUG: Input found:', input);
-        if (input) {
-            input.disabled = disableDestacado;
-            console.log('🔍 DEBUG: Input disabled set to:', disableDestacado);
-
-            // Si se deshabilita (plan inferior), desmarca el checkbox
-            if (disableDestacado && input && input.type === 'checkbox') {
-                console.log('🔍 DEBUG: Unchecking checkbox');
-                input.checked = false;
-            }
-        }
-    });
+// =====================================================
+// BLOQUE FINAL: NAVEGACIÓN Y MANEJO DE PLANES
+// =====================================================
+
+// Función para manejar los botones de selección de plan
+// Esta función fue eliminada - hay duplicación. Usar la versión en línea 2555
+
+// =====================================================
+// DEFINICIÓN DE VIGENCIAS Y MANEJADOR DE PLANES
+// =====================================================
+
+const VIGENCIA_PLANES = {
+    'free': 15,
+    'bronce': 30,
+    'plata': 30,
+    'oro': 45,
+    'top': 60
 };
 
+// Función eliminada: inertializarManejadorPlanes() - ahora el flujo se maneja en el event listener de .plan-select-h
+// Esto evita conflictos de event listeners duplicados
 
-/* === PASO CLAVE: ENLAZAR LA FUNCIÓN A LOS EVENTOS === */
+// Inicializar cuando el DOM esté listo
+// Nota: La lógica de selección de planes ahora está manejada por el event listener de .plan-select-h
 
-// 1. Enlazar al cambio de plan (para actualizar al seleccionar un radio diferente)
-document.querySelectorAll('input[name="plan"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-        console.log('Plan cambiado a:', this.value);
-        updatePlanRestrictions(this.value);
-        
-        // Navegar automáticamente al paso 4
-        setTimeout(() => {
-            navigateToStep(4);
-        }, 500);
-    });
-});
-
-
-// 2. Enlazar a la carga inicial de la página (para el plan preseleccionado)
-const initialPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
-updatePlanRestrictions(initialPlan);
+// =====================================================
+// EXPORTAR FUNCIONES AL OBJETO GLOBAL (para tipo=module)
+// =====================================================
+// window.inicializarManejadorPlanes ya no existe - la lógica está en el event listener de .plan-select-h
+window.initializePublishPage = initializePublishPage;
+window.updatePlanRestrictions = updatePlanRestrictions;
 }
+
+
+
+

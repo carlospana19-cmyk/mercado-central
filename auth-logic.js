@@ -50,6 +50,9 @@ function setupForms() {
         console.log("✅ Agregando listener al formulario de reset");
         resetPasswordForm.addEventListener('submit', handleResetPassword);
     }
+
+    // Conectar botón de Google
+    setupGoogleButton();
 }
 
 async function handleLogin(e) {
@@ -118,7 +121,6 @@ async function handleRegister(e) {
     try {
         const email = document.getElementById('email-register')?.value?.trim();
         const password = document.getElementById('password-register')?.value;
-        const codigoInvitacion = document.getElementById('codigo-invitacion')?.value?.trim().toUpperCase();
 
         if (!email || !password) {
             alert('Por favor ingresa email y contraseña');
@@ -163,61 +165,12 @@ async function handleRegister(e) {
         }
         // =====================================================
 
-        // Variable para saber si aplicó código de cortesía
-        let codigoAplicado = false;
+        // =====================================================
 
-        // Si hay código de invitación, validarlo y aplicar
-        if (codigoInvitacion) {
-            console.log('🎟️ Validando código de invitación:', codigoInvitacion);
-            
-            try {
-                const { data: resultado, error: tokenError } = await supabase
-                    .rpc('validar_y_aplicar_token', {
-                        p_codigo: codigoInvitacion,
-                        p_user_id: authData.user.id,
-                        p_anuncio_id: null
-                    });
-
-                if (tokenError) {
-                    console.error('Error validando código:', tokenError);
-                    alert('Código de invitación inválido. Continuando con registro normal.');
-                } else if (resultado && resultado.success) {
-                    codigoAplicado = true;
-                    alert(`✅ ¡Código aplicado! Tienes plan ${resultado.plan.toUpperCase()} gratis por ${resultado.dias} días. Redirigiendo...`);
-                    sessionStorage.setItem('hasFreePlan', resultado.plan);
-                    // Limpiar cualquier plan en sessionStorage
-                    sessionStorage.removeItem('selectedPlan');
-                    sessionStorage.removeItem('afterRegisterAction');
-                    // Redirigir directo a publicar (ya tiene plan gratis)
-                    setTimeout(() => {
-                        window.location.href = 'publicar.html';
-                    }, 2000);
-                    return; // Importante: salir aquí para no continuar
-                } else {
-                    alert('Código inválido o ya usado. Continuando con registro normal.');
-                }
-            } catch (tokenErr) {
-                console.error('Error en validación de token:', tokenErr);
-            }
-        }
-
-        // Solo si NO aplicó código de cortesía, continuar con flujo normal
-        if (!codigoAplicado) {
-            // ✅ VERIFICAR SI HAY REDIRECCIÓN PENDIENTE (desde publicar.html)
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectUrl = urlParams.get('redirect');
-            
-            if (redirectUrl) {
-                console.log('🔄 Redirigiendo a:', redirectUrl);
-                alert('¡Registro exitoso! Redirigiendo...');
-                window.location.href = redirectUrl;
-                return;
-            }
-            
-            // Por defecto: redirigir a publicar.html para que pueda publicar su anuncio
-            alert('¡Registro exitoso! Ya puedes publicar tu anuncio.');
-            window.location.href = 'publicar.html';
-        }
+        // ✅ Redirección directa a panel-unificado.html
+        console.log('🔄 Redirigiendo a panel-unificado.html...');
+        alert('¡Registro exitoso! Redirigiendo al panel...');
+        window.location.href = 'panel-unificado.html';
     } catch (err) {
         console.error('❌ Error:', err);
         alert('Error: ' + (err.message || 'Desconocido'));
@@ -327,3 +280,39 @@ async function handleResetPassword(e) {
         alert('Error: ' + (err.message || 'Desconocido'));
     }
 }
+
+// ==========================================
+// FUNCIÓN DE LOGIN CON GOOGLE
+// ==========================================
+async function signInWithGoogle() {
+    console.log('🔐 Iniciando login con Google...');
+    
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + '/index.html'
+            }
+        });
+
+        if (error) {
+            console.error('❌ Error al conectar con Google:', error.message);
+            alert('Error al iniciar sesión con Google: ' + error.message);
+        }
+    } catch (err) {
+        console.error('❌ Error:', err);
+        alert('Error: ' + (err.message || 'Desconocido'));
+    }
+}
+
+// Conectar el botón de Google cuando se carga la página
+function setupGoogleButton() {
+    const googleBtn = document.getElementById('google-login-btn');
+    if (googleBtn) {
+        console.log('✅ Botón de Google encontrado, conectando...');
+        googleBtn.addEventListener('click', signInWithGoogle);
+    }
+}
+
+// Exportar la función para usarla en otros lugares
+export { signInWithGoogle };

@@ -41,23 +41,27 @@ async function loadDynamicStats() {
       .from('anuncios')
       .select('*', { count: 'exact', head: true });
 
-    // Contar usuarios registrados usando una función RPC segura
+    // Contar usuarios registrados directamente de la tabla profiles
     let usersCount = 0;
+    let usersError = null;  // Definir fuera del try para que esté disponible después
     try {
-      const { data: usersData, error: usersError } = await supabase
-        .rpc('get_users_count');
+      const { count: profilesCount, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
 
-      if (!usersError && usersData !== null) {
-        usersCount = usersData;
+      usersError = profilesError;
+
+      if (!usersError && profilesCount !== null) {
+        usersCount = profilesCount;
       } else {
-        // Fallback: usar un conteo aproximado o mostrar "100+"
+        // Fallback: usar un conteo aproximado o mostrar "150+"
         usersCount = 150; // Valor aproximado
         console.log('Usando conteo aproximado de usuarios');
       }
     } catch (error) {
-      // Si la función RPC no existe, usar aproximado
+      // Si la tabla no existe o hay error, usar aproximado
       usersCount = 150;
-      console.log('Función get_users_count no disponible, usando aproximado');
+      console.log('Tabla profiles no disponible, usando aproximado');
     }
 
     if (adsError) console.error('Error al contar anuncios:', adsError);
@@ -167,7 +171,7 @@ function filterBySearchTerm(searchTerm) {
  * Aplica los filtros combinados (categoría + búsqueda) a las tarjetas
  */
 function applyFilters() {
-  const cards = document.querySelectorAll('.card');
+  const cards = document.querySelectorAll('.box');
   let visibleCount = 0;
   
   cards.forEach(card => {
@@ -256,7 +260,7 @@ export function clearAllFilters() {
   });
   
   // Mostrar todas las tarjetas
-  document.querySelectorAll('.card').forEach(card => {
+  document.querySelectorAll('.box').forEach(card => {
     card.style.display = '';
     card.classList.remove('card-hidden');
   });
@@ -297,19 +301,14 @@ function performSearch() {
   const category = document.getElementById('categorySelect').value;
   const location = document.getElementById('locationInput').value.trim();
 
-  // Si hay término de búsqueda o categoría, filtrar en tiempo real
-  if (searchTerm || (category && category !== 'all')) {
-    currentSearchTerm = searchTerm.toLowerCase();
-    currentCategoryFilter = category !== 'all' ? category : null;
-    applyFilters();
-  } else {
-    // Si no hay filtros, ir a la página de resultados
-    const queryParams = new URLSearchParams();
-    if (searchTerm) queryParams.set('q', searchTerm);
-    if (category && category !== 'all') queryParams.set('category', category);
-    if (location) queryParams.set('location', location);
-    window.location.href = `resultados.html?${queryParams.toString()}`;
-  }
+  // Siempre ir a la página de resultados cuando se hace click en Buscar
+  const queryParams = new URLSearchParams();
+  if (searchTerm) queryParams.set('q', searchTerm);
+  if (category && category !== 'all') queryParams.set('category', category);
+  if (location) queryParams.set('location', location);
+  
+  // Redirigir a resultados.html con los parámetros de búsqueda
+  window.location.href = `resultados.html?${queryParams.toString()}`;
 }
 
 export function initializeSearchButton() {

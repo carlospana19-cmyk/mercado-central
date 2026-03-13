@@ -1,3 +1,37 @@
+/* NOTA: Las reglas de .property-card, .property-image y .btn-contact están en cards.css */
+
+/* === PREVENCIÓN DE ZOOM EN MÓVILES === */
+/* Asegurar font-size >= 16px para evitar zoom automático en iOS/Android */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Prevent text size adjustment on orientation change */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Contenedores flexibles - width 100% con max-width adecuado */
+  .container, 
+  .container-fluid,
+  .main-content,
+  .products,
+  .box-container,
+  .results-container,
+  .results-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
 /* Cuadros vacíos para alinear la última fila de atributos de inmueble */
 .spec-item-empty {
   background: transparent !important;
@@ -161,8 +195,6 @@ html {
 
 body {
   background: var(--color-fondo);
-  color: var(--color-texto);
-  font-size: 1.6rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -207,9 +239,8 @@ body {
   z-index: 1000;
   flex-wrap: wrap;
   gap: 1rem;
-  overflow-x: auto;
-  min-width: 0;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   border-bottom: none;
 }
@@ -284,9 +315,10 @@ body {
 /* ===== RESPONSIVE NAVBAR ===== */
 @media (max-width: 768px) {
   .navbar-moderno {
-    padding: 1rem 3%;
-    flex-wrap: wrap;
+    height: 60px;
+    padding: 0.8rem 1rem;
     gap: 0.8rem;
+    flex-wrap: wrap;
   }
 
   .logo-img {
@@ -301,7 +333,6 @@ body {
   .buttons-nav {
     gap: 0.6rem;
     flex-wrap: wrap;
-    width: 100%;
     justify-content: flex-end;
   }
 
@@ -319,11 +350,11 @@ body {
 
 @media (max-width: 480px) {
   .navbar-moderno {
-    padding: 0.6rem 1%;
+    padding: 0.6rem 0.8rem;
     gap: 0.3rem;
     justify-content: flex-start;
-    overflow: visible !important;
     min-height: auto;
+    overflow: visible;
   }
 
   .logo-container {
@@ -405,7 +436,7 @@ body {
   }
 
   .buttons-nav {
-    gap: 0.1rem;
+    gap: 0.5rem;
     overflow: visible !important;
   }
 
@@ -545,12 +576,14 @@ body {
 
 .search-form-container {
     background: rgba(255,255,255,0.15);
-    border-radius: .8rem;
+    border-radius: 8px;
     padding: 1rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     max-width: 900px;
+    margin: 0 auto;
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -561,8 +594,9 @@ body {
     display: flex;
     align-items: center;
     background: #fff;
-    border-radius: .5rem;
+    border-radius: 8px;
     padding: 0 1.5rem;
+    flex: 1;
 }
 
 .search-field i {
@@ -577,17 +611,17 @@ body {
     background: none;
     border: none;
     outline: none;
-    padding: 1.5rem 0;
+    padding: 10px 0;
     font-size: 1.6rem;
     color: var(--color-texto);
 }
 
 .btn-search-hero {
-    padding: 1.5rem 3rem;
-    background: var(--color-acento);
-    color: var(--color-texto);
+    padding: 10px 20px;
+    background: #00c1ab;
+    color: #fff;
     border: none;
-    border-radius: .5rem;
+    border-radius: 8px;
     font-size: 1.6rem;
     font-weight: 700;
     cursor: pointer;
@@ -599,7 +633,7 @@ body {
 }
 
 .btn-search-hero:hover {
-    background: var(--color-acento-claro);
+    background: #00a393;
 }
 
 .hero-stats {
@@ -847,130 +881,74 @@ body {
 /* ========================================
    ESTILOS PARA DEPORTES Y HOBBIES
    ======================================== */
-.sports-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
-}
 
-.sports-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.sports-details i {
-    color: #222;
-    font-size: 1.6rem;
+.sports-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA MASCOTAS
    ======================================== */
-.pets-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
-}
 
-.pets-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.pets-details i {
-    color: #222;
-    font-size: 1.6rem;
+.pets-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA SERVICIOS
    ======================================== */
-.services-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
-}
 
-.services-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.services-details i {
-    color: #222;
-    font-size: 1.6rem;
+.services-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA NEGOCIOS
    ======================================== */
-.business-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
-}
 
-.business-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.business-details i {
-    color: #222;
-    font-size: 1.6rem;
+.business-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i,
+.services-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* ========================================
    ESTILOS PARA COMUNIDAD
    ======================================== */
-.community-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
-}
-
-.community-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.community-details i {
-    color: #222;
-    font-size: 1.6rem;
+.community-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i,
+.services-details i,
+.business-details i {
+    color: #666 !important;
+    font-size: 1.1rem !important;
 }
 
 /* === ESTILOS UNIFICADOS PARA TODOS LOS DETALLES DE CATEGORÍAS === */
 
-/* Inmuebles - Mismo estilo que vehículos */
-.real-estate-details {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.6rem !important;
-    font-size: 1.3rem !important;
-    color: #444 !important;
-    margin-bottom: 8px !important;
-    font-weight: 500 !important;
-}
 
 /* Electrónica - Mismo estilo que otras categorías */
 .electronics-details {
@@ -1011,14 +989,15 @@ body {
   width: 100%;
 }
 .spec-item {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 1.2rem 1.2rem;
+  background: #f8f9fa; /* Fondo suave casi blanco */
+  border-radius: 12px;
+  box-shadow: none; /* Sin sombra */
+  border: none; /* Sin borde */
+  padding: 10px 18px; /* Padding horizontal más grande para cápsulas */
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  min-height: 90px;
+  min-height: 70px;
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
@@ -1026,8 +1005,17 @@ body {
 }
 .specs-grid > .spec-item {
   min-width: 0;
-  min-height: 90px;
+  min-height: 70px;
   height: 100%;
+}
+
+/* Iconos de spec-item con tamaño consistente */
+.spec-item i {
+    font-size: 2rem; /* Tamaño consistente */
+    color: #0a2342; /* Azul de marca */
+    width: 3rem;
+    text-align: center;
+    flex-shrink: 0; /* Evita que se encoja */
 }
 @media (max-width: 900px) {
   .specs-grid {
@@ -1042,13 +1030,13 @@ body {
 /* --- FIN AJUSTE ALINEACIÓN PERFECTA ATRIBUTOS --- */
 .spec-label {
   font-size: 0.95rem;
-  color: #009688;
+  color: #0a2342; /* Azul para las etiquetas */
   font-weight: 600;
 }
 .spec-value {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #222;
+  color: #000000; /* Negro para los valores */
 }
 @media (max-width: 900px) {
   .specs-grid {
@@ -1061,44 +1049,52 @@ body {
   }
 }
 /* --- FIN AJUSTE ALINEACIÓN ATRIBUTOS INMUEBLE --- */
-.home-furniture-details {
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: var(--color-gris);
-    margin-bottom: 1rem;
-}
-
-.home-furniture-details span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.home-furniture-details i {
-    color: #222;
-    font-size: 1.6rem;
-} /* Cierre de .home-furniture-details i */
-
-/* Moda y Belleza - Mismo estilo */
-.fashion-details {
+.home-furniture-details,
+.fashion-details,
+.vehicle-details,
+.real-estate-details,
+.electronics-details,
+.sports-details,
+.pets-details,
+.services-details,
+.business-details,
+.community-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1.4rem;
-    color: #222;
-    margin-bottom: 1rem;
+    gap: 0.6rem !important;
+    font-size: 1.4rem !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.fashion-details span {
-    display: flex;
+.home-furniture-details span,
+.fashion-details span,
+.vehicle-details span,
+.real-estate-details span,
+.electronics-details span,
+.sports-details span,
+.pets-details span,
+.services-details span,
+.business-details span,
+.community-details span {
+    display: flex !important;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.7rem;
 }
 
-.fashion-details i {
-    color: #222;
-    font-size: 1.6rem;
+.home-furniture-details i,
+.fashion-details i,
+.vehicle-details i,
+.real-estate-details i,
+.electronics-details i,
+.sports-details i,
+.pets-details i,
+.services-details i,
+.business-details i,
+.community-details i {
+    color: #666 !important;
+    font-size: 1.4rem !important;
 }
 .box .btn-contact {
   display: block;
@@ -1298,8 +1294,33 @@ body {
 
 @media (max-width: 768px) {
   .search-form-container {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 100%;
+    padding: 15px;
+    position: relative;
+    transform: none;
+    left: auto;
+    bottom: auto;
   }
+  
+  .search-field {
+    width: 100%;
+    flex: none;
+  }
+  
+  .search-field input,
+  .search-field select {
+    font-size: 1rem;
+    padding: 10px 0;
+  }
+  
+  .btn-search-hero {
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px 20px;
+  }
+  
   .hero-title-animated {
     font-size: 3.5rem;
   }
@@ -1349,15 +1370,6 @@ body {
   clear: both;
 }
 
-.categories-horizontal-bar {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-around; /* Distribuye el espacio uniformemente */
-  align-items: center;
-  flex-wrap: wrap; /* Permite que se ajuste en pantallas pequeñas */
-  gap: 1rem;
-}
 
 .category-item {
   display: flex;
@@ -1488,29 +1500,14 @@ body {
   padding: 2.5rem;
   border-radius: 1rem;
   box-shadow: var(--sombra-suave);
-  position: sticky; /* Hacemos que el sidebar se quede fijo al hacer scroll */
-  top: 100px; /* Separado del navbar */
-}
-
-.results-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-}
-
-#results-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  width: 100%;
-  flex: 1;
+  position: sticky;
+  top: 100px;
 }
 
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
 .filters-sidebar h3 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 1rem; }
 .filter-group { margin-bottom: 2rem; }
-.filter-group label { font-weight: 600; font-size: 1.6rem; display: block; margin-bottom: 1rem; }
+.filter-group label { font-weight: 600; font-size: 2.0rem; display: block; margin-bottom: 1rem; }
 .filter-group input[type="number"] { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.4rem; }
 #subcategory-filter-container .subcategory-label { display: block; margin-bottom: 0.8rem; cursor: pointer; }
 .btn-apply-filters { width: 100%; padding: 1.5rem; background: var(--color-secundario); color: var(--color-blanco); border: none; border-radius: .5rem; font-size: 1.6rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
@@ -1538,8 +1535,7 @@ body {
 }
 
 /* 3. Asegurar que el carrusel y la imagen llenen el contenedor */
-.tarjeta-auto .product-swiper,
-.property-image .tarjeta-auto {
+.tarjeta-auto .product-swiper {
   width: 100%;
   height: 100%;
 }
@@ -1548,11 +1544,6 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-.property-image .tarjeta-auto .swiper {
-  width: 100%;
-  height: 100%;
 }
 
 .tarjeta-auto .swiper-wrapper,
@@ -1584,8 +1575,9 @@ body {
   width: 40px !important;
   height: 40px !important;
   border-radius: 50%;
-  transform: translateY(-50%);
+  /* Sin transform para evitar movimiento */
   top: 50% !important;
+  margin-top: -20px !important;
   z-index: 10 !important;
   display: flex !important;
   align-items: center !important;
@@ -1602,7 +1594,7 @@ body {
 .tarjeta-auto .swiper-button-next:hover {
   background-color: var(--color-primario) !important;
   color: white !important;
-  transform: translateY(-50%) scale(1.15);
+  /* Sin transform para que no se mueva */
 }
 
 /* Ocultar flechas en móviles y dejar solo swipe táctil */
@@ -1618,10 +1610,10 @@ body {
     display: none !important;
   }
 
-  /* Mantener visibles las flechas de mini-gallery en móviles */
+  /* Ocultar flechas de mini-gallery en móviles - solo swipe táctil */
   .mini-gallery .swiper-button-next,
   .mini-gallery .swiper-button-prev {
-    display: flex !important;
+    display: none !important;
   }
 }
 
@@ -1765,13 +1757,8 @@ body {
 @media (max-width: 1400px) {
   .results-inner-wrapper {
     grid-template-columns: max-content 1fr;
-    gap: 1.5rem;
+    gap: 4rem;
     padding: 2rem 1.5%;
-  }
-  
-  #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
   }
 }
 
@@ -1788,21 +1775,11 @@ body {
     max-width: 100%;
     display: none;
   }
-  
-  #results-container {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-  }
 }
 
 @media (max-width: 640px) {
   .results-inner-wrapper {
     padding: 1rem 2%;
-  }
-  
-  #results-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
   }
   
   .box, .tarjeta-auto {
@@ -1871,7 +1848,7 @@ body {
 
 .detalle-header h1 {
     font-size: 2.8rem;
-    color: var(--color-texto);
+    color: #0a2342; /* Azul para el título del producto */
     margin-bottom: 1rem;
     font-weight: 600;
 }
@@ -1880,12 +1857,51 @@ body {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    font-size: 1.6rem;
-    color: var(--color-gris);
+    font-size: 1.4rem;
+    color: #4a6fa5; /* Azul suave para ubicación */
 }
 
 .location-info i {
-    color: var(--color-primario);
+    color: #0a2342; /* Azul de marca */
+}
+
+/* Títulos de secciones en página de detalle */
+.page-detalle h2 {
+    color: #0a2342; /* Azul para títulos de secciones */
+    font-weight: 600;
+}
+
+/* Sección de ubicación del producto */
+.product-location-section h2 {
+    color: #0a2342; /* Azul para títulos */
+    font-size: 1.3em;
+    margin-bottom: 15px;
+}
+
+/* Sección de reseñas del vendedor */
+.seller-reviews-section {
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
+.seller-reviews-section h2 {
+    color: #0a2342; /* Azul para títulos */
+    font-size: 1.5em;
+    margin-bottom: 15px; /* Reducido para acercar el contenido */
+}
+
+/* Estadísticas y lista de reseñas - reducir espacio */
+#seller-reviews-stats,
+#seller-reviews-list {
+    margin-top: 5px;
+}
+
+/* Mensaje de sin reseñas */
+.no-reviews {
+    font-size: 17px;
+    color: #4a6fa5; /* Azul intermedio */
+    text-align: center;
+    padding: 20px;
 }
 
 /* Grid Principal */
@@ -1936,10 +1952,18 @@ body {
     width: 30px !important;
     height: 30px !important;
     border-radius: 50% !important;
-    margin-top: -15px !important;
+    /* Sin margin-top para evitar movimiento */
     opacity: 1 !important;
     visibility: visible !important;
     z-index: 10 !important;
+}
+
+/* Ocultar flechas en móvil - solo swipe táctil */
+@media (max-width: 768px) {
+    .mini-gallery .swiper-button-next,
+    .mini-gallery .swiper-button-prev {
+        display: none !important;
+    }
 }
 
 .mini-gallery .swiper-button-next::after,
@@ -2011,8 +2035,8 @@ body {
 .product-gallery-swiper .swiper-button-prev {
     color: var(--color-primario) !important;
     background: rgba(255, 255, 255, 0.9);
-    width: 40px !important;
-    height: 40px !important;
+    width: 30px !important;
+    height: 30px !important;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
@@ -2022,12 +2046,12 @@ body {
 .product-gallery-swiper .swiper-button-prev:hover {
     background: var(--color-primario);
     color: white !important;
-    transform: scale(1.1);
+    /* Sin transform para evitar movimiento */
 }
 
 .product-gallery-swiper .swiper-button-next::after,
 .product-gallery-swiper .swiper-button-prev::after {
-    font-size: 16px !important;
+    font-size: 15px !important;
     font-weight: bold;
 }
 
@@ -2050,7 +2074,7 @@ body {
 
 .gallery-main img#main-product-image {
     width: 100%;
-    height: 400px;
+    height: 500px;
     object-fit: cover;
     display: block;
     transition: opacity 0.2s ease;
@@ -2058,10 +2082,21 @@ body {
 
 .gallery-thumbnails {
     display: flex;
+    flex-wrap: wrap; /* 👈 ESTA ES LA MAGIA: Obliga a saltar de línea */
     gap: 10px;
-    overflow-x: auto;
     padding: 5px 0;
     scroll-behavior: smooth;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.gallery-thumbnails img {
+    width: 80px;         /* Tamaño fijo para que sean cuadritos perfectos */
+    height: 80px;
+    object-fit: cover;   /* Evita que la foto se deforme o se aplaste */
+    border-radius: 8px;  /* Bordes redondeados para elegancia */
+    cursor: pointer;
+    flex-shrink: 0;     /* Evita que se encojan */
 }
 
 .gallery-thumbnails .thumbnail {
@@ -2139,9 +2174,39 @@ body {
 
 .price {
     font-size: 3.5rem; /* Más grande que el título */
-    font-weight: 900;
-    color: #000; /* Color oscuro y prominente */
+    font-weight: 700;
+    color: #000000; /* Color negro para destacar */
     margin-bottom: 20px;
+}
+
+/* Sección de Visitas - Estilo limpio sin burbujas */
+.visits-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0;
+    background-color: transparent;
+    border-radius: 0;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.visits-section i.fa-eye {
+    font-size: 1.9rem;
+    color: #0a2342; /* Azul de marca */
+}
+
+.visits-label {
+    font-size: 1.9rem;
+    color: #0a2342;
+    font-weight: 500;
+}
+
+.visits-section .visits {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #0a2342;
 }
 
 /* Formulario de Contacto */
@@ -2154,9 +2219,40 @@ body {
 }
 
 .contact-seller-box h3 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    margin-top: 10px;
     color: var(--color-texto);
+}
+
+/* Badge de nombre del vendedor - Estilo limpio sin burbuja */
+.contact-seller-box .seller-name-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    background-color: transparent;
+    border-radius: 0;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-left: none;
+}
+
+.contact-seller-box .seller-name-badge i {
+    font-size: 1.9rem;
+    color: #0a2342;
+}
+
+.contact-seller-box .seller-name-badge span,
+.contact-seller-box .seller-name-badge {
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--color-texto);
+}
+
+/* Texto de ayuda de reseñas - Espaciado */
+.contact-seller-box .review-seller-section {
+    margin-top: 15px;
 }
 
 .contact-seller-box textarea {
@@ -2238,7 +2334,6 @@ body {
 
 .description-container h2 {
     font-size: 2.4rem;
-    color: var(--color-primario);
     margin-bottom: 2rem;
 }
 
@@ -2277,20 +2372,12 @@ body {
     padding: 15px;
     background: #f8f9fa;
     border-radius: 1rem;
-    border-left: 4px solid var(--color-primario);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .spec-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 191, 174, 0.1);
-}
-
-.spec-item i {
-    font-size: 2.5rem;
-    color: var(--color-primario);
-    width: 3rem;
-    text-align: center;
+    box-shadow: 0 4px 15px rgba(10, 35, 66, 0.1); /* Azul suave */
 }
 
 .spec-content {
@@ -2380,12 +2467,6 @@ body {
     }
 }
 
-/* Estilos para las filas de anuncios personalizados */
-.ads-row {
-  display: grid;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem; /* Espacio entre filas */
-}
 
 .ads-row:last-child {
   margin-bottom: 0;
@@ -2395,8 +2476,22 @@ body {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.row-3-cols {
-  grid-template-columns: repeat(3, 1fr);
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .row-2-cols,
+  .row-3-cols,
+  .row-4-cols {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  
+  .ads-row .box,
+  .ads-row .tarjeta-auto,
+  .ads-row.row-3-cols .box {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 .row-4-cols {
@@ -2458,7 +2553,7 @@ body {
 
 /* Nuevos estilos para la estructura de la tarjeta */
 .property-seller-name {
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
     margin-bottom: 5px;
 }
@@ -2538,18 +2633,9 @@ body {
     letter-spacing: normal !important;
 }
 
-/* Reset general para todas las tarjetas */
-.property-card * {
-    letter-spacing: normal !important;
-    word-spacing: normal !important;
-}
+/* Reset general para todas las tarjetas - Eliminado para permitir herencia de cards.css */
 
-/* Si el problema persiste, forzar valores específicos */
-.property-details {
-    letter-spacing: 0 !important;
-    word-spacing: 0 !important;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-}
+/* Reglas de fuentes eliminadas - ahora controladas por cards.css */
 
 /* CORREGIR LAYOUT DE RESULTADOS - Los estilos ahora están en results.css */
 /* Comentado para permitir que results.css controle el diseño responsive */
@@ -2567,19 +2653,6 @@ body {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 25px !important;
-}
-
-#results-container.grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-}
-*/
-
-/* Asegurar que las tarjetas ocupen todo el ancho */
-.property-card {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
 }
 
 
@@ -2609,12 +2682,22 @@ body#pagina-login {
 /* 2. Estilo de la Tarjeta (form-box) */
 .form-box {
     background-color: #ffffff;
-    padding: 20px 30px;
+    padding: 25px 35px;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
+    min-width: 350px;
     text-align: center;
+}
+
+/* Responsive para móviles */
+@media (max-width: 600px) {
+    .form-box {
+        padding: 20px;
+        min-width: auto;
+        width: 95%;
+    }
 }
 
 /* 3. Estilos Internos */
@@ -2661,6 +2744,14 @@ body#pagina-login {
     color: #00bfae;
     text-decoration: none;
     font-weight: 600;
+}
+
+/* === CONTENEDOR DE CÓDIGO DE INVITACIÓN === */
+.invitation-container {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f0f9ff;
+    border-radius: 5px;
 }
 
 /* === ESTILOS PARA LA GALERÍA DE IMÁGENES (Vistas Previas) === */
@@ -2812,16 +2903,16 @@ body#pagina-login {
    ============================================ */
 .vendor-avatar {
     position: relative;
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    max-width: 56px !important;
+    max-height: 56px !important;
     flex-shrink: 0;
     border-radius: 50% !important;
     background: white;
-    border: 3px solid var(--color-primario);
+    border: none;
     overflow: hidden !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     cursor: pointer;
@@ -2838,13 +2929,6 @@ body#pagina-login {
     box-shadow: 0 6px 20px rgba(0, 191, 174, 0.3);
 }
 
-.vendor-avatar-img {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
-}
 
 .vendor-name-tooltip {
     position: absolute;
@@ -3105,6 +3189,90 @@ body#pagina-login {
     transform: rotate(90deg);
 }
 
+/* =========================================================
+   BADGES DE PLANES (CORONAS: Bronce, Plata, Oro, Diamante)
+   ========================================================= */
+
+/* Contenedor para la corona sobre la imagen (con fondo blanco) */
+.card-crown-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 100 !important;
+    background-color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* Ajuste del icono de la corona */
+.card-crown-badge i {
+    font-size: 2.2rem !important;
+    margin: 0 !important;
+}
+
+/* Badge base para los planes */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Badge Básico - Bronce */
+.badge-basico {
+    background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+    color: #fff;
+}
+
+/* Badge Premium - Plata */
+.badge-premium {
+    background: linear-gradient(135deg, #c0c0c0, #808080);
+    color: #333;
+}
+
+/* Badge Top - Oro */
+.badge-top {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #333;
+}
+
+/* Badge Elite - Diamante */
+.badge-elite {
+    background: linear-gradient(135deg, #b9f2ff, #4682b4);
+    color: #fff;
+}
+
+/* 1. PLAN BÁSICO: Corona de Bronce */
+.crown-bronze {
+    color: #cd7f32 !important;
+}
+
+/* 2. PLAN PREMIUM: Corona de Plata */
+.crown-silver {
+    color: #847b7b !important;
+}
+
+/* 3. PLAN TOP/DESTACADO: Corona de Oro */
+.crown-gold {
+    color: #ffb906 !important;
+}
+
+/* 4. PLAN ELITE/MÁXIMO: Corona de Diamante */
+.crown-diamond {
+    color: #b9f2ff !important;
+    text-shadow: 1px 1px 0px #4682b4, -1px -1px 0px #ffffff !important;
+    filter: drop-shadow(0 0 6px rgba(185, 242, 255, 0.8)) !important;
+}
+
 /* Responsivo */
 @media (max-width: 768px) {
     .modal-content {
@@ -3137,7 +3305,7 @@ body#pagina-login {
 /* ===== OPTIMIZACIÓN COMPLETA PARA MÓVILES ===== */
 @media (max-width: 768px) {
     /* Tarjetas responsivas */
-    .box, .property-card {
+    .box {
         border-radius: 8px;
         overflow: hidden;
     }
@@ -3152,17 +3320,7 @@ body#pagina-login {
         display: none;
     }
 
-    #results-container {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        width: 100%;
-        padding: 0 1rem;
-    }
-
-    .box .image-container,
-    .property-image {
-        height: 180px;
-    }
+    /* Eliminadas reglas de height fijo para property-image - ahora controladas por cards.css */
 
     .box .content, .property-details {
         padding: 12px !important;
@@ -3220,7 +3378,7 @@ body#pagina-login {
     }
 
     /* Botones más grandes para móvil */
-    .btn-contact, .btn {
+    .btn {
         padding: 0.8rem 1.2rem;
         font-size: 1rem;
         border-radius: 6px;
@@ -3267,18 +3425,13 @@ body#pagina-login {
 
     /* Avatar del vendedor */
     .vendor-avatar {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
     }
 
     .vendor-avatar-img {
-        width: 50px;
-        height: 50px;
-    }
-
-    /* Navbar en móvil */
-    .navbar-moderno {
-        padding: 0.8rem 1rem;
+        width: 52px;
+        height: 52px;
     }
 
     .logo-text {
@@ -3299,16 +3452,12 @@ body#pagina-login {
     .results-container-flex {
         gap: 1rem;
     }
-
-    .property-card {
-        margin-bottom: 1rem;
-    }
+    
 }
 
 @media (max-width: 480px) {
     /* Ultra responsive para screens muy pequeños */
-    .box .image-container,
-    .property-image {
+    .box .image-container {
         height: 150px;
     }
 
@@ -3326,13 +3475,6 @@ body#pagina-login {
         display: none;
     }
 
-    #results-container {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        width: 100%;
-        padding: 0 0.8rem;
-    }
-
     .box h3, .property-title {
         font-size: 1.6rem !important;
     }
@@ -3345,7 +3487,7 @@ body#pagina-login {
         padding: 0.8rem;
     }
 
-    .btn-contact, .btn {
+    .btn {
         width: 100%;
         padding: 0.7rem 1rem;
     }
@@ -3372,15 +3514,6 @@ body#pagina-login {
     .vendor-avatar-img {
         width: 40px;
         height: 40px;
-    }
-
-    /* Navegación más compacta */
-    .navbar-moderno {
-        padding: 0.6rem 0.8rem;
-    }
-
-    .logo-text {
-        font-size: 1rem;
     }
 
     .nav-btn-user, .nav-btn-guest {
