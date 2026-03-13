@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me https://www.google.com https://maps.google.com; child-src 'self' https://wa.me https://www.google.com https://maps.google.com; script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://maps.googleapis.com;">
+    <meta http-equiv="Content-Security-Policy" content="connect-src * http://127.0.0.1:5000; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me https://www.google.com https://maps.google.com; child-src 'self' https://wa.me https://www.google.com https://maps.google.com; script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://maps.googleapis.com;">
     <title>Publicar Anuncio - Mercado Central</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -289,14 +289,20 @@
                         </div>
 
                         <!-- DESCRIPCIÓN -->
-                        <div class="form-group">
+                        <div class="form-group" id="description-group">
                             <label for="description">
                                 Descripción 
                                 <span class="required">*</span>
                                 <span class="char-count">(0/1000)</span>
                             </label>
-                            <textarea id="description" name="descripcion" rows="6" placeholder="Describe las características, estado, mantenimiento, etc." maxlength="1000" required></textarea>
-                            <small class="help-text">Mínimo 30 caracteres para mejor visibilidad</small>
+                            <textarea id="description" name="descripcion" rows="6" placeholder="Describe las características, estado, mantenimiento, etc." maxlength="1000" required=""></textarea>
+                        </div>
+                        <!-- Botón de IA - fuera del form-group -->
+                        <div class="ia-button-wrapper">
+                            <button type="button" id="btn-optimizar-ia" class="btn-ia">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Optimizar con IA
+                            </button>
+                            <span id="ia-status"></span>
                         </div>
 
                         <!-- ===== CONTENEDORES DE ATRIBUTOS DINÁMICOS ===== -->
@@ -749,6 +755,9 @@
     
     <!-- Lógica del formulario de publicación -->
     <script type="module" src="form-logic.js"></script>
+    
+    <!-- Botón de IA para optimizar anuncios -->
+    <script src="ia-button.js"></script>
 
     <!-- Definiciones SVG para badges metálicos -->
     <svg style="display: none;">

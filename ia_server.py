@@ -23,7 +23,7 @@ def optimizar():
         mensajes = [
             {
                 "role": "system", 
-                "content": "Eres un redactor profesional. Responde en JSON con solo dos campos: titulo y descripcion. USA SOLO TEXTO SIN NADA DE EMOJIS, SIN ASTERISCOS, SIN SIMBOLOS ESPECIALES. Solo letras, numeros y signos de puntuacion."
+                "content": "Actúa como un experto en marketing de ventas. Tu respuesta debe ser una descripción detallada, atractiva, profesional y persuasiva de al menos 150 a 200 palabras, estructurada en párrafos cortos. No uses emojis. Responde en formato JSON con dos campos: 'titulo' y 'descripcion'."
             },
             {
                 "role": "user", 

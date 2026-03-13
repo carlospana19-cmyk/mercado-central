@@ -7,8 +7,8 @@ document.addEventListener('click', async function(e) {
         e.preventDefault();
         console.log("CLIC DETECTADO VIA DELEGACION");
         
-        const tituloInput = document.getElementById('ad-title');
-        const descInput = document.getElementById('ad-description');
+        const tituloInput = document.getElementById('title');
+        const descInput = document.getElementById('description');
         const status = document.getElementById('ia-status');
 
         if (!tituloInput || !descInput) {
