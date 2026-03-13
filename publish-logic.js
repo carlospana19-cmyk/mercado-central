@@ -1276,6 +1276,7 @@ function showCommunityFields() {
                                 <li>✓ Destaca sobre anuncios gratis</li>
                                 <li>✓ Acceso a 2000+ compradores</li>
                                 <li>✓ Reposicionamiento diario</li>
+                                <li>✓ Optimización básica con IA</li>
                                 <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="basico">
@@ -1292,6 +1293,7 @@ function showCommunityFields() {
                                 <li>✓ Destacado en resultados</li>
                                 <li>✓ Acceso a 5000+ compradores</li>
                                 <li>✓ Estadísticas básicas</li>
+                                <li>✓ IA: Redacción Profesional de Ventas</li>
                                 <li>✓ Reposicionamiento cada 6 horas</li>
                                 <li>✓ 30 días de vigencia</li>
                             </ul>
@@ -1308,6 +1310,7 @@ function showCommunityFields() {
                                 <li>✓ Posición premium en búsquedas</li>
                                 <li>✓ Acceso a 10000+ compradores</li>
                                 <li>✓ Estadísticas detalladas</li>
+                                <li>✓ IA Avanzada: Ventas + SEO + Estructura Premium</li>
                                 <li>✓ Reposicionamiento cada 3 horas</li>
                                 <li>✓ 1 video HD</li>
                                 <li>✓ 30 días de vigencia</li>
