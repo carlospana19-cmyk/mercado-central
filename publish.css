@@ -1237,8 +1237,9 @@ textarea::placeholder {
 /* 3. Alinear el bloque de IA a la derecha */
 .ia-button-wrapper {
     display: flex !important;
-    justify-content: flex-end !important; /* Manda el botón a la derecha */
+    justify-content: flex-end !important;
     width: 100% !important;
+    margin-top: 10px !important;
 }
 
 /* Pastilla Premium con Borde de Neón y Efecto 3D */

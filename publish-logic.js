@@ -27,6 +27,39 @@ let validatedToken = null; // Almacena el token validado exitosamente
  */
 function updatePlanRestrictions(plan) {
     console.log('Actualizando restricciones para plan:', plan);
+    
+    // =========================================================
+    // NUEVO: LIMPIEZA TOTAL DE IMÁGENES AL CAMBIAR DE PLAN
+    // =========================================================
+    try {
+        console.log('Borrando imágenes del plan anterior...');
+        
+        // 1. Limpiar inputs de archivo (Portada y Galería)
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => input.value = '');
+
+        // 2. Limpiar previsualización de la Portada
+        const coverPreviews = document.querySelectorAll('.main-cover-preview, #cover-preview');
+        coverPreviews.forEach(preview => {
+            // Restaurar el HTML original del botón de subir portada
+            preview.innerHTML = '<div class="upload-placeholder"><i class="fas fa-camera"></i><span>Añadir Portada</span></div>';
+            preview.style.backgroundImage = 'none'; // Por si la imagen se puso como fondo
+        });
+
+        // 3. Limpiar las miniaturas de la galería
+        // Buscamos los contenedores de fotos y eliminamos las imágenes subidas
+        const photoContainers = document.querySelectorAll('.photo-uploader-box .photo-preview, #photo-grid .thumbnail, .fotos-container img');
+        photoContainers.forEach(photo => photo.remove());
+
+        // 4. Resetear arrays globales si existen (importante para la lógica de límites)
+        if (window.uploadedPhotosArray) window.uploadedPhotosArray = [];
+        if (window.coverPhotoFile) window.coverPhotoFile = null;
+        
+    } catch (error) {
+        console.error('Error al limpiar las imágenes:', error);
+    }
+    // =========================================================
+
     const isDestacado = plan === 'destacado';
     
     // Usar setTimeout para asegurar que el DOM del paso 2 está listo
@@ -590,13 +623,11 @@ export async function initializePublishPage() {
     const nextBtns = form.querySelectorAll('.next-btn'); // Botones de siguiente en otros pasos
     const backBtns = form.querySelectorAll('.back-btn');
     
-    // Manejador para botones "Atrás"
+    // Manejador para botones "Atrás" - Refresh completo de la página
     backBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const targetStep = btn.dataset.target;
-            if (targetStep) {
-                navigateToStep(parseInt(targetStep));
-            }
+            // Forzar refresh completo de la página para limpiar toda la memoria
+            location.reload();
         });
     });
 
@@ -1276,7 +1307,7 @@ function showCommunityFields() {
                                 <li>✓ Destaca sobre anuncios gratis</li>
                                 <li>✓ Acceso a 2000+ compradores</li>
                                 <li>✓ Reposicionamiento diario</li>
-                                <li>✓ Optimización básica con IA</li>
+                                <li>✓ 1 Optimización de descripción con IA</li>
                                 <li>✓ 30 días de vigencia</li>
                             </ul>
                             <button class="btn-plan btn-plan-paid" data-plan="basico">
@@ -1293,7 +1324,7 @@ function showCommunityFields() {
                                 <li>✓ Destacado en resultados</li>
                                 <li>✓ Acceso a 5000+ compradores</li>
                                 <li>✓ Estadísticas básicas</li>
-                                <li>✓ IA: Redacción Profesional de Ventas</li>
+                                <li>✓ 3 Optimizaciones de descripción con IA</li>
                                 <li>✓ Reposicionamiento cada 6 horas</li>
                                 <li>✓ 30 días de vigencia</li>
                             </ul>
@@ -1310,7 +1341,7 @@ function showCommunityFields() {
                                 <li>✓ Posición premium en búsquedas</li>
                                 <li>✓ Acceso a 10000+ compradores</li>
                                 <li>✓ Estadísticas detalladas</li>
-                                <li>✓ IA Avanzada: Ventas + SEO + Estructura Premium</li>
+                                <li>✓ 5 Optimizaciones de descripción con IA</li>
                                 <li>✓ Reposicionamiento cada 3 horas</li>
                                 <li>✓ 1 video HD</li>
                                 <li>✓ 30 días de vigencia</li>
@@ -2350,6 +2381,20 @@ const VIGENCIA_PLANES = {
 window.initializePublishPage = initializePublishPage;
 window.updatePlanRestrictions = updatePlanRestrictions;
 }
+
+// =====================================================
+// BOTÓN ATRÁS: REFRESH COMPLETO DE LA PÁGINA
+// =====================================================
+// El 'true' al final hace que este código se ejecute ANTES que cualquier otro script
+document.addEventListener('click', function(e) {
+    const botonAtras = e.target.closest('.back-btn');
+    
+    if (botonAtras) {
+        console.log('🔄 REFRESH COMPLETO: Recargando página para limpiar toda la memoria...');
+        // Forzar refresh completo de la página (como F5)
+        location.reload();
+    }
+}, true); // <--- ESTE 'true' ES LA CLAVE DEL ÉXITO. DA PRIORIDAD MÁXIMA.
 
 
 
