@@ -135,10 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 2. UBICACIÓN BILINGÜE: Mandamos ambos nombres para no fallar
                 provincia: provinceSelect?.value || '',
                 distrito: districtSelect?.value || '',
-                latitud: window.selectedLatitude || 8.98,  // Valor por defecto si falla el mapa
-                latitude: window.selectedLatitude || 8.98, // Nombre en inglés por si acaso
-                longitud: window.selectedLongitude || -79.51,
-                longitude: window.selectedLongitude || -79.51,
+                latitud: window.selectedLatitude || null,
+                longitud: window.selectedLongitude || null,
                 direccion_exacta: locationInput.value || '',
                 
                 // 3. FOTOS: Usar los nombres que vimos ayer
@@ -150,9 +148,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 activo: true,             // 👈 Crucial para que el Index lo vea
                 estado: 'aprobado',       // 👈 Por si el Index filtra por estado
                 fecha_publicacion: new Date().toISOString(), // 👈 Para que salga de primero
-                selected_plan: window.selectedPlanData || 'free',
-                featured_plan: window.selectedPlanData || 'destacado' // 👈 Para que salga en el Index
             };
+            
+            // === LÓGICA DE PLAN: Obtener de sessionStorage y validar tokens ===
+            let finalPlanData = 'gratis'; // Valor por defecto
+            
+            // Primero intentar desde sessionStorage
+            const planFromSession = sessionStorage.getItem('selectedPlan');
+            const tokenApplied = sessionStorage.getItem('tokenApplied');
+            
+            if (planFromSession) {
+                // Si el plan es destacado, verificar que tenga token válido
+                if (planFromSession === 'destacado' && tokenApplied !== 'true') {
+                    // No hay token aplicado, forzar a gratis
+                    console.warn('⚠️ Plan Destacado sin token válido - Forzando a Gratis');
+                    finalPlanData = 'gratis';
+                } else {
+                    finalPlanData = planFromSession;
+                }
+            }
+            
+            console.log('Enviando a Supabase - Plan detectado:', finalPlanData, '| Token aplicado:', tokenApplied);
+            
+            adToSave.selected_plan = finalPlanData;
+            adToSave.featured_plan = finalPlanData;
 
             console.log("🛰️ Enviando a Supabase:", adToSave); // Para ver el "61" morir en vivo
 
@@ -203,6 +222,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             alert('¡Anuncio publicado con éxito!');
+            
+            // Limpiar sessionStorage para evitar problemas en próximas publicaciones
+            sessionStorage.removeItem('selectedPlan');
+            sessionStorage.removeItem('tokenApplied');
+            
             window.location.href = `detalle-producto.html?id=${savedAdId}`;
 
         } catch (error) {

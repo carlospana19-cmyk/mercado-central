@@ -16,28 +16,7 @@
 </head>
 <body>
     <!-- NAVBAR -->
-  <nav class="navbar-moderno">
-    <div class="logo-container">
-        <a href="index.html" class="logo-link">
-            <img src="gemini-3-pro-image-preview (nano-banana-pro)_b_quiero_crear_un_logo.png" alt="Mercado Central" class="logo-img">
-            <span class="logo-text">Mercado Central</span>
-        </a>
-    </div>
-    <div class="buttons-nav">
-        <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
-            <i class="fas fa-user"></i>
-        </button>
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
-            <i class="fas fa-plus"></i> Publicar anuncio
-        </button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </button>
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
-            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-        </button>
-    </div>
-  </nav>
+  <div id="navbar-container"></div>
 
     <!-- HERO DE CATEGORÍA -->
     <section class="category-hero">
@@ -104,48 +83,7 @@
     </main>
 
     <!-- FOOTER PREMIUM -->
-    <footer class="footer">
-    <div class="footer-contenedor">
-      <div class="footer-col">
-        <h4 class="footer-title">Mercado Central</h4>
-        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-title">Enlaces rápidos</h4>
-        <ul>
-          <li><a href="#">Quiénes somos</a></li>
-          <li><a href="#">Términos y Condiciones</a></li>
-          <li><a href="#">Política de Privacidad</a></li>
-          <li><a href="#">Contáctanos</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-title">Síguenos</h4>
-        <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i> Facebook</a>
-                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-                    <a href="#"><i class="fab fa-twitter"></i> Twitter/X</a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-title">App y Pagos</h4>
-        <p class="footer-subtitle">Próximamente</p>
-        <div class="app-buttons">
-            <span class="store-badge-placeholder"><i class="fab fa-google-play"></i> Google Play</span>
-            <span class="store-badge-placeholder"><i class="fab fa-apple"></i> App Store</span>
-        </div>
-        <h4 class="footer-title" style="margin-top: 15px;">Pagos Seguros</h4>
-        <div class="payment-icons">
-            <i class="fab fa-cc-visa"></i>
-            <i class="fab fa-cc-mastercard"></i>
-            <i class="fab fa-cc-paypal"></i>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
-    </div>
-  </footer>
+    <div id="footer-container"></div>
 
     <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
@@ -168,6 +106,9 @@
         <path id="star" d="M0,-8 L2.4,-2.6 L8, -2.6 L3.2,0.9 L5.0,6.4 L0,3.2 L-5.0,6.4 L-3.2,0.9 L-8,-2.6 L-2.4,-2.6 Z"/>
       </defs>
     </svg>
+
+<script type="module" src="navbar-logic.js"></script>
+<script src="load-components.js" defer></script>
 
 </body>
 </html>

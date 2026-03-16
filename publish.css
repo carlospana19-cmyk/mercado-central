@@ -42,18 +42,35 @@ input, textarea, select, button {
     box-sizing: border-box !important;
 }
 
-/* Contenedor de imagen de portada */
-#cover-image-preview {
+/* Contenedor de imagen de portada - para DIV (publicar) */
+div#cover-image-preview {
     width: 100% !important;
     box-sizing: border-box !important;
     max-width: 100% !important;
     overflow: hidden !important;
+    text-align: center !important;
 }
 
-#cover-image-preview img {
+/* Imagen dentro del contenedor (publicar) */
+div#cover-image-preview img {
     max-width: 100% !important;
     width: auto !important;
     height: auto !important;
+    max-height: 200px !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Imagen de portada - para IMG (editar-anuncio) */
+#current-cover-image #cover-image-preview,
+img#cover-image-preview {
+    width: auto !important;
+    max-width: 100% !important;
+    max-height: 200px !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+    text-align: center !important;
 }
 
 /* ================================================= */
@@ -719,7 +736,7 @@ select {
     transition: all 0.3s ease;
     background: #ffffff;
     font-family: 'Poppins', sans-serif !important;
-    margin-bottom: 18px;
+    margin-bottom: 0px;
 }
 
 input[type="text"]:focus,
@@ -1289,4 +1306,67 @@ textarea::placeholder {
     color: #667eea !important;  
     font-weight: 500 !important;  
     font-size: 13px !important;  
+} 
+  
+/* TARJETAS DE PLAN EN FORMATO HORIZONTAL (BANNER)  
+/* Imagen a la izquierda, contenido a la derecha  
+.plan-card-h.horizontal {  
+    flex-direction: row;  
+    align-items: stretch;  
+    text-align: left;  
+    min-height: 180px;  
+    padding: 0;  
+} 
+  
+.plan-card-h.horizontal .plan-top-section {  
+    flex: 0 0 35%%;  
+    max-width: 180px;  
+    padding: 20px;  
+    display: flex;  
+    flex-direction: column;  
+    justify-content: center;  
+    align-items: center;  
+    background: linear-gradient(135deg, var(--color-primario), #008f88);  
+    color: white;  
+}  
+  
+.plan-card-h.horizontal .plan-top-section .plan-title-h {  
+    color: white;  
+    font-size: 1.8rem;  
+}  
+  
+.plan-card-h.horizontal .plan-top-section .plan-price-h {  
+    color: white;  
+    font-size: 2.5rem;  
+} 
+  
+.plan-card-h.horizontal .plan-middle-section {  
+    flex: 1;  
+    padding: 20px;  
+    margin: 0;  
+}  
+  
+.plan-card-h.horizontal .plan-bottom-section {  
+    flex: 0 0 auto;  
+    padding: 20px;  
+    display: flex;  
+    align-items: center;  
+}  
+  
+.plan-card-h.horizontal .plan-button-h {  
+    width: 100%%;  
+    padding: 12px 20px;  
+}  
+  
+/* Responsive para formato horizontal en movil */  
+@media (max-width: 768px) {  
+    .plan-card-h.horizontal {  
+        flex-direction: column;  
+        min-height: auto;  
+    }  
+    .plan-card-h.horizontal .plan-top-section {  
+        flex: none;  
+        max-width: 100%;  
+        padding: 15px;  
+    }  
 } 

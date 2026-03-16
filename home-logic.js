@@ -22,28 +22,28 @@ export function initializeHomePage() {
         }
 
         try {
-            // ✅ CARGAR SOLO ANUNCIOS ORO (top y destacado) PARA LA PÁGINA PRINCIPAL
-            // Solo mostramos anuncios Oro en el Index según la nueva estrategia comercial
+            // ✅ CARGAR SOLO ANUNCIOS DESTACADOS PARA LA PÁGINA PRINCIPAL
+            // Solo mostramos anuncios Destacados en la sección Recién Agregado
             let { data: premiumAds, error: premiumError } = await supabase
                 .from('anuncios')
                 .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
-                .in('featured_plan', ['top', 'destacado'])
+                .eq('featured_plan', 'destacado')
                 .order('created_at', { ascending: false })
-                .limit(100); // Límite de 20 anuncios Oro
+                .limit(100);
 
             if (premiumError) throw premiumError;
 
-            // No cargamos anuncios de otros planes (premium, basico, free) en el Index
-            // Solo anuncios Oro tienen derecho a la portada
+            // No cargamos anuncios de otros planes (premium, basico, gratis, free) en el Index
+            // Solo anuncios Destacados tienen derecho a la sección Recién Agregado
             let ads = premiumAds || [];
 
             // ✅ Si la columna is_sold no existe, intentar sin el filtro
             if (premiumError && premiumError.code === '42703') {
-                console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios Oro.');
+                console.warn('⚠️ Columna is_sold no existe. Mostrando todos los anuncios Destacados.');
                 const { data: adsWithoutFilter, error: error2 } = await supabase
                     .from('anuncios')
                     .select('*, profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
-                    .in('featured_plan', ['top', 'destacado'])
+                    .eq('featured_plan', 'destacado')
                     .order('created_at', { ascending: false })
                     .limit(20);
                 ads = adsWithoutFilter || [];
@@ -111,8 +111,19 @@ const getVideoEmbedUrl = (videoUrl) => {
 
             // === FUNCIÓN PARA GENERAR SLIDE DE BANNER ELITE ===
             const generateEliteSlideHTML = (ad, index) => {
-                const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
-                const mainImage = allImages[0] || 'https://via.placeholder.com/800x400?text=Sin+Imagen';
+                // Fallback unificado de imagen
+                let mainImage = null;
+                if (ad.imagen_portada) {
+                    mainImage = ad.imagen_portada;
+                } else if (ad.imagenes && ad.imagenes[0]?.url_imagen) {
+                    mainImage = ad.imagenes[0].url_imagen;
+                } else if (ad.url_portada) {
+                    mainImage = ad.url_portada;
+                } else if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+                    mainImage = ad.url_galeria[0];
+                } else {
+                    mainImage = 'https://via.placeholder.com/800x400?text=Sin+Imagen';
+                }
                 const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
                 
                 const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
@@ -221,7 +232,18 @@ const getVideoEmbedUrl = (videoUrl) => {
             };
 
             const generateCardHTML = (ad) => {
-                const allImages = [ad.url_portada, ...(ad.url_galeria || [])].filter(Boolean);
+                // Fallback unificado de imagen
+                let allImages = [];
+                if (ad.imagen_portada) {
+                    allImages = [ad.imagen_portada];
+                } else if (ad.imagenes && ad.imagenes[0]?.url_imagen) {
+                    allImages = [ad.imagenes[0].url_imagen, ...(ad.url_galeria || [])];
+                } else if (ad.url_portada) {
+                    allImages = [ad.url_portada, ...(ad.url_galeria || [])];
+                } else if (Array.isArray(ad.url_galeria)) {
+                    allImages = ad.url_galeria;
+                }
+                allImages = allImages.filter(Boolean);
                 const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
                 const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
                 

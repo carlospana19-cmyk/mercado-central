@@ -435,8 +435,23 @@ function displayFilteredProducts(ads) {
     };
 
     const adsHTML = ads.map(product => {
-        // 1. Extraer la imagen correcta de este anuncio específico
-        const imagenUrl = (product.imagenes && product.imagenes[0]?.url_imagen) || product.url_portada || 'img/placeholder.jpg';
+        // 1. Extraer la imagen correcta - formato unificado para todos los planes
+        // Prioridad: imagen_portada > imagenes[0] > url_portada > url_galeria > placeholder
+        let imagenUrl = null;
+        
+        if (product.imagen_portada) {
+            imagenUrl = product.imagen_portada;
+        } else if (product.imagenes && product.imagenes[0]?.url_imagen) {
+            imagenUrl = product.imagenes[0].url_imagen;
+        } else if (product.url_portada) {
+            imagenUrl = product.url_portada;
+        } else if (Array.isArray(product.url_galeria) && product.url_galeria.length > 0) {
+            imagenUrl = product.url_galeria[0];
+        } else if (product.url_galeria && typeof product.url_galeria === 'string') {
+            imagenUrl = product.url_galeria;
+        } else {
+            imagenUrl = 'img/placeholder.jpg';
+        }
 
         // 2. Asegurar que atributos_clave sea un objeto para la tarjeta
         let attrs = product.atributos_clave || {};
@@ -813,7 +828,26 @@ return `
                 <div class="property-image">
                         ${['premium','destacado','top'].includes(ad.featured_plan)
                                     ? (() => {
-                                        const galleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length ? ad.url_galeria : [ad.url_portada];
+                                        // Fallback estricto para tarjetas Premium (igual que en UIComponents y product-detail)
+                                        const getImgUrl = (ad) => {
+                                            if (ad.imagen_portada) return ad.imagen_portada;
+                                            if (ad.url_portada && ad.url_portada.trim() !== '') return ad.url_portada;
+                                            if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) return ad.url_galeria[0];
+                                            if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') return ad.url_galeria;
+                                            return 'https://via.placeholder.com/500x400?text=Sin+Imagen';
+                                        };
+                                        // PRIMERO obtener imagen_portada como imagen principal
+                                        let galleryImages = [];
+                                        const portadaUrl = getImgUrl(ad); // imagen_portada > url_portada > url_galeria
+                                        galleryImages = [portadaUrl];
+                                        // Luego agregar imágenes adicionales de url_galeria si existen y son diferentes
+                                        if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+                                            ad.url_galeria.forEach(url => {
+                                                if (!galleryImages.includes(url)) {
+                                                    galleryImages.push(url);
+                                                }
+                                            });
+                                        }
                                         const hasMultipleImages = galleryImages.length > 1 || videoEmbedUrl;
                                         return `
                                     <div class="tarjeta-auto">
@@ -821,7 +855,7 @@ return `
                                         <div class="swiper-wrapper">
                                             ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
                                             ${galleryImages.map(img =>
-                                                `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`
+                                                `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'"></div>`
                                             ).join('')}
                                         </div>
                                         <div class="swiper-pagination"></div>
@@ -832,7 +866,13 @@ return `
                                         </div>
                                     </div>`;
                                     })()
-                            : `<img src="${ad.url_portada || 'placeholder.jpg'}" alt="${ad.titulo}" class="dashboard-ad-image" loading="lazy">`}
+                            : `<img src="${(() => {
+                                if (ad.imagen_portada) return ad.imagen_portada;
+                                if (ad.url_portada && ad.url_portada.trim() !== '') return ad.url_portada;
+                                if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) return ad.url_galeria[0];
+                                if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') return ad.url_galeria;
+                                return 'https://via.placeholder.com/500x400?text=Sin+Imagen';
+                            })()}" alt="${ad.titulo}" class="dashboard-ad-image" loading="lazy" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">`}
                 </div>
         
                 <div class="property-details">

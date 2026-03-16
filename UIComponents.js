@@ -5,9 +5,29 @@ export const UIComponents = {
      * Genera el HTML de una tarjeta unificada
      */
     generateCardHTML(ad) {
+        // DEBUG: Ver estructura real del objeto anuncio
+        console.log('🟢 [UIComponents] Datos del anuncio recibidos:', ad);
+        console.log('🟢 [UIComponents] Keys del objeto:', Object.keys(ad));
+        
         const attributes = this.renderAttributes(ad);
         const precioFormateado = ad.precio ? Number(ad.precio).toLocaleString('en-US') : '0.00';
-        const imagenPortada = ad.url_portada || 'img/placeholder.jpg';
+        
+        // Fallback estricto que no se deja engañar por strings vacíos
+        // Prioridad: imagen_portada > url_portada (no vacía) > url_galeria[0]
+        let imagenPortada = 'https://via.placeholder.com/500x400?text=Sin+Imagen';
+        if (ad.imagen_portada) { 
+            imagenPortada = ad.imagen_portada; 
+        }
+        else if (ad.url_portada && ad.url_portada.trim() !== '') { 
+            imagenPortada = ad.url_portada; 
+        }
+        else if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) { 
+            imagenPortada = ad.url_galeria[0]; 
+        }
+        else if (ad.url_galeria && typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') {
+            imagenPortada = ad.url_galeria;
+        }
+        
         const planClass = ad.featured_plan ? `card-${ad.featured_plan}` : 'card-free';
         
         // Badge según el plan
@@ -19,7 +39,7 @@ export const UIComponents = {
             <div class="property-card ${planClass}" data-id="${ad.id}">
                 <div class="property-image">
                     ${badgeHTML}
-                    <img src="${imagenPortada}" alt="${ad.titulo || 'Anuncio'}" loading="lazy">
+                    <img src="${imagenPortada}" alt="${ad.titulo || 'Anuncio'}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
                 </div>
                 <div class="property-details">
                     <div class="property-price">${precioFormateado}</div>

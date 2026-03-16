@@ -57,34 +57,7 @@ function togglePassword(inputId) {
 <body id="pagina-login">
 
   <!-- NAVBAR MODERNO -->
-  <nav class="navbar-moderno">
-    <div class="logo-container">
-      <a href="index.html" class="logo-link" style="display: flex; align-items: center; text-decoration: none; color: #fff;">
-        <img src="gemini-3-pro-image-preview (nano-banana-pro)_b_quiero_crear_un_logo.png" alt="Logo Mercado Central" class="logo-img" style="height:36px; width:auto; margin-right:8px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.08); background:#fff;">
-        <span class="logo-text" style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; color: #fff;">Mercado Central</span>
-      </a>
-    </div>
-    
-    <!-- NUEVO BLOQUE DE BOTONES MEJORADO -->
-    <div class="buttons-nav">
-        <!-- Este botón se mostrará solo si el usuario está conectado -->
-        <!-- Botones de Panel, Publicar y Logout (solo para usuarios conectados) -->
-        <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
-            <i class="fas fa-user"></i>
-        </button>
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
-            <i class="fas fa-plus"></i> Publicar anuncio
-        </button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </button>
-
-        <!-- Botón de Iniciar Sesión (solo para invitados) -->
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
-            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-        </button>
-    </div>
-  </nav>
+  <div id="navbar-container"></div>
 
   <div class="login-center-container">
     <main class="auth-main">
@@ -117,50 +90,12 @@ function togglePassword(inputId) {
   </div>
 
   <!-- FOOTER PREMIUM -->
-  <footer class="footer">
-    <div class="footer-contenedor">
-      <div class="footer-col">
-        <h4 class="footer-title">Mercado Central</h4>
-        <p>Tu plataforma confiable para comprar, vender y encontrar lo que necesites en tu ciudad.</p>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-title">Enlaces rápidos</h4>
-        <ul>
-          <li><a href="#">Quiénes somos</a></li>
-          <li><a href="#">Términos y Condiciones</a></li>
-          <li><a href="#">Política de Privacidad</a></li>
-          <li><a href="#">Contáctanos</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-title">Síguenos</h4>
-        <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i> Facebook</a>
-                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-                    <a href="#"><i class="fab fa-twitter"></i> Twitter/X</a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-title">App y Pagos</h4>
-        <p class="footer-subtitle">Próximamente</p>
-        <div class="app-buttons">
-            <span class="store-badge-placeholder"><i class="fab fa-google-play"></i> Google Play</span>
-            <span class="store-badge-placeholder"><i class="fab fa-apple"></i> App Store</span>
-        </div>
-        <h4 class="footer-title" style="margin-top: 15px;">Pagos Seguros</h4>
-        <div class="payment-icons">
-            <i class="fab fa-cc-visa"></i>
-            <i class="fab fa-cc-mastercard"></i>
-            <i class="fab fa-cc-paypal"></i>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2024 Mercado Central - Todos los derechos reservados</p>
-    </div>
-  </footer>
+  <div id="footer-container"></div>
 
   <!-- Inicialización centralizada -->
   <script type="module" src="main.js"></script>
+<script type="module" src="navbar-logic.js"></script>
+<script src="load-components.js" defer></script>
+
 </body>
 </html>

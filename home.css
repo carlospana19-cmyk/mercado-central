@@ -359,26 +359,6 @@
   color: var(--color-texto);
 }
 
-/* Prevenir zoom automático en iOS/Android al enfocar inputs */
-@media (max-width: 768px) {
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-  
-  /* Contenedores flexibles para el index */
-  #index-page .container,
-  #index-page .container-fluid,
-  #index-page .main-content-wrapper,
-  #index-page #products,
-  #index-page .box-container,
-  #index-page .featured-carousel-wrapper {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-  }
-}
-
 .btn-search-hero {
   background: var(--color-acento);
   color: var(--color-texto);

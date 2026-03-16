@@ -503,7 +503,7 @@ section {
 .ad-card, .property-card, .box, .tarjeta-auto {
     flex: 1 1 auto !important;
     width: 100% !important;
-    min-width: 280px !important;
+    min-width: 350px !important;
     max-width: 100% !important;
     margin: 0 !important; /* Sin márgenes que causen choques */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;

@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeNavbar();
     updateUIBasedOnAuthState(); // <-- LLAMADA A LA FUNCIÓN DE AUTH
 
+    // Escuchar evento de navbar cargado dinámicamente
+    document.addEventListener('navbarLoaded', () => {
+        console.log('🎯 Evento navbarLoaded recibido, actualizando UI de autenticación');
+        initializeNavbar();
+        updateUIBasedOnAuthState();
+    });
+
     const path = window.location.pathname;
 
     if (path.endsWith('/') || path.endsWith('index.html')) {
