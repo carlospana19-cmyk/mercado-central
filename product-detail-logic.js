@@ -23,6 +23,49 @@ function waitForGoogleMaps() {
 }
 
 // ============================================
+// FUNCIÓN: Geocodificar dirección usando Google Maps Geocoder
+// ============================================
+async function geocodeAddress(ad) {
+    // Build address string from available fields
+    const parts = [];
+    if (ad.direccion_exacta) parts.push(ad.direccion_exacta);
+    if (ad.distrito) parts.push(ad.distrito);
+    if (ad.provincia) parts.push(ad.provincia);
+    // Add country to improve geocoding accuracy
+    parts.push('Panama');
+    
+    const address = parts.filter(Boolean).join(', ');
+    if (!address) {
+        return null;
+    }
+    
+    // Ensure Google Maps is loaded
+    await loadGoogleMapsScriptDetalle();
+    await waitForGoogleMaps();
+    
+    if (!window.google || !window.google.maps) {
+        console.error('Google Maps not available for geocoding');
+        return null;
+    }
+    
+    const geocoder = new window.google.maps.Geocoder();
+    return new Promise((resolve) => {
+        geocoder.geocode({ address }, (results, status) => {
+            if (status === window.google.maps.GeocoderStatus.OK && results[0]) {
+                const first = results[0];
+                resolve({
+                    lat: first.geometry.location.lat(),
+                    lng: first.geometry.location.lng(),
+                    formatted_address: first.formatted_address
+                });
+            } else {
+                resolve(null);
+            }
+        });
+    });
+}
+
+// ============================================
 // FUNCIÓN: Cargar mapa de solo lectura en detalle del producto
 // ============================================
 async function loadProductMap(lat, lng, address) {
@@ -117,6 +160,8 @@ const convertToFullUrl = (imagePath) => {
 // product-detail-logic.js (VERSIÓN CON GALERÍA Y MEJOR MANEJO DE ERRORES)
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🔔 DOMContentLoaded disparado - Iniciando carga del detalle...');
+    
     // Poner esto apenas inicia la carga de la página de detalle
     window.scrollTo({ top: 0, behavior: 'instant' });
     
@@ -136,14 +181,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        // Hacemos ambas peticiones a la vez
-        console.log('Realizando consultas a la base de datos...');
-        const [adResponse, imagesResponse] = await Promise.all([
-            supabase.from('anuncios').select('*').eq('id', adId).single(),
-            supabase.from('imagenes').select('url_imagen, orden').eq('anuncio_id', adId).order('orden', { ascending: true })
-        ]);
-
-        const { data: ad, error: adError } = adResponse;
+        console.log('🔔 Inside try block');
+        // Primero cargar el anuncio
+        console.log('Cargando anuncio con ID:', adId);
+        const { data: ad, error: adError } = await supabase
+            .from('anuncios')
+            .select('*')
+            .eq('id', adId)
+            .single();
 
         console.log('Respuesta del anuncio:', { ad, adError });
 
@@ -160,20 +205,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         console.log("Datos del anuncio:", ad);
+        console.log("🟢 [Detail] Keys del objeto ad:", Object.keys(ad));
         
-        // Procesar imágenes de la tabla imagenes
+        // Procesar imágenes: Usar url_galeria como fuente principal (la tabla imagenes puede fallar)
         let galleryImages = [];
-        if (imagesResponse.data && imagesResponse.data.length > 0) {
-            galleryImages = imagesResponse.data.map(img => convertToFullUrl(img.url_imagen));
-        } else if (ad.url_portada) {
-            // Fallback a las imágenes del anuncio
-            const rawGalleryImages = Array.isArray(ad.url_galeria) && ad.url_galeria.length
-                ? ad.url_galeria
-                : [ad.url_portada];
-            galleryImages = rawGalleryImages.map(convertToFullUrl);
-        }
         
-        displayProductDetails(ad, openChat, galleryImages);
+        // PRIORIDAD 1: url_galeria (array de strings - fuente principal)
+        if (ad.url_galeria) {
+            if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+                galleryImages = ad.url_galeria.map(url => convertToFullUrl(url));
+            } else if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') {
+                galleryImages = [convertToFullUrl(ad.url_galeria)];
+            }
+            console.log('🟢 [Detail] Usando url_galeria:', galleryImages.length);
+        }
+        // PRIORIDAD 2: url_portada
+        else if (ad.url_portada && ad.url_portada.trim() !== '') {
+            galleryImages = [convertToFullUrl(ad.url_portada)];
+            console.log('🟢 [Detail] Usando url_portada');
+        }
+        // ULTIMO RESORT: placeholder
+        if (galleryImages.length === 0) {
+            galleryImages = ['https://via.placeholder.com/500x400?text=Sin+Imagen'];
+            console.log('🟢 [Detail] Sin imágenes, usando placeholder');
+        }
 
         // Incrementar contador de visitas
         try {
@@ -190,6 +245,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error('Error al incrementar visitas:', error);
         }
+        
+        // ✅ LLAMAR A displayProductDetails PARA MOSTRAR LOS DATOS
+        console.log('🔔 LLAMANDO displayProductDetails con galleryImages:', galleryImages);
+        await displayProductDetails(ad, openChat, galleryImages);
+        console.log('🔔 displayProductDetails completado');
     } catch (error) {
         console.error('Error inesperado al cargar el producto:', error);
         displayError("Error inesperado al cargar el producto. Por favor, intenta de nuevo.");
@@ -216,38 +276,45 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     document.title = `${ad.titulo} - Mercado Central`;
 
     // Rellenar datos de texto
-    productNameEl.textContent = ad.titulo;
+    productNameEl.textContent = ad.titulo || 'Sin título';
     
     // Establecer mensaje por defecto en el textarea de contacto
-    const mensajeInput = document.getElementById('message-input');
-    if (mensajeInput && ad.titulo) {
-        mensajeInput.value = `Hola, estoy interesado en tu anuncio: ${ad.titulo}. ¿Sigue disponible?`;
-    }
+    try {
+        const mensajeInput = document.getElementById('message-input');
+        if (mensajeInput && ad.titulo) {
+            mensajeInput.value = `Hola, estoy interesado en tu anuncio: ${ad.titulo}. ¿Sigue disponible?`;
+        }
+    } catch(e) { console.warn('Error con message-input:', e); }
     
     // Formatear precio con moneda panameña (B/.) y dos decimales
-    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+    const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio || 0);
     productPriceEl.textContent = priceFormatted;
-    productDescriptionEl.textContent = ad.descripcion;
+    productDescriptionEl.textContent = ad.descripcion || 'Sin descripción';
 
     // Mostrar visitas
-    const productVisitsEl = document.getElementById('product-visits');
-    if (productVisitsEl) {
-        productVisitsEl.textContent = ad.visitas || 0;
-    }
+    try {
+        const productVisitsEl = document.getElementById('product-visits');
+        if (productVisitsEl) {
+            productVisitsEl.textContent = ad.visitas || 0;
+        }
+    } catch(e) { console.warn('Error con visits:', e); }
 
-    // Mostrar información de contacto del vendedor
-    loadSellerContactInfo(ad);
+    // Mostrar información de contacto del vendedor (opcional)
+    try {
+        if (typeof loadSellerContactInfo === 'function') loadSellerContactInfo(ad);
+    } catch(e) { console.warn('Error con loadSellerContactInfo:', e); }
 
-    // Eliminado: el scroll/focus al formulario de contacto causaba salto no deseado
-    // Ya no se hace scroll automático cuando viene de "Contactar"
+    // Configurar botón de reseñas (opcional)
+    try {
+        if (typeof setupReviewButton === 'function') setupReviewButton(ad);
+    } catch(e) { console.warn('Error con setupReviewButton:', e); }
 
-    // Configurar botón de reseñas
-    setupReviewButton(ad);
-
-    // ✅ Cargar y mostrar reseñas del vendedor
-    if (ad.user_id) {
-        loadSellerReviewsSection(ad.user_id);
-    }
+    // ✅ Cargar y mostrar reseñas del vendedor (opcional)
+    try {
+        if (ad.user_id && typeof loadSellerReviewsSection === 'function') {
+            loadSellerReviewsSection(ad.user_id);
+        }
+    } catch(e) { console.warn('Error con loadSellerReviewsSection:', e); }
 
     // Calcular y mostrar fecha de publicación
     if (ad.fecha_publicacion) {
@@ -318,7 +385,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         // Construir HTML de la galería con miniaturas
         let galleryHTML = `
             <div class="gallery-main">
-                <img id="main-product-image" src="${mainImage}" alt="${ad.titulo}">
+                <img id="main-product-image" src="${mainImage}" alt="${ad.titulo}" style="width: 100%; height: 500px; min-height: 400px; max-height: 600px; object-fit: cover; object-position: center;" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
             </div>
         `;
         
@@ -327,7 +394,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
                 <div class="gallery-thumbnails">
                     ${galleryImages.map((img, index) => `
                         <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
-                            <img src="${img}" alt="Miniatura ${index + 1}">
+                            <img src="${img}" alt="Miniatura ${index + 1}" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
                         </div>
                     `).join('')}
                 </div>
@@ -363,7 +430,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         console.log('No hay imágenes disponibles, usando placeholder');
         galleryWrapperEl.innerHTML = `
             <div class="gallery-main">
-                <img src="https://via.placeholder.com/500x400?text=Sin+Imagen" alt="Sin imagen disponible">
+                <img src="https://via.placeholder.com/500x400?text=Sin+Imagen" alt="Sin imagen disponible" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
             </div>
         `;
     }
@@ -388,15 +455,32 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     }
 
     // --- MAPA DE UBICACIÓN DEL PRODUCTO ---
-    if (ad.latitud && ad.longitud) {
-        // Mostrar la sección del mapa
-        const mapSection = document.getElementById('product-location-section');
-        if (mapSection) {
-            mapSection.style.display = 'block';
-        }
+    // Mostrar la sección del mapa por defecto (se ocultará solo si no hay ubicación en absoluto)
+    const mapSection = document.getElementById('product-location-section');
+    if (mapSection) {
+        mapSection.style.display = 'block';
+    }
 
-        // Cargar Google Maps API y mostrar el mapa
+    // Intentar cargar el mapa con coordenadas precisas si están disponibles
+    if (ad.latitud && ad.longitud) {
         await loadProductMap(ad.latitud, ad.longitud, ad.ubicacion);
+    } else {
+        // Si no hay coordenadas precisas, intentar geocodificar con la dirección textual
+        const geocoded = await geocodeAddress(ad);
+        if (geocoded) {
+            // Si geocodificación exitosa, mostrar mapa con coordenadas aproximadas
+            await loadProductMap(geocoded.lat, geocoded.lng, geocoded.formatted_address || ad.ubicacion);
+        } else {
+            // Si también falla la geocodificación, ocultar el mapa y mostrar mensaje
+            if (mapSection) {
+                mapSection.style.display = 'none';
+            }
+            // Mostrar mensaje de ubicación no especificada
+            const mapContainer = document.getElementById('mapa-detalles');
+            if (mapContainer) {
+                mapContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Ubicación no especificada</div>';
+            }
+        }
     }
 }
 

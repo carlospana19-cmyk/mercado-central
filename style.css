@@ -6,7 +6,7 @@
   input, select, textarea {
     font-size: 16px !important;
   }
-  
+   
   /* Prevent text size adjustment on orientation change */
   html {
     -webkit-text-size-adjust: 100%;
@@ -14,9 +14,9 @@
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
-  
+   
   /* Contenedores flexibles - width 100% con max-width adecuado */
-  .container, 
+  .container,
   .container-fluid,
   .main-content,
   .products,
@@ -30,6 +30,27 @@
     margin-left: auto !important;
     margin-right: auto !important;
   }
+  
+  /* BLOQUEAR EL SCROLL HORIZONTAL */
+  body, html {
+    overflow-x: hidden;
+  }
+  .container, .product-detail-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+    padding: 0 15px; /* Evitar que el texto toque los bordes */
+    box-sizing: border-box;
+  }
+  
+  /* ARREGLAR EL ZOOM Y TAMAÑO DE LA IMAGEN PRINCIPAL */
+  #main-product-image, .gallery-main img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 300px !important; /* Altura más manejable para celular */
+    min-height: auto !important;
+    object-fit: contain !important; /* contain evita el zoom excesivo que corta la imagen */
+    border-radius: 8px;
+  }
 }
 
 /* Cuadros vacíos para alinear la última fila de atributos de inmueble */
@@ -41,6 +62,34 @@
   min-height: 90px;
   height: 100%;
 }
+
+/* ================================================= */
+/* ========== ANIMACIONES GLOBALES ========== */
+/* ================================================= */
+
+/* Animación fadeIn - Unificada aquí para evitar duplicados */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación fadeInUp */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 /* ================================================= */
 /* ========== ESTILOS GENERALES DEL SITIO ========== */
 /* ================================================= */
@@ -51,10 +100,10 @@
 /* --- CARRUSEL DE CATEGORÍA EN RESULTADOS --- */
 .category-hero {
     position: relative;
-    height: 50vh;
-    min-height: 400px;
+    height: 30vh;
+    min-height: 200px;
     overflow: hidden;
-    margin-bottom: 4rem;
+    margin-bottom: 1rem;
 }
 
 .category-hero-carousel {
@@ -1346,13 +1395,13 @@ body {
 /* --- TÍTULO DE SECCIÓN EN LA ZONA BLANCA --- */
 .section-title-container {
   background-color: var(--color-blanco);
-  padding: 2rem 2rem 1.5rem 2rem;
+  padding: 1rem 2rem;
   margin-top: 0;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .section-main-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1a1a1a;
   text-align: left;
@@ -1481,7 +1530,7 @@ body {
 .results-page-container {
   width: 100%;
   margin: 0;
-  padding: 2rem 2%; /* Add padding here to control overall content inset */
+  padding: 1rem 2%; /* Add padding here to control overall content inset */
   background: #f5f5f5;
 }
 
@@ -1497,20 +1546,23 @@ body {
 .filters-sidebar {
   /* No necesita flex: 0 0 280px porque el grid ya define su ancho */
   background: var(--color-blanco);
-  padding: 2.5rem;
+  padding: 3.9rem;
   border-radius: 1rem;
   box-shadow: var(--sombra-suave);
   position: sticky;
-  top: 100px;
+  top: 80px;
+  height: fit-content;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 /* El resto de estilos del sidebar (.filters-sidebar h3, .filter-group, etc.) se mantienen igual */
-.filters-sidebar h3 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 1rem; }
-.filter-group { margin-bottom: 2rem; }
-.filter-group label { font-weight: 600; font-size: 2.0rem; display: block; margin-bottom: 1rem; }
-.filter-group input[type="number"] { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.4rem; }
-#subcategory-filter-container .subcategory-label { display: block; margin-bottom: 0.8rem; cursor: pointer; }
-.btn-apply-filters { width: 100%; padding: 1.5rem; background: var(--color-secundario); color: var(--color-blanco); border: none; border-radius: .5rem; font-size: 1.6rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+.filters-sidebar h3 { font-size: 1.6rem; margin-bottom: 1rem; border-bottom: 2px solid var(--color-primario); padding-bottom: 0.5rem; }
+.filter-group { margin-bottom: 1rem; }
+.filter-group label { font-weight: 600; font-size: 1.3rem; display: block; margin-bottom: 0.5rem; }
+.filter-group input[type="number"] { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.2rem; }
+#subcategory-filter-container .subcategory-label { display: block; margin-bottom: 0.5rem; cursor: pointer; font-size: 1.4rem; }
+.btn-apply-filters { width: 100%; padding: 1rem; background: var(--color-secundario); color: var(--color-blanco); border: none; border-radius: .5rem; font-size: 1.4rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 1rem; }
 .btn-apply-filters:hover { background-color: var(--color-primario); }
 /* --- PARCHE DE EMERGENCIA PARA TARJETA-AUTO EN CUADRÍCULA --- */
 
@@ -2067,15 +2119,19 @@ body {
 
 .gallery-main {
     width: 100%;
+    min-height: 400px;
+    height: auto;
     border-radius: 12px;
-    overflow: hidden;
     background: #f5f5f5;
 }
 
 .gallery-main img#main-product-image {
     width: 100%;
     height: 500px;
+    min-height: 400px;
+    max-height: 600px;
     object-fit: cover;
+    object-position: center;
     display: block;
     transition: opacity 0.2s ease;
 }
@@ -2650,9 +2706,19 @@ body {
 }
 
 .results-container-flex {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 25px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 20px !important;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.results-container-flex .tarjeta-auto {
+    flex: 0 0 280px !important;
+    max-width: 280px !important;
+    scroll-snap-align: start;
 }
 
 
@@ -3450,7 +3516,13 @@ body#pagina-login {
 
     /* Tarjetas de resultado más compactas */
     .results-container-flex {
+        flex-wrap: nowrap !important;
         gap: 1rem;
+    }
+    
+    .results-container-flex .tarjeta-auto {
+        flex: 0 0 240px !important;
+        max-width: 240px !important;
     }
     
 }
@@ -3469,6 +3541,15 @@ body#pagina-login {
         grid-template-columns: 1fr;
         gap: 0;
         padding: 0;
+    }
+    
+    .results-container-flex {
+        flex-wrap: nowrap !important;
+    }
+    
+    .results-container-flex .tarjeta-auto {
+        flex: 0 0 200px !important;
+        max-width: 200px !important;
     }
     
     .filters-sidebar {
