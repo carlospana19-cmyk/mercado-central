@@ -150,28 +150,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 fecha_publicacion: new Date().toISOString(), // 👈 Para que salga de primero
             };
             
-            // === LÓGICA DE PLAN: Obtener de sessionStorage y validar tokens ===
+            // === LÓGICA DE PLAN Y RELOJ DE TIEMPO (SISTEMA UNIFICADO) ===
             let finalPlanData = 'gratis'; // Valor por defecto
             
-            // Primero intentar desde sessionStorage
             const planFromSession = sessionStorage.getItem('selectedPlan');
             const tokenApplied = sessionStorage.getItem('tokenApplied');
             
+            // 1. Obtener la información del token si existe (Evitando duplicados de declaración)
+            const infoToken = window.getPendingTokenData ? window.getPendingTokenData() : window.pendingTokenData;
+
+            // 2. Validar qué plan se va a guardar realmente
             if (planFromSession) {
-                // Si el plan es destacado, verificar que tenga token válido
                 if (planFromSession === 'destacado' && tokenApplied !== 'true') {
-                    // No hay token aplicado, forzar a gratis
                     console.warn('⚠️ Plan Destacado sin token válido - Forzando a Gratis');
                     finalPlanData = 'gratis';
                 } else {
                     finalPlanData = planFromSession;
                 }
             }
+
+            // 3. LA CALCULADORA DE TIEMPO (El Reloj)
+            function calcularFechasPlan(planTipo, tokenInfo) {
+                const ahora = new Date();
+                let featuredUntil = null;
+                let fechaEliminacion = new Date(ahora);
+                let diasDestacado = 0;
+                
+                if (tokenInfo && tokenInfo.cortesia && tokenInfo.cortesia.duracion_dias) {
+                    diasDestacado = parseInt(tokenInfo.cortesia.duracion_dias);
+                } else if (planTipo === 'premium' || planTipo === 'vip' || planTipo === 'destacado') {
+                    diasDestacado = 30; 
+                }
+
+                if (diasDestacado > 0) {
+                    featuredUntil = new Date(ahora);
+                    featuredUntil.setDate(ahora.getDate() + diasDestacado);
+                    
+                    fechaEliminacion = new Date(featuredUntil);
+                    fechaEliminacion.setDate(fechaEliminacion.getDate() + 30);
+                } else {
+                    fechaEliminacion.setDate(ahora.getDate() + 30);
+                }
+
+                return {
+                    featured_until: featuredUntil ? featuredUntil.toISOString() : null,
+                    fecha_eliminacion: fechaEliminacion.toISOString()
+                };
+            }
+
+            // 4. Calcular y asignar las fechas al anuncio
+            const fechasCalculadas = calcularFechasPlan(finalPlanData, infoToken);
             
-            console.log('Enviando a Supabase - Plan detectado:', finalPlanData, '| Token aplicado:', tokenApplied);
+            console.log('Enviando a Supabase - Plan:', finalPlanData, '| Días Token:', infoToken?.cortesia?.duracion_dias || 0);
             
             adToSave.selected_plan = finalPlanData;
             adToSave.featured_plan = finalPlanData;
+            adToSave.featured_until = fechasCalculadas.featured_until;
+            adToSave.fecha_eliminacion = fechasCalculadas.fecha_eliminacion;
 
             console.log("🛰️ Enviando a Supabase:", adToSave); // Para ver el "61" morir en vivo
 

@@ -4,54 +4,57 @@ export const UIComponents = {
     /**
      * Genera el HTML de una tarjeta unificada
      */
-    generateCardHTML(ad) {
-        // DEBUG: Ver estructura real del objeto anuncio
-        console.log('🟢 [UIComponents] Datos del anuncio recibidos:', ad);
-        console.log('🟢 [UIComponents] Keys del objeto:', Object.keys(ad));
-        
+    // 4. GENERADOR DE HTML PARA LA TARJETA COMPLETA (UNIFICADO Y CORREGIDO)
+    generateCardHTML: function(ad) {
         const attributes = this.renderAttributes(ad);
         const precioFormateado = ad.precio ? Number(ad.precio).toLocaleString('en-US') : '0.00';
         
-        // Fallback estricto que no se deja engañar por strings vacíos
-        // Prioridad: imagen_portada > url_portada (no vacía) > url_galeria[0]
+        // 1. Fallback estricto de imagen
         let imagenPortada = 'https://via.placeholder.com/500x400?text=Sin+Imagen';
-        if (ad.imagen_portada) { 
-            imagenPortada = ad.imagen_portada; 
-        }
-        else if (ad.url_portada && ad.url_portada.trim() !== '') { 
-            imagenPortada = ad.url_portada; 
-        }
-        else if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) { 
-            imagenPortada = ad.url_galeria[0]; 
-        }
-        else if (ad.url_galeria && typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') {
+        if (ad.imagen_portada && ad.imagen_portada.trim() !== '') {
+            imagenPortada = ad.imagen_portada;
+        } else if (ad.url_portada && ad.url_portada.trim() !== '') {
+            imagenPortada = ad.url_portada;
+        } else if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+            imagenPortada = ad.url_galeria[0];
+        } else if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') {
             imagenPortada = ad.url_galeria;
         }
-        
-        const planClass = ad.featured_plan ? `card-${ad.featured_plan}` : 'card-free';
-        
-        // Badge según el plan
-        const badgeHTML = ad.featured_plan === 'top' ? '<span class="badge-top">TOP</span>' : 
-                          ad.featured_plan === 'destacado' ? '<span class="badge-destacado">Destacado</span>' :
-                          ad.featured_plan === 'premium' ? '<span class="badge-premium">Premium</span>' : '';
 
+        // 2. MAGIA DEL TIEMPO (LECTOR INTELIGENTE DE BADGES)
+        let badgeHTML = '';
+        if (ad.featured_until) {
+            const ahora = new Date();
+            const finDestacado = new Date(ad.featured_until);
+            
+            if (ahora < finDestacado) {
+                const nombrePlan = ad.plan || ad.selected_plan || ad.featured_plan || 'Destacado';
+                if (nombrePlan.toLowerCase() !== 'free' && nombrePlan.toLowerCase() !== 'gratis') {
+                    badgeHTML = `
+                        <div class="badge-plan" style="position: absolute; top: 10px; left: 10px; background: #FFD700; color: #333; padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.75rem; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.2); text-transform: uppercase; letter-spacing: 1px;">
+                            <i class="fas fa-star" style="margin-right: 4px;"></i> ${nombrePlan}
+                        </div>`;
+                }
+            }
+        }
+
+        // 3. Ensamblaje de la Tarjeta
         return `
-            <div class="property-card ${planClass}" data-id="${ad.id}">
-                <div class="property-image">
+            <div class="property-card" data-id="${ad.id}" style="position: relative; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+                <div class="property-image" style="position: relative; height: 200px;">
                     ${badgeHTML}
-                    <img src="${imagenPortada}" alt="${ad.titulo || 'Anuncio'}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
+                    <img src="${imagenPortada}" alt="${ad.titulo || 'Anuncio'}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
                 </div>
-                <div class="property-details">
-                    <div class="property-price">${precioFormateado}</div>
-                    <h3 class="property-title">${ad.titulo || 'Sin título'}</h3>
-                    <div class="property-location">
-                        <i class="fas fa-map-marker-alt"></i> 
-                        ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ''}, ${ad.provincia || ''}
+                <div class="property-details" style="padding: 15px;">
+                    <div class="property-price" style="font-size: 1.3rem; font-weight: bold; color: #2d3436; margin-bottom: 5px;">$${precioFormateado}</div>
+                    <h3 class="property-title" style="font-size: 1.05rem; margin-bottom: 8px; color: #2d3436; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ad.titulo || 'Sin título'}</h3>
+                    <div class="property-location" style="color: #636e72; font-size: 0.85rem; margin-bottom: 12px;">
+                        <i class="fas fa-map-marker-alt"></i> ${ad.corregimiento ? ad.corregimiento + ', ' : ''}${ad.distrito || ''}, ${ad.provincia || 'Panamá'}
                     </div>
-                    <div class="property-attributes">
+                    <div class="property-attributes" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
                         ${attributes}
                     </div>
-                    <a href="detalle-producto.html?id=${ad.id}" class="btn-contact-card">Contactar</a>
+                    <a href="detalle-producto.html?id=${ad.id}" class="btn-contact-card" style="margin-top: 15px; display: block; text-align: center; background: #00bfae; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.2s ease;">Ver Detalles</a>
                 </div>
             </div>
         `;
@@ -104,12 +107,12 @@ export const UIComponents = {
         if (electronicsSubcats.some(subcat => categoria.includes(subcat))) {
             let details = [];
 
-            if (attributes.marca) details.push(`<span><i class="fas fa-cube"></i> ${attributes.marca}</span>`); // Cubo 3D en lugar de etiqueta
-            if (attributes.modelo) details.push(`<span><i class="fas fa-laptop-code"></i> ${attributes.modelo}</span>`); // Laptop moderna
-            if (attributes.almacenamiento) details.push(`<span><i class="fas fa-database"></i> ${attributes.almacenamiento} GB</span>`); // Base de datos (más pro)
-            if (attributes.memoria_ram) details.push(`<span><i class="fas fa-memory"></i> ${attributes.memoria_ram} GB RAM</span>`); // Chip de memoria real
+            if (attributes.marca) details.push(`<span><i class="fas fa-cube"></i> ${attributes.marca}</span>`);
+            if (attributes.modelo) details.push(`<span><i class="fas fa-laptop-code"></i> ${attributes.modelo}</span>`);
+            if (attributes.almacenamiento) details.push(`<span><i class="fas fa-database"></i> ${attributes.almacenamiento} GB</span>`);
+            if (attributes.memoria_ram) details.push(`<span><i class="fas fa-memory"></i> ${attributes.memoria_ram} GB RAM</span>`);
             if (attributes.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.procesador}</span>`);
-            if (attributes.condicion) details.push(`<span><i class="fas fa-award"></i> ${attributes.condicion}</span>`); // Medalla/Premio en lugar de estrella
+            if (attributes.condicion) details.push(`<span><i class="fas fa-award"></i> ${attributes.condicion}</span>`);
 
             if (details.length > 0) {
                 detailsHTML += `<div class="electronics-details">${details.slice(0, 3).join('')}</div>`;
@@ -148,11 +151,11 @@ export const UIComponents = {
         if (categoria.includes('moda') || categoria.includes('belleza') || categoria.includes('ropa')) {
             let details = [];
             
-            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`); // Etiqueta de marca
-            if (attributes.talla) details.push(`<span><i class="fas fa-tshirt"></i> Talla: ${attributes.talla}</span>`); // Prenda de ropa
-            if (attributes.color) details.push(`<span><i class="fas fa-palette"></i> ${attributes.color}</span>`); // Paleta de colores
-            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`); // Diamante de calidad
-            if (attributes.edad) details.push(`<span><i class="fas fa-child"></i> Edad: ${attributes.edad}</span>`); // Para ropa de niños
+            if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
+            if (attributes.talla) details.push(`<span><i class="fas fa-tshirt"></i> Talla: ${attributes.talla}</span>`);
+            if (attributes.color) details.push(`<span><i class="fas fa-palette"></i> ${attributes.color}</span>`);
+            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
+            if (attributes.edad) details.push(`<span><i class="fas fa-child"></i> Edad: ${attributes.edad}</span>`);
             
             if (details.length > 0) {
                 detailsHTML += `<div class="fashion-details">${details.slice(0, 3).join('')}</div>`;
@@ -179,7 +182,7 @@ export const UIComponents = {
             let details = [];
             
             // Magia: Cambiamos el icono principal dependiendo de si es perro, gato o ave
-            let iconMascota = '<i class="fas fa-paw"></i>'; // Huella por defecto
+            let iconMascota = '<i class="fas fa-paw"></i>';
             if (subcategory) {
                 const sub = subcategory.toLowerCase();
                 if (sub.includes('perro')) iconMascota = '<i class="fas fa-dog"></i>';
@@ -189,7 +192,7 @@ export const UIComponents = {
             }
 
             if (attributes.raza) details.push(`<span>${iconMascota} ${attributes.raza}</span>`);
-            if (attributes.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attributes.genero}</span>`); // Símbolo de género
+            if (attributes.genero) details.push(`<span><i class="fas fa-venus-mars"></i> ${attributes.genero}</span>`);
             
             // Validamos si la edad ya trae texto para no duplicar la palabra "años"
             if (attributes.edad_mascota) {
@@ -222,9 +225,9 @@ export const UIComponents = {
         if (attributes.subcategoria && businessSubcats.includes(attributes.subcategoria)) {
             let details = [];
             
-            if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-building"></i> ${attributes.tipo_negocio}</span>`); // Edificio corporativo
-            if (attributes.razon_venta) details.push(`<span><i class="fas fa-handshake"></i> ${attributes.razon_venta}</span>`); // Apretón de manos
-            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`); // Diamante (Calidad/Condición)
+            if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-building"></i> ${attributes.tipo_negocio}</span>`);
+            if (attributes.razon_venta) details.push(`<span><i class="fas fa-handshake"></i> ${attributes.razon_venta}</span>`);
+            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
             
             if (details.length > 0) {
                 detailsHTML += `<div class="business-details">${details.slice(0, 3).join('')}</div>`;
@@ -236,12 +239,12 @@ export const UIComponents = {
         if (attributes.subcategoria && communitySubcats.includes(attributes.subcategoria)) {
             let details = [];
             
-            if (attributes.tipo_evento) details.push(`<span><i class="fas fa-ticket-alt"></i> ${attributes.tipo_evento}</span>`); // Ticket de entrada
-            if (attributes.tipo_actividad) details.push(`<span><i class="fas fa-user-friends"></i> ${attributes.tipo_actividad}</span>`); // Grupo de personas
-            if (attributes.tipo_clase) details.push(`<span><i class="fas fa-book-reader"></i> ${attributes.tipo_clase}</span>`); // Persona leyendo
-            if (attributes.nivel) details.push(`<span><i class="fas fa-layer-group"></i> ${attributes.nivel}</span>`); // Capas/Niveles
-            if (attributes.modalidad) details.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`); // Globo terráqueo (Online/Global)
-            if (attributes.fecha_evento) details.push(`<span><i class="far fa-calendar-check"></i> ${attributes.fecha_evento}</span>`); // Calendario con check
+            if (attributes.tipo_evento) details.push(`<span><i class="fas fa-ticket-alt"></i> ${attributes.tipo_evento}</span>`);
+            if (attributes.tipo_actividad) details.push(`<span><i class="fas fa-user-friends"></i> ${attributes.tipo_actividad}</span>`);
+            if (attributes.tipo_clase) details.push(`<span><i class="fas fa-book-reader"></i> ${attributes.tipo_clase}</span>`);
+            if (attributes.nivel) details.push(`<span><i class="fas fa-layer-group"></i> ${attributes.nivel}</span>`);
+            if (attributes.modalidad) details.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`);
+            if (attributes.fecha_evento) details.push(`<span><i class="far fa-calendar-check"></i> ${attributes.fecha_evento}</span>`);
             
             if (details.length > 0) {
                 detailsHTML += `<div class="community-details">${details.slice(0, 3).join('')}</div>`;
@@ -381,9 +384,9 @@ export function cleanLocationString(fullAddress) {
     });
     
     // 4. Limpiar comas huérfanas o dobles espacios que hayan quedado
-    cleanStr = cleanStr.replace(/,(\s*,)+/g, ','); // Quitar comas repetidas
-    cleanStr = cleanStr.replace(/,\s*$/, '');      // Quitar coma al final
-    cleanStr = cleanStr.replace(/^\s*,\s*/, '');   // Quitar coma al principio
+    cleanStr = cleanStr.replace(/,(\s*,)+/g, ',');
+    cleanStr = cleanStr.replace(/,\s*$/, '');
+    cleanStr = cleanStr.replace(/^\s*,\s*/, '');
     cleanStr = cleanStr.trim();
     
     // Si después de limpiar quedó vacío, devolvemos el original truncado a 30 caracteres

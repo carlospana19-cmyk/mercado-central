@@ -1,5 +1,5 @@
 // =====================================================
-// ADMIN LOGIC - Panel Vercel Ultra-Wide
+// ADMIN LOGIC - Panel Vercel Ultra-Wide - FIX TOTAL
 // =====================================================
 
 import { supabase } from './supabase-client.js';
@@ -106,46 +106,42 @@ async function cargarDashboard() {
             .from('profiles')
             .select('*', { count: 'exact', head: true });
 
+        // --- CÁLCULO DE FACTURACIÓN MENSUAL (SOLO DINERO REAL) ---
         const now = new Date();
         const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
         
         let { data: planesMes } = await supabase
             .from('user_plans')
-            .select('plan_tipo, monto')
+            .select('plan_type, amount_paid')
             .gte('created_at', inicioMes);
         
         let facturacionMes = 0;
-        const precios = { top: 20, destacado: 15, premium: 10, basico: 5 };
         
         if (planesMes && planesMes.length > 0) {
-            planesMes.forEach(v => facturacionMes += v.monto || precios[v.plan_tipo] || 0);
-        } else {
-            const { data: planesActivos } = await supabase
-                .from('user_plans')
-                .select('plan_tipo')
-                .eq('activo', true);
-            
-            if (planesActivos) {
-                planesActivos.forEach(p => facturacionMes += precios[p.plan_tipo] || 20);
-            }
+            // Solo suma amount_paid si existe y es un número mayor a 0. No usa precios ficticios.
+            planesMes.forEach(v => {
+                if (v.amount_paid && !isNaN(v.amount_paid)) {
+                    facturacionMes += Number(v.amount_paid);
+                }
+            });
         }
 
+        // --- CÁLCULO DE FACTURACIÓN ANUAL (SOLO DINERO REAL) ---
         const inicioAno = new Date(now.getFullYear(), 0, 1).toISOString();
         
         let { data: planesAno } = await supabase
             .from('user_plans')
-            .select('plan_tipo, monto')
+            .select('plan_type, amount_paid')
             .gte('created_at', inicioAno);
         
         let facturacionAno = 0;
         
         if (planesAno && planesAno.length > 0) {
-            planesAno.forEach(v => facturacionAno += v.monto || precios[v.plan_tipo] || 0);
-        } else {
-            const { data: todosPlanes } = await supabase.from('user_plans').select('plan_tipo');
-            if (todosPlanes) {
-                todosPlanes.forEach(p => facturacionAno += precios[p.plan_tipo] || 20);
-            }
+            planesAno.forEach(v => {
+                if (v.amount_paid && !isNaN(v.amount_paid)) {
+                    facturacionAno += Number(v.amount_paid);
+                }
+            });
         }
 
         document.getElementById('stat-anuncios').textContent = totalAnuncios || 0;
@@ -172,17 +168,21 @@ function generarGrafico(facturacionMes) {
     }).join('');
 }
 
-// GANANCIAS
+// GANANCIAS - TABLA CON "VALOR (REGALÍA)"
 async function cargarGanancias() {
     const tbody = document.getElementById('ganancias-tbody');
+    if (!tbody) return;
+    
     tbody.innerHTML = '<tr><td colspan="5" class="loading"><div class="loading-spinner"></div></td></tr>';
 
     try {
-        const { data: cortesias } = await supabase
+        const { data: cortesias, error: errC } = await supabase
             .from('cortesias_aplicadas')
-            .select('*, user:profiles(email)')
+            .select('*')
             .order('created_at', { ascending: false })
             .limit(50);
+
+        if (errC) throw errC;
 
         const userIds = [...new Set(cortesias?.map(c => c.user_id).filter(Boolean) || [])];
         let usuariosMap = {};
@@ -190,12 +190,12 @@ async function cargarGanancias() {
         if (userIds.length > 0) {
             const { data: profiles } = await supabase
                 .from('profiles')
-                .select('id, email, nombre_negocio')
+                .select('id, email')
                 .in('id', userIds);
-            if (profiles) profiles.forEach(p => usuariosMap[p.id] = p);
+            if (profiles) profiles.forEach(p => usuariosMap[p.id] = p.email);
         }
 
-        const precios = { top: 20, destacado: 15, premium: 10, basico: 5 };
+        const precios = { top: 40, destacado: 30, premium: 20, basico: 10 };
         let tokensUsados = 0;
         let cortesiasActivas = 0;
         let gananciaMes = 0;
@@ -221,11 +221,11 @@ async function cargarGanancias() {
                 if (fecha >= inicioAno) gananciaAno += monto;
 
                 tbody.innerHTML += '<tr>' +
-                    '<td>' + (usuario?.email || 'N/A') + '</td>' +
+                    '<td>' + (usuario || 'N/A') + '</td>' +
                     '<td>' + c.plan_tipo.toUpperCase() + '</td>' +
-                    '<td>$' + monto + '</td>' +
+                    '<td>$' + monto + ' <small style="color: #888; display: block; font-size: 0.7rem;">(Regalía)</small></td>' +
                     '<td>' + formatearFecha(c.fecha_inicio) + '</td>' +
-                    '<td>' + (c.metodo === 'codigo' ? 'Codigo' : 'Manual') + '</td>' +
+                    '<td>' + (c.metodo === 'codigo' ? 'Código' : 'Manual') + '</td>' +
                     '</tr>';
             });
         }
@@ -335,7 +335,7 @@ function renderizarInventario(data) {
     }).join('');
 }
 
-// USUARIOS
+// USUARIOS - BOTÓN ONCLICK FIJO
 async function cargarUsuarios() {
     const loadingEl = document.getElementById('loading-usuarios');
     const tableEl = document.getElementById('usuarios-table');
@@ -370,7 +370,7 @@ async function cargarUsuarios() {
                 .from('user_plans')
                 .select('user_id')
                 .in('user_id', userIds)
-                .eq('activo', true);
+                .eq('status', 'active');
             if (planes) planes.forEach(p => planesActivos[p.user_id] = true);
         }
 
@@ -380,6 +380,7 @@ async function cargarUsuarios() {
             tbodyEl.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #555;">No hay usuarios</td></tr>';
         } else {
             usuarios.forEach(usuario => {
+                const emailSafe = (usuario.email || 'NA').replace(/'/g, "\\'");
                 const tienePlan = planesActivos[usuario.id];
                 const vipBadge = tienePlan ? '<span style="background:#1a3d1a;color:#4ade80;padding:2px 8px;border-radius:4px;font-size:11px;margin-left:8px;">VIP</span>' : '';
                 tbodyEl.innerHTML += '<tr>' +
@@ -387,7 +388,7 @@ async function cargarUsuarios() {
                     '<td>' + (usuario.nombre_negocio || usuario.full_name || '-') + vipBadge + '</td>' +
                     '<td>' + formatearFecha(usuario.created_at) + '</td>' +
                     '<td>' + (anunciosCount[usuario.id] || 0) + '</td>' +
-                    '<td><button class="btn btn-sm" onclick="asignarRapido(\'' + usuario.email + '\')">Dar TOP</button></td>' +
+                    '<td><button class="btn btn-sm" onclick="asignarRapido(\'' + (usuario.email || '') + '\')">Dar TOP</button></td>' +
                     '</tr>';
             });
         }
@@ -401,7 +402,7 @@ async function cargarUsuarios() {
     }
 }
 
-// TOKENS
+// TOKENS - BOTÓN ONCLICK FIJO
 async function cargarTokens() {
     const loadingEl = document.getElementById('loading-tokens');
     const tableEl = document.getElementById('tokens-table');
@@ -434,6 +435,7 @@ async function cargarTokens() {
                 else if (!token.activo) estado = 'Inactivo';
                 else badgeClass = 'badge-active';
 
+                const idSafe = token.id.replace(/'/g, "\\'");
                 tbodyEl.innerHTML += '<tr>' +
                     '<td><strong>' + token.codigo + '</strong></td>' +
                     '<td>' + token.plan_tipo.toUpperCase() + '</td>' +

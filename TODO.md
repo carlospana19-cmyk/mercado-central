@@ -1,4 +1,1 @@
-# TODO: Modificar login.html
-
-- [x] Añadir id="pagina-login" a la etiqueta <body>
-- [x] Reemplazar todas las etiquetas <script> por <script type="module" src="main.js"></script>
+# TODO: Reemplazo Crítico en form-logic.js\n\n- [x] 1. Leer form-logic.js (completo)\n- [ ] 2. Editar bloque de lógica de planes\n- [ ] 3. Verificar inserción Supabase intacta\n- [ ] 4. Entregar archivo completo verificado\n- [ ] 5. Completar tarea
