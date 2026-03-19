@@ -1,551 +1,474 @@
 // =====================================================
-// ADMIN LOGIC - Panel Vercel Ultra-Wide - FIX TOTAL
+// ADMIN LOGIC - VERSIÓN MAESTRA INTEGRAL (RESTABLECIDA)
 // =====================================================
-
 import { supabase } from './supabase-client.js';
 
+// --- ESTADO GLOBAL ---
 let currentAdminUser = null;
 let inventarioData = [];
 
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Iniciando Panel Admin...');
-    
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-        mostrarAccessDenied();
-        return;
-    }
+// Diccionario Estético
+const displayNames = {
+    'inmuebles': 'Inmuebles', 'vehiculos': 'Vehículos', 'hogar': 'Hogar', 'moda': 'Moda',
+    'electronica': 'Electrónica', 'servicios': 'Servicios', 'comunidad': 'Comunidad',
+    'empleos': 'Empleos', 'otros': 'Otros', 'basico': 'Básico', 'premium': 'Premium',
+    'destacado': 'Destacado', 'top': 'Top'
+};
 
-    const { data: profile, error: profileError } = await supabase
+// ==========================================
+// 1. INICIALIZACIÓN Y SEGURIDAD
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🛰️ Iniciando Sistema Administrativo...');
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) { window.location.href = '/index.html'; return; }
+
+    const { data: profile } = await supabase
         .from('profiles')
         .select('is_admin, email')
         .eq('id', user.id)
         .single();
 
-    if (profileError || !profile || !profile.is_admin) {
-        mostrarAccessDenied();
+    if (!profile || !profile.is_admin) {
+        alert('Acceso no autorizado');
+        window.location.href = '/index.html';
         return;
     }
 
     currentAdminUser = user;
-    console.log('Admin:', profile.email);
-
     inicializarNavegacion();
-    await cargarDashboard();
-    await cargarTokens();
-    await cargarUsuarios();
+    
+    // Carga inicial masiva de datos
+    await Promise.all([
+        cargarDashboard(),
+        cargarTokens(),
+        cargarUsuarios()
+    ]);
 });
 
 function inicializarNavegacion() {
     const navItems = document.querySelectorAll('.nav-item');
-    
     navItems.forEach(item => {
         item.addEventListener('click', async () => {
-            // Verificar sesión antes de cambiar de pestaña
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                alert('Sesion expirada. Redirigiendo al login...');
-                window.location.href = '/login.html';
-                return;
-            }
-            
             const sectionId = item.dataset.section;
             if (!sectionId) return;
-            
-            // Verificar que sigue siendo admin
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('is_admin')
-                .eq('id', session.user.id)
-                .single();
-            
-            if (!profile || !profile.is_admin) {
-                alert('No tienes permisos de administrador');
-                window.location.href = '/index.html';
-                return;
-            }
-            
+
+            // UI de Navegación
             navItems.forEach(n => n.classList.remove('active'));
             item.classList.add('active');
-            
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + sectionId).classList.add('active');
-            
-            if (sectionId === 'inventario') cargarInventario();
-            else if (sectionId === 'tokens') cargarTokens();
-            else if (sectionId === 'usuarios') cargarUsuarios();
-            else if (sectionId === 'ganancias') cargarGanancias();
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + sectionId)?.classList.add('active');
+
+            // Cargas por Sección
+            if (sectionId === 'inventario') await cargarInventario();
+            if (sectionId === 'tokens') await cargarTokens();
+            if (sectionId === 'usuarios') await cargarUsuarios();
+            if (sectionId === 'ganancias') await cargarGanancias();
         });
     });
 
-    document.getElementById('form-generar-token').addEventListener('submit', async (e) => {
+    // Filtros
+    document.getElementById('filter-categoria')?.addEventListener('change', (e) => {
+        cargarInventario(e.target.value);
+    });
+    document.getElementById('filter-estado')?.addEventListener('change', () => {
+        const load = document.getElementById('loading-inventario');
+        const container = document.getElementById('inventario-list');
+        if (load) load.style.display = 'block';
+        if (container) container.style.display = 'none';
+        setTimeout(() => {
+            filtrarInventario();
+            if (load) load.style.display = 'none';
+            if (container) container.style.display = 'block';
+        }, 100);
+    });
+    document.getElementById('filter-buscar')?.addEventListener('input', () => {
+        const load = document.getElementById('loading-inventario');
+        const container = document.getElementById('inventario-list');
+        if (load) load.style.display = 'block';
+        if (container) container.style.display = 'none';
+        setTimeout(() => {
+            filtrarInventario();
+            if (load) load.style.display = 'none';
+            if (container) container.style.display = 'block';
+        }, 100);
+    });
+
+    // Formulario de Tokens
+    document.getElementById('form-generar-token')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await generarToken();
     });
-
-    document.getElementById('filter-categoria').addEventListener('change', filtrarInventario);
-    document.getElementById('filter-estado').addEventListener('change', filtrarInventario);
-    document.getElementById('filter-buscar').addEventListener('input', filtrarInventario);
 }
 
-function mostrarAccessDenied() {
-    document.getElementById('access-denied').classList.add('show');
-    setTimeout(() => { window.location.href = '/index.html'; }, 3000);
-}
-
-// DASHBOARD
+// ==========================================
+// 2. DASHBOARD (ESTADÍSTICAS GLOBALES)
+// ==========================================
 async function cargarDashboard() {
     try {
-        const { count: totalAnuncios } = await supabase
-            .from('anuncios')
-            .select('*', { count: 'exact', head: true });
-
-        const { count: totalUsuarios } = await supabase
-            .from('profiles')
-            .select('*', { count: 'exact', head: true });
-
-        // --- CÁLCULO DE FACTURACIÓN MENSUAL (SOLO DINERO REAL) ---
-        const now = new Date();
-        const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const { count: totalAds } = await supabase.from('anuncios').select('*', { count: 'exact', head: true });
+        const { count: totalUsr } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
         
-        let { data: planesMes } = await supabase
-            .from('user_plans')
-            .select('plan_type, amount_paid')
-            .gte('created_at', inicioMes);
-        
-        let facturacionMes = 0;
-        
-        if (planesMes && planesMes.length > 0) {
-            // Solo suma amount_paid si existe y es un número mayor a 0. No usa precios ficticios.
-            planesMes.forEach(v => {
-                if (v.amount_paid && !isNaN(v.amount_paid)) {
-                    facturacionMes += Number(v.amount_paid);
-                }
-            });
-        }
+        // Dinero Real (Facturación)
+        const { data: pagos } = await supabase.from('user_plans').select('amount_paid').gt('amount_paid', 0);
+        let totalDinero = 0;
+        pagos?.forEach(p => totalDinero += Number(p.amount_paid));
 
-        // --- CÁLCULO DE FACTURACIÓN ANUAL (SOLO DINERO REAL) ---
-        const inicioAno = new Date(now.getFullYear(), 0, 1).toISOString();
-        
-        let { data: planesAno } = await supabase
-            .from('user_plans')
-            .select('plan_type, amount_paid')
-            .gte('created_at', inicioAno);
-        
-        let facturacionAno = 0;
-        
-        if (planesAno && planesAno.length > 0) {
-            planesAno.forEach(v => {
-                if (v.amount_paid && !isNaN(v.amount_paid)) {
-                    facturacionAno += Number(v.amount_paid);
-                }
-            });
-        }
-
-        document.getElementById('stat-anuncios').textContent = totalAnuncios || 0;
-        document.getElementById('stat-usuarios').textContent = totalUsuarios || 0;
-        document.getElementById('stat-mensual').textContent = '$' + facturacionMes;
-        document.getElementById('stat-anual').textContent = '$' + facturacionAno;
-
-        generarGrafico(facturacionMes);
-
-    } catch (error) {
-        console.error('Error dashboard:', error);
-    }
+        document.getElementById('stat-anuncios').textContent = totalAds || 0;
+        document.getElementById('stat-usuarios').textContent = totalUsr || 0;
+        document.getElementById('stat-mensual').textContent = '$' + totalDinero;
+    } catch (e) { console.error('Dashboard:', e); }
 }
 
-function generarGrafico(facturacionMes) {
-    const container = document.getElementById('chart-ganancias');
-    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
-    const valores = [facturacionMes || 1200, 1900, 1500, 2200, 1800, facturacionMes || 2400];
-    const max = Math.max(...valores);
-
-    container.innerHTML = valores.map((v, i) => {
-        const height = (v / max) * 100;
-        return '<div class="chart-bar" style="height: ' + height + '%" title="' + meses[i] + ': $' + v + '"></div>';
-    }).join('');
-}
-
-// GANANCIAS - TABLA CON "VALOR (REGALÍA)"
+// ==========================================
+// 3. GANANCIAS (SEPARACIÓN DINERO VS REGALÍAS)
+// ==========================================
 async function cargarGanancias() {
     const tbody = document.getElementById('ganancias-tbody');
     if (!tbody) return;
-    
-    tbody.innerHTML = '<tr><td colspan="5" class="loading"><div class="loading-spinner"></div></td></tr>';
 
     try {
-        const { data: cortesias, error: errC } = await supabase
-            .from('cortesias_aplicadas')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(50);
-
-        if (errC) throw errC;
-
-        const userIds = [...new Set(cortesias?.map(c => c.user_id).filter(Boolean) || [])];
-        let usuariosMap = {};
+        const { data: pagos } = await supabase.from('user_plans').select('*').gt('amount_paid', 0);
         
-        if (userIds.length > 0) {
-            const { data: profiles } = await supabase
-                .from('profiles')
-                .select('id, email')
-                .in('id', userIds);
-            if (profiles) profiles.forEach(p => usuariosMap[p.id] = p.email);
-        }
-
-        const precios = { top: 40, destacado: 30, premium: 20, basico: 10 };
-        let tokensUsados = 0;
-        let cortesiasActivas = 0;
-        let gananciaMes = 0;
-        let gananciaAno = 0;
-
         const now = new Date();
-        const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-        const inicioAno = new Date(now.getFullYear(), 0, 1);
+        let hoy = 0, mes = 0, ano = 0;
 
-        tbody.innerHTML = '';
-        
-        if (!cortesias || cortesias.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #555;">No hay registros</td></tr>';
-        } else {
-            cortesias.forEach(c => {
-                const usuario = usuariosMap[c.user_id];
-                const fecha = new Date(c.fecha_inicio);
-                const monto = precios[c.plan_tipo] || 0;
+        pagos?.forEach(p => {
+            const fecha = new Date(p.created_at);
+            const monto = Number(p.amount_paid);
 
-                if (c.usado || c.activo) tokensUsados++;
-                if (c.activo && new Date(c.fecha_fin) > now) cortesiasActivas++;
-                if (fecha >= inicioMes) gananciaMes += monto;
-                if (fecha >= inicioAno) gananciaAno += monto;
+            // 1. Suma Año
+            if (fecha.getFullYear() === now.getFullYear()) {
+                ano += monto;
+                // 2. Suma Mes
+                if (fecha.getMonth() === now.getMonth()) {
+                    mes += monto;
+                    // 3. Suma Día
+                    if (fecha.getDate() === now.getDate()) {
+                        hoy += monto;
+                    }
+                }
+            }
+        });
 
-                tbody.innerHTML += '<tr>' +
-                    '<td>' + (usuario || 'N/A') + '</td>' +
-                    '<td>' + c.plan_tipo.toUpperCase() + '</td>' +
-                    '<td>$' + monto + ' <small style="color: #888; display: block; font-size: 0.7rem;">(Regalía)</small></td>' +
-                    '<td>' + formatearFecha(c.fecha_inicio) + '</td>' +
-                    '<td>' + (c.metodo === 'codigo' ? 'Código' : 'Manual') + '</td>' +
-                    '</tr>';
-            });
-        }
+        // Inyectar en los cuadros
+        document.getElementById('ganancia-hoy').textContent = '$' + hoy;
+        document.getElementById('ganancia-mensual').textContent = '$' + mes;
+        document.getElementById('ganancia-anual').textContent = '$' + ano;
 
-        document.getElementById('ganancia-mensual').textContent = '$' + gananciaMes;
-        document.getElementById('ganancia-anual').textContent = '$' + gananciaAno;
-        document.getElementById('ganancia-tokens').textContent = tokensUsados;
-        document.getElementById('ganancia-cortesias').textContent = cortesiasActivas;
+        // Llenar la tabla de historial de pagos (ordenado descendente)
+        const pagosOrdenados = (pagos || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        tbody.innerHTML = pagosOrdenados.map(p => `
+            <tr>
+                <td>ID: ${p.user_id.substring(0,8)}</td>
+                <td>${(p.plan_type || 'PLAN').toUpperCase()}</td>
+                <td style="color:#4ade80; font-weight:bold;">$${p.amount_paid}</td>
+                <td>${new Date(p.created_at).toLocaleDateString()}</td>
+                <td><span class="status-pill active">EFECTIVO</span></td>
+            </tr>`).join('');
 
-    } catch (error) {
-        console.error('Error ganancias:', error);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ff4444;">Error</td></tr>';
+    } catch (e) {
+        console.error("Error en Ganancias Reales:", e);
     }
 }
 
-// INVENTARIO
-async function cargarInventario() {
-    const loadingEl = document.getElementById('loading-inventario');
-    const containerEl = document.getElementById('inventario-list');
-
-    loadingEl.style.display = 'block';
-    containerEl.style.display = 'none';
+// ==========================================
+// 4. INVENTARIO (CUADROS CON LÍNEAS - image_5029e0)
+// ==========================================
+async function cargarInventario(categoriaSeleccionada = '') {
+    const load = document.getElementById('loading-inventario');
+    const container = document.getElementById('inventario-list');
+    if (load) load.style.display = 'block';
+    if (container) container.style.display = 'none';
 
     try {
-        const { data, error } = await supabase
-            .from('anuncios')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        inventarioData = data || [];
-
-        const userIds = [...new Set(inventarioData.map(a => a.user_id).filter(Boolean))];
-        let usuariosMap = {};
+        let query;
         
-        if (userIds.length > 0) {
-            const { data: profiles } = await supabase
-                .from('profiles')
-                .select('id, email, nombre_negocio')
-                .in('id', userIds);
-            if (profiles) profiles.forEach(p => usuariosMap[p.id] = p);
+        if (categoriaSeleccionada) {
+            console.log("🔍 Buscando categoria:", categoriaSeleccionada);
+            query = supabase.from('anuncios')
+                .select('*')
+                .ilike('categoria', `${categoriaSeleccionada}`)
+                .order('created_at', { ascending: false });
+        } else {
+            console.log("🔍 Buscando en Supabase -> todas las categorías");
+            query = supabase.from('anuncios')
+                .select('*')
+                .order('created_at', { ascending: false });
         }
 
-        inventarioData = inventarioData.map(a => Object.assign({}, a, { usuario: usuariosMap[a.user_id] }));
-
-        filtrarInventario();
-
-        loadingEl.style.display = 'none';
-        containerEl.style.display = 'block';
-
-    } catch (error) {
-        console.error('Error inventario:', error);
-        loadingEl.innerHTML = '<p style="color: #ff4444;">Error</p>';
+        const { data } = await query;
+        const uIds = [...new Set((data || []).map(a => a.user_id).filter(Boolean))];
+        const { data: profs } = await supabase.from('profiles').select('id, email, nombre_negocio').in('id', uIds);
+        const uMap = {}; profs?.forEach(p => uMap[p.id] = p);
+        
+        inventarioData = (data || []).map(a => ({ ...a, usuario: uMap[a.user_id] }));
+        
+        // Limpiar y renderizar
+        if (container) {
+            container.innerHTML = '';
+            if (data.length === 0) {
+                container.innerHTML = '<div class="loading">No hay anuncios en esta categoría</div>';
+            } else {
+                renderizarInventario(inventarioData);
+            }
+        }
+    } catch (e) { 
+        console.error(e);
+        const container = document.getElementById('inventario-list');
+        if (container) {
+            container.innerHTML = '<div class="loading">Error al cargar los anuncios</div>';
+        }
+    } finally {
+        if (load) load.style.display = 'none';
+        if (container) container.style.display = 'block';
     }
 }
 
 function filtrarInventario() {
-    const categoria = document.getElementById('filter-categoria').value;
-    const estado = document.getElementById('filter-estado').value;
-    const buscar = document.getElementById('filter-buscar').value.toLowerCase();
-
-    let filtered = inventarioData;
-
-    if (categoria) filtered = filtered.filter(i => i.categoria === categoria);
-    if (estado === 'activo') filtered = filtered.filter(i => i.activo);
-    else if (estado === 'inactivo') filtered = filtered.filter(i => !i.activo);
-    if (buscar) filtered = filtered.filter(i => 
-        (i.titulo && i.titulo.toLowerCase().includes(buscar)) ||
-        (i.usuario && i.usuario.email && i.usuario.email.toLowerCase().includes(buscar))
-    );
-
-    renderizarInventario(filtered);
+    const cat = document.getElementById('filter-categoria')?.value;
+    const est = document.getElementById('filter-estado')?.value;
+    const bus = document.getElementById('filter-buscar')?.value.toLowerCase();
+    
+    let filtered = [...inventarioData];
+    console.log('Categoría filtrada:', cat);
+    if (cat) {
+        filtered = filtered.filter(i => (i.categoria || '').toLowerCase() === cat.toLowerCase());
+    }
+    if (est === 'activo') filtered = filtered.filter(i => i.activo);
+    if (est === 'inactivo') filtered = filtered.filter(i => !i.activo);
+    if (bus) {
+        filtered = filtered.filter(i => 
+            i.titulo?.toLowerCase().includes(bus) || i.usuario?.email?.toLowerCase().includes(bus)
+        );
+    }
+    
+    const container = document.getElementById('inventario-list');
+    if (container) {
+        container.innerHTML = '';
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="loading">No hay anuncios en esta categoría</div>';
+        } else {
+            renderizarInventario(filtered);
+        }
+    }
 }
 
 function renderizarInventario(data) {
     const container = document.getElementById('inventario-list');
+    if (!container) return;
     
-    if (!data || data.length === 0) {
-        container.innerHTML = '<div class="loading">No hay anuncios</div>';
+    if (data.length === 0) {
+        container.innerHTML = '<div class="loading">No hay anuncios registrados.</div>';
         return;
     }
-
+    
     container.innerHTML = data.map(anuncio => {
         let imagenes = [];
-        try { if (anuncio.imagenes) imagenes = JSON.parse(anuncio.imagenes); } catch(e) {}
-        
+        try { if(anuncio.imagenes) imagenes = JSON.parse(anuncio.imagenes); } catch(e){}
         const imgUrl = imagenes.length > 0 ? imagenes[0] : '/imgx-logopng.jpeg';
-        const visitas = anuncio.visitas || 0;
         const vendedor = anuncio.usuario ? (anuncio.usuario.nombre_negocio || anuncio.usuario.email) : 'Desconocido';
-        
-        return '<div class="inventario-item">' +
-            '<img src="' + imgUrl + '" alt="" class="inventario-img" onerror="this.src=\'/imgx-logopng.jpeg\'">' +
-            '<div class="inventario-info">' +
-            '<h4>' + (anuncio.titulo || 'Sin titulo') + '</h4>' +
-            '<div class="inventario-meta">' +
-            '<span><strong>Vendedor:</strong> ' + vendedor + '</span>' +
-            '<span>' + (anuncio.categoria || 'Sin categoria') + '</span>' +
-            '<span>$' + (anuncio.precio || 0) + '</span>' +
-            '<span>' + formatearFecha(anuncio.created_at) + '</span>' +
-            '<span class="badge ' + (anuncio.activo ? 'badge-active' : '') + '">' + (anuncio.activo ? 'Activo' : 'Inactivo') + '</span>' +
-            '</div></div>' +
-            '<div class="inventario-stats">' +
-            '<div class="number">' + visitas + '</div>' +
-            '<div class="label">visitas</div>' +
-            '</div></div>';
+
+        return `
+            <div class="inventario-item">
+                <img src="${imgUrl}" class="inventario-img" onerror="this.src='/imgx-logopng.jpeg'">
+                <div class="inventario-info">
+                    <h4>${anuncio.titulo || 'Sin título'}</h4>
+                    <div class="inventario-meta">
+                        <span><strong>Vendedor:</strong> ${vendedor}</span>
+                        <span><strong>Categoría:</strong> ${displayNames[anuncio.categoria?.toLowerCase()] || anuncio.categoria}</span>
+                        <span><strong>Precio:</strong> $${anuncio.precio || 0}</span>
+                        <span><strong>Fecha:</strong> ${formatearFecha(anuncio.created_at)}</span>
+                        <span class="badge ${anuncio.activo ? 'badge-active' : ''}">${anuncio.activo ? 'Activo' : 'Inactivo'}</span>
+                    </div>
+                </div>
+                <div class="inventario-stats">
+                    <div class="number">${anuncio.visitas || 0}</div>
+                    <div class="label">visitas</div>
+                </div>
+            </div>`;
     }).join('');
 }
 
-// USUARIOS - BOTÓN ONCLICK FIJO
-async function cargarUsuarios() {
-    const loadingEl = document.getElementById('loading-usuarios');
-    const tableEl = document.getElementById('usuarios-table');
-    const tbodyEl = document.getElementById('usuarios-tbody');
+// ==========================================
+// 5. TOKENS (GESTIÓN Y TABLA)
+// ==========================================
+async function cargarTokens() {
+    const loading = document.getElementById('loading-tokens');
+    const table = document.getElementById('tokens-table');
+    const tbody = document.getElementById('tokens-tbody');
 
-    loadingEl.style.display = 'block';
-    tableEl.style.display = 'none';
-
+    if (loading) loading.style.display = 'block';
+    
     try {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        const usuarios = data || [];
-
-        const userIds = usuarios.map(u => u.id);
-        let anunciosCount = {};
-        let planesActivos = {};
+        const { data: tks } = await supabase.from('plan_tokens').select('*').order('created_at', { ascending: false });
         
-        if (userIds.length > 0) {
-            const { data: counts } = await supabase
-                .from('anuncios')
-                .select('user_id')
-                .in('user_id', userIds);
-            if (counts) counts.forEach(c => anunciosCount[c.user_id] = (anunciosCount[c.user_id] || 0) + 1);
-            
-            // Obtener usuarios con planes activos
-            const { data: planes } = await supabase
-                .from('user_plans')
-                .select('user_id')
-                .in('user_id', userIds)
-                .eq('status', 'active');
-            if (planes) planes.forEach(p => planesActivos[p.user_id] = true);
-        }
+        // Estadísticas de Pestaña Tokens
+        if(document.getElementById('stat-tokens-total')) document.getElementById('stat-tokens-total').textContent = tks?.length || 0;
+        if(document.getElementById('stat-tokens-usados')) document.getElementById('stat-tokens-usados').textContent = tks?.filter(t => t.usado).length || 0;
+        if(document.getElementById('stat-tokens-disponibles')) document.getElementById('stat-tokens-disponibles').textContent = tks?.filter(t => !t.usado && t.activo).length || 0;
 
-        tbodyEl.innerHTML = '';
+        if (tbody) {
+            tbody.innerHTML = (tks || []).map(t => `
+                <tr>
+                    <td><strong>${t.codigo}</strong></td>
+                    <td>${(t.plan_tipo || '').toUpperCase()}</td>
+                    <td>${t.duracion_dias}</td>
+                    <td><span class="badge ${!t.usado && t.activo ? 'badge-active' : ''}">${t.usado ? 'Usado' : (t.activo ? 'Disponible' : 'Inactivo')}</span></td>
+                    <td>${formatearFecha(t.created_at)}</td>
+                    <td>${!t.usado && t.activo ? `<button class="btn btn-danger btn-sm" onclick="window.desactivarToken('${t.id}')">X</button>` : '-'}</td>
+                </tr>`).join('');
+        }
         
-        if (usuarios.length === 0) {
-            tbodyEl.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #555;">No hay usuarios</td></tr>';
-        } else {
-            usuarios.forEach(usuario => {
-                const emailSafe = (usuario.email || 'NA').replace(/'/g, "\\'");
-                const tienePlan = planesActivos[usuario.id];
-                const vipBadge = tienePlan ? '<span style="background:#1a3d1a;color:#4ade80;padding:2px 8px;border-radius:4px;font-size:11px;margin-left:8px;">VIP</span>' : '';
-                tbodyEl.innerHTML += '<tr>' +
-                    '<td>' + (usuario.email || 'N/A') + '</td>' +
-                    '<td>' + (usuario.nombre_negocio || usuario.full_name || '-') + vipBadge + '</td>' +
-                    '<td>' + formatearFecha(usuario.created_at) + '</td>' +
-                    '<td>' + (anunciosCount[usuario.id] || 0) + '</td>' +
-                    '<td><button class="btn btn-sm" onclick="asignarRapido(\'' + (usuario.email || '') + '\')">Dar TOP</button></td>' +
-                    '</tr>';
-            });
-        }
-
-        loadingEl.style.display = 'none';
-        tableEl.style.display = 'table';
-
-    } catch (error) {
-        console.error('Error usuarios:', error);
-        loadingEl.innerHTML = '<p style="color: #ff4444;">Error</p>';
-    }
+        if (loading) loading.style.display = 'none';
+        if (table) table.style.display = 'table';
+    } catch (e) { console.error(e); }
 }
 
-// TOKENS - BOTÓN ONCLICK FIJO
-async function cargarTokens() {
-    const loadingEl = document.getElementById('loading-tokens');
-    const tableEl = document.getElementById('tokens-table');
-    const tbodyEl = document.getElementById('tokens-tbody');
+// ==========================================
+// 6. USUARIOS Y FUNCIONES GLOBALES
+// ==========================================
+async function cargarUsuarios() {
+    const loading = document.getElementById('loading-usuarios');
+    const table = document.getElementById('usuarios-table');
+    const tbody = document.getElementById('usuarios-tbody');
 
-    loadingEl.style.display = 'block';
-    tableEl.style.display = 'none';
+    // Mostrar spinner al iniciar
+    if (loading) loading.style.display = 'block';
+    if (table) table.style.display = 'none';
 
     try {
-        const { data, error } = await supabase
-            .from('plan_tokens')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        const tokens = data || [];
-
-        tbodyEl.innerHTML = '';
+        const { data: usrs } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
         
-        if (tokens.length === 0) {
-            tbodyEl.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #555;">No hay tokens</td></tr>';
-        } else {
-            tokens.forEach(token => {
-                let estado = 'Disponible';
-                let badgeClass = '';
-                
-                if (token.usado) estado = 'Usado';
-                else if (token.expira_en && new Date(token.expira_en) < new Date()) estado = 'Expirado';
-                else if (!token.activo) estado = 'Inactivo';
-                else badgeClass = 'badge-active';
-
-                const idSafe = token.id.replace(/'/g, "\\'");
-                tbodyEl.innerHTML += '<tr>' +
-                    '<td><strong>' + token.codigo + '</strong></td>' +
-                    '<td>' + token.plan_tipo.toUpperCase() + '</td>' +
-                    '<td>' + token.duracion_dias + '</td>' +
-                    '<td><span class="badge ' + badgeClass + '">' + estado + '</span></td>' +
-                    '<td>' + formatearFecha(token.created_at) + '</td>' +
-                    '<td>' + 
-                    (!token.usado && token.activo ? '<button class="btn btn-danger btn-sm" onclick="desactivarToken(\'' + token.id + '\')">X</button>' : '') +
-                    '</td></tr>';
-            });
+        if (tbody) {
+            tbody.innerHTML = (usrs || []).map(u => {
+                try {
+                    const nombre = u.nombre_negocio || u.nombre_completo || u.email.split('@')[0];
+                    const rol = u.is_admin ? '<span class="badge-admin">Admin</span>' : '<span class="badge-user">Usuario</span>';
+                    const foto = u.url_foto_perfil || '/imgx-logopng.jpeg';
+                    
+                    return `
+                        <tr>
+                            <td><img src="${foto}" class="user-avatar-mini"></td>
+                            <td>${nombre}</td>
+                            <td>${u.email}</td>
+                            <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                            <td>${rol}</td>
+                            <td><button class="btn-sm btn-gift" onclick="window.asignarTokenDirecto('${u.id}', '${u.whatsapp || u.telefono || ''}')">🎁 Dar Token</button></td>
+                        </tr>`;
+                } catch (err) {
+                    console.error('Error al renderizar usuario:', err);
+                    return ''; // Skip corrupted data
+                }
+            }).join('');
         }
-
-        loadingEl.style.display = 'none';
-        tableEl.style.display = 'table';
-
-    } catch (error) {
-        console.error('Error tokens:', error);
-        loadingEl.innerHTML = '<p style="color: #ff4444;">Error</p>';
+    } catch (e) { 
+        console.error('Error al cargar usuarios:', e);
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error al cargar usuarios</td></tr>';
+        }
+    } finally {
+        // Ocultar spinner y mostrar tabla al finalizar
+        if (loading) loading.style.display = 'none';
+        if (table) table.style.display = 'table';
     }
 }
 
 async function generarToken() {
-    const planTipo = document.getElementById('plan-tipo').value;
-    const duracionDias = parseInt(document.getElementById('duracion-dias').value);
-    const categoriaEspecifica = document.getElementById('categoria-especifica').value || null;
-    const expiraEn = document.getElementById('expira-en').value || null;
-    const notas = document.getElementById('notas').value || null;
-
-    try {
-        const codigo = await generarCodigoUnico();
-
-        const { error } = await supabase.from('plan_tokens').insert([{
-            codigo: codigo,
-            plan_tipo: planTipo,
-            duracion_dias: duracionDias,
-            categoria_especifica: categoriaEspecifica,
-            expira_en: expiraEn ? new Date(expiraEn).toISOString() : null,
-            notas: notas,
-            creado_por: currentAdminUser.id,
-            activo: true
-        }]);
-
-        if (error) throw error;
-
-        document.getElementById('codigo-value').textContent = codigo;
-        document.getElementById('codigo-generado').style.display = 'block';
-        document.getElementById('form-generar-token').reset();
-        
-        await cargarTokens();
-
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-async function generarCodigoUnico() {
-    let codigo;
-    let existe = true;
+    const plan = document.getElementById('plan-tipo').value;
+    const dias = parseInt(document.getElementById('duracion-dias').value);
+    const cod = 'MC-' + Math.random().toString(36).substring(2, 5).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
     
-    while (existe) {
-        const random1 = Math.random().toString(36).substring(2, 5).toUpperCase();
-        const random2 = Math.random().toString(36).substring(2, 6).toUpperCase();
-        codigo = 'MC-' + random1 + '-' + random2;
-        
-        const { data } = await supabase
-            .from('plan_tokens')
-            .select('codigo')
-            .eq('codigo', codigo)
-            .single();
-        
-        existe = data !== null;
-    }
+    await supabase.from('plan_tokens').insert([{ 
+        codigo: cod, plan_tipo: plan, duracion_dias: dias, activo: true, creado_por: currentAdminUser.id 
+    }]);
     
-    return codigo;
+    document.getElementById('codigo-value').textContent = cod;
+    document.getElementById('codigo-generado').style.display = 'block';
+    await cargarTokens();
 }
 
 function formatearFecha(fecha) {
     if (!fecha) return '-';
-    const date = new Date(fecha);
-    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const d = new Date(fecha);
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-window.copiarCodigo = function() {
-    const codigo = document.getElementById('codigo-value').textContent;
-    navigator.clipboard.writeText(codigo).then(() => alert('Copiado: ' + codigo));
+// EXPOSICIÓN AL OBJETO WINDOW (CRÍTICO PARA type="module")
+window.desactivarToken = async (id) => {
+    if (!confirm('¿Desactivar token?')) return;
+    await supabase.from('plan_tokens').update({ activo: false }).eq('id', id);
+    await cargarTokens();
 };
 
-window.desactivarToken = async function(tokenId) {
-    if (!confirm('Desactivar token?')) return;
-    try {
-        await supabase.from('plan_tokens').update({ activo: false }).eq('id', tokenId);
-        await cargarTokens();
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
+window.seleccionarCategoria = (cat, el) => {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const filtered = (cat === 'General') ? inventarioData : inventarioData.filter(i => i.categoria === cat);
+    renderizarInventario(filtered);
 };
 
-window.asignarRapido = function(email) {
+window.asignarRapido = (email) => {
     document.querySelector('[data-section="tokens"]').click();
-    document.getElementById('email-usuario').value = email;
-    document.getElementById('plan-manual').value = 'top';
+    setTimeout(() => { document.getElementById('email-usuario').value = email; }, 200);
 };
 
-window.cerrarSesion = async function() {
-    if (!confirm('Cerrar sesion?')) return;
+window.copiarCodigo = () => {
+    const cod = document.getElementById('codigo-value').textContent;
+    navigator.clipboard.writeText(cod).then(() => alert('Copiado: ' + cod));
+};
+
+window.cerrarSesion = async () => {
+    if (!confirm('¿Cerrar sesión?')) return;
+    await supabase.auth.signOut();
+    window.location.href = '/index.html';
+};
+
+window.asignarTokenDirecto = async (userId, phone) => {
     try {
-        await supabase.auth.signOut();
-        window.location.href = '/index.html';
+        console.log('Asignar token al usuario:', userId);
+        
+        // Obtener días de validez
+        const diasInput = prompt('¿Cuántos días de validez tendrá este token?', '30');
+        const duracionDias = parseInt(diasInput) || 30;
+        
+        // Generar código aleatorio
+        const codigo = 'MC-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+        
+        // Insertar en la tabla plan_tokens
+        await supabase.from('plan_tokens').insert({
+            codigo: codigo,
+            plan_type: 'premium',
+            duracion_dias: duracionDias,
+            usado: false,
+            activo: true
+        });
+        
+        // Mensaje de éxito con botón WhatsApp
+        const mensaje = `¡Token generado: ${codigo}!`;
+        const whatsappLink = `https://wa.me/${phone}?text=Hola!+Tu+codigo+de+regalo+para+Mercado+Central+es:+${codigo}`;
+        
+        // Crear modal o alerta custom
+        const confirmacion = confirm(`${mensaje}\n\n¿Deseas enviar el token por WhatsApp?`);
+        if (confirmacion && phone) {
+            window.open(whatsappLink, '_blank');
+        }
+        
+        // Recargar la lista de tokens
+        await cargarTokens();
+        
+        // Navegar a la sección de tokens
+        document.querySelector('[data-section="tokens"]').click();
+        
     } catch (error) {
-        alert('Error: ' + error.message);
+        console.error('Error al generar token:', error);
+        alert('Hubo un error al generar el token');
     }
 };
+
+// Exponer funciones ocultas
+window.cargarGanancias = cargarGanancias;
+window.cargarInventario = cargarInventario;
+window.cargarTokens = cargarTokens;
+window.filtrarInventario = filtrarInventario;

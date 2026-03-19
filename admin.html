@@ -189,36 +189,46 @@
             font-size: 14px;
         }
 
-        /* =========================================
-           ESTADÍSTICAS DASHBOARD
-           ========================================= */
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            background: var(--border-color);
-            border: 1px solid var(--border-color);
-            margin-bottom: 40px;
-        }
+         /* =========================================
+            ESTADÍSTICAS DASHBOARD
+            ========================================= */
+         
+         /* La base se mantiene igual */
+         .stats-grid {
+             display: grid;
+             gap: 1px;
+             background: var(--border-color);
+             border: 1px solid var(--border-color);
+             margin-bottom: 40px;
+         }
 
-        .stat-card {
-            background: var(--bg-secondary);
-            padding: 32px;
-        }
+         /* Variante para el Dashboard (4 columnas) */
+         .grid-4 {
+             grid-template-columns: repeat(4, 1fr);
+         }
 
-        .stat-card h3 {
-            font-size: 36px;
-            font-weight: 600;
-            letter-spacing: -1px;
-            margin-bottom: 4px;
-        }
+         /* Variante para Ganancias y Tokens (3 columnas) */
+         .grid-3 {
+             grid-template-columns: repeat(3, 1fr);
+         }
+ 
+         .stat-card {
+             background: #000000;
+             padding: 32px;
+         }
 
-        .stat-card p {
+        .stat-label {
             color: var(--text-secondary);
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -1px;
         }
 
         /* =========================================
@@ -226,7 +236,7 @@
            ========================================= */
         
         .chart-container {
-            background: var(--bg-secondary);
+            background: #000000;
             border: 1px solid var(--border-color);
             padding: 32px;
             margin-bottom: 40px;
@@ -257,14 +267,14 @@
             background: var(--text-secondary);
         }
 
-        /* =========================================
-           TABLAS
-           ========================================= */
-        
-        .data-table-container {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-        }
+         /* =========================================
+            TABLAS
+            ========================================= */
+         
+         .data-table-container {
+             background: #000000;
+             border: 1px solid var(--border-color);
+         }
 
         .data-table-header {
             padding: 24px 32px;
@@ -298,7 +308,7 @@
 
         .data-table td {
             padding: 20px 24px;
-            border-bottom: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .data-table tr:hover td {
@@ -335,12 +345,56 @@
             border-color: #2d5a2d;
         }
 
+        .badge-admin {
+            background: #331111;
+            color: #ff4444;
+            border-color: #552222;
+        }
+
+        .badge-user {
+            color: #edf3f0;
+        }
+
+        .user-avatar-mini {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-gift {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000000;
+            border: 1px solid #ffd700;
+            font-weight: 500;
+            padding: 6px 12px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-gift:hover {
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            border-color: #ffed4e;
+            transform: translateY(-1px);
+        }
+
+        /* Responsividad para botón en móviles */
+        @media (max-width: 480px) {
+            .btn-gift span.text {
+                display: none;
+            }
+            .btn-gift {
+                padding: 6px 8px;
+            }
+        }
+
         /* =========================================
            FORMULARIOS
            ========================================= */
         
         .form-card {
-            background: var(--bg-secondary);
+            background: #000000;
             border: 1px solid var(--border-color);
             padding: 32px;
             max-width: 600px;
@@ -600,7 +654,7 @@
             }
             
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
             
             .form-row {
@@ -662,7 +716,7 @@
                     <p>Resumen de la plataforma</p>
                 </div>
                 
-                <div class="stats-grid">
+                <div class="stats-grid grid-4">
                     <div class="stat-card">
                         <h3 id="stat-anuncios">0</h3>
                         <p>Anuncios</p>
@@ -696,22 +750,18 @@
                     <p>Resumen de ingresos y planes</p>
                 </div>
 
-                <div class="stats-grid">
+                <div class="stats-grid grid-3">
                     <div class="stat-card">
-                        <h3 id="ganancia-mensual">$0</h3>
-                        <p>Este Mes</p>
+                        <div class="stat-label">Ventas de Hoy</div>
+                        <div class="stat-value" id="ganancia-hoy">$0</div>
                     </div>
                     <div class="stat-card">
-                        <h3 id="ganancia-anual">$0</h3>
-                        <p>Este Año</p>
+                        <div class="stat-label">Ventas del Mes</div>
+                        <div class="stat-value" id="ganancia-mensual">$0</div>
                     </div>
                     <div class="stat-card">
-                        <h3 id="ganancia-tokens">0</h3>
-                        <p>Tokens Usados</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 id="ganancia-cortesias">0</h3>
-                        <p>Cortesías Activas</p>
+                        <div class="stat-label">Total del Año</div>
+                        <div class="stat-value" id="ganancia-anual">$0</div>
                     </div>
                 </div>
 
@@ -745,12 +795,18 @@
 
                 <div class="filters" style="margin-bottom: 24px;">
                     <select id="filter-categoria">
-                        <option value="">Categoría</option>
-                        <option value="vehiculos">Vehículos</option>
-                        <option value="inmuebles">Inmuebles</option>
-                        <option value="electronica">Electrónica</option>
-                        <option value="hogar">Hogar</option>
-                        <option value="moda">Moda</option>
+                        <option value="">Todas las Categorías</option>
+                        <option value="inmuebles">Inmuebles 🏠</option>
+                        <option value="vehiculos">Vehículos 🚗</option>
+                        <option value="tecnologia">Tecnología 📱</option>
+                        <option value="hogar">Hogar y Muebles 🛏️</option>
+                        <option value="moda">Moda y Belleza 👗</option>
+                        <option value="deportes-y-ocio">Deportes y Ocio ⚽</option>
+                        <option value="mascotas">Mascotas 🐶</option>
+                        <option value="comunidad">Comunidad 🤝</option>
+                        <option value="servicios">Servicios 🛠️</option>
+                        <option value="empleos">Empleos 💼</option>
+                        <option value="otros">Otros 📦</option>
                     </select>
                     <select id="filter-estado">
                         <option value="">Estado</option>
@@ -784,10 +840,11 @@
                     <table class="data-table" id="usuarios-table" style="display: none;">
                         <thead>
                             <tr>
-                                <th>Email</th>
+                                <th>Foto</th>
                                 <th>Nombre</th>
+                                <th>Email</th>
                                 <th>Registro</th>
-                                <th>Anuncios</th>
+                                <th>Rol</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -798,9 +855,24 @@
 
             <!-- TOKENS -->
             <section class="section" id="section-tokens">
-                <div class="section-header">
+<div class="section-header">
                     <h2>Tokens</h2>
                     <p>Generador de códigos de invitación</p>
+                </div>
+
+                <div class="stats-grid grid-3" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-label">Tokens Totales Generados</div>
+                        <div class="stat-value" id="stat-tokens-total">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tokens Canjeados (Usados)</div>
+                        <div class="stat-value" id="stat-tokens-usados">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tokens Disponibles</div>
+                        <div class="stat-value" id="stat-tokens-disponibles">0</div>
+                    </div>
                 </div>
 
                 <!-- Generar Token -->
