@@ -80,6 +80,15 @@ export const UIComponents = {
         const subcategory = ad.subcategoria || attributes.subcategoria || '';
         let detailsHTML = '';
 
+        // Iconos por categoría principal (Visibilidad Universal)
+        if (categoria.includes('mascota') || categoria.includes('mascotas')) {
+            detailsHTML += `<span class="category-icon" style="background: #ff6b6b; color: white;"><i class="fas fa-paw"></i> Mascotas</span>`;
+        } else if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
+            detailsHTML += `<span class="category-icon" style="background: #4ecdc4; color: white;"><i class="fas fa-car"></i> Vehículos</span>`;
+        } else if (categoria.includes('electrónica') || categoria.includes('electronica') || categoria.includes('celular') || categoria.includes('computadora')) {
+            detailsHTML += `<span class="category-icon" style="background: #45b7d1; color: white;"><i class="fas fa-microchip"></i> Electrónica</span>`;
+        }
+
         // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
         if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
             let details = [];
@@ -97,6 +106,19 @@ export const UIComponents = {
             if (attributes.m2) details.push(`<span><i class="fas fa-ruler-combined"></i> ${attributes.m2} m²</span>`);
             if (attributes.habitaciones) details.push(`<span><i class="fas fa-bed"></i> ${attributes.habitaciones} hab</span>`);
             if (attributes.baños || attributes.banos) details.push(`<span><i class="fas fa-bath"></i> ${(attributes.baños || attributes.banos)} baños</span>`);
+            if (attributes.piso) details.push(`<span><i class="fas fa-building"></i> Piso ${attributes.piso}</span>`);
+            if (attributes.estacionamiento) details.push(`<span><i class="fas fa-parking"></i> ${attributes.estacionamiento} estacionamiento(s)</span>`);
+            if (attributes.amueblado) details.push(`<span><i class="fas fa-couch"></i> ${attributes.amueblado}</span>`);
+            if (attributes.ascensor) details.push(`<span><i class="fas fa-elevator"></i> ${attributes.ascensor}</span>`);
+            if (attributes.jardin) details.push(`<span><i class="fas fa-leaf"></i> ${attributes.jardin}</span>`);
+            if (attributes.piscina) details.push(`<span><i class="fas fa-swimming-pool"></i> ${attributes.piscina}</span>`);
+            if (attributes.tipo_propiedad) details.push(`<span><i class="fas fa-home"></i> ${attributes.tipo_propiedad}</span>`);
+            if (attributes.anio_construccion) details.push(`<span><i class="fas fa-calendar-alt"></i> ${attributes.anio_construccion}</span>`);
+            if (attributes.estado_conservacion) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.estado_conservacion}</span>`);
+            if (attributes.calefaccion) details.push(`<span><i class="fas fa-fire"></i> ${attributes.calefaccion}</span>`);
+            if (attributes.aire_acondicionado) details.push(`<span><i class="fas fa-snowflake"></i> ${attributes.aire_acondicionado}</span>`);
+            if (attributes.seguridad) details.push(`<span><i class="fas fa-shield-alt"></i> ${attributes.seguridad}</span>`);
+            if (attributes.orientacion) details.push(`<span><i class="fas fa-compass"></i> ${attributes.orientacion}</span>`);
             if (details.length > 0) {
                 detailsHTML += `<div class="real-estate-details">${details.join('')}</div>`;
             }

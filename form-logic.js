@@ -23,6 +23,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleryPreview = document.getElementById('gallery-preview-container');
     const dropArea = document.getElementById('gallery-drop-area');
 
+    // =============================================================
+    // --- 4. VISIBILIDAD DE CAMPOS DINÁMICOS ---
+    // =============================================================
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            const selectedCategory = this.value;
+            const realestateDetails = document.getElementById('realestate-details');
+            const vehicleDetails = document.getElementById('vehicle-details');
+            const electronicsDetails = document.getElementById('electronics-details');
+            const homeFurnitureDetails = document.getElementById('home-furniture-details');
+            const fashionDetails = document.getElementById('fashion-details');
+            const sportsDetails = document.getElementById('sports-details');
+            const petsDetails = document.getElementById('pets-details');
+            const servicesDetails = document.getElementById('services-details');
+            const businessDetails = document.getElementById('business-details');
+            const communityDetails = document.getElementById('community-details');
+
+            // Ocultar todas las secciones
+            if (realestateDetails) realestateDetails.style.display = 'none';
+            if (vehicleDetails) vehicleDetails.style.display = 'none';
+            if (electronicsDetails) electronicsDetails.style.display = 'none';
+            if (homeFurnitureDetails) homeFurnitureDetails.style.display = 'none';
+            if (fashionDetails) fashionDetails.style.display = 'none';
+            if (sportsDetails) sportsDetails.style.display = 'none';
+            if (petsDetails) petsDetails.style.display = 'none';
+            if (servicesDetails) servicesDetails.style.display = 'none';
+            if (businessDetails) businessDetails.style.display = 'none';
+            if (communityDetails) communityDetails.style.display = 'none';
+
+            // Mostrar la sección correspondiente
+            if (selectedCategory === 'inmuebles' && realestateDetails) {
+                realestateDetails.style.display = 'block';
+            } else if (selectedCategory === 'vehiculos' && vehicleDetails) {
+                vehicleDetails.style.display = 'block';
+            } else if (selectedCategory === 'electronica' && electronicsDetails) {
+                electronicsDetails.style.display = 'block';
+            } else if (selectedCategory === 'hogar' && homeFurnitureDetails) {
+                homeFurnitureDetails.style.display = 'block';
+            } else if (selectedCategory === 'moda' && fashionDetails) {
+                fashionDetails.style.display = 'block';
+            } else if (selectedCategory === 'deportes' && sportsDetails) {
+                sportsDetails.style.display = 'block';
+            } else if (selectedCategory === 'mascotas' && petsDetails) {
+                petsDetails.style.display = 'block';
+            } else if (selectedCategory === 'servicios' && servicesDetails) {
+                servicesDetails.style.display = 'block';
+            } else if (selectedCategory === 'negocios' && businessDetails) {
+                businessDetails.style.display = 'block';
+            } else if (selectedCategory === 'comunidad' && communityDetails) {
+                communityDetails.style.display = 'block';
+            }
+        });
+    }
+
     let newGalleryFiles = [];
     let coverImageUrl = '';
 
@@ -101,21 +155,119 @@ document.addEventListener('DOMContentLoaded', () => {
             const distrito = districtSelect ? districtSelect.value : '';
             
             // 3. Recopilar atributos dinámicos (campos que dependen de la subcategoría)
-            const dynamicFieldsContainer = document.querySelector(
-                '#vehicle-fields, #realestate-fields, #electronics-fields, #home-furniture-fields, ' +
-                '#fashion-fields, #sports-fields, #pets-fields, #services-fields, ' +
-                '#business-fields, #community-fields'
-            );
+            const selectedCategoryValue = categorySelect.value;
+            console.log("Categoría seleccionada (value):", selectedCategoryValue);
+            console.log("Categoría seleccionada (text):", categorySelect.options[categorySelect.selectedIndex]?.text);
             
-            const atributos = {};
-            if (dynamicFieldsContainer) {
-                const inputs = dynamicFieldsContainer.querySelectorAll('input, select, textarea');
-                inputs.forEach(input => {
-                    if (input.name && input.value) {
-                        atributos[input.name] = input.value;
-                    }
+            let atributos = {};
+            
+            // Captura manual de atributos para Inmuebles (Versión Corregida)
+            const esInmueble = selectedCategoryValue === '2' || 
+                           selectedCategoryValue === '24' || 
+                           categorySelect.options[categorySelect.selectedIndex]?.text.includes('Inmuebles');
+
+            if (esInmueble) {
+                console.log("🚀 CATEGORÍA CONFIRMADA: Capturando datos de Inmuebles...");
+                
+                // Verificar si los elementos existen
+                const m2Input = document.getElementById('attr-m2');
+                const habitacionesInput = document.getElementById('attr-habitaciones');
+                const banosInput = document.getElementById('attr-banos');
+                const pisoInput = document.getElementById('attr-piso');
+                const estacionamientoInput = document.getElementById('attr-estacionamiento');
+                const amuebladoInput = document.getElementById('attr-amueblado');
+                const ascensorInput = document.getElementById('attr-ascensor');
+                const jardinInput = document.getElementById('attr-jardin');
+                const piscinaInput = document.getElementById('attr-piscina');
+                const tipoPropiedadInput = document.getElementById('attr-tipo_propiedad');
+                const anioConstruccionInput = document.getElementById('attr-anio_construccion');
+                const estadoConservacionInput = document.getElementById('attr-estado_conservacion');
+                const calefaccionInput = document.getElementById('attr-calefaccion');
+                const aireAcondicionadoInput = document.getElementById('attr-aire_acondicionado');
+                const seguridadInput = document.getElementById('attr-seguridad');
+                const orientacionInput = document.getElementById('attr-orientacion');
+                
+                console.log("Elementos encontrados:", {
+                    m2Input: !!m2Input,
+                    habitacionesInput: !!habitacionesInput,
+                    banosInput: !!banosInput,
+                    pisoInput: !!pisoInput,
+                    estacionamientoInput: !!estacionamientoInput,
+                    amuebladoInput: !!amuebladoInput,
+                    ascensorInput: !!ascensorInput,
+                    jardinInput: !!jardinInput,
+                    piscinaInput: !!piscinaInput,
+                    tipoPropiedadInput: !!tipoPropiedadInput,
+                    anioConstruccionInput: !!anioConstruccionInput,
+                    estadoConservacionInput: !!estadoConservacionInput,
+                    calefaccionInput: !!calefaccionInput,
+                    aireAcondicionadoInput: !!aireAcondicionadoInput,
+                    seguridadInput: !!seguridadInput,
+                    orientacionInput: !!orientacionInput
                 });
+                
+                const m2 = m2Input?.value;
+                const habitaciones = habitacionesInput?.value;
+                const banos = banosInput?.value;
+                const piso = pisoInput?.value;
+                const estacionamiento = estacionamientoInput?.value;
+                const amueblado = amuebladoInput?.value;
+                const ascensor = ascensorInput?.value;
+                const jardin = jardinInput?.value;
+                const piscina = piscinaInput?.value;
+                const tipo_propiedad = tipoPropiedadInput?.value;
+                const anio_construccion = anioConstruccionInput?.value;
+                const estado_conservacion = estadoConservacionInput?.value;
+                const calefaccion = calefaccionInput?.value;
+                const aire_acondicionado = aireAcondicionadoInput?.value;
+                const seguridad = seguridadInput?.value;
+                const orientacion = orientacionInput?.value;
+                
+                console.log("Valores de campos:", {
+                    m2, habitaciones, banos, piso, estacionamiento, 
+                    amueblado, ascensor, jardin, piscina, tipo_propiedad, 
+                    anio_construccion, estado_conservacion, calefaccion, 
+                    aire_acondicionado, seguridad, orientacion
+                });
+                
+                // Solo incluir campos con valores
+                if (m2) atributos['m2'] = m2;
+                if (habitaciones) atributos['habitaciones'] = habitaciones;
+                if (banos) atributos['banos'] = banos;
+                if (piso) atributos['piso'] = piso;
+                if (estacionamiento) atributos['estacionamiento'] = estacionamiento;
+                if (amueblado) atributos['amueblado'] = amueblado;
+                if (ascensor) atributos['ascensor'] = ascensor;
+                if (jardin) atributos['jardin'] = jardin;
+                if (piscina) atributos['piscina'] = piscina;
+                if (tipo_propiedad) atributos['tipo_propiedad'] = tipo_propiedad;
+                if (anio_construccion) atributos['anio_construccion'] = anio_construccion;
+                if (estado_conservacion) atributos['estado_conservacion'] = estado_conservacion;
+                if (calefaccion) atributos['calefaccion'] = calefaccion;
+                if (aire_acondicionado) atributos['aire_acondicionado'] = aire_acondicionado;
+                if (seguridad) atributos['seguridad'] = seguridad;
+                if (orientacion) atributos['orientacion'] = orientacion;
+                
+                console.log("📦 PAQUETE SELLADO Y LISTO:", atributos);
+            } else {
+                // Para otras categorías, usar el método original
+                const dynamicFieldsContainer = document.querySelector(
+                    '#vehicle-fields, #electronics-fields, #home-furniture-fields, ' +
+                    '#fashion-fields, #sports-fields, #pets-fields, #services-fields, ' +
+                    '#business-fields, #community-fields'
+                );
+                
+                if (dynamicFieldsContainer) {
+                    const inputs = dynamicFieldsContainer.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        if (input.name && input.value) {
+                            atributos[input.name] = input.value;
+                        }
+                    });
+                }
             }
+            
+            console.log("Atributos empaquetados:", atributos);
 
             // 4. Obtener el plan seleccionado desde sessionStorage
             const selectedPlan = sessionStorage.getItem('selectedPlan') || 'free';
@@ -142,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 3. FOTOS: Usar los nombres que vimos ayer
                 url_portada: coverImageUrl,
                 url_galeria: galleryUrls,
-                atributos_clave: atributos || {},
+                atributos_clave: JSON.stringify(atributos || {}),
                 
                 // 4. EL INTERRUPTOR MÁGICO: Sin esto no sale en el Index
                 activo: true,             // 👈 Crucial para que el Index lo vea

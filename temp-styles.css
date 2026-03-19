@@ -1,0 +1,26 @@
+/* --- ESTILOS PARA LA FICHA TÉCNICA (DETALLE DEL PRODUCTO) --- */
+.specs-container-premium {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.attributes-grid-detail {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 15px !important;
+    width: 100%;
+}
+
+/* Estilo para cada tarjetita de atributo */
+.attributes-grid-detail > div {
+    background: #ffffff;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 5px;
+}

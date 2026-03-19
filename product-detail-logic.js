@@ -137,6 +137,128 @@ function loadGoogleMapsScriptDetalle() {
 }
 
 // ============================================
+// FUNCIÓN NUEVA: Mostrar TODOS los atributos en #lista-detalles-completa
+// ============================================
+function displayAllAttributesComprehensive(ad) {
+    const listaDetalles = document.getElementById('lista-detalles-completa');
+    if (!listaDetalles) {
+        console.warn('No encontrado #lista-detalles-completa');
+        return;
+    }
+
+    let attr = ad.atributos_clave;
+    if (!attr) {
+        listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">No hay atributos adicionales disponibles.</p>';
+        return;
+    }
+
+    // Parsear si es string JSON
+    if (typeof attr === 'string') {
+        try {
+            attr = JSON.parse(attr);
+        } catch (e) {
+            console.warn('Error parseando atributos_clave:', e);
+            listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Error cargando atributos.</p>';
+            return;
+        }
+    }
+
+    if (!attr || typeof attr !== 'object' || Object.keys(attr).length === 0) {
+        listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">No hay atributos adicionales disponibles.</p>';
+        return;
+    }
+
+    // Diccionario de mapeo llave -> {label, icon, suffix}
+    const attrMapping = {
+        // Inmuebles
+        m2: { label: 'Superficie', icon: 'fas fa-ruler-combined', suffix: ' m²' },
+        habitaciones: { label: 'Habitaciones', icon: 'fas fa-bed' },
+        banos: { label: 'Baños', icon: 'fas fa-bath' },
+        piso: { label: 'Piso', icon: 'fas fa-building' },
+        estacionamiento: { label: 'Estacionamiento', icon: 'fas fa-parking' },
+        amueblado: { label: 'Amueblado', icon: 'fas fa-couch' },
+        ascensor: { label: 'Elevador', icon: 'fas fa-elevator' },
+        jardin: { label: 'Jardín', icon: 'fas fa-leaf' },
+        piscina: { label: 'Piscina', icon: 'fas fa-swimmer' },
+        tipo_propiedad: { label: 'Tipo Propiedad', icon: 'fas fa-home' },
+        anio_construccion: { label: 'Año Construcción', icon: 'fas fa-calendar' },
+        estado_conservacion: { label: 'Estado Conservación', icon: 'fas fa-tools' },
+        calefaccion: { label: 'Calefacción', icon: 'fas fa-fire' },
+        aire_acondicionado: { label: 'Aire Acondicionado', icon: 'fas fa-snowflake' },
+        seguridad: { label: 'Seguridad', icon: 'fas fa-shield-alt' },
+        orientacion: { label: 'Orientación', icon: 'fas fa-compass' },
+        mascotas: { label: 'Mascotas Permitidas', icon: 'fas fa-paw' },
+        gimnasio: { label: 'Gimnasio', icon: 'fas fa-dumbbell' },
+
+        // Vehículos
+        marca: { label: 'Marca', icon: 'fas fa-car' },
+        modelo: { label: 'Modelo', icon: 'fas fa-car-side' },
+        anio: { label: 'Año', icon: 'fas fa-calendar-alt' },
+        kilometraje: { label: 'Kilometraje', icon: 'fas fa-tachometer-alt', suffix: ' km' },
+        transmision: { label: 'Transmisión', icon: 'fas fa-cogs' },
+        combustible: { label: 'Combustible', icon: 'fas fa-gas-pump' },
+        color: { label: 'Color', icon: 'fas fa-palette' },
+        puertas: { label: 'Puertas', icon: 'fas fa-door-open' },
+        vidrios: { label: 'Vidrios', icon: 'fas fa-window-restore' },
+        rines: { label: 'Rines', icon: 'fas fa-circle' },
+        tapiz: { label: 'Tapiz', icon: 'fas fa-couch' },
+        direccion: { label: 'Dirección', icon: 'fas fa-steering-wheel' },
+        frenos: { label: 'Frenos', icon: 'fas fa-stopwatch' },
+        airbags: { label: 'Airbags', icon: 'fas fa-life-ring' },
+
+        // Mascotas
+        raza: { label: 'Raza', icon: 'fas fa-dog' },
+        edad_mascota: { label: 'Edad', icon: 'fas fa-birthday-cake' },
+        genero: { label: 'Género', icon: 'fas fa-venus-mars' },
+        tipo_accesorio: { label: 'Tipo Accesorio', icon: 'fas fa-bone' },
+
+        // Electrónica y otros
+        almacenamiento: { label: 'Almacenamiento', icon: 'fas fa-hdd', suffix: ' GB' },
+        memoria_ram: { label: 'RAM', icon: 'fas fa-memory', suffix: ' GB' },
+        procesador: { label: 'Procesador', icon: 'fas fa-microchip' },
+        condicion: { label: 'Condición', icon: 'fas fa-star' }
+    };
+
+    const items = [];
+    Object.keys(attr).forEach(key => {
+        const mapping = attrMapping[key];
+        if (mapping) {
+            let value = attr[key];
+            let valueDisplay = value;
+
+            // Manejar booleans
+            if (value === true || value === 'true' || value === 'Si') {
+                valueDisplay = '<i class="fas fa-check-circle" style="color: #28a745;"></i> Sí';
+            } else if (value === false || value === 'false' || value === 'No') {
+                valueDisplay = '<i class="fas fa-times-circle" style="color: #dc3545;"></i> No';
+                return; // Skip 'No' values to keep clean
+            } else {
+                valueDisplay = value;
+            }
+
+            // Agregar suffix si aplica
+            if (mapping.suffix) {
+                valueDisplay += mapping.suffix;
+            }
+
+            items.push(`
+                <div class="universal-attr-item" style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <i class="${mapping.icon}" style="color: #0a2342; font-size: 1.2em; margin-bottom: 5px; display: block;"></i>
+                    <span class="attr-label" style="font-weight: 600; color: #333; display: block; margin-bottom: 4px;">${mapping.label}</span>
+                    <span class="attr-value" style="color: #666; font-size: 0.95em;">${valueDisplay}</span>
+                </div>
+            `);
+        }
+    });
+
+    if (items.length > 0) {
+        listaDetalles.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">${items.join('')}</div>`;
+    } else {
+        listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic; padding: 40px;">No se encontraron atributos adicionales.</p>';
+    }
+}
+
+// ============================================
 // FUNCIÓN AUXILIAR: Convertir rutas de imágenes a URLs completas
 // ============================================
 const convertToFullUrl = (imagePath) => {
@@ -212,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // PRIORIDAD 1: url_galeria (array de strings - fuente principal)
         if (ad.url_galeria) {
-            if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+        if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
                 galleryImages = ad.url_galeria.map(url => convertToFullUrl(url));
             } else if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') {
                 galleryImages = [convertToFullUrl(ad.url_galeria)];
@@ -286,7 +408,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         }
     } catch(e) { console.warn('Error con message-input:', e); }
     
-    // Formatear precio con moneda panameña (B/.) y dos decimales
+    // Formatear precio con moneda panameña (B/. ) y dos decimales
     const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio || 0);
     productPriceEl.textContent = priceFormatted;
     productDescriptionEl.textContent = ad.descripcion || 'Sin descripción';
@@ -371,6 +493,9 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     // Agregar información detallada de comunidad si existe
     addCommunityDetails(ad);
 
+    // ⭐️ VISIBILIDAD UNIVERSAL: MOSTRAR TODOS LOS ATRIBUTOS
+    displayAllAttributesComprehensive(ad);
+    
     // ✅ Construir la galería con imagen principal y miniaturas
     // Las imágenes ya vienen procesadas del parámetro galleryImages
     console.log('Imágenes válidas para mostrar:', galleryImages);
@@ -394,7 +519,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
                 <div class="gallery-thumbnails">
                     ${galleryImages.map((img, index) => `
                         <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
-                            <img src="${img}" alt="Miniatura ${index + 1}" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
+                            <img src="${img}" alt="Minitura ${index + 1}" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
                         </div>
                     `).join('')}
                 </div>
@@ -606,7 +731,7 @@ function addHomeFurnitureDetails(ad) {
                 tipo_mueble: { icon: 'fas fa-couch', label: 'Tipo de Mueble' },
                 tipo_articulo: { icon: 'fas fa-utensils', label: 'Tipo de Artículo' },
                 tipo_decoracion: { icon: 'fas fa-paint-brush', label: 'Tipo' },
-            marca: { icon: 'fas fa-tag', label: 'Marca' },
+                marca: { icon: 'fas fa-tag', label: 'Marca' },
                 material: { icon: 'fas fa-cube', label: 'Material' },
                 color: { icon: 'fas fa-palette', label: 'Color' },
                 dimensiones: { icon: 'fas fa-ruler-combined', label: 'Dimensiones' },
@@ -792,7 +917,7 @@ function addSportsDetails(ad) {
             tipo_articulo: { icon: 'fas fa-tag', label: 'Tipo de Artículo' },
             marca: { icon: 'fas fa-tag', label: 'Marca' },
             modelo: { icon: 'fas fa-barcode', label: 'Modelo' },
-            aro: { icon: 'fas fa-circle-notch', label: 'Aro' },
+        aro: { icon: 'fas fa-circle-notch', label: 'Aro' },
             condicion: { icon: 'fas fa-star', label: 'Condición' },
             material: { icon: 'fas fa-cube', label: 'Material' },
             genero: { icon: 'fas fa-venus-mars', label: 'Género' },
@@ -1250,7 +1375,7 @@ async function loadSellerContactInfo(ad) {
         const contactTitleEl = document.querySelector('.contact-seller-box h3');
         if (contactTitleEl) {
             // Título estático limpio
-            contactTitleEl.innerHTML = `<i class="fas fa-comments"></i> Contactar al Vendedor`;
+            contactTitleEl.innerHTML = `<i class="fas fa-comments" style="color: #0a2342;"></i> Contactar al Vendedor`;
         }
 
         // ✅ Añadir nombre del vendedor debajo del título con estilo prominence
@@ -1304,7 +1429,7 @@ async function loadSellerContactInfo(ad) {
         if (emailLinkEl && sellerProfile?.email) {
             const subject = encodeURIComponent(`Interesado en tu anuncio: ${ad.titulo}`);
             const body = encodeURIComponent(`Hola, estoy interesado en tu anuncio "${ad.titulo}" y me gustaría tener más detalles.`);
-            emailLinkEl.href = `mailto:${sellerProfile.email}?subject=${subject}&body=${body}`;
+            emailLinkEl.href = `mailto:${sellerProfile.email}?subject=${subject}&amp;body=${body}`;
             emailLinkEl.style.display = 'inline-block';
         } else {
             if (emailLinkEl) emailLinkEl.style.display = 'none';
@@ -1471,6 +1596,7 @@ async function loadSellerReviewsSection(sellerId) {
         }
         
         // Generar lista de reseñas
+        
         if (reviews && reviews.length > 0) {
             listContainer.innerHTML = `
                 <div class="reviews-list">

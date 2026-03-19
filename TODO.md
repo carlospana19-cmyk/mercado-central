@@ -1,1 +1,8 @@
-# TODO: Reemplazo Crítico en form-logic.js\n\n- [x] 1. Leer form-logic.js (completo)\n- [ ] 2. Editar bloque de lógica de planes\n- [ ] 3. Verificar inserción Supabase intacta\n- [ ] 4. Entregar archivo completo verificado\n- [ ] 5. Completar tarea
+**TASK COMPLETE** 🎉 Visibilidad Universal implementada:
+
+✅ Auditoría de llaves: Nombres consistentes (m2, banos, anio_construccion, piscina, seguridad, etc.)  
+✅ Nueva función `displayAllAttributesComprehensive()` en product-detail-logic.js con mapeo completo  
+✅ Llamada automática en displayProductDetails() - muestra TODO en #lista-detalles-completa  
+✅ Iconos categoría en UIComponents.js: 🐾 Mascotas (fa-paw), 🚗 Vehículos (fa-car), ⚡ Electrónica (fa-microchip)  
+
+**Para probar:** Abre detalle-producto.html?id=[ID_ANUNCIO] - verás nueva sección "Detalles Completos" con TODOS los atributos + iconos en tarjetas.
