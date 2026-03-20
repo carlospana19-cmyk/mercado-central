@@ -80,14 +80,7 @@ export const UIComponents = {
         const subcategory = ad.subcategoria || attributes.subcategoria || '';
         let detailsHTML = '';
 
-        // Iconos por categoría principal (Visibilidad Universal)
-        if (categoria.includes('mascota') || categoria.includes('mascotas')) {
-            detailsHTML += `<span class="category-icon" style="background: #ff6b6b; color: white;"><i class="fas fa-paw"></i> Mascotas</span>`;
-        } else if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
-            detailsHTML += `<span class="category-icon" style="background: #4ecdc4; color: white;"><i class="fas fa-car"></i> Vehículos</span>`;
-        } else if (categoria.includes('electrónica') || categoria.includes('electronica') || categoria.includes('celular') || categoria.includes('computadora')) {
-            detailsHTML += `<span class="category-icon" style="background: #45b7d1; color: white;"><i class="fas fa-microchip"></i> Electrónica</span>`;
-        }
+
 
         // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
         if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
