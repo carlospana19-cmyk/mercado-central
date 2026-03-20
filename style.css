@@ -465,6 +465,40 @@ body {
   }
 }
 
+/* --- TAMAÑO IDEAL PARA ATRIBUTOS (FICHA TÉCNICA) --- */
+
+/* 1. Contenedor de la Tarjeta Individual */
+.universal-attr-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px !important; /* Espaciado interno cómodo */
+    gap: 6px !important;
+}
+
+/* 2. El Icono (Equilibrado y visible) */
+.universal-attr-item i {
+    font-size: 1.6rem !important; /* Aproximadamente 25px. Grande pero no gigante */
+    color: #00bfae !important; /* Usamos el color de acento turquesa */
+    margin-bottom: 5px !important;
+}
+
+/* 3. La Etiqueta (ej: "Superficie") */
+.universal-attr-item .attr-label {
+    font-size: 0.9rem !important; /* Tamaño estándar de lectura */
+    color: #666666 !important; /* Gris suave */
+    font-weight: 400 !important;
+    margin: 0 !important;
+}
+
+/* 4. El Valor (ej: "120 m²" - Lo más importante) */
+.universal-attr-item .attr-value {
+    font-size: 1.1rem !important; /* Un poco más grande que la etiqueta */
+    font-weight: 700 !important; /* Negrita para resaltar el dato */
+    color: #0a2342 !important; /* Azul oscuro premium */
+    margin: 0 !important;
+}
+
 /* Ultra pequeño para pantallas de 400px o menos */
 @media (max-width: 400px) {
   .navbar-moderno {

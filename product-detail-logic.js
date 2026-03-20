@@ -140,122 +140,54 @@ function loadGoogleMapsScriptDetalle() {
 // FUNCIÓN NUEVA: Mostrar TODOS los atributos en #lista-detalles-completa
 // ============================================
 function displayAllAttributesComprehensive(ad) {
-    const listaDetalles = document.getElementById('lista-detalles-completa');
-    if (!listaDetalles) {
-        console.warn('No encontrado #lista-detalles-completa');
-        return;
-    }
+    const container = document.getElementById('lista-detalles-completa');
+    if (!container) return;
 
-    let attr = ad.atributos_clave;
-    if (!attr) {
-        listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">No hay atributos adicionales disponibles.</p>';
-        return;
-    }
+    let atributos = {};
+    try {
+        atributos = typeof ad.atributos_clave === 'string' ? JSON.parse(ad.atributos_clave) : ad.atributos_clave;
+    } catch (e) { console.error("Error al leer atributos", e); return; }
 
-    // Parsear si es string JSON
-    if (typeof attr === 'string') {
-        try {
-            attr = JSON.parse(attr);
-        } catch (e) {
-            console.warn('Error parseando atributos_clave:', e);
-            listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Error cargando atributos.</p>';
-            return;
-        }
-    }
-
-    if (!attr || typeof attr !== 'object' || Object.keys(attr).length === 0) {
-        listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">No hay atributos adicionales disponibles.</p>';
-        return;
-    }
-
-    // Diccionario de mapeo llave -> {label, icon, suffix}
-    const attrMapping = {
-        // Inmuebles
-        m2: { label: 'Superficie', icon: 'fas fa-ruler-combined', suffix: ' m²' },
-        habitaciones: { label: 'Habitaciones', icon: 'fas fa-bed' },
-        banos: { label: 'Baños', icon: 'fas fa-bath' },
-        piso: { label: 'Piso', icon: 'fas fa-building' },
-        estacionamiento: { label: 'Estacionamiento', icon: 'fas fa-parking' },
-        amueblado: { label: 'Amueblado', icon: 'fas fa-couch' },
-        ascensor: { label: 'Elevador', icon: 'fas fa-elevator' },
-        jardin: { label: 'Jardín', icon: 'fas fa-leaf' },
-        piscina: { label: 'Piscina', icon: 'fas fa-swimmer' },
-        tipo_propiedad: { label: 'Tipo Propiedad', icon: 'fas fa-home' },
-        anio_construccion: { label: 'Año Construcción', icon: 'fas fa-calendar' },
-        estado_conservacion: { label: 'Estado Conservación', icon: 'fas fa-tools' },
-        calefaccion: { label: 'Calefacción', icon: 'fas fa-fire' },
-        aire_acondicionado: { label: 'Aire Acondicionado', icon: 'fas fa-snowflake' },
-        seguridad: { label: 'Seguridad', icon: 'fas fa-shield-alt' },
-        orientacion: { label: 'Orientación', icon: 'fas fa-compass' },
-        mascotas: { label: 'Mascotas Permitidas', icon: 'fas fa-paw' },
-        gimnasio: { label: 'Gimnasio', icon: 'fas fa-dumbbell' },
-
-        // Vehículos
-        marca: { label: 'Marca', icon: 'fas fa-car' },
-        modelo: { label: 'Modelo', icon: 'fas fa-car-side' },
-        anio: { label: 'Año', icon: 'fas fa-calendar-alt' },
-        kilometraje: { label: 'Kilometraje', icon: 'fas fa-tachometer-alt', suffix: ' km' },
-        transmision: { label: 'Transmisión', icon: 'fas fa-cogs' },
-        combustible: { label: 'Combustible', icon: 'fas fa-gas-pump' },
-        color: { label: 'Color', icon: 'fas fa-palette' },
-        puertas: { label: 'Puertas', icon: 'fas fa-door-open' },
-        vidrios: { label: 'Vidrios', icon: 'fas fa-window-restore' },
-        rines: { label: 'Rines', icon: 'fas fa-circle' },
-        tapiz: { label: 'Tapiz', icon: 'fas fa-couch' },
-        direccion: { label: 'Dirección', icon: 'fas fa-steering-wheel' },
-        frenos: { label: 'Frenos', icon: 'fas fa-stopwatch' },
-        airbags: { label: 'Airbags', icon: 'fas fa-life-ring' },
-
-        // Mascotas
-        raza: { label: 'Raza', icon: 'fas fa-dog' },
-        edad_mascota: { label: 'Edad', icon: 'fas fa-birthday-cake' },
-        genero: { label: 'Género', icon: 'fas fa-venus-mars' },
-        tipo_accesorio: { label: 'Tipo Accesorio', icon: 'fas fa-bone' },
-
-        // Electrónica y otros
-        almacenamiento: { label: 'Almacenamiento', icon: 'fas fa-hdd', suffix: ' GB' },
-        memoria_ram: { label: 'RAM', icon: 'fas fa-memory', suffix: ' GB' },
-        procesador: { label: 'Procesador', icon: 'fas fa-microchip' },
-        condicion: { label: 'Condición', icon: 'fas fa-star' }
+    const keysConIcono = ['superficie', 'habitaciones', 'banos', 'kilometraje', 'anio', 'combustible'];
+    const iconos = { 
+        'superficie': 'fa-ruler-combined', 'habitaciones': 'fa-bed', 'banos': 'fa-bath', 
+        'kilometraje': 'fa-tachometer-alt', 'anio': 'fa-calendar-alt', 'combustible': 'fa-gas-pump' 
     };
 
-    const items = [];
-    Object.keys(attr).forEach(key => {
-        const mapping = attrMapping[key];
-        if (mapping) {
-            let value = attr[key];
-            let valueDisplay = value;
-
-            // Manejar booleans
-            if (value === true || value === 'true' || value === 'Si') {
-                valueDisplay = '<i class="fas fa-check-circle" style="color: #28a745;"></i> Sí';
-            } else if (value === false || value === 'false' || value === 'No') {
-                valueDisplay = '<i class="fas fa-times-circle" style="color: #dc3545;"></i> No';
-                return; // Skip 'No' values to keep clean
-            } else {
-                valueDisplay = value;
-            }
-
-            // Agregar suffix si aplica
-            if (mapping.suffix) {
-                valueDisplay += mapping.suffix;
-            }
-
-            items.push(`
-                <div class="universal-attr-item" style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <i class="${mapping.icon}" style="color: #0a2342; font-size: 1.2em; margin-bottom: 5px; display: block;"></i>
-                    <span class="attr-label" style="font-weight: 600; color: #333; display: block; margin-bottom: 4px;">${mapping.label}</span>
-                    <span class="attr-value" style="color: #666; font-size: 0.95em;">${valueDisplay}</span>
-                </div>
-            `);
-        }
+    // 1. FILA DE BURBUJAS (ESTILO PREMIUM HORIZONTAL)
+    let htmlBurbujas = '<div style="display: flex; flex-direction: row; justify-content: space-around; width: 100%; border: 1px solid #e0e0e0; border-radius: 12px; margin-bottom: 25px; background: #fff; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
+    
+    const burbujasAMostrar = Object.entries(atributos).filter(([k]) => keysConIcono.includes(k));
+    
+    burbujasAMostrar.forEach(([key, val], index) => {
+        const borderLeft = index === 0 ? '' : 'border-left: 1px solid #e0e0e0;';
+        htmlBurbujas += `
+            <div style="flex: 1; padding: 20px 10px; text-align: center; ${borderLeft} display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;">
+                <i class="fas ${iconos[key]}" style="font-size: 1.5rem; color: #555;"></i>
+                <span style="font-size: 1.3rem; font-weight: 800; color: #000;">${val}${key === 'superficie' ? ' m²' : ''}</span>
+                <span style="font-size: 0.85rem; color: #888; text-transform: uppercase; font-weight: 600;">${key === 'anio' ? 'año' : key === 'banos' ? 'baños' : key.replace('_', ' ')}</span>
+            </div>`;
     });
+    htmlBurbujas += '</div>';
 
-    if (items.length > 0) {
-        listaDetalles.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">${items.join('')}</div>`;
-    } else {
-        listaDetalles.innerHTML = '<p style="text-align: center; color: #666; font-style: italic; padding: 40px;">No se encontraron atributos adicionales.</p>';
-    }
+    // 2. LISTA DE DETALLES (EN 2 COLUMNAS PARA LLENAR EL ESPACIO)
+    // 2. LISTA DE DETALLES (MÁS COMPACTA Y PROFESIONAL)
+    // 2. LISTA DE DETALLES (ALINEADA Y SIN HUECOS)
+    let htmlLista = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 40px; width: 100%; border-top: 2px solid #f0f0f0; padding-top: 15px;">';
+    
+    Object.entries(atributos).forEach(([key, val]) => {
+        if (!val || keysConIcono.includes(key)) return;
+        const label = key.replace(/_/g, ' ');
+        htmlLista += `
+            <div style="display: flex; padding: 6px 0; border-bottom: 1px solid #f1f1f1; font-size: 1.15rem;">
+                <span style="color: #666; text-transform: capitalize; width: 40%;">${label}:</span>
+                <span style="font-weight: 700; color: #222; width: 60%; text-align: left;">${val}</span>
+            </div>`;
+    });
+    htmlLista += '</div>';
+
+    container.style.display = 'block'; 
+    container.innerHTML = htmlBurbujas + htmlLista;
 }
 
 // ============================================
@@ -463,35 +395,6 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         document.getElementById('product-date').textContent = "Fecha no disponible";
     }
 
-
-    // Agregar información detallada del vehículo si existe
-    addVehicleDetails(ad);
-
-    // Agregar información detallada del inmueble si existe
-    addRealEstateDetails(ad);
-
-    // Agregar información detallada de electrónica si existe
-    addElectronicsDetails(ad);
-
-    // Agregar información detallada de hogar y muebles si existe
-    addHomeFurnitureDetails(ad);
-    // Agregar información detallada de moda y belleza si existe
-    addFashionDetails(ad);
-
-    // Agregar información detallada de deportes y hobbies si existe
-    addSportsDetails(ad);
-
-    // Agregar información detallada de mascotas si existe
-    addPetsDetails(ad);
-
-    // Agregar información detallada de servicios si existe
-    addServicesDetails(ad);
-
-    // Agregar información detallada de negocios si existe
-    addBusinessDetails(ad);
-
-    // Agregar información detallada de comunidad si existe
-    addCommunityDetails(ad);
 
     // ⭐️ VISIBILIDAD UNIVERSAL: MOSTRAR TODOS LOS ATRIBUTOS
     displayAllAttributesComprehensive(ad);
