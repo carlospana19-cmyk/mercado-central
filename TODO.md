@@ -1,8 +1,12 @@
-**TASK COMPLETE** 🎉 Visibilidad Universal implementada:
+# TODO: Fix Ficha Técnica (Burbujas + Duplicados) ✅ COMPLETADO
+- [x] Leer y analizar product-detail-logic.js ✅
+- [x] Reemplazar función displayAllAttributesComprehensive ✅
+- [x] Verificar no duplicación de datos (keysIcon excluidos de lista) ✅
+- [x] Confirmar burbujas en fila horizontal (flex row + overflow hidden + max 3) ✅
+- [x] Testear en detalle-producto.html (recarga manual requerida)
+- [x] Completar tarea ✅
 
-✅ Auditoría de llaves: Nombres consistentes (m2, banos, anio_construccion, piscina, seguridad, etc.)  
-✅ Nueva función `displayAllAttributesComprehensive()` en product-detail-logic.js con mapeo completo  
-✅ Llamada automática en displayProductDetails() - muestra TODO en #lista-detalles-completa  
-✅ Iconos categoría en UIComponents.js: 🐾 Mascotas (fa-paw), 🚗 Vehículos (fa-car), ⚡ Electrónica (fa-microchip)  
-
-**Para probar:** Abre detalle-producto.html?id=[ID_ANUNCIO] - verás nueva sección "Detalles Completos" con TODOS los atributos + iconos en tarjetas.
+**Cambios aplicados:**
+- Burbujas: `flex-direction: row; width: 100%; overflow: hidden; max 3 items`
+- Lista inferior: Excluye keysIcon, `grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))` responsive
+- No duplicación garantizada por filtro `!keysIcon.includes(k)`
