@@ -1,1 +1,0 @@
-console.log("TEST: Función ejecutándose"); window.cargarTokens ? console.log("OK: window.cargarTokens existe") : console.log("ERROR: window.cargarTokens no existe"); document.getElementById("tokens-tbody") ? console.log("OK: tokens-tbody existe") : console.log("ERROR: tokens-tbody no existe");

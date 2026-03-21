@@ -235,19 +235,19 @@ export const UIComponents = {
             }
         }
 
-        // --- NEGOCIOS (Iconos corporativos y serios) ---
-        const businessSubcats = ["Equipos para Negocios", "Maquinaria para Negocios", "Negocios en Venta"];
-        if (attributes.subcategoria && businessSubcats.includes(attributes.subcategoria)) {
-            let details = [];
-            
-            if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-building"></i> ${attributes.tipo_negocio}</span>`);
-            if (attributes.razon_venta) details.push(`<span><i class="fas fa-handshake"></i> ${attributes.razon_venta}</span>`);
-            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
-            
-            if (details.length > 0) {
-                detailsHTML += `<div class="business-details">${details.slice(0, 3).join('')}</div>`;
-            }
-        }
+       // --- NEGOCIOS, EMPLEOS Y SERVICIOS ---
+    let extraDetails = []; // <-- ¡Aquí creamos la bolsa nueva para que no de error!
+    
+    if (attributes.tipo_negocio) extraDetails.push(`<span><i class="fas fa-store"></i> ${attributes.tipo_negocio}</span>`);
+    if (attributes.razon_venta) extraDetails.push(`<span><i class="fas fa-hand-holding-usd"></i> ${attributes.razon_venta}</span>`);
+    if (attributes.condicion) extraDetails.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
+    if (attributes.experiencia) extraDetails.push(`<span><i class="fas fa-briefcase"></i> ${attributes.experiencia}</span>`);
+    if (attributes.modalidad) extraDetails.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`);
+
+    if (extraDetails.length > 0) {
+        // Lo agregamos al HTML usando tu misma clase original "business-details"
+        detailsHTML += `<div class="business-details">${extraDetails.slice(0, 3).join('')}</div>`;
+    }
 
         // --- COMUNIDAD, CLASES Y EVENTOS (Iconos dinámicos) ---
         const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
