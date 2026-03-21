@@ -300,15 +300,32 @@ img#cover-image-preview {
 /* ========================================== */
 
 .plans-container-horizontal {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px !important;
-    margin: 20px auto;
-    padding: 0 20px;
-    max-width: 1400px;
-    justify-content: start !important;
-    align-items: stretch;
+    display: grid !important;
+    gap: 20px !important;
     width: 100%;
+    grid-template-columns: 1fr !important;
+    justify-content: center !important;
+    justify-items: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+@media (min-width: 600px) and (max-width: 1023px) {
+    .plans-container-horizontal {
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 90% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .plans-container-horizontal {
+        grid-template-columns: repeat(4, 1fr) !important;
+        max-width: 1200px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
 }
 
 /* Tarjeta de plan profesional */
@@ -328,7 +345,7 @@ img#cover-image-preview {
     text-align: center;
     min-width: 200px;
     max-width: 300px !important;
-    width: 100%;
+    width: 100% !important;
     margin: 0 !important;
 }
 
@@ -731,7 +748,7 @@ select {
     border: 2px solid #e0e0e0 !important;
     border-radius: 10px !important;
     padding: 16px 18px !important;
-    font-size: 1.8rem !important;
+    font-size: 1.4rem !important;
     font-weight: 500 !important;
     transition: all 0.3s ease;
     background: #ffffff;
