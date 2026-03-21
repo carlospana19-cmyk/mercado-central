@@ -78,6 +78,8 @@
     flex-direction: column;
     height: auto;
     max-width: 100%;
+    margin: 0 !important;
+    width: 100% !important;
   }
 }
 
@@ -94,8 +96,11 @@
   #results-container,
   .results-grid {
     grid-template-columns: 1fr;
-    padding: 1rem;
+    padding: 0 !important;
     gap: 15px;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
   }
 }
 
@@ -108,6 +113,7 @@
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Imagen en móvil - altura optimizada */
@@ -497,13 +503,56 @@ section {
 .box,
 .tarjeta-auto {
     margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ==========================================================
+   🚨 REPARACIÓN DEFINITIVA: CENTRADO Y ANCHO EN MÓVILES
+   ========================================================== */
+
+/* 1. Primero reseteamos el contenedor para que no empuje a la derecha */
+.results-grid, .properties-grid, .results-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important; /* CENTRA LAS TARJETAS */
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 10px 0 !important;
+    margin: 0 auto !important;
+    overflow-x: hidden !important;
+}
+
+/* 2. Corregimos la tarjeta con las clases que pasaste: .property-card y .card */
+.property-card.card, .property-card {
+    /* Aquí eliminamos el fantasma de los 350px */
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 350px !important; /* Para que no se vea gigante en pantallas medianas */
+    
+    /* Centrado horizontal */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 20px !important;
+    
+    /* Evita que se estire */
+    flex: 0 0 auto !important; 
+    display: block !important;
+    box-sizing: border-box !important;
+}
+
+/* 3. Ajuste para pantallas extra pequeñas (Redmi/Samsung viejos) */
+@media screen and (max-width: 340px) {
+    .property-card.card {
+        min-width: 0 !important;
+        width: 95% !important;
+    }
 }
 
 /* 4. Asegurar que la tarjeta no se deforme - Ancho flexible para grid */
 .ad-card, .property-card, .box, .tarjeta-auto {
     flex: 1 1 auto !important;
     width: 100% !important;
-    min-width: 350px !important;
+    min-width: 280px !important;
     max-width: 100% !important;
     margin: 0 !important; /* Sin márgenes que causen choques */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
