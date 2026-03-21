@@ -80,14 +80,7 @@ export const UIComponents = {
         const subcategory = ad.subcategoria || attributes.subcategoria || '';
         let detailsHTML = '';
 
-        // Iconos por categoría principal (Visibilidad Universal)
-        if (categoria.includes('mascota') || categoria.includes('mascotas')) {
-            detailsHTML += `<span class="category-icon" style="background: #ff6b6b; color: white;"><i class="fas fa-paw"></i> Mascotas</span>`;
-        } else if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
-            detailsHTML += `<span class="category-icon" style="background: #4ecdc4; color: white;"><i class="fas fa-car"></i> Vehículos</span>`;
-        } else if (categoria.includes('electrónica') || categoria.includes('electronica') || categoria.includes('celular') || categoria.includes('computadora')) {
-            detailsHTML += `<span class="category-icon" style="background: #45b7d1; color: white;"><i class="fas fa-microchip"></i> Electrónica</span>`;
-        }
+
 
         // --- DETALLES DE VEHÍCULOS (desde JSONB) ---
         if (categoria.includes('vehículo') || categoria.includes('auto') || categoria.includes('carro') || categoria.includes('moto')) {
@@ -242,19 +235,19 @@ export const UIComponents = {
             }
         }
 
-        // --- NEGOCIOS (Iconos corporativos y serios) ---
-        const businessSubcats = ["Equipos para Negocios", "Maquinaria para Negocios", "Negocios en Venta"];
-        if (attributes.subcategoria && businessSubcats.includes(attributes.subcategoria)) {
-            let details = [];
-            
-            if (attributes.tipo_negocio) details.push(`<span><i class="fas fa-building"></i> ${attributes.tipo_negocio}</span>`);
-            if (attributes.razon_venta) details.push(`<span><i class="fas fa-handshake"></i> ${attributes.razon_venta}</span>`);
-            if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
-            
-            if (details.length > 0) {
-                detailsHTML += `<div class="business-details">${details.slice(0, 3).join('')}</div>`;
-            }
-        }
+       // --- NEGOCIOS, EMPLEOS Y SERVICIOS ---
+    let extraDetails = []; // <-- ¡Aquí creamos la bolsa nueva para que no de error!
+    
+    if (attributes.tipo_negocio) extraDetails.push(`<span><i class="fas fa-store"></i> ${attributes.tipo_negocio}</span>`);
+    if (attributes.razon_venta) extraDetails.push(`<span><i class="fas fa-hand-holding-usd"></i> ${attributes.razon_venta}</span>`);
+    if (attributes.condicion) extraDetails.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
+    if (attributes.experiencia) extraDetails.push(`<span><i class="fas fa-briefcase"></i> ${attributes.experiencia}</span>`);
+    if (attributes.modalidad) extraDetails.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`);
+
+    if (extraDetails.length > 0) {
+        // Lo agregamos al HTML usando tu misma clase original "business-details"
+        detailsHTML += `<div class="business-details">${extraDetails.slice(0, 3).join('')}</div>`;
+    }
 
         // --- COMUNIDAD, CLASES Y EVENTOS (Iconos dinámicos) ---
         const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
