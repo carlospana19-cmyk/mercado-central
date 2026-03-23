@@ -137,7 +137,7 @@ function loadGoogleMapsScriptDetalle() {
 }
 
 // ============================================
-// FUNCIÓN NUEVA: Mostrar TODOS los atributos en #lista-detalles-completa
+// FUNCIÓN UNIFICADA: Burbujas Uniformes para TODOS los Atributos
 // ============================================
 function displayAllAttributesComprehensive(ad) {
     const container = document.getElementById('lista-detalles-completa');
@@ -146,49 +146,94 @@ function displayAllAttributesComprehensive(ad) {
     let atributos = {};
     try {
         atributos = typeof ad.atributos_clave === 'string' ? JSON.parse(ad.atributos_clave) : ad.atributos_clave;
-    } catch (e) { console.error("Error al leer atributos", e); return; }
+    } catch (e) { 
+        console.error("Error al leer atributos", e); 
+        return; 
+    }
 
-    const keysConIcono = ['superficie', 'habitaciones', 'banos', 'kilometraje', 'anio', 'combustible'];
-    const iconos = { 
-        'superficie': 'fa-ruler-combined', 'habitaciones': 'fa-bed', 'banos': 'fa-bath', 
-        'kilometraje': 'fa-tachometer-alt', 'anio': 'fa-calendar-alt', 'combustible': 'fa-gas-pump' 
+    const categoria = ad.categoria?.toLowerCase() || '';
+    const iconMap = { 
+        // Inmuebles
+        'superficie': 'fa-ruler-combined', 'm2': 'fa-ruler-combined', 'habitaciones': 'fa-bed', 
+        'banos': 'fa-bath', 'piso': 'fa-building', 'estacionamiento': 'fa-parking', 
+        'amueblado': 'fa-couch', 'ascensor': 'fa-elevator', 'jardin': 'fa-leaf', 
+        'piscina': 'fa-swimmer', 'tipo_propiedad': 'fa-home',
+        // Vehículos
+        'kilometraje': 'fa-tachometer-alt', 'anio': 'fa-calendar-alt', 'combustible': 'fa-gas-pump',
+        'marca': 'fa-car', 'modelo': 'fa-car-side', 'color': 'fa-palette', 
+        'rines': 'fa-circle-notch', 'tapiz': 'fa-couch', 'transmision': 'fa-cogs', 
+        'puertas': 'fa-door-open', 'vidrios': 'fa-window-restore', 'direccion': 'fa-steering-wheel', 
+        'frenos': 'fa-stop-circle', 'airbags': 'fa-shield-alt', 'estado': 'fa-star',
+        // Electrónica
+        'memoria_ram': 'fa-microchip', 'almacenamiento': 'fa-hdd', 'procesador': 'fa-microchip', 'condicion': 'fa-check-circle',
+        // Mascotas
+        'raza': 'fa-dog', 'genero': 'fa-venus-mars', 'edad_mascota': 'fa-birthday-cake',
+        // Genéricos
+        'talla': 'fa-ruler', 'material': 'fa-cube'
     };
 
-    // 1. FILA DE BURBUJAS (ESTILO PREMIUM HORIZONTAL)
-    let htmlBurbujas = '<div style="display: flex; flex-direction: row; justify-content: space-around; width: 100%; border: 1px solid #e0e0e0; border-radius: 12px; margin-bottom: 25px; background: #fff; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
-    
-    const burbujasAMostrar = Object.entries(atributos).filter(([k]) => keysConIcono.includes(k));
-    
-    burbujasAMostrar.forEach(([key, val], index) => {
-        const borderLeft = index === 0 ? '' : 'border-left: 1px solid #e0e0e0;';
-        htmlBurbujas += `
-            <div style="flex: 1; padding: 20px 10px; text-align: center; ${borderLeft} display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;">
-                <i class="fas ${iconos[key]}" style="font-size: 1.5rem; color: #555;"></i>
-                <span style="font-size: 1.3rem; font-weight: 800; color: #000;">${val}${key === 'superficie' ? ' m²' : ''}</span>
-                <span style="font-size: 0.85rem; color: #888; text-transform: uppercase; font-weight: 600;">${key === 'anio' ? 'año' : key === 'banos' ? 'baños' : key.replace('_', ' ')}</span>
-            </div>`;
+    // Excluir keys de control interno
+    const excludePatterns = ['step', 'categoria', 'subcategoria', 'provincia', 'distrito', 'attr-'];
+    const validEntries = Object.entries(atributos).filter(([key, val]) => {
+        const isValidKey = !excludePatterns.some(pattern => key.includes(pattern) || key.startsWith(pattern));
+        const isValidValue = val && val !== '' && val !== 'N/A' && val !== '{}' && val !== null;
+        return isValidKey && isValidValue;
     });
-    htmlBurbujas += '</div>';
 
-    // 2. LISTA DE DETALLES (EN 2 COLUMNAS PARA LLENAR EL ESPACIO)
-    // 2. LISTA DE DETALLES (MÁS COMPACTA Y PROFESIONAL)
-    // 2. LISTA DE DETALLES (ALINEADA Y SIN HUECOS)
-    let htmlLista = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 0px; width: 100%; border-top: 2px solid #f0f0f0; padding-top: 15px;">';
+    if (validEntries.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    // Configuración dinámico TOP 3 BURBUJAS por categoría
+    let topKeys = ['anio', 'kilometraje', 'combustible']; // Default vehículos
+    if (categoria.includes('inmuebl')) topKeys = ['m2', 'habitaciones', 'banos'];
+    else if (['electronica', 'celular', 'computadora'].some(c => categoria.includes(c))) topKeys = ['condicion', 'almacenamiento', 'memoria_ram'];
+    else if (['mascota', 'perro', 'gato'].some(c => categoria.includes(c))) topKeys = ['raza', 'genero', 'edad_mascota'];
+    else topKeys = validEntries.slice(0,3).map(([k]) => k); // Fallback: primeros 3
+
+    const topBurbujas = validEntries.filter(([key]) => topKeys.includes(key));
     
-    Object.entries(atributos).forEach(([key, val]) => {
-        if (!val || keysConIcono.includes(key)) return;
-        const label = key.replace(/_/g, ' ');
-        htmlLista += `
-            <div style="display: flex; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 1.05rem;">
-                <span style="color: #666; text-transform: capitalize; width: 40%;">${label}:</span>
-                <span style="font-weight: 700; color: #222; width: 60%; text-align: left; padding-left: 35px; word-break: break-word;">${val}</span>
+    let htmlTop = '';
+    if (topBurbujas.length > 0) {
+        htmlTop = '<div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 25px;">';
+        topBurbujas.forEach(([key, val]) => {
+            const icon = iconMap[key] || 'fa-tag';
+            const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            let value = val;
+            if (key === 'kilometraje') value += ' km';
+            else if (key === 'm2') value += ' m²';
+            htmlTop += `
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 16px 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 1px solid #dee2e6; border-radius: 12px; min-width: 120px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <i class="fas ${icon}" style="font-size: 1.8rem; color: #00bfae; margin-bottom: 6px;"></i>
+                    <span style="font-weight: 800; font-size: 1.3rem; color: #212529; line-height: 1.2;">${value}</span>
+                    <span style="font-size: 0.8rem; color: #6c757d; text-transform: uppercase; font-weight: 600;">${label}</span>
+                </div>`;
+        });
+        htmlTop += '</div>';
+    }
+
+    // GRUPO 2: LISTA 2 COL (resto attrs)
+    const bottomEntries = validEntries.filter(([key]) => !topKeys.includes(key));
+    let htmlBottom = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 2px solid #e9ecef; padding-top: 18px;">';
+    
+    bottomEntries.forEach(([key, val]) => {
+        const icon = iconMap[key] || 'fa-info-circle';
+        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        htmlBottom += `
+            <div style="display: flex; align-items: center; padding: 8px 12px; gap: 3px; border-bottom: 1px solid #f1f3f4; font-size: 0.95rem;">
+                <i class="fas ${icon}" style="color: #00bfae; width: 18px; flex-shrink: 0;"></i>
+                <span style="color: #6c757d; font-weight: 500; min-width: 45%;">${label}:</span>
+                <span style="font-weight: 700; color: #212529;">${val}</span>
             </div>`;
     });
-    htmlLista += '</div>';
+    htmlBottom += '</div>';
 
     container.style.display = 'block'; 
-    container.innerHTML = htmlBurbujas + htmlLista;
+    container.innerHTML = htmlTop + htmlBottom;
 }
+
+
 
 // ============================================
 // FUNCIÓN AUXILIAR: Convertir rutas de imágenes a URLs completas
@@ -396,7 +441,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     }
 
 
-    // ⭐️ VISIBILIDAD UNIVERSAL: MOSTRAR TODOS LOS ATRIBUTOS
+    // ⭐️ VISIBILIDAD UNIFICADA: SOLO LA FUNCIÓN PRINCIPAL (sin duplicidad)
     displayAllAttributesComprehensive(ad);
     
     // ✅ Construir la galería con imagen principal y miniaturas

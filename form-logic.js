@@ -92,43 +92,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // ⭐ CAPTURA ATRIBUTOS MEJORADA - NUNCA VACÍO
+// ⭐ CAPTURA ATRIBUTOS MEJORADA - NUNCA VACÍO (VEHÍCULOS + MÁS)
             const categoriaNombre = categorySelect.options[categorySelect.selectedIndex].text;
             console.log('📦 Publicando categoría:', categoriaNombre);
             
             let atributos = {};
 
-          // 📦 MÉTODO ESCÁNER 2.0: Busca con o sin prefijo "attr-"
-            atributos = {}; // Usamos la variable directa
-            
+          // 📦 MÉTODO ESCÁNER VEHÍCULOS + MÁS: Busca con o sin prefijo "attr-"
             const camposClave = [
-                'anio', 'combustible', 'kilometraje', 'm2', 'habitaciones', 'banos', 'piso', 'estacionamiento',
-                'marca', 'modelo', 'almacenamiento', 'memoria_ram', 'procesador', 'condicion', 
-                'tipo_electrodomestico', 'tipo_mueble', 'tipo_articulo', 'tipo_decoracion', 'material', 'color', 
-                'talla', 'edad', 'tipo_bicicleta', 'tipo_instrumento', 'aro', 'raza', 'genero', 'edad_mascota', 
-                'tipo_anuncio', 'tipo_servicio', 'modalidad', 'experiencia', 'tipo_negocio', 'razon_venta', 
-                'tipo_evento', 'tipo_actividad', 'tipo_clase', 'nivel', 'fecha_evento'
+                // Vehículos
+                'marca', 'modelo', 'anio', 'kilometraje', 'transmision', 'combustible', 
+                'color', 'puertas', 'vidrios', 'rines', 'tapiz', 'direccion', 'frenos', 'airbags', 'estado',
+                // Inmuebles
+                'm2', 'superficie', 'habitaciones', 'banos', 'piso', 'estacionamiento', 
+                'amueblado', 'ascensor', 'jardin', 'piscina', 'tipo_propiedad',
+                // Electrónica / Tecnología
+                'memoria_ram', 'almacenamiento', 'procesador', 'condicion',
+                // Mascotas
+                'raza', 'genero', 'edad_mascota',
+                // Moda, Hogar, Deportes, Servicios, Negocios, Comunidad
+                'talla', 'material', 'tipo_electrodomestico', 'tipo_mueble', 'tipo_articulo', 
+                'tipo_decoracion', 'edad', 'tipo_bicicleta', 'tipo_instrumento', 'aro', 
+                'tipo_anuncio', 'tipo_servicio', 'modalidad', 'experiencia', 'tipo_negocio', 
+                'razon_venta', 'tipo_evento', 'tipo_actividad', 'tipo_clase', 'nivel', 'fecha_evento'
             ];
 
             camposClave.forEach(clave => {
-                // 🔍 LA MAGIA AQUÍ: Buscamos el ID normal O el ID con "attr-"
+                // 🔍 Buscamos el ID normal O "attr-" + clave
                 const el = document.getElementById(clave) || document.getElementById('attr-' + clave);
                 
-                // Además, filtramos si el usuario dejó la opción por defecto "Seleccionar"
                 if (el && el.value && el.value.trim() !== '' && el.value !== '0' && el.value.toLowerCase() !== 'seleccionar') {
                     let valor = el.value.trim();
                     
-                    // Si es un campo numérico (como m2 o km), lo convertimos a número
+                    // Conversión numérica selectiva
                     if (['kilometraje', 'm2', 'anio', 'habitaciones', 'banos'].includes(clave)) {
                         valor = parseFloat(valor.replace(/,/g, '')) || 0;
                     }
                     
-                    // Lo guardamos siempre con la clave limpia (ej: "raza")
                     atributos[clave] = valor;
                 }
             });
 
-            console.log('✅ Atributos empacados para Supabase:', atributos);
+            console.log('✅ Atributos capturados (Vehículos+Inmuebles+Genéricos):', atributos);
+            console.log('🔍 Total atributos para Supabase:', Object.keys(atributos).length);
 
             // ⭐ DEBUG: Siempre mostrar qué se capturó
             console.log('✅ Atributos capturados:', atributos);
