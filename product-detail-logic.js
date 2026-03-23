@@ -173,15 +173,15 @@ function displayAllAttributesComprehensive(ad) {
     // 2. LISTA DE DETALLES (EN 2 COLUMNAS PARA LLENAR EL ESPACIO)
     // 2. LISTA DE DETALLES (MÁS COMPACTA Y PROFESIONAL)
     // 2. LISTA DE DETALLES (ALINEADA Y SIN HUECOS)
-    let htmlLista = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 40px; width: 100%; border-top: 2px solid #f0f0f0; padding-top: 15px;">';
+    let htmlLista = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 0px; width: 100%; border-top: 2px solid #f0f0f0; padding-top: 15px;">';
     
     Object.entries(atributos).forEach(([key, val]) => {
         if (!val || keysConIcono.includes(key)) return;
         const label = key.replace(/_/g, ' ');
         htmlLista += `
-            <div style="display: flex; padding: 6px 0; border-bottom: 1px solid #f1f1f1; font-size: 1.15rem;">
+            <div style="display: flex; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 1.05rem;">
                 <span style="color: #666; text-transform: capitalize; width: 40%;">${label}:</span>
-                <span style="font-weight: 700; color: #222; width: 60%; text-align: left;">${val}</span>
+                <span style="font-weight: 700; color: #222; width: 60%; text-align: left; padding-left: 35px; word-break: break-word;">${val}</span>
             </div>`;
     });
     htmlLista += '</div>';
