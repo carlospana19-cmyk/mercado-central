@@ -158,12 +158,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 fecha_publicacion: new Date().toISOString()
             };
 
-            // Plan logic (sin cambios)
-            const selectedPlan = sessionStorage.getItem('selectedPlan') || 'free';
+// Plan logic (CORREGIDO: jerarquía planes - 60d pagos / 30d free)
+            const selectedPlan = (sessionStorage.getItem('selectedPlan') || 'free').toLowerCase();
             adData.selected_plan = selectedPlan;
             adData.featured_plan = selectedPlan;
+            
+            // ✅ LÓGICA EXACTA: Pagos (destacado/premium/basico)=60d, Free=30d
+            const isPaid = ['destacado', 'premium', 'basico'].includes(selectedPlan);
+            const diasVigencia = isPaid ? 60 : 30;
+            const hoy = new Date();
+            adData.fecha_eliminacion = new Date(hoy.getTime() + (diasVigencia * 24 * 60 * 60 * 1000)).toISOString();
 
-            console.log('🚀 Enviando a Supabase:', adData);
+            console.log('🚀 Enviando a Supabase (fecha_eliminacion):', {
+                selectedPlan,
+                diasVigencia,
+                fecha_eliminacion: adData.fecha_eliminacion
+            });
 
             // INSERTAR
             const { data: newAd, error } = await supabase.from('anuncios').insert([adData]).select('id').single();
