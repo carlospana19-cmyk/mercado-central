@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let coverImageUrl = '';
             const coverImageFile = coverImageInput.files[0];
             if (coverImageFile) {
-                const filePath = `${user.id}/${Date.now()}_cover_${coverImageFile.name}`;
+                const cleanName = coverImageFile.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_.]/g, '');
+                const filePath = `${user.id}/${Date.now()}_cover_${cleanName}`;
                 await supabase.storage.from('imagenes_anuncios').upload(filePath, coverImageFile);
                 const { data } = supabase.storage.from('imagenes_anuncios').getPublicUrl(filePath);
                 coverImageUrl = data.publicUrl;
@@ -84,7 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const galleryFiles = window.galleryFiles || [];
             const galleryUrls = [];
             for (const file of galleryFiles) {
-                const fileName = `${Date.now()}_gallery_${file.name}`;
+                const cleanName = file.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_.]/g, '');
+                const fileName = `${Date.now()}_gallery_${cleanName}`;
                 const { data } = await supabase.storage.from('imagenes_anuncios').upload(`${user.id}/${fileName}`, file);
                 if (data) {
                     const { data: urlData } = supabase.storage.from('imagenes_anuncios').getPublicUrl(data.path);
@@ -144,7 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 user_id: user.id,
                 titulo: titleInput.value.trim(),
                 descripcion: descriptionInput.value.trim(),
-                precio: parseFloat(priceInput.value) || 0,
+                precioRaw: priceInput.value.replace(/[^0-9]/g, ''),
+                precio: parseInt(priceInput.value.replace(/[^0-9]/g, '')) || 0,
                 categoria: categoriaNombre, // ⭐ NOMBRE correcto
                 provincia: provinceSelect?.value || '',
                 distrito: districtSelect?.value || '',
