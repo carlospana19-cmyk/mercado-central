@@ -1634,6 +1634,73 @@ textarea::placeholder {
     display: none !important;
 }
 
+/* ================================================= */
+/* === AJUSTES PARA MÓVILES EXTRA PEQUEÑOS (<340px) === */
+/* ================================================= */
+@media (max-width: 360px) {
+    /* 1. Reducir el contenedor de Términos y Condiciones - Samsung Galaxy S8+ */
+    .terms-agreement,
+    .terms-agreement *,
+    .terms-container, 
+    .terms-group label, 
+    .policy-text {
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .terms-agreement input[type="checkbox"],
+    .terms-container input[type="checkbox"] {
+        transform: scale(0.9) !important;
+        margin-top: 1px !important;
+    }
+
+    /* 2. Ajustar zonas de carga de imagen (Portada y Galería) - Samsung Galaxy S8+ */
+    #cover-image-preview,
+    .file-input-wrapper, 
+    .upload-zone {
+        padding: 12px 8px !important;
+        min-height: auto !important;
+    }
+
+    .file-input-wrapper label,
+    #cover-image-preview label,
+    #gallery-drop-area label,
+    .upload-zone label {
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .file-input-wrapper .btn-upload, 
+    .upload-zone .btn-upload {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        width: 100% !important;
+    }
+
+    .upload-zone p,
+    #cover-image-preview p {
+        font-size: 10px !important;
+        margin-top: 3px !important;
+        line-height: 1.1 !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+    }
+
+    /* 3. Ajustar márgenes generales del formulario */
+    .publish-wizard {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+}
+
+
+
+
 
 
 
