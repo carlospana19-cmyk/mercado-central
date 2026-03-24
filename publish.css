@@ -1324,6 +1324,62 @@ textarea::placeholder {
     font-weight: 500 !important;  
     font-size: 13px !important;  
 } 
+
+/* ================================================= */
+/* ZOOM DE CAMPOS INTERNOS SOLO PARA PC (ESCRITORIO) */
+/* ================================================= */
+@media screen and (min-width: 992px) {
+    /* 1. Agrandar los títulos (labels) para que se lean mejor */
+    .classification-location-block label,
+    .primary-section label {
+        font-size: 15px !important; 
+        font-weight: 600 !important;
+        margin-bottom: 10px !important;
+        color: #333 !important;
+    }
+
+    /* 2. Agrandar las 'burbujas' (selects e inputs) para que no se vean enanas */
+    .classification-location-block select,
+    .primary-section select,
+    .primary-section input[type="text"],
+    .primary-section input[type="number"] {
+        font-size: 15px !important; /* Letra interna más grande */
+        padding: 14px 18px !important; /* Cajas más gorditas y altas */
+        height: auto !important;
+        width: 100% !important; /* Asegura que llenen su columna asignada */
+    }
+
+    /* 3. Asegurar que los grupos de formulario usen bien el espacio en PC */
+    .classification-location-block .form-group,
+    .primary-section .form-group {
+        flex: 1 1 calc(50% - 15px) !important; /* Mantiene 2 columnas en PC bien distribuidas */
+        min-width: 250px !important;
+    }
+}
+
+/* ================================================= */
+/* ZOOM PARA LA SECCIÓN DE CONTACTO EN PC            */
+/* ================================================= */
+@media screen and (min-width: 992px) {
+    /* Agrandar los títulos de contacto */
+    .contact-block label {
+        font-size: 15px !important; 
+        font-weight: 600 !important;
+        margin-bottom: 10px !important;
+        color: #333 !important;
+    }
+
+    /* Agrandar las burbujas de input en contacto (texto, email, teléfono) */
+    .contact-block input[type="text"],
+    .contact-block input[type="email"],
+    .contact-block input[type="tel"],
+    .contact-block input[type="number"] {
+        font-size: 15px !important; 
+        padding: 14px 18px !important; 
+        height: auto !important;
+        width: 100% !important; 
+    }
+}
   
 /* TARJETAS DE PLAN EN FORMATO HORIZONTAL (BANNER)  
 /* Imagen a la izquierda, contenido a la derecha  
