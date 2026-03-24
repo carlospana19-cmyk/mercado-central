@@ -1,8 +1,17 @@
-# TODO: Premium Image Upload Design
+# TODO: Nueva Misión - Cuadrícula Marcos de Fotos Estilo Encuentra24
 
-- [x] 1. Confirm classes in publicar.html and form.css for upload containers
-- [x] 2. Edit publicar.html to add <i class="fas fa-camera upload-placeholder-icon"></i> before upload texts in portada and galería sections
-- [x] 3. Append premium CSS block to publish.css with correct selectors (.file-input-wrapper, #gallery-drop-area.upload-zone)
-- [x] 4. Verify changes
-- [ ] 5. Commit and push to new branch
+## Fases Anteriores
+✅ Fase 1 completada
+✅ Fase 2 completada
+
+## Plan Desglosado Nueva Misión
+1. [ ] **Paso 1**: Actualizar TODO.md (completado)
+2. [ ] **Paso 2**: Confirmar contenido de publicar.html y publish.css (realizado)
+3. [x] **Paso 3**: Editar publicar.html - Reemplazar contenido interno de #gallery-preview-container con <ul class="photo-grid-container"> (completado)
+4. [x] **Paso 4**: Editar publish.css - Eliminar bloque Fase 2 y agregar nuevos estilos cuadrícula (completado)
+5. [x] **Paso 5**: Confirmar ediciones (exitosas)
+6. [ ] **Paso 6**: Actualizar TODO.md completo
+7. [ ] **Paso 7**: Completar misión
+
+**Estado**: ✅ Misión completada. Cuadrícula de 5 marcos de fotos estilo Encuentra24 implementada en #gallery-preview-container (HTML) y nuevos estilos CSS aplicados (Fase 2 CSS reemplazado).
 
