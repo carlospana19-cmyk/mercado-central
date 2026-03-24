@@ -1146,6 +1146,9 @@ function showDynamicFields() {
             showCommunityFields();
         }
     }
+    
+    // Actualizar nombres dinámicos de categoría
+    updateDynamicCategoryNames();
 }
 
 // Función genérica para mostrar campos de cualquier categoría
@@ -1171,7 +1174,7 @@ function showCategoryFields(categoryKey, containerId, sectionId) {
 
     // Añadir título
     const titleDiv = document.createElement('div');
-    titleDiv.innerHTML = `<h4 style="color: var(--color-primario); margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+    titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: left;">Especificaciones para ${selectedSubcategory}</h4>`;
     container.appendChild(titleDiv);
 
     // Crear campos dinámicos
@@ -1723,11 +1726,45 @@ function showCommunityFields() {
         });
     }
 
+    // Función para actualizar los nombres dinámicos de categoría en los títulos
+    function updateDynamicCategoryNames() {
+        const vehicleDetails = document.getElementById('vehicle-details');
+        const realestateDetails = document.getElementById('realestate-details');
+        
+        // Actualizar título de vehículos
+        if (vehicleDetails) {
+            const vehicleCategoryName = vehicleDetails.querySelector('.dynamic-category-name');
+            if (vehicleCategoryName) {
+                if (selectedSubcategory && selectedSubcategory.trim() !== '') {
+                    vehicleCategoryName.textContent = selectedSubcategory;
+                } else if (selectedMainCategory) {
+                    vehicleCategoryName.textContent = selectedMainCategory;
+                }
+            }
+        }
+        
+        // Actualizar título de inmuebles
+        if (realestateDetails) {
+            const realestateCategoryName = realestateDetails.querySelector('.dynamic-category-name');
+            if (realestateCategoryName) {
+                if (selectedSubcategory && selectedSubcategory.trim() !== '') {
+                    realestateCategoryName.textContent = selectedSubcategory;
+                } else if (selectedMainCategory) {
+                    realestateCategoryName.textContent = selectedMainCategory;
+                }
+            }
+        }
+    }
+
     // Función para manejar cambio de subcategoría (compartida)
     function handleSubcategoryChange(selectElement) {
         selectedSubcategory = selectElement.value;
         console.log('Subcategory changed to:', selectedSubcategory);
         console.log('Main category is:', selectedMainCategory);
+        
+        // Actualizar el nombre dinámico en los títulos de especificaciones
+        updateDynamicCategoryNames();
+        
         if (selectedMainCategory.toLowerCase().includes('electrónica')) {
             console.log('Main category is Electrónica. Calling showElectronicsFields.');
             showElectronicsFields();

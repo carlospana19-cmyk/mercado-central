@@ -1620,5 +1620,20 @@ textarea::placeholder {
 }
 
 
+/* ================================================= */
+/* === LIMPIEZA INTELIGENTE DE CONTENEDORES VACÍOS === */
+/* ================================================= */
+
+/* Ocultar `#home-furniture-details` si no tiene contenido interno */
+#home-furniture-details:empty {
+    display: none !important;
+}
+
+/* Por seguridad, ocultar también si el div interno está vacío */
+#home-furniture-details:has(#home-furniture-fields:empty) {
+    display: none !important;
+}
+
+
 
 
