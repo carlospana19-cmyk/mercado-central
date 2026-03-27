@@ -7,6 +7,10 @@ export function initializeEditPage() {
     const form = document.getElementById('edit-ad-form');
     if (!form) return;
 
+    const safeStyle = (id, display) => { const el = document.getElementById(id); if (el) el.style.display = display; };
+
+    const hideIfExist = (id) => safeStyle(id, 'none');
+
     // --- ELEMENTOS DEL DOM ---
     const allSteps = form.querySelectorAll('.form-section');
     const progressSteps = document.querySelectorAll('.step');
@@ -14,8 +18,75 @@ export function initializeEditPage() {
     const subcategoryGroup = document.getElementById('subcategory-group');
     const subcategorySelect = document.getElementById('subcategory');
     const provinceSelect = document.getElementById('province');
-    const districtGroup = document.getElementById('district-group');
     const districtSelect = document.getElementById('district');
+
+    /* --- SISTEMA DEFINITIVO DE GALERÍA ACUMULATIVA --- */
+    const MAX_FILES = 10;
+    let currentImages = []; 
+    let newFiles = [];      
+
+
+    const galleryDropArea = document.getElementById('gallery-drop-area');
+    const galleryImagesInput = document.getElementById('gallery-images-input');
+    const galleryPreviewContainer = document.getElementById('gallery-preview-container');
+
+    const renderPreviews = () => {
+        if (!galleryPreviewContainer) return;
+        galleryPreviewContainer.innerHTML = '';
+
+        currentImages.forEach((url) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'preview-image-wrapper';
+            wrapper.innerHTML = `<img src="${url}" class="preview-image"><button type="button" class="remove-image-btn" data-url="${url}">&times;</button>`;
+            galleryPreviewContainer.appendChild(wrapper);
+        });
+
+        newFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'preview-image-wrapper';
+                wrapper.innerHTML = `<img src="${e.target.result}" class="preview-image"><button type="button" class="remove-image-btn" data-index="${index}">&times;</button>`;
+                galleryPreviewContainer.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const addFiles = (files) => {
+        const filesToAdd = Array.from(files);
+        const totalActuales = currentImages.length + newFiles.length;
+        if (totalActuales + filesToAdd.length > MAX_FILES) {
+            alert("Solo puedes subir un máximo de " + MAX_FILES + " imágenes.");
+            const slots = MAX_FILES - totalActuales;
+            if (slots > 0) newFiles.push(...filesToAdd.slice(0, slots));
+        } else {
+            newFiles.push(...filesToAdd);
+        }
+        renderPreviews();
+    };
+
+    if (galleryDropArea && galleryImagesInput && galleryPreviewContainer) {
+        galleryDropArea.addEventListener('click', () => galleryImagesInput.click());
+        galleryImagesInput.addEventListener('change', (e) => {
+            addFiles(e.target.files);
+            e.target.value = null;
+        });
+        galleryPreviewContainer.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('remove-image-btn')) return;
+            const imageUrl = e.target.dataset.url;
+            const fileIndex = e.target.dataset.index;
+            if (imageUrl) {
+                if (confirm('¿Eliminar imagen?')) {
+                    currentImages = currentImages.filter(img => img !== imageUrl);
+                    renderPreviews();
+                }
+            } else if (fileIndex !== undefined) {
+                newFiles.splice(parseInt(fileIndex), 1);
+                renderPreviews();
+            }
+        });
+    }  
     
     // --- REINSTALACIÓN DE PROVINCIAS Y DISTRITOS ---
     
@@ -42,8 +113,7 @@ export function initializeEditPage() {
             districtSelect.innerHTML = '<option value="">Seleccione Distrito</option>';
             
             if (selectedProvince && districtsByProvince[selectedProvince]) {
-                // Mostrar el grupo de distritos
-                if (districtGroup) districtGroup.style.display = 'block';
+                safeStyle('district-group', 'block');
                 
                 // Llenar con los nuevos distritos
                 districtsByProvince[selectedProvince].forEach(district => {
@@ -53,17 +123,14 @@ export function initializeEditPage() {
                     districtSelect.appendChild(option);
                 });
             } else {
-                // Si no hay provincia, ocultar distritos
-                if (districtGroup) districtGroup.style.display = 'none';
+                safeStyle('district-group', 'none');
             }
         });
     }
     
     const coverImageInput = document.getElementById('cover-image-input');
     const coverImageName = document.getElementById('cover-image-name');
-    const galleryDropArea = document.getElementById('gallery-drop-area');
-    const galleryImagesInput = document.getElementById('gallery-images-input');
-    const galleryPreviewContainer = document.getElementById('gallery-preview-container');
+
     // Botones de navegación eliminados - ahora es un solo paso
     const vehicleDetails = document.getElementById('vehicle-details');
     const realestateDetails = document.getElementById('realestate-details');
@@ -105,8 +172,6 @@ export function initializeEditPage() {
 
     // --- DATOS DE DISTRITOS POR PROVINCIA ---
     // ✅ districtsByProvince importada desde config-locations.js
-
-    let galleryFiles = [];
 
     // --- DATOS DE SUBCATEGORÍAS DE ELECTRÓNICA ---
     const electronicsSubcategories = {
@@ -196,176 +261,160 @@ export function initializeEditPage() {
     // --- FUNCIONES AUXILIARES PARA EL PASO 3 ---
 function showDynamicFields() {
     // Deshabilitar todos los inputs de secciones ocultas
-    vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
-    communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (vehicleDetails) vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (realestateDetails) realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (electronicsDetails) electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (homeFurnitureDetails) homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (fashionDetails) fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (sportsDetails) sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (petsDetails) petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (servicesDetails) servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (businessDetails) businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (communityDetails) communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = true);
 
     console.log('🔍 showDynamicFields - Categoría actual:', selectedMainCategory);
     const catLower = selectedMainCategory.toLowerCase();
     console.log('🔍 Categoría en minúsculas:', catLower);
 
+    safeStyle('vehicle-details', 'none');
+    safeStyle('realestate-details', 'none');
+    safeStyle('electronics-details', 'none');
+    safeStyle('home-furniture-details', 'none');
+    safeStyle('fashion-details', 'none');
+    safeStyle('sports-details', 'none');
+    safeStyle('pets-details', 'none');
+    safeStyle('services-details', 'none');
+    safeStyle('business-details', 'none');
+    safeStyle('community-details', 'none');
+
     if (catLower.includes('vehículo') || catLower.includes('auto') || catLower.includes('carro')) {
-        vehicleDetails.style.display = 'block';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'block');
+        if (vehicleDetails) vehicleDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
     } else if (selectedMainCategory.toLowerCase().includes('inmueble') || selectedMainCategory.toLowerCase().includes('casa') || selectedMainCategory.toLowerCase().includes('apartamento')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'block';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('realestate-details', 'block');
+        if (realestateDetails) realestateDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
     } else if (selectedMainCategory.toLowerCase().includes('electrónica')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'block';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('electronics-details', 'block');
+        if (electronicsDetails) electronicsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showElectronicsFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('hogar') || selectedMainCategory.toLowerCase().includes('mueble')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'block';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'block');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'none');
+        if (homeFurnitureDetails) homeFurnitureDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showHomeFurnitureFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('moda') || selectedMainCategory.toLowerCase().includes('belleza') || selectedMainCategory.toLowerCase().includes('ropa')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'block';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'block');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'none');
+        if (fashionDetails) fashionDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showFashionFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('deportes') || selectedMainCategory.toLowerCase().includes('hobbies')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'block';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'block');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'none');
+        if (sportsDetails) sportsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showSportsFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('mascota')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'block';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'block');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'none');
+        if (petsDetails) petsDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showPetsFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('servicio')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'block';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
-        servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'block');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'none');
+        if (servicesDetails) servicesDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showServicesFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('negocio')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'block';
-        communityDetails.style.display = 'none';
-        businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'block');
+        safeStyle('community-details', 'none');
+        if (businessDetails) businessDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showBusinessFields();
         }
     } else if (selectedMainCategory.toLowerCase().includes('comunidad')) {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'block';
-        communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'block');
+        if (communityDetails) communityDetails.querySelectorAll('input, select').forEach(el => el.disabled = false);
         if (selectedSubcategory) {
             showCommunityFields();
         }
     } else {
-        vehicleDetails.style.display = 'none';
-        realestateDetails.style.display = 'none';
-        electronicsDetails.style.display = 'none';
-        homeFurnitureDetails.style.display = 'none';
-        fashionDetails.style.display = 'none';
-        sportsDetails.style.display = 'none';
-        petsDetails.style.display = 'none';
-        servicesDetails.style.display = 'none';
-        businessDetails.style.display = 'none';
-        communityDetails.style.display = 'none';
+        safeStyle('vehicle-details', 'none');
+        safeStyle('realestate-details', 'none');
+        safeStyle('electronics-details', 'none');
+        safeStyle('home-furniture-details', 'none');
+        safeStyle('fashion-details', 'none');
+        safeStyle('sports-details', 'none');
+        safeStyle('pets-details', 'none');
+        safeStyle('services-details', 'none');
+        safeStyle('business-details', 'none');
+        safeStyle('community-details', 'none');
     }
 }
 
@@ -379,13 +428,15 @@ function showDynamicFields() {
         console.log('Showing fields for subcategory:', selectedSubcategory, fields);
 
         // PRIORIDAD #1: Asegurar visibilidad del contenedor principal
-        electronicsDetails.style.display = 'block';
-        electronicsDetails.style.padding = '20px';
-        electronicsDetails.style.marginTop = '20px';
-        electronicsDetails.style.backgroundColor = '#f8f9fa';
+        safeStyle('electronics-details', 'block');
+        if (electronicsDetails) {
+            electronicsDetails.style.padding = '20px';
+            electronicsDetails.style.marginTop = '20px';
+            electronicsDetails.style.backgroundColor = '#f8f9fa';
+        }
 
         // PRIORIDAD #2: Limpiar el contenedor de campos
-        electronicsFields.innerHTML = '';
+        if (electronicsFields) electronicsFields.innerHTML = ''; 
 
         // PRIORIDAD #3: Añadir título descriptivo
         const titleDiv = document.createElement('div');
@@ -497,8 +548,8 @@ function showDynamicFields() {
 
         console.log('Showing fields for subcategory:', selectedSubcategory, fields);
 
-        homeFurnitureDetails.style.display = 'block';
-        homeFurnitureFields.innerHTML = '';
+        safeStyle('home-furniture-details', 'block');
+        if (homeFurnitureFields) homeFurnitureFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
         titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
@@ -1544,31 +1595,14 @@ if (ad.latitud && ad.longitud) {
             if (contactEmailField) contactEmailField.value = ad.contact_email;
         }
 
-// --- CARGA DE GALERÍA DESDE COLUMNA ARRAY ---
-        const galleryContainer = document.getElementById('gallery-preview-container');
-
-        if (galleryContainer) {
-            galleryContainer.innerHTML = ''; // Limpiamos
-
-            // Verificamos si existe el array url_galeria en los datos del anuncio
-            if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
-                console.log(`📸 Cargando ${ad.url_galeria.length} fotos desde url_galeria.`);
-                
-                ad.url_galeria.forEach(url => {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'preview-image-wrapper';
-                    wrapper.innerHTML = `
-                        <img src="${url}" class="preview-image">
-                        <button type="button" class="remove-image-btn" data-url="${url}">X</button>
-                    `;
-                    galleryContainer.appendChild(wrapper);
-                });
-                console.log("✅ Galería cargada desde la columna array.");
-            } else {
-                console.log("ℹ️ El campo url_galeria está vacío o no es un array.");
-                galleryContainer.innerHTML = '<p class="text-muted">No hay imágenes en la galería.</p>';
-            }
-        }
+// --- CARGA DE GALERÍA EXISTENTE ---
+if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+    currentImages = [...ad.url_galeria]; 
+    renderPreviews(); 
+} else {
+    currentImages = []; 
+    if (galleryPreviewContainer) galleryPreviewContainer.innerHTML = ''; 
+}
 
         // ✅ MOSTRAR IMAGEN DE PORTADA ACTUAL (mantener existente)
         if (ad.url_portada) {
@@ -1664,7 +1698,7 @@ if (ad.latitud && ad.longitud) {
         isLoadingAdData = false; // ✅ Desactivar flag - carga completada
     }
 
-    // --- FUNCIÓN PARA GUARDAR CAMBIOS DEL ANUNCIO ---
+    // --- FUNCIÓN PARA GUARDAR CAMBIOS DEL ANUNCIO (CON GALERÍA) ---
     async function saveEditedAd() {
         const saveButton = document.getElementById('btn-save-edit');
         if (saveButton) {
@@ -1684,46 +1718,100 @@ if (ad.latitud && ad.longitud) {
         }
 
         const formData = new FormData(form);
-        const adData = {
-            titulo: formData.get('titulo'),
-            descripcion: formData.get('descripcion'),
-            precio: parseInt(formData.get('precio'), 10),  // FIXED: Integer price
-            categoria: selectedMainCategory,
-            provincia: formData.get('provincia'),
-            distrito: formData.get('distrito'),
-            latitud: document.getElementById('latitud').value,
-            longitud: document.getElementById('longitud').value,
-            contact_name: formData.get('contact_name'),
-            contact_phone: formData.get('contact_phone'),
-            contact_email: formData.get('contact_email')
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert("Error de sesión.");
+            return;
+        }
+
+        const adIdNum = Number(adId);
+        if (isNaN(adIdNum)) {
+            alert('ID de anuncio inválido.');
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Guardar cambios';
+            }
+            return;
+        }
+
+        // Clean data object with only DB-confirmed fields
+        const updateData = {
+            titulo: formData.get('titulo') || '',
+            descripcion: formData.get('descripcion') || '',
+            precio: parseInt(formData.get('precio'), 10) || 0,
+            categoria: selectedMainCategory || '',
+            subcategoria: selectedSubcategory || '',
+            provincia: formData.get('provincia') || '',
+            distrito: formData.get('distrito') || '',
+            latitud: document.getElementById('latitud')?.value || null,
+            longitud: document.getElementById('longitud')?.value || null,
+            url_portada: null,
+            url_galeria: []
         };
 
-        // ⚠️ IMPORTANTE: subcategoria va DENTRO de atributos_clave, no como columna
-        adData.atributos_clave = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
+        // Build atributos_clave from dynamic fields
+        const attrs = buildUnifiedAttributesJSON(formData, selectedMainCategory, selectedSubcategory);
+        if (attrs && Object.keys(attrs).length > 0) {
+            updateData.atributos_clave = JSON.stringify(attrs);
+        }
 
-        // --- MANEJAR ACTUALIZACIÓN DE IMAGEN DE PORTADA ---
-        const coverImageInput = document.getElementById('cover-image-input');
-        const coverImageFile = coverImageInput.files[0];
+        // === NUEVA LÓGICA DE GALERÍA ===
+        let uploadedUrls = [];
 
-        if (coverImageFile) {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                alert("Error de sesión. No se puede subir la nueva portada.");
+        // 1. Subir newFiles a 'imagenes_anuncios'
+        if (newFiles.length > 0) {
+            const uploadPromises = newFiles.map(async (file) => {
+                const fileExt = file.name.split('.').pop();
+                const timestamp = Date.now();
+                const randomStr = Math.random().toString(36).substr(2, 9);
+                const fileName = `${user.id}/${timestamp}-${randomStr}.${fileExt}`;
+                
+                const { error: uploadError } = await supabase.storage
+                    .from('imagenes_anuncios')
+                    .upload(fileName, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('imagenes_anuncios')
+                    .getPublicUrl(fileName);
+
+                return publicUrl;
+            });
+
+            try {
+                uploadedUrls = await Promise.all(uploadPromises);
+                console.log(`✅ ${uploadedUrls.length} nuevas fotos subidas`);
+            } catch (error) {
+                console.error('Error subiendo fotos:', error);
+                alert('Error subiendo imágenes de galería.');
                 if (saveButton) {
                     saveButton.disabled = false;
                     saveButton.textContent = 'Guardar cambios';
                 }
                 return;
             }
+        }
 
-            const fileName = `${user.id}/cover-${Date.now()}-${coverImageFile.name}`;
+        // 2. Clean gallery array
+        updateData.url_galeria = [...currentImages, ...uploadedUrls];
+
+        // === PORTADA ===
+        const coverImageInput = document.getElementById('cover-image-input');
+        const coverImageFile = coverImageInput?.files[0];
+
+        if (coverImageFile) {
+            const timestamp = Date.now();
+            const randomStr = Math.random().toString(36).substr(2, 9);
+            const cleanName = coverImageFile.name.split('.')[0];
+            const fileName = `${user.id}/${timestamp}-${randomStr}-${cleanName}.${coverImageFile.name.split('.').pop()}`;
             const { error: uploadError } = await supabase.storage
                 .from('imagenes_anuncios')
                 .upload(fileName, coverImageFile);
 
             if (uploadError) {
-                console.error('Error al subir nueva portada:', uploadError);
-                alert('Hubo un error al subir la nueva imagen de portada.');
+                console.error('Error portada:', uploadError);
+                alert('Error subiendo portada.');
                 if (saveButton) {
                     saveButton.disabled = false;
                     saveButton.textContent = 'Guardar cambios';
@@ -1735,18 +1823,21 @@ if (ad.latitud && ad.longitud) {
                 .from('imagenes_anuncios')
                 .getPublicUrl(fileName);
 
-            adData.url_portada = publicUrl;
+            updateData.url_portada = publicUrl;
         }
 
-        // --- ACTUALIZAR DATOS EN LA TABLA 'anuncios' ---
+        // Debug log
+        console.log('DATOS A ENVIAR:', updateData);
+
+        // === UPDATE SUPABASE ===
         const { error: updateError } = await supabase
             .from('anuncios')
-            .update(adData)
-            .eq('id', adId);
+            .update(updateData)
+            .eq('id', adIdNum);
 
         if (updateError) {
-            console.error('Error al actualizar el anuncio:', updateError);
-            alert('Hubo un error al guardar los cambios.');
+            console.error('Error update:', updateError);
+            alert('Error guardando cambios.');
             if (saveButton) {
                 saveButton.disabled = false;
                 saveButton.textContent = 'Guardar cambios';
@@ -1754,42 +1845,17 @@ if (ad.latitud && ad.longitud) {
             return;
         }
 
-        // --- Subir nuevas imágenes de la galería (lógica existente) ---
-        if (galleryFiles.length > 0) {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                alert("Error de sesión. No se pueden subir las imágenes de la galería.");
-                if (saveButton) {
-                    saveButton.disabled = false;
-                    saveButton.textContent = 'Guardar cambios';
-                }
-                return;
-            }
+        // Reset gallery state
+        currentImages = updateData.url_galeria;
+        newFiles = [];
 
-            for (const file of galleryFiles) {
-                const fileName = `${user.id}/${Date.now()}-${file.name}`;
-                const { error: uploadError } = await supabase.storage
-                    .from('imagenes_anuncios')
-                    .upload(fileName, file);
 
-                if (uploadError) {
-                    console.error('Error al subir imagen de galería:', uploadError);
-                    continue;
-                }
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('imagenes_anuncios')
-                    .getPublicUrl(fileName);
-
-                await supabase.from('imagenes').insert({
-                    anuncio_id: adId,
-                    url_imagen: publicUrl,
-                    user_id: user.id
-                });
-            }
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = 'Guardar cambios';
         }
 
-        alert('¡Anuncio actualizado correctamente!');
+        alert('¡Anuncio actualizado correctamente con galería!');
         window.location.href = `panel-unificado.html`;
     }
 
@@ -1936,7 +2002,7 @@ if (ad.latitud && ad.longitud) {
         console.log('🔄 Category changed via event. Selected:', selectedMainCategory, 'ID:', parentId);
         const subcategories = allCategories.filter(c => c.parent_id === parentId);
         if (subcategories.length > 0) {
-            subcategoryGroup.style.display = 'block';
+            safeStyle('subcategory-group', 'block');
             subcategorySelect.innerHTML = '<option value="">Selecciona</option>';
             subcategories.forEach(s => {
                 const opt = document.createElement('option');
@@ -1945,7 +2011,7 @@ if (ad.latitud && ad.longitud) {
                 subcategorySelect.appendChild(opt);
             });
         } else {
-            subcategoryGroup.style.display = 'none';
+            safeStyle('subcategory-group', 'none');
         }
 
         // Mostrar campos dinámicos inmediatamente al cambiar categoría
@@ -2001,112 +2067,14 @@ if (ad.latitud && ad.longitud) {
                 option.textContent = district;
                 districtSelect.appendChild(option);
             });
-            districtGroup.style.display = 'block';
+            safeStyle('district-group', 'block');
         } else {
-            districtGroup.style.display = 'none';
+            safeStyle('district-group', 'none');
             districtSelect.innerHTML = '';
         }
     });
 
-    // --- LÓGICA DE GESTIÓN DE GALERÍA ---
-    const MAX_FILES = 10;
 
-    // 1. FUNCIÓN DE RENDERIZADO
-    const renderPreviews = () => {
-        galleryPreviewContainer.innerHTML = '';
-        galleryFiles.forEach((file, index) => {
-        const reader = new FileReader();
-            reader.onload = (e) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'preview-image-wrapper';
-                wrapper.innerHTML = `
-                    <img src="${e.target.result}" class="preview-image">
-                    <button type="button" class="remove-image-btn" data-index="${index}">&times;</button>
-                `;
-                galleryPreviewContainer.appendChild(wrapper);
-        };
-            reader.readAsDataURL(file);
-        });
-    };
-
-    // 2. FUNCIÓN PARA AÑADIR ARCHIVOS
-    const addFiles = (newFiles) => {
-        const filesToAdd = Array.from(newFiles);
-        if (galleryFiles.length + filesToAdd.length > MAX_FILES) {
-            alert(`Solo puedes subir un máximo de ${MAX_FILES} imágenes.`);
-            filesToAdd.splice(MAX_FILES - galleryFiles.length);
-        }
-        galleryFiles.push(...filesToAdd);
-        renderPreviews();
-    };
-
-    // 3. EVENT LISTENERS PARA IMÁGENES
-    if (galleryDropArea && galleryImagesInput && galleryPreviewContainer) {
-        galleryDropArea.addEventListener('click', () => galleryImagesInput.click());
-
-        galleryImagesInput.addEventListener('change', (e) => {
-            addFiles(e.target.files);
-            e.target.value = null;
-        });
-
-        // --- LÓGICA DE ELIMINACIÓN (NUEVA Y MEJORADA) ---
-        galleryPreviewContainer.addEventListener('click', async (e) => {
-            if (!e.target.classList.contains('remove-image-btn')) return;
-
-            const wrapper = e.target.closest('.preview-image-wrapper');
-            const imageUrl = e.target.dataset.url; // URL de imagen existente en DB
-            const fileIndex = e.target.dataset.index; // Índice de archivo nuevo (aún no subido)
-
-            if (imageUrl) {
-                // Eliminar imagen existente de la base de datos y Storage
-                if (!confirm('¿Estás seguro de que quieres eliminar esta imagen permanentemente?')) return;
-
-                // Extraer el nombre del archivo de la URL
-                const fileName = imageUrl.split('/').pop();
-                const filePath = `imagenes_anuncios/${fileName}`;
-
-                // 1. Eliminar de Storage
-                const { error: storageError } = await supabase.storage.from('imagenes_anuncios').remove([fileName]);
-                if (storageError) {
-                    console.error('Error al eliminar del Storage:', storageError);
-                    alert('No se pudo eliminar la imagen del almacenamiento.');
-                    return;
-                }
-
-                // 2. Eliminar de la tabla 'imagenes'
-                const { error: dbError } = await supabase.from('imagenes').delete().eq('url_imagen', imageUrl);
-                if (dbError) {
-                    console.error('Error al eliminar de la base de datos:', dbError);
-                    alert('No se pudo eliminar la referencia de la imagen.');
-                    // Opcional: intentar resubir el archivo si falla la eliminación de la DB
-                    return;
-                }
-
-                // 3. Eliminar de la vista
-                wrapper.remove();
-                alert('Imagen eliminada correctamente.');
-
-            } else if (fileIndex) {
-                // Eliminar imagen nueva (aún no subida) del array local
-                const indexToRemove = parseInt(fileIndex, 10);
-                if (!isNaN(indexToRemove)) {
-                    galleryFiles.splice(indexToRemove, 1);
-                    renderPreviews(); // Re-renderizar las previsualizaciones de archivos nuevos
-                }
-        }
-    });
-
-        // Configuración de Drag and Drop (sin cambios)
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            galleryDropArea.addEventListener(eventName, e => {
-        e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-        galleryDropArea.addEventListener('drop', e => {
-            addFiles(e.dataTransfer.files);
-        });
-    }
 
     // Event listener para portada
     coverImageInput.addEventListener('change', function() {

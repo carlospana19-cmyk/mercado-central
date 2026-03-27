@@ -1,40 +1,12 @@
-# TODO: Complete Editar Anuncio Map Integration - ✅ COMPLETED
+# TODO: Fix districtGroup Null Error in editar-anuncio-logic.js
 
-## Progress
-- [x] Review file contents and identify edit locations
-- [x] Create detailed edit plan  
-- [x] Get user confirmation on plan
-- [x] Create TODO.md 
-- [x] Execute edit_file on saveEditedAd() adData object (removed direccion_especifica, added latitud/longitud)
-- [x] Verify no 'address' references remain
-- [x] All changes applied successfully
+## Approved Plan Steps:
+- [✅] Step 1: Create TODO.md (current)
+- [✅] Step 2: Remove districtGroup declaration (~line 27)
+- [✅] Step 3: Fix provinceSelect.addEventListener handlers (~line 110 & ~1950) - use safeStyle
+- [✅] Step 4: Fix subcategoryGroup in categorySelect.change (~line 1900) - use safeStyle
+- [✅] Step 5: Verify no other null risks, update TODO.md
+- [ ] Step 6: Test page loads without console errors
+- [ ] Step 7: attempt_completion
 
-**Final blocks requested:**
-
-**Carga Inicial (loadAdData):**
-```javascript
-if (ad.latitud && ad.longitud) {
-    inicializarMapaEdicion(ad.latitud, ad.longitud);
-}
-```
-
-**Submit actualizado (saveEditedAd adData):**
-```javascript
-const adData = {
-    titulo: formData.get('titulo'),
-    descripcion: formData.get('descripcion'),
-    precio: parseInt(formData.get('precio'), 10),
-    categoria: selectedMainCategory,
-    provincia: formData.get('provincia'),
-    distrito: formData.get('distrito'),
-    latitud: document.getElementById('latitud').value,
-    longitud: document.getElementById('longitud').value,
-    contact_name: formData.get('contact_name'),
-    contact_phone: formData.get('contact_phone'),
-    contact_email: formData.get('contact_email')
-};
-```
-
-Test: Open editar-anuncio.html, load an ad with existing lat/lng, interact with map, submit form. Verify lat/lng update in Supabase.
-
-
+**Status:** No other null risks found. Code verified safe. Ready for testing.
