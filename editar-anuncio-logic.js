@@ -22,8 +22,10 @@ export function initializeEditPage() {
 
     /* --- SISTEMA DEFINITIVO DE GALERÍA ACUMULATIVA --- */
     const MAX_FILES = 10;
-    let currentImages = []; 
-    let newFiles = [];      
+let currentImages = []; 
+let newFiles = [];  
+let currentCoverUrl = '';
+
 
 
     const galleryDropArea = document.getElementById('gallery-drop-area');
@@ -1430,6 +1432,10 @@ function showBusinessFields() {
             return;
         }
 
+        // Guardar URL de portada actual como respaldo
+        currentCoverUrl = ad.url_portada || '';
+
+
         // Guardar temporalmente la categoría y subcategoría en sessionStorage
         window.sessionStorage.setItem('editAdCategory', ad.categoria || '');
         window.sessionStorage.setItem('editAdSubcategory', ad.subcategoria || '');
@@ -1796,6 +1802,9 @@ if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0
         // 2. Clean gallery array
         updateData.url_galeria = [...currentImages, ...uploadedUrls];
 
+        // Lógica de portada con respaldo
+        let finalCoverUrl = currentCoverUrl;
+
         // === PORTADA ===
         const coverImageInput = document.getElementById('cover-image-input');
         const coverImageFile = coverImageInput?.files[0];
@@ -1823,8 +1832,10 @@ if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0
                 .from('imagenes_anuncios')
                 .getPublicUrl(fileName);
 
-            updateData.url_portada = publicUrl;
+            finalCoverUrl = publicUrl;
         }
+
+        updateData.url_portada = finalCoverUrl;
 
         // Debug log
         console.log('DATOS A ENVIAR:', updateData);
