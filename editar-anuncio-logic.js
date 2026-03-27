@@ -16,6 +16,49 @@ export function initializeEditPage() {
     const provinceSelect = document.getElementById('province');
     const districtGroup = document.getElementById('district-group');
     const districtSelect = document.getElementById('district');
+    
+    // --- REINSTALACIÓN DE PROVINCIAS Y DISTRITOS ---
+    
+    // 1. Llenar el selector de Provincias
+    if (provinceSelect) {
+        // Limpiamos por si acaso
+        provinceSelect.innerHTML = '<option value="">Seleccione Provincia</option>';
+        
+        // Obtenemos las llaves del archivo config-locations.js
+        Object.keys(districtsByProvince).forEach(province => {
+            const option = document.createElement('option');
+            option.value = province;
+            option.textContent = province;
+            provinceSelect.appendChild(option);
+        });
+    }
+
+    // 2. Escuchar cuando cambie la provincia para mostrar los distritos
+    if (provinceSelect && districtSelect) {
+        provinceSelect.addEventListener('change', () => {
+            const selectedProvince = provinceSelect.value;
+            
+            // Limpiar distritos actuales
+            districtSelect.innerHTML = '<option value="">Seleccione Distrito</option>';
+            
+            if (selectedProvince && districtsByProvince[selectedProvince]) {
+                // Mostrar el grupo de distritos
+                if (districtGroup) districtGroup.style.display = 'block';
+                
+                // Llenar con los nuevos distritos
+                districtsByProvince[selectedProvince].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            } else {
+                // Si no hay provincia, ocultar distritos
+                if (districtGroup) districtGroup.style.display = 'none';
+            }
+        });
+    }
+    
     const coverImageInput = document.getElementById('cover-image-input');
     const coverImageName = document.getElementById('cover-image-name');
     const galleryDropArea = document.getElementById('gallery-drop-area');
@@ -1340,22 +1383,141 @@ function showBusinessFields() {
         window.sessionStorage.setItem('editAdCategory', ad.categoria || '');
         window.sessionStorage.setItem('editAdSubcategory', ad.subcategoria || '');
 
-        // 2. OBTENER IMÁGENES DE LA GALERÍA DESDE LA TABLA 'imagenes'
-        const { data: images, error: imagesError } = await supabase
-            .from('imagenes')
-            .select('url_imagen')
-            .eq('anuncio_id', adId);
 
-        if (imagesError) {
-            console.error("Error al cargar imágenes de la galería:", imagesError);
-        }
 
-        // Rellenar campos básicos
+// --- EL SÚPER RADAR: ESPERAR A QUE CARGUEN LAS CATEGORÍAS PRIMERO ---
+        const categorySelect = document.getElementById('category');
+
+        // 1. Radar para Categoría Principal
+        let intentosCat = 0;
+        const radarCategorias = setInterval(() => {
+            intentosCat++;
+            
+            // Si el select de categorías ya tiene opciones (más allá del "Selecciona...")
+            if (categorySelect && categorySelect.options.length > 1) {
+                clearInterval(radarCategorias); // ¡Las categorías ya llegaron! Detenemos este radar
+                
+                let catFound = false;
+                // Buscar y seleccionar la Categoría Principal
+                for (let i = 0; i < categorySelect.options.length; i++) {
+                    if (categorySelect.options[i].text === ad.categoria || categorySelect.options[i].value === ad.categoria) {
+                        categorySelect.selectedIndex = i;
+                        catFound = true;
+                        console.log(`✅ Categoría principal anclada: ${ad.categoria}`);
+                        break;
+                    }
+                }
+
+                if (catFound) {
+                    // Disparar el cambio para que el sistema busque las subcategorías
+                    categorySelect.dispatchEvent(new Event('change')); 
+                    
+                    // 2. RADAR ACTIVO para Subcategorías
+                    let intentosSub = 0;
+                    const radarSubcategorias = setInterval(() => {
+                        const subSelect = document.getElementById('subcategory');
+                        intentosSub++;
+                        
+                        if (subSelect && subSelect.options.length > 1) {
+                            clearInterval(radarSubcategorias); // ¡Las subcategorías ya llegaron!
+                            
+                            // Buscar y seleccionar la Subcategoría
+                            for (let i = 0; i < subSelect.options.length; i++) {
+                                if (subSelect.options[i].text === ad.subcategoria || subSelect.options[i].value === ad.subcategoria) {
+                                    subSelect.selectedIndex = i;
+                                    console.log(`✅ Subcategoría anclada: ${ad.subcategoria}`);
+                                    break;
+                                }
+                            }
+                            
+                            // Disparar el cambio para mostrar los atributos de Vehículos
+                            subSelect.dispatchEvent(new Event('change'));
+                            
+                            // 3. Dar un pequeño respiro para los campos dinámicos
+                            setTimeout(() => {
+                                if(ad.atributos_clave) {
+                                    try {
+                                        let atributos = typeof ad.atributos_clave === 'string' ? JSON.parse(ad.atributos_clave) : ad.atributos_clave;
+                                        Object.keys(atributos).forEach(key => {
+                                            const input = document.getElementById(`attr-${key}`) || document.querySelector(`[name="${key}"]`);
+                                            if(input) {
+                                                input.value = atributos[key];
+                                                console.log(`✅ Atributo cargado: ${key} = ${atributos[key]}`);
+                                            }
+                                        });
+                                    } catch (e) {
+                                        console.error("Error parseando atributos:", e);
+                                    }
+                                }
+                                
+// --- FIX FINAL DE TITANIO: FORZAR VISTA (DOM) CON ESCUDO ANTICHOQUES ---
+                                setTimeout(() => {
+                                    const subSelectFinal = document.getElementById('subcategory');
+                                    if (!subSelectFinal) return;
+                                    
+                                    // 🛡️ ESCUDO: Verificamos que ad.subcategoria exista antes de hacer nada
+                                    if (!ad.subcategoria) {
+                                        console.warn("⚠️ ALERTA: ad.subcategoria es null o undefined. No hay subcategoría guardada para este anuncio en la BD.");
+                                        return; // Abortamos la misión pacíficamente sin estrellar el código
+                                    }
+
+                                    // Convertimos a String por seguridad antes del trim
+                                    const targetSub = String(ad.subcategoria).trim().toLowerCase();
+                                    
+                                    // 1. Limpiamos cualquier selección previa a nivel HTML
+                                    for (let j = 0; j < subSelectFinal.options.length; j++) {
+                                        subSelectFinal.options[j].selected = false;
+                                        subSelectFinal.options[j].removeAttribute('selected');
+                                    }
+
+                                    // 2. Buscamos y forzamos la nueva opción
+                                    for (let i = 0; i < subSelectFinal.options.length; i++) {
+                                        const optText = String(subSelectFinal.options[i].text || '').trim().toLowerCase();
+                                        const optVal = String(subSelectFinal.options[i].value || '').trim().toLowerCase();
+                                        
+                                        if (optText === targetSub || optVal === targetSub) {
+                                            // Fuerza bruta en todos los niveles de JS y HTML
+                                            subSelectFinal.selectedIndex = i;
+                                            subSelectFinal.value = subSelectFinal.options[i].value;
+                                            subSelectFinal.options[i].selected = true;
+                                            subSelectFinal.options[i].setAttribute('selected', 'selected');
+                                            
+                                            console.log(`⚓ ÉXITO VISUAL: Subcategoría fijada a: ${subSelectFinal.options[i].text}`);
+                                            
+                                            // Si la plantilla usa plugins visuales:
+                                            if (typeof jQuery !== 'undefined' && jQuery.fn.niceSelect) {
+                                                jQuery(subSelectFinal).niceSelect('update');
+                                            }
+                                            if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
+                                                jQuery(subSelectFinal).trigger('change.select2');
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }, 800);
+                                
+                            }, 500); 
+                            
+                        } else if (intentosSub > 40) {
+                            clearInterval(radarSubcategorias);
+                            console.warn("⏳ Radar apagado: Las subcategorías no cargaron a tiempo.");
+                        }
+                    }, 100);
+                } else {
+                    console.warn(`⚠️ La categoría "${ad.categoria}" no existe en las opciones cargadas.`);
+                }
+            } else if (intentosCat > 50) {
+                clearInterval(radarCategorias); // Si después de 5 segundos no cargan las categorías, abortar.
+                console.warn("⏳ Radar apagado: Las categorías principales nunca cargaron.");
+            }
+        }, 100);
+
+        // Rellenar campos básicos (mantener existentes)
         document.getElementById('title').value = ad.titulo;
         document.getElementById('description').value = ad.descripcion;
         document.getElementById('price').value = ad.precio;
 
-        // Rellenar ubicación
+        // Rellenar ubicación (mantener existente)
         if (ad.provincia) {
             document.getElementById('province').value = ad.provincia;
             document.getElementById('province').dispatchEvent(new Event('change'));
@@ -1363,11 +1525,12 @@ function showBusinessFields() {
                 if (ad.distrito) document.getElementById('district').value = ad.distrito;
             }, 100);
         }
-        if (ad.direccion_especifica) {
-            document.getElementById('address').value = ad.direccion_especifica;
-        }
+       // AGREGA ESTO EN SU LUGAR
+if (ad.latitud && ad.longitud) {
+    inicializarMapaEdicion(ad.latitud, ad.longitud);
+}
 
-        // ✅ Rellenar campos de contacto (datos del usuario que publicó)
+        // ✅ Rellenar campos de contacto (mantener existente)
         if (ad.contact_name) {
             const contactNameField = document.getElementById('contact-name');
             if (contactNameField) contactNameField.value = ad.contact_name;
@@ -1381,151 +1544,122 @@ function showBusinessFields() {
             if (contactEmailField) contactEmailField.value = ad.contact_email;
         }
 
-// 5. RELLENAR CATEGORÍAS — versión completa estable final
-const normalize = (s) =>
-  s?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+// --- CARGA DE GALERÍA DESDE COLUMNA ARRAY ---
+        const galleryContainer = document.getElementById('gallery-preview-container');
 
-if (Array.isArray(categories) && categories.length) {
-  const categorySelect = document.getElementById("category");
-  const subcategorySelect = document.getElementById("subcategory");
-  const subcategoryGroup = document.getElementById("subcategory-group");
+        if (galleryContainer) {
+            galleryContainer.innerHTML = ''; // Limpiamos
 
-  const adCat = normalize(ad.categoria);
-  const adSub = normalize(ad.subcategoria);
-
-  // Primero intenta búsqueda exacta (sin normalizar)
-  let foundMainCat = categories.find(
-    (c) => !c.parent_id && c.nombre === ad.categoria
-  );
-  let foundSubCat = categories.find(
-    (c) => c.parent_id && c.nombre === ad.subcategoria
-  );
-
-  // Si no encuentra, intenta con normalización
-  if (!foundMainCat && ad.categoria) {
-    foundMainCat = categories.find(
-      (c) => !c.parent_id && normalize(c.nombre) === adCat
-    );
-  }
-
-  if (!foundSubCat && ad.subcategoria) {
-    foundSubCat = categories.find(
-      (c) => c.parent_id && normalize(c.nombre) === adSub
-    );
-  }
-
-  if (foundMainCat) {
-    // Asignar categoría principal usando el ID
-    categorySelect.value = foundMainCat.id;
-    selectedMainCategory = foundMainCat.nombre;
-    console.log('✅ Categoría asignada:', foundMainCat.nombre, 'con ID:', foundMainCat.id);
-
-    // Poblar subcategorías de esa categoría
-    const subcats = categories.filter((c) => c.parent_id === foundMainCat.id);
-    if (subcats.length > 0) {
-      subcategoryGroup.style.display = "block";
-      subcategorySelect.innerHTML = '<option value="">Selecciona</option>';
-
-      subcats.forEach((s) => {
-        const opt = document.createElement("option");
-        opt.value = s.nombre;
-        opt.textContent = s.nombre;
-        subcategorySelect.appendChild(opt);
-      });
-
-      if (foundSubCat) {
-        subcategorySelect.value = foundSubCat.nombre;
-        selectedSubcategory = foundSubCat.nombre;
-      } else if (ad.subcategoria) {
-        console.warn(
-          `Subcategoría '${ad.subcategoria}' no coincide con las del grupo '${foundMainCat.nombre}'.`
-        );
-        subcategorySelect.value = "";
-        selectedSubcategory = "";
-      } else {
-        subcategorySelect.value = "";
-        selectedSubcategory = "";
-      }
-    } else {
-      // Categoría sin subcategorías asociadas
-      subcategoryGroup.style.display = "none";
-      subcategorySelect.innerHTML = "";
-      selectedSubcategory = "";
-    }
-  } else {
-    // No se encontró coincidencia con categorías principales
-    console.warn(
-      `Categoría '${ad.categoria}' no encontrada en el catálogo de categorías cargadas.`
-    );
-    categorySelect.value = "";
-    subcategoryGroup.style.display = "none";
-    subcategorySelect.innerHTML = "";
-    selectedMainCategory = "";
-    selectedSubcategory = "";
-  }
-
-  // Mostrar los campos dinámicos basados en la categoría/subcategoría actual
-  showDynamicFields();
-  
-  // Disparar el evento change para que se actualice el select de subcategorías
-  categorySelect.dispatchEvent(new Event('change'));
-} else {
-  // Fallback si no hay categorías cargadas
-  console.warn(
-    "⚠️ No se encontraron categorías en memoria al intentar rellenar el formulario de edición."
-  );
-}
-
-
-        // RENDERIZAR IMÁGENES DE GALERÍA EXISTENTES (NUEVA LÓGICA)
-        if (images && images.length > 0) {
-            galleryPreviewContainer.innerHTML = ''; // Limpiar previsualizaciones
-            images.forEach(image => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'preview-image-wrapper';
-                // Por ahora, solo mostramos la imagen. El borrado desde DB se implementará después.
-                wrapper.innerHTML = `
-                    <img src="${image.url_imagen}" class="preview-image">
-                    <button type="button" class="remove-image-btn" data-url="${image.url_imagen}">&times;</button>
-                `;
-                galleryPreviewContainer.appendChild(wrapper);
-            });
+            // Verificamos si existe el array url_galeria en los datos del anuncio
+            if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
+                console.log(`📸 Cargando ${ad.url_galeria.length} fotos desde url_galeria.`);
+                
+                ad.url_galeria.forEach(url => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-image-wrapper';
+                    wrapper.innerHTML = `
+                        <img src="${url}" class="preview-image">
+                        <button type="button" class="remove-image-btn" data-url="${url}">X</button>
+                    `;
+                    galleryContainer.appendChild(wrapper);
+                });
+                console.log("✅ Galería cargada desde la columna array.");
+            } else {
+                console.log("ℹ️ El campo url_galeria está vacío o no es un array.");
+                galleryContainer.innerHTML = '<p class="text-muted">No hay imágenes en la galería.</p>';
+            }
         }
 
-        // ✅ MOSTRAR IMAGEN DE PORTADA ACTUAL (si existe)
+        // ✅ MOSTRAR IMAGEN DE PORTADA ACTUAL (mantener existente)
         if (ad.url_portada) {
             const currentCoverWrapper = document.getElementById('current-cover-image');
             const coverPreviewImg = document.getElementById('cover-image-preview');
             if (currentCoverWrapper && coverPreviewImg) {
                 coverPreviewImg.src = ad.url_portada;
                 currentCoverWrapper.style.display = 'block';
-                console.log('✅ Portada actual cargada');
             }
         }
 
-        // 6. RELLENAR CAMPOS DINÁMICOS DE ATRIBUTOS
-        if (ad.atributos_clave) {
-            try {
-                let atributos = ad.atributos_clave;
-                // Si es string, parsear JSON
-                if (typeof atributos === 'string') {
-                    atributos = JSON.parse(atributos);
-                }
+        // --- SISTEMA DE MAPAS EN EL EDITOR (Arranque Seguro) ---
+        function cargarMapaEditor(lat, lng) {
+            const mapaElemento = document.getElementById('map');
+            if (!mapaElemento) return;
+
+            // Si la librería de Google aún no carga, esperamos 500ms y reintentamos
+            if (typeof google === 'undefined' || !google.maps) {
+                console.log("⏳ Esperando a Google Maps...");
+                setTimeout(() => cargarMapaEditor(lat, lng), 500);
+                return;
+            }
+
+            const defaultLat = lat ? parseFloat(lat) : 8.9824; 
+            const defaultLng = lng ? parseFloat(lng) : -79.5199;
+
+            const map = new google.maps.Map(mapaElemento, {
+                center: { lat: defaultLat, lng: defaultLng },
+                zoom: 15
+            });
+
+            const marker = new google.maps.Marker({
+                position: { lat: defaultLat, lng: defaultLng },
+                map: map,
+                draggable: true
+            });
+
+            // Aseguramos que el mapa se redibuje si estaba oculto
+            google.maps.event.trigger(map, "resize");
+
+            marker.addListener('dragend', function() {
+                const newPos = marker.getPosition();
+                document.getElementById('latitud').value = newPos.lat();
+                document.getElementById('longitud').value = newPos.lng();
+                console.log("📍 Ubicación actualizada:", newPos.lat(), newPos.lng());
+            });
+
+            // --- LÓGICA DE MOVIMIENTO CORREGIDA ---
+            // Intentamos capturar los selectores (probamos ambos idiomas por si acaso)
+            const provSelect = document.getElementById('province') || document.getElementById('provincia');
+            const distSelect = document.getElementById('district') || document.getElementById('distrito');
+
+            if (provSelect && distSelect) {
+                console.log("✅ Selectores de ubicación detectados. Conectando con el mapa...");
                 
-                // Mapear cada atributo a su campo correspondiente en el formulario
-                Object.entries(atributos).forEach(([key, value]) => {
-                    // Buscar campos con name o id que coincidan con el atributo
-                    let field = document.querySelector(`[name="${key}"]`) || 
-                                document.querySelector(`#attr-${key}`);
-                    if (field) {
-                        field.value = value;
-                        console.log(`✅ Campo dinámico rellenado: ${key} = ${value}`);
-                    }
-                });
-            } catch (e) {
-                console.warn('No se pudieron parsear los atributos:', e);
+                const geocoder = new google.maps.Geocoder();
+
+                const moverMapaALocalidad = () => {
+                    const p = provSelect.options[provSelect.selectedIndex]?.text || "";
+                    const d = distSelect.options[distSelect.selectedIndex]?.text || "";
+                    
+                    // Si el usuario aún no ha seleccionado nada real, no movemos
+                    if (p === "" || p.toLowerCase().includes("seleccione")) return;
+
+                    const direccionBusqueda = `${d}, ${p}, Panama`;
+                    console.log("🔍 Buscando en el mapa:", direccionBusqueda);
+
+                    geocoder.geocode({ address: direccionBusqueda }, (results, status) => {
+                        if (status === "OK" && results[0]) {
+                            map.setCenter(results[0].geometry.location);
+                            marker.setPosition(results[0].geometry.location);
+                            map.setZoom(13); // Zoom de ciudad
+                            
+                            // Actualizamos los inputs ocultos con la nueva posición
+                            document.getElementById('latitud').value = results[0].geometry.location.lat();
+                            document.getElementById('longitud').value = results[0].geometry.location.lng();
+                        } else {
+                            console.error("❌ Google Maps no encontró la ubicación:", status);
+                        }
+                    });
+                };
+
+                // Escuchamos el cambio en ambos selectores
+                provSelect.addEventListener('change', moverMapaALocalidad);
+                distSelect.addEventListener('change', moverMapaALocalidad);
+            } else {
+                console.warn("⚠️ No se encontraron los selectores 'province/provincia' o 'district/distrito' en el HTML.");
             }
         }
+
+        cargarMapaEditor(ad.latitud, ad.longitud);
 
         isLoadingAdData = false; // ✅ Desactivar flag - carga completada
     }
@@ -1553,11 +1687,12 @@ if (Array.isArray(categories) && categories.length) {
         const adData = {
             titulo: formData.get('titulo'),
             descripcion: formData.get('descripcion'),
-            precio: parseFloat(formData.get('precio')),
+            precio: parseInt(formData.get('precio'), 10),  // FIXED: Integer price
             categoria: selectedMainCategory,
             provincia: formData.get('provincia'),
             distrito: formData.get('distrito'),
-            direccion_especifica: formData.get('direccion_especifica'),
+            latitud: document.getElementById('latitud').value,
+            longitud: document.getElementById('longitud').value,
             contact_name: formData.get('contact_name'),
             contact_phone: formData.get('contact_phone'),
             contact_email: formData.get('contact_email')
@@ -1685,6 +1820,94 @@ if (Array.isArray(categories) && categories.length) {
         if (categories) {
             await loadAdData(categories);
         }
+
+        // === IA CREDITS LOAD + BUTTON HANDLER ===
+        const user = await supabase.auth.getUser();
+        if (user.data.user) {
+            const { data: suscripcion } = await supabase
+                .from('suscripciones')
+                .select('optimizations_ia_usadas, limite_ia')
+                .eq('user_id', user.data.user.id)
+                .single();
+
+            const counter = document.getElementById('ia-credits-counter');
+            const btnIA = document.getElementById('btn-ia-optimize');
+            if (counter && suscripcion) {
+                const restantes = suscripcion.limite_ia - suscripcion.optimizations_ia_usadas;
+                counter.textContent = `${restantes} créditos IA`;
+                if (restantes === 0) {
+                    btnIA.disabled = true;
+                }
+            }
+        }
+
+        // IA button handler (editar-anuncio version)
+        document.getElementById('btn-ia-optimize')?.addEventListener('click', async () => {
+            const tituloInput = document.getElementById('title');
+            const descInput = document.getElementById('description');
+            if (!tituloInput.value || !descInput.value) {
+                alert('Escribe título y descripción primero.');
+                return;
+            }
+
+            // Check suscripciones
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user.data.user) {
+                alert('Debes iniciar sesión.');
+                return;
+            }
+
+            const { data: suscripcion } = await supabase
+                .from('suscripciones')
+                .select('optimizations_ia_usadas, limite_ia')
+                .eq('user_id', user.data.user.id)
+                .single();
+
+            if (!suscripcion || suscripcion.optimizations_ia_usadas >= suscripcion.limite_ia) {
+                alert("Has agotado tus optimizaciones de IA de tu plan actual.");
+                return;
+            }
+
+            // Fetch Python IA
+            try {
+                const response = await fetch('http://127.0.0.1:5000/optimizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        titulo: tituloInput.value,
+                        descripcion: descInput.value
+                    })
+                });
+
+                const data = await response.json();
+                if (data.titulo && data.descripcion) {
+                    tituloInput.value = data.titulo;
+                    descInput.value = data.descripcion;
+
+                    // Increment in suscripciones
+                    await supabase
+                        .from('suscripciones')
+                        .update({ optimizations_ia_usadas: suscripcion.optimizations_ia_usadas + 1 })
+                        .eq('user_id', user.data.user.id);
+
+                    // Update UI
+                    const restantes = suscripcion.limite_ia - (suscripcion.optimizations_ia_usadas + 1);
+                    const counter = document.getElementById('ia-credits-counter');
+                    const btnIA = document.getElementById('btn-ia-optimize');
+                    if (counter) counter.textContent = `${restantes} créditos IA`;
+                    if (restantes === 0) {
+                        btnIA.disabled = true;
+                    }
+                    
+                    alert('¡Anuncio optimizado con IA!');
+                } else {
+                    alert('Error en la optimización. Intenta de nuevo.');
+                }
+            } catch (error) {
+                console.error('Python IA error:', error);
+                alert('Error conectando con IA. Verifica que el servidor Python esté corriendo.');
+            }
+        });
     }
 
     initialize();
@@ -1951,4 +2174,60 @@ if (Array.isArray(categories) && categories.length) {
     // ✅ FUNCIÓN UNIFICADA PARA RELLENAR CAMPOS DE ATRIBUTOS
     // --- FUNCIÓN DE NAVEGACIÓN ELIMINADA - Ahora es un solo paso ---
     // Los campos dinámicos se muestran automáticamente al cambiar la categoría
+}
+// --- FUNCIÓN QUE ESTABA FALTANDO ---
+function inicializarMapaEdicion(latOriginal, lngOriginal) {
+    const centroInicial = { 
+        lat: parseFloat(latOriginal) || 8.9824, 
+        lng: parseFloat(lngOriginal) || -79.5199 
+    };
+
+    const mapa = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: centroInicial,
+        mapTypeControl: false,
+        streetViewControl: false
+    });
+
+    const marcador = new google.maps.Marker({
+        position: centroInicial,
+        map: mapa,
+        draggable: true,
+        animation: google.maps.Animation.DROP
+    });
+
+    // Guardar coordenadas actuales en los inputs ocultos
+    document.getElementById('latitud').value = centroInicial.lat;
+    document.getElementById('longitud').value = centroInicial.lng;
+
+    // Actualizar coordenadas al arrastrar el pin
+    marcador.addListener('dragend', function() {
+        const posicion = marcador.getPosition();
+        document.getElementById('latitud').value = posicion.lat();
+        document.getElementById('longitud').value = posicion.lng();
+    });
+
+    // Mover mapa al cambiar Provincia/Distrito
+    const provSelect = document.getElementById('province');
+    const distSelect = document.getElementById('district');
+
+    if (provSelect && distSelect) {
+        const geocoder = new google.maps.Geocoder();
+        const moverMapa = () => {
+            const p = provSelect.options[provSelect.selectedIndex]?.text || "";
+            const d = distSelect.options[distSelect.selectedIndex]?.text || "";
+            const busqueda = `${d}, ${p}, Panama`;
+
+            geocoder.geocode({ address: busqueda }, (results, status) => {
+                if (status === "OK") {
+                    mapa.setCenter(results[0].geometry.location);
+                    marcador.setPosition(results[0].geometry.location);
+                    document.getElementById('latitud').value = results[0].geometry.location.lat();
+                    document.getElementById('longitud').value = results[0].geometry.location.lng();
+                }
+            });
+        };
+        provSelect.addEventListener('change', moverMapa);
+        distSelect.addEventListener('change', moverMapa);
+    }
 }

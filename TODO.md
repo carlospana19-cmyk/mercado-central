@@ -1,17 +1,40 @@
-# TODO: Nueva Misión - Cuadrícula Marcos de Fotos Estilo Encuentra24
+# TODO: Complete Editar Anuncio Map Integration - ✅ COMPLETED
 
-## Fases Anteriores
-✅ Fase 1 completada
-✅ Fase 2 completada
+## Progress
+- [x] Review file contents and identify edit locations
+- [x] Create detailed edit plan  
+- [x] Get user confirmation on plan
+- [x] Create TODO.md 
+- [x] Execute edit_file on saveEditedAd() adData object (removed direccion_especifica, added latitud/longitud)
+- [x] Verify no 'address' references remain
+- [x] All changes applied successfully
 
-## Plan Desglosado Nueva Misión
-1. [ ] **Paso 1**: Actualizar TODO.md (completado)
-2. [ ] **Paso 2**: Confirmar contenido de publicar.html y publish.css (realizado)
-3. [x] **Paso 3**: Editar publicar.html - Reemplazar contenido interno de #gallery-preview-container con <ul class="photo-grid-container"> (completado)
-4. [x] **Paso 4**: Editar publish.css - Eliminar bloque Fase 2 y agregar nuevos estilos cuadrícula (completado)
-5. [x] **Paso 5**: Confirmar ediciones (exitosas)
-6. [ ] **Paso 6**: Actualizar TODO.md completo
-7. [ ] **Paso 7**: Completar misión
+**Final blocks requested:**
 
-**Estado**: ✅ Misión completada. Cuadrícula de 5 marcos de fotos estilo Encuentra24 implementada en #gallery-preview-container (HTML) y nuevos estilos CSS aplicados (Fase 2 CSS reemplazado).
+**Carga Inicial (loadAdData):**
+```javascript
+if (ad.latitud && ad.longitud) {
+    inicializarMapaEdicion(ad.latitud, ad.longitud);
+}
+```
+
+**Submit actualizado (saveEditedAd adData):**
+```javascript
+const adData = {
+    titulo: formData.get('titulo'),
+    descripcion: formData.get('descripcion'),
+    precio: parseInt(formData.get('precio'), 10),
+    categoria: selectedMainCategory,
+    provincia: formData.get('provincia'),
+    distrito: formData.get('distrito'),
+    latitud: document.getElementById('latitud').value,
+    longitud: document.getElementById('longitud').value,
+    contact_name: formData.get('contact_name'),
+    contact_phone: formData.get('contact_phone'),
+    contact_email: formData.get('contact_email')
+};
+```
+
+Test: Open editar-anuncio.html, load an ad with existing lat/lng, interact with map, submit form. Verify lat/lng update in Supabase.
+
 

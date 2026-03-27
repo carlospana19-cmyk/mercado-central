@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
+    <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
     <title>Editar Anuncio - Mercado Central</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -70,38 +70,35 @@
                                 </select>
                             </div>
 
-                            <!-- Ubicación -->
-                            <div class="internal-subtitle"><i class="fas fa-map-marker-alt"></i> Ubicación</div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="province">Provincia</label>
-                                    <select id="province" name="provincia" required>
-                                        <option value="">Selecciona una provincia</option>
-                                        <option value="Panamá">Panamá</option>
-                                        <option value="Panamá Oeste">Panamá Oeste</option>
-                                        <option value="Colón">Colón</option>
-                                        <option value="Chiriquí">Chiriquí</option>
-                                        <option value="Veraguas">Veraguas</option>
-                                        <option value="Coclé">Coclé</option>
-                                        <option value="Los Santos">Los Santos</option>
-                                        <option value="Herrera">Herrera</option>
-                                        <option value="Darién">Darién</option>
-                                        <option value="Bocas del Toro">Bocas del Toro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" id="district-group" style="display: none;">
-                                    <label for="district">Distrito / Corregimiento</label>
-                                    <select id="district" name="distrito" required>
-                                        <option value="">Selecciona un distrito</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="address">Dirección o Sector Específico</label>
-                                <input type="text" id="address" name="direccion_especifica" placeholder="Ej: El Cangrejo, Bella Vista">
-                            </div>
+                           
+                           
                         </div>
 
+      <div class="form-section" style="border: 2px solid #00c2cb; border-top: 1px solid #00c2cb; margin-top: -22px; margin-bottom: -22px; border-radius: 0; padding: 25px; background-color: #ffffff;">
+    <h4 class="mb-4" style="color: #00c2cb; font-weight: bold; border-bottom: 2px solid #00c2cb; padding-bottom: 10px;">
+        <i class="bi bi-geo-alt-fill me-2"></i>Información de Ubicación
+    </h4>
+
+    <div style="display: flex; gap: 20px; width: 100%; margin-bottom: 20px; align-items: flex-end;">
+        <div style="flex: 1;">
+            <label for="province" class="form-label fw-bold" style="font-size: 1.1rem;">Provincia</label>
+           <select id="province" name="provincia" class="form-select" 
+    style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
+    <option value="">Seleccione Provincia</option>
+</select>
+
+<select id="district" name="distrito" class="form-select" 
+    style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
+    <option value="">Seleccione Distrito</option>
+</select>
+        </div>
+    </div>
+
+    <div id="map" style="height: 380px; width: 100%; border-radius: 12px; border: 1px solid #00c2cb;"></div>
+    
+    <input type="hidden" id="latitud" name="latitud">
+    <input type="hidden" id="longitud" name="longitud">
+</div>
                         <!-- SECCIÓN PRINCIPAL: TÍTULO Y PRECIO -->
                         <div class="primary-section">
                             <div class="form-row">
@@ -120,8 +117,8 @@
                                         <span class="required">*</span>
                                     </label>
                                     <div class="price-input-wrapper">
-                                        <span class="currency-symbol">$</span>
-                                        <input type="number" id="price" name="precio" step="0.01" placeholder="15000" min="1" required>
+<span class="currency-symbol">$</span>
+                                        <input type="number" id="price" name="precio" placeholder="15000" min="1" required>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +131,15 @@
                                 <span class="required">*</span>
                                 <span class="char-count">(0/1000)</span>
                             </label>
-                            <textarea id="description" name="descripcion" rows="6" placeholder="Describe las características, estado, mantenimiento, etc." maxlength="1000" required></textarea>
+<textarea id="description" name="descripcion" rows="6" placeholder="Describe las características, estado, mantenimiento, etc." maxlength="1000" required></textarea>
+
+                            <!-- IA Optimizer Container -->
+                            <div class="ia-optimizer-container">
+                                <button type="button" id="btn-ia-optimize" class="btn-ia-magic">
+                                    <i class="fas fa-magic"></i> Optimizar con IA
+                                </button>
+                                <span id="ia-credits-counter" class="ia-credits-badge">Cargando créditos...</span>
+                            </div>
                             <small class="help-text">Mínimo 30 caracteres para mejor visibilidad</small>
                         </div>
 
@@ -701,6 +706,9 @@
                                 </div>
                             </div>
 
+
+                            </div>
+
                             <div class="form-group">
                                 <label>Galería de Imágenes (hasta el límite de tu plan)</label>
                                 <div id="gallery-drop-area" class="drop-area">
@@ -732,5 +740,6 @@
     
     <!-- ======================== SCRIPTS ======================== -->
     <script type="module" src="main.js" defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBijfhc6uDfEfzAreBjH_tJpYpc1yDvFas&libraries=places"></script>
 </body>
 </html>

@@ -142,24 +142,31 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Atributos capturados:', atributos);
 
             // Datos finales para Supabase
+            const subcategorySelect = document.getElementById('subcategoria-step4') || document.getElementById('subcategory');
+            const subcategoriaValue = subcategorySelect ? subcategorySelect.value.trim() : '';
+
             const adData = {
                 user_id: user.id,
                 titulo: titleInput.value.trim(),
                 descripcion: descriptionInput.value.trim(),
-                precioRaw: priceInput.value.replace(/[^0-9]/g, ''),
                 precio: parseInt(priceInput.value.replace(/[^0-9]/g, '')) || 0,
                 categoria: categoriaNombre, // ⭐ NOMBRE correcto
+                subcategoria: subcategoriaValue, // ⭐ COLUMNA DEDICADA EN RAÍZ
                 provincia: provinceSelect?.value || '',
                 distrito: districtSelect?.value || '',
-                direccion_exacta: locationInput.value || '',url_portada: coverImageUrl,
+                direccion_exacta: locationInput.value || '',
+                url_portada: coverImageUrl,
                 url_galeria: galleryUrls,
                 
-                // ⭐ EL CAMBIO VITAL: Sin JSON.stringify, solo la variable limpia
+                // ⭐ atributos_clave SIN subcategoria (solo campos dinámicos marca/modelo/etc)
                 atributos_clave: atributos, 
                 
                 activo: true,
                 fecha_publicacion: new Date().toISOString()
             };
+
+            console.log('📤 INSERT PAYLOAD - subcategoria (root):', subcategoriaValue);
+            console.log('📤 INSERT PAYLOAD - categoria (root):', categoriaNombre);
 
 // Plan logic (CORREGIDO: jerarquía planes - 60d pagos / 30d free)
             const selectedPlan = (sessionStorage.getItem('selectedPlan') || 'free').toLowerCase();

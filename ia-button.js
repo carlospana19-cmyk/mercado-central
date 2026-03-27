@@ -4,7 +4,7 @@
 
 // Función para actualizar el contador de chances
 function actualizarContadorChances() {
-    const chancesSpan = document.getElementById('ia-chances');
+    const chancesSpan = document.getElementById('ia-chances') || document.getElementById('ia-credits-counter');
     if (!chancesSpan) return;
     
     const planSeleccionado = document.querySelector('input[name="plan"]:checked');
@@ -93,7 +93,7 @@ document.addEventListener('change', function(e) {
 
 document.addEventListener('click', async function(e) {
     // Verificar si el clic fue exactamente en el botón de IA
-    if (e.target && e.target.id === 'btn-optimizar-ia') {
+    if (e.target.id === 'btn-optimizar-ia' || e.target.id === 'btn-ia-optimize') {
         e.preventDefault();
         console.log("CLIC DETECTADO VIA DELEGACION");
         
