@@ -910,7 +910,6 @@ textarea::placeholder {
     padding: 20px;
     border-radius: 12px;
     margin: 20px 0;
-    border-left: 5px solid #00bfae;
     transition: all 0.3s ease;
 }
 

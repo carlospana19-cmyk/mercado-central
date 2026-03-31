@@ -194,16 +194,16 @@ document.addEventListener('click', async function(e) {
         
         try {
             console.log("Conectando con Python...");
-            const response = await fetch('http://127.0.0.1:5000/optimizar', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    titulo: tituloInput.value, 
-                    descripcion: descInput.value,
-                    plan: plan,
-                    token_id: token_id
-                })
-            });
+const response = await fetch('http://127.0.0.1:5001/optimizar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        titulo: tituloInput.value, 
+        descripcion: descInput.value,
+        plan: plan,
+        token_id: token_id
+    })
+});
             
             const resData = await response.json();
             console.log("Respuesta IA:", resData);
@@ -238,6 +238,16 @@ document.addEventListener('click', async function(e) {
             if(resData.titulo_optimizado || resData.titulo) {
                 tituloInput.value = limpiarTexto(resData.titulo_optimizado || resData.titulo);
                 descInput.value = limpiarTexto(resData.descripcion_optimizada || resData.descripcion);
+                
+                // CRUCIAL: Marcar IA usada = "1" para que form-logic.js reste crédito
+                const inputIaUsada = document.getElementById('ia_usada_al_publicar');
+                if (inputIaUsada) {
+                    inputIaUsada.value = "1";
+                    console.log("🪙 Crédito de IA marcado (ia_usada_al_publicar = 1)");
+                } else {
+                    console.warn("⚠️ inputIA oculto NO encontrado - crédito NO marcado");
+                }
+                
                 status.innerText = "Anuncio Optimizado!";
                 status.style.color = "green";
                 

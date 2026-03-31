@@ -11,7 +11,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:3000'])
 
 # Base de datos en memoria para registrar uso de IA
 # Formato: {token_id: {'plan': plan, 'usados': cantidad}}
@@ -28,11 +28,11 @@ PROMPTS = {
 
 # Límites por plan
 LIMITS = {
-    'free': 0,
-    'basico': 1,
-    'bronce': 1,
-    'premium': 3,
-    'destacado': 5
+    'free': 999,
+    'basico': 999,
+    'bronce': 999,
+    'premium': 999,
+    'destacado': 999
 }
 
 @app.route('/optimizar', methods=['POST'])
@@ -68,19 +68,23 @@ def optimizar():
         
         usados = usage_db[db_key]['usados']
         
-        # Verificar si agotó los intentos
-        if limite > 0 and usados >= limite:
-            # Si es Destacado (plan máximo), no mostrar mensaje de subir de plan
-            if plan == 'destacado':
-                mensaje = "Has agotado tu límite"
-            else:
-                mensaje = "Has agotado tu límite. ¡Sube a un plan superior para más!"
-            return jsonify({
-                "error": mensaje,
-                "bloqueado": True,
-                "usados": usados,
-                "limite": limite
-            }), 403
+        # DESARROLLO: SIN LÍMITES - SIEMPRE PASA
+        # (Comentado para desarrollo ilimitado)
+        # if limite > 0 and usados >= limite:
+        #     if plan == 'destacado':
+        #         mensaje = "Has agotado tu límite"
+        #     else:
+        #         mensaje = "Has agotado tu límite. ¡Sube a un plan superior para más!"
+        #     return jsonify({
+        #         "error": mensaje,
+        #         "bloqueado": True,
+        #         "usados": usados,
+        #         "limite": limite
+        #     }), 403
+        
+        # Resetear contador cada vez (desarrollo)
+        if limite > 0:
+            usage_db[db_key]['usados'] = 0
         
         mensajes = [
             {
@@ -132,4 +136,5 @@ def optimizar():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5001, debug=True)
+

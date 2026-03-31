@@ -1,0 +1,1 @@
+# Port Fix - Fijar Puerto IA 5001\n\n1. [x] Create TODO.md ✅\n2. [ ] Edit ia-button.js: Fetch URL a 5001\n3. [ ] Edit ia_server.py: app.run(host=127.0.0.1, port=5001) + print\n4. [ ] Edit editar-anuncio-logic.js: Fetch URL a 5001\n5. [ ] Test: Reiniciar Python server, probar botón IA\n6. [ ] Verify: Network tab sin 5000/5500

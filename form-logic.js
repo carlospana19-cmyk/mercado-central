@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("Usuario no autenticado");
 
-            // SUBIR IMÁGENES (sin cambios)
+// FLEXIBLE IMAGE VALIDATION & UPLOAD - MIN 1 IMAGE, NO MAX BLOCK
             let coverImageUrl = '';
             const coverImageFile = coverImageInput.files[0];
             if (coverImageFile) {
@@ -93,6 +93,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     galleryUrls.push(urlData.publicUrl);
                 }
             }
+
+            // ✅ LIMPIEZA: Filtrar URLs vacías/nulas
+            const cleanGalleryUrls = galleryUrls.filter(url => url && url.trim() !== '');
+
+            // ✅ VALIDACIÓN FLEXIBLE: Mínimo 1 imagen total (portada O galería)
+            const totalImages = (coverImageUrl ? 1 : 0) + cleanGalleryUrls.length;
+            if (totalImages === 0) {
+                alert("Por favor, sube al menos una imagen (portada o galería).");
+                formButton.disabled = false;
+                formButton.textContent = 'Publicar Anuncio';
+                return;
+            }
+
+            console.log(`📸 Imágenes validadas: Portada=${!!coverImageUrl}, Galería=${cleanGalleryUrls.length}, Total=${totalImages}`);
+
 
 // ⭐ CAPTURA ATRIBUTOS MEJORADA - NUNCA VACÍO (VEHÍCULOS + MÁS)
             const categoriaNombre = categorySelect.options[categorySelect.selectedIndex].text;
@@ -141,6 +156,30 @@ document.addEventListener('DOMContentLoaded', () => {
             // ⭐ DEBUG: Siempre mostrar qué se capturó
             console.log('✅ Atributos capturados:', atributos);
 
+            // --- 1. CAPTURA DE VALORES EN EL MOMENTO DEL SUBMIT ---
+            const planRadio = document.querySelector('input[name="plan"]:checked');
+            const currentPlan = planRadio ? planRadio.value : 'free';
+            const inputIA = document.getElementById('ia_usada_al_publicar');
+            const iaUsadaValue = inputIA ? inputIA.value : '0';
+
+            // --- 2. CÁLCULO DE CRÉDITOS ---
+            let totales = 1;
+            if (currentPlan === 'destacado') totales = 5;
+            else if (currentPlan === 'premium') totales = 3;
+
+            // La resta: forzamos a que sea una comparación limpia
+            const fueUsada = (iaUsadaValue === "1");
+            let restantes = fueUsada ? (totales - 1) : totales;
+
+            // --- 3. LOGS DE EVIDENCIA (Para ver en F12) ---
+            console.log("🚀 VERIFICACIÓN PRE-ENVÍO:");
+            console.table({
+                "Plan Seleccionado": currentPlan,
+                "IA Usada (Input)": iaUsadaValue,
+                "Créditos Totales": totales,
+                "Créditos a Enviar": restantes
+            });
+
             // Datos finales para Supabase
             const subcategorySelect = document.getElementById('subcategoria-step4') || document.getElementById('subcategory');
             const subcategoriaValue = subcategorySelect ? subcategorySelect.value.trim() : '';
@@ -156,7 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 distrito: districtSelect?.value || '',
                 direccion_exacta: locationInput.value || '',
                 url_portada: coverImageUrl,
-                url_galeria: galleryUrls,
+                url_galeria: cleanGalleryUrls,
+
+                
+                // En el objeto adData (sin tildes):
+                creditos_ia_totales: totales,
+                creditos_ia_restantes: restantes,
                 
                 // ⭐ atributos_clave SIN subcategoria (solo campos dinámicos marca/modelo/etc)
                 atributos_clave: atributos, 
@@ -169,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('📤 INSERT PAYLOAD - categoria (root):', categoriaNombre);
 
 // Plan logic (CORREGIDO: jerarquía planes - 60d pagos / 30d free)
-            const selectedPlan = (sessionStorage.getItem('selectedPlan') || 'free').toLowerCase();
             adData.selected_plan = selectedPlan;
             adData.featured_plan = selectedPlan;
             
