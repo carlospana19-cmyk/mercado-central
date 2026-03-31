@@ -342,12 +342,26 @@ const getVideoEmbedUrl = (videoUrl) => {
                             </div>
                             <h3 class="property-title">${ad.titulo}</h3>
                             <p class="property-location"><i class="fas fa-map-marker-alt"></i> ${cleanLocationString(ad.direccion_exacta || (ad.corregimiento ? ad.corregimiento + ', ' : '') + (ad.distrito || ad.ubicacion || '') + ', ' + (ad.provincia || 'N/A'))}</p>
-                            ${(() => {
-                                const attrHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
-                                // Solo creamos el contenedor si attrHTML tiene contenido real
-                                return attrHTML && attrHTML !== '' && attrHTML !== '<span></span>' 
-                                    ? `<div class="property-specs">${attrHTML}</div>` 
-                                    : ''; 
+${(() => {
+                                try {
+                                    // 1. Asegurar que los atributos sean un objeto válido
+                                    let attrs = ad.atributos_clave;
+                                    if (typeof attrs === 'string') {
+                                        attrs = JSON.parse(attrs);
+                                    }
+                                    
+                                    // 2. Generar el HTML
+                                    const attrHTML = generateAttributesHTML(attrs, ad.categoria, attrs?.subcategoria);
+                                    
+                                    // 3. Forzar visibilidad en caso de que el CSS de la página principal lo oculte
+                                    if (attrHTML && attrHTML.trim() !== '' && attrHTML !== '<span></span>') {
+                                        return `<div class="property-specs card-attributes" style="display: flex !important; flex-wrap: wrap; gap: 8px; margin-top: 8px; font-size: 0.9em; color: #555;">${attrHTML}</div>`;
+                                    }
+                                    return '';
+                                } catch (error) {
+                                    console.error("Error renderizando atributos para ID " + ad.id, error);
+                                    return '';
+                                }
                             })()}
                             ${profilePhotoHTML}
                             <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>

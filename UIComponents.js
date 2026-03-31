@@ -73,12 +73,17 @@ export const UIComponents = {
      * @param {Object} ad - Objeto del anuncio con atributos_clave y categoria
      * @returns {String} HTML con iconos y atributos
      */
+
     renderAttributes(ad) {
         const attributes = ad.atributos_clave || {};
         const category = ad.categoria || '';
         const categoria = category.toLowerCase();
         const subcategory = ad.subcategoria || attributes.subcategoria || '';
         let detailsHTML = '';
+        let spanCount = 0;
+        const MAX_SPANS = 3;
+
+
 
 
 
@@ -129,9 +134,15 @@ export const UIComponents = {
             if (attributes.procesador) details.push(`<span><i class="fas fa-microchip"></i> ${attributes.procesador}</span>`);
             if (attributes.condicion) details.push(`<span><i class="fas fa-award"></i> ${attributes.condicion}</span>`);
 
+
             if (details.length > 0) {
-                detailsHTML += `<div class="electronics-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="electronics-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
         // --- HOGAR Y MUEBLES ---
@@ -157,9 +168,15 @@ export const UIComponents = {
             if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
             if (attributes.color) details.push(`<span><i class="fas fa-palette"></i> ${attributes.color}</span>`);
             if (attributes.condicion) details.push(`<span><i class="fas fa-check-circle"></i> ${attributes.condicion}</span>`);
+
             if (details.length > 0) {
-                detailsHTML += `<div class="home-furniture-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="home-furniture-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
         // --- MODA Y BELLEZA (Iconos de estilo) ---
@@ -172,9 +189,15 @@ export const UIComponents = {
             if (attributes.condicion) details.push(`<span><i class="fas fa-gem"></i> ${attributes.condicion}</span>`);
             if (attributes.edad) details.push(`<span><i class="fas fa-child"></i> Edad: ${attributes.edad}</span>`);
             
+
             if (details.length > 0) {
-                detailsHTML += `<div class="fashion-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="fashion-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
         // --- DEPORTES Y HOBBIES ---
@@ -187,9 +210,15 @@ export const UIComponents = {
             if (attributes.marca) details.push(`<span><i class="fas fa-tag"></i> ${attributes.marca}</span>`);
             if (attributes.aro) details.push(`<span><i class="fas fa-circle-notch"></i> Aro ${attributes.aro}</span>`);
             if (attributes.condicion) details.push(`<span><i class="fas fa-star"></i> ${attributes.condicion}</span>`);
+
             if (details.length > 0) {
-                detailsHTML += `<div class="sports-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="sports-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
         // --- MASCOTAS (Iconos dinámicos y amigables) ---
@@ -218,9 +247,15 @@ export const UIComponents = {
             
             if (attributes.tipo_anuncio) details.push(`<span><i class="fas fa-bullhorn"></i> ${attributes.tipo_anuncio}</span>`);
 
+
             if (details.length > 0) {
-                detailsHTML += `<div class="pets-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="pets-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
         // --- SERVICIOS ---
@@ -230,9 +265,15 @@ export const UIComponents = {
             if (attributes.tipo_servicio) details.push(`<span><i class="fas fa-wrench"></i> ${attributes.tipo_servicio}</span>`);
             if (attributes.modalidad) details.push(`<span><i class="fas fa-location-arrow"></i> ${attributes.modalidad}</span>`);
             if (attributes.experiencia) details.push(`<span><i class="fas fa-award"></i> ${attributes.experiencia}</span>`);
+
             if (details.length > 0) {
-                detailsHTML += `<div class="services-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="services-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
        // --- NEGOCIOS, EMPLEOS Y SERVICIOS ---
@@ -244,10 +285,15 @@ export const UIComponents = {
     if (attributes.experiencia) extraDetails.push(`<span><i class="fas fa-briefcase"></i> ${attributes.experiencia}</span>`);
     if (attributes.modalidad) extraDetails.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`);
 
+
     if (extraDetails.length > 0) {
-        // Lo agregamos al HTML usando tu misma clase original "business-details"
-        detailsHTML += `<div class="business-details">${extraDetails.slice(0, 3).join('')}</div>`;
+        const spansToAdd = extraDetails.slice(0, 3 - spanCount);
+        if (spansToAdd.length > 0) {
+            detailsHTML += `<div class="business-details">${spansToAdd.join('')}</div>`;
+            spanCount += spansToAdd.length;
+        }
     }
+
 
         // --- COMUNIDAD, CLASES Y EVENTOS (Iconos dinámicos) ---
         const communitySubcats = ["Clases y Cursos", "Eventos", "Otros"];
@@ -261,9 +307,15 @@ export const UIComponents = {
             if (attributes.modalidad) details.push(`<span><i class="fas fa-globe"></i> ${attributes.modalidad}</span>`);
             if (attributes.fecha_evento) details.push(`<span><i class="far fa-calendar-check"></i> ${attributes.fecha_evento}</span>`);
             
+
             if (details.length > 0) {
-                detailsHTML += `<div class="community-details">${details.slice(0, 3).join('')}</div>`;
+                const spansToAdd = details.slice(0, 3 - spanCount);
+                if (spansToAdd.length > 0) {
+                    detailsHTML += `<div class="community-details">${spansToAdd.join('')}</div>`;
+                    spanCount += spansToAdd.length;
+                }
             }
+
         }
 
         // Si hay atributos pero no coincidieron con ninguna categoría, devolvemos vacío

@@ -890,13 +890,27 @@ return `
                                 </div>
                         </div>
             
-                        ${(() => {
-                            const attrHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
-                            // Solo creamos el contenedor si attrHTML tiene contenido real
-                            return attrHTML && attrHTML !== '' && attrHTML !== '<span></span>' 
-                                ? `<div class="property-attributes">${attrHTML}</div>` 
-                                : ''; 
-                        })()}
+${(() => {
+                                try {
+                                    // 1. Asegurar que los atributos sean un objeto válido
+                                    let attrs = ad.atributos_clave;
+                                    if (typeof attrs === 'string') {
+                                        attrs = JSON.parse(attrs);
+                                    }
+                                    
+                                    // 2. Generar el HTML
+                                    const attrHTML = generateAttributesHTML(attrs, ad.categoria, attrs?.subcategoria);
+                                    
+                                    // 3. Forzar visibilidad en caso de que el CSS de la página principal lo oculte
+                                    if (attrHTML && attrHTML.trim() !== '' && attrHTML !== '<span></span>') {
+                                        return `<div class="property-attributes card-attributes" style="display: flex !important; flex-wrap: wrap; gap: 8px; margin-top: 8px; font-size: 0.9em; color: #555;">${attrHTML}</div>`;
+                                    }
+                                    return '';
+                                } catch (error) {
+                                    console.error("Error renderizando atributos para ID " + ad.id, error);
+                                    return '';
+                                }
+                            })()}
             
             <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
                 Contactar
