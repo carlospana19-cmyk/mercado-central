@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("Usuario no autenticado");
 
-// FLEXIBLE IMAGE VALIDATION & UPLOAD - MIN 1 IMAGE, NO MAX BLOCK
+            // FLEXIBLE IMAGE VALIDATION & UPLOAD - MIN 1 IMAGE, NO MAX BLOCK
             let coverImageUrl = '';
             const coverImageFile = coverImageInput.files[0];
             if (coverImageFile) {
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`📸 Imágenes validadas: Portada=${!!coverImageUrl}, Galería=${cleanGalleryUrls.length}, Total=${totalImages}`);
 
 
-// ⭐ CAPTURA ATRIBUTOS MEJORADA - NUNCA VACÍO (VEHÍCULOS + MÁS)
+            // ⭐ CAPTURA ATRIBUTOS MEJORADA - NUNCA VACÍO (VEHÍCULOS + MÁS)
             const categoriaNombre = categorySelect.options[categorySelect.selectedIndex].text;
             console.log('📦 Publicando categoría:', categoriaNombre);
             
@@ -156,29 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // ⭐ DEBUG: Siempre mostrar qué se capturó
             console.log('✅ Atributos capturados:', atributos);
 
-            // --- 1. CAPTURA DE VALORES EN EL MOMENTO DEL SUBMIT ---
-            const planRadio = document.querySelector('input[name="plan"]:checked');
-            const currentPlan = planRadio ? planRadio.value : 'free';
-            const inputIA = document.getElementById('ia_usada_al_publicar');
-            const iaUsadaValue = inputIA ? inputIA.value : '0';
 
-            // --- 2. CÁLCULO DE CRÉDITOS ---
-            let totales = 1;
-            if (currentPlan === 'destacado') totales = 5;
-            else if (currentPlan === 'premium') totales = 3;
+            // ✅ CRÉDITOS ELIMINADOS: Cobro ya se hace en ia-button.js inmediatamente
+            console.log("🚀 VERIFICACIÓN PRE-ENVÍO: Créditos manejados en ia-button.js");
 
-            // La resta: forzamos a que sea una comparación limpia
-            const fueUsada = (iaUsadaValue === "1");
-            let restantes = fueUsada ? (totales - 1) : totales;
-
-            // --- 3. LOGS DE EVIDENCIA (Para ver en F12) ---
-            console.log("🚀 VERIFICACIÓN PRE-ENVÍO:");
-            console.table({
-                "Plan Seleccionado": currentPlan,
-                "IA Usada (Input)": iaUsadaValue,
-                "Créditos Totales": totales,
-                "Créditos a Enviar": restantes
-            });
 
             // Datos finales para Supabase
             const subcategorySelect = document.getElementById('subcategoria-step4') || document.getElementById('subcategory');
@@ -198,9 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 url_galeria: cleanGalleryUrls,
 
                 
-                // En el objeto adData (sin tildes):
-                creditos_ia_totales: totales,
-                creditos_ia_restantes: restantes,
+
+                // ✅ REMOVIDO: No incluir creditos en adData (cobro ya hecho en ia-button.js)
+
                 
                 // ⭐ atributos_clave SIN subcategoria (solo campos dinámicos marca/modelo/etc)
                 atributos_clave: atributos, 
@@ -212,7 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('📤 INSERT PAYLOAD - subcategoria (root):', subcategoriaValue);
             console.log('📤 INSERT PAYLOAD - categoria (root):', categoriaNombre);
 
-// Plan logic (CORREGIDO: jerarquía planes - 60d pagos / 30d free)
+            // 🎯 FIX selectedPlan: Obtener del sessionStorage o radio (patrón de publish-logic.js)
+            let selectedPlan = sessionStorage.getItem('selectedPlan');
+            if (!selectedPlan) {
+                selectedPlan = document.querySelector('input[name="plan"]:checked')?.value || 'free';
+            }
+            if (!selectedPlan) {
+                throw new Error('No hay plan seleccionado. Por favor, selecciona un plan antes de publicar.');
+            }
+            console.log('✅ Plan seleccionado:', selectedPlan);
+
+            // Plan logic (CORREGIDO: jerarquía planes - 60d pagos / 30d free)
             adData.selected_plan = selectedPlan;
             adData.featured_plan = selectedPlan;
             
@@ -247,11 +238,15 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = `detalle-producto.html?id=${newAd.id}`;
 
         } catch (error) {
-            console.error('❌ Error publicación:', error);
-            alert(`Error: ${error.message}`);
+            // DEPURACIÓN COMPLETA
+            console.log("❌ DETALLE DEL ERROR:", JSON.stringify(error, null, 2));
+            console.dir(error);
+            let adDataForLog = typeof adData !== 'undefined' ? adData : 'adData no definida (alcance)';
+            console.log("Payload completo:", JSON.stringify(adDataForLog, null, 2));
+            alert(`Error: ${error.message || 'Error desconocido'}`);
             formButton.disabled = false;
             formButton.textContent = 'Publicar Anuncio';
         }
+
     });
 });
-
