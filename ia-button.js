@@ -2,6 +2,22 @@
 // Botón IA ilimitado durante redacción. Cobro ÚNICAMENTE al publicar.
 
 // =====================================================
+// 🎯 FIX: Ocultar botón en modo edición (URL contiene 'edit' o ?id=)
+// =====================================================
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const isEditMode = window.location.href.includes('edit') || new URLSearchParams(window.location.search).has('id');
+        if (isEditMode) {
+            const btnIA = document.getElementById('btn-optimizar-ia');
+            if (btnIA) {
+                btnIA.style.display = 'none';
+                console.log('🔒 Botón IA oculto - Modo edición detectado:', window.location.href);
+            }
+        }
+    }, 500); // Margen para carga dinámica
+});
+
+// =====================================================
 // LÓGICA SIMPLE DEL BOTÓN IA
 // =====================================================
 document.addEventListener('click', async function(e) {

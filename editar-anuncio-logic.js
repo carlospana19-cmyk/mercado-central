@@ -442,7 +442,7 @@ function showDynamicFields() {
 
         // PRIORIDAD #3: Añadir título descriptivo
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: var(--color-primario); margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         electronicsFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -554,7 +554,7 @@ function showDynamicFields() {
         if (homeFurnitureFields) homeFurnitureFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         homeFurnitureFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -678,7 +678,7 @@ function showDynamicFields() {
         fashionFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         fashionFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -865,7 +865,7 @@ function showDynamicFields() {
         sportsFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         sportsFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -978,7 +978,7 @@ function showDynamicFields() {
         petsFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         petsFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -1078,7 +1078,7 @@ function showDynamicFields() {
         servicesFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         servicesFields.appendChild(titleDiv);
 
         fields.forEach(field => {
@@ -1307,7 +1307,7 @@ function showBusinessFields() {
         communityFields.innerHTML = '';
 
         const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h4 style="color: #007bff; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
+        titleDiv.innerHTML = `<h4 style="color: #0a2342; margin-bottom: 20px; text-align: center;">Especificaciones para ${selectedSubcategory}</h4>`;
         communityFields.appendChild(titleDiv);
 
         fields.forEach(field => {

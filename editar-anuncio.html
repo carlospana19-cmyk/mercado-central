@@ -75,24 +75,29 @@
                         </div>
 
       <div class="form-section" style="border: 2px solid #00c2cb; border-top: 1px solid #00c2cb; margin-top: -22px; margin-bottom: -22px; border-radius: 0; padding: 25px; background-color: #ffffff;">
-    <h4 class="mb-4" style="color: #00c2cb; font-weight: bold; border-bottom: 2px solid #00c2cb; padding-bottom: 10px;">
+    <h4 class="mb-4" style="color: #0a2342; font-weight: bold; border-bottom: 2px solid #00c2cb; padding-bottom: 10px;">
         <i class="bi bi-geo-alt-fill me-2"></i>Información de Ubicación
     </h4>
 
-    <div style="display: flex; gap: 20px; width: 100%; margin-bottom: 20px; align-items: flex-end;">
-        <div style="flex: 1;">
-            <label for="province" class="form-label fw-bold" style="font-size: 1.1rem;">Provincia</label>
-           <select id="province" name="provincia" class="form-select" 
-    style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
-    <option value="">Seleccione Provincia</option>
-</select>
-
-<select id="district" name="distrito" class="form-select" 
-    style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
-    <option value="">Seleccione Distrito</option>
-</select>
-        </div>
+ <div style="display: flex; gap: 20px; width: 100%; margin-bottom: 20px;">
+    
+    <div style="flex: 1;">
+        <label for="province" class="form-label fw-bold" style="font-size: 1.1rem;">Provincia</label>
+        <select id="province" name="provincia" class="form-select" 
+            style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
+            <option value="">Seleccione Provincia</option>
+        </select>
     </div>
+
+    <div style="flex: 1;">
+        <label for="district" class="form-label fw-bold" style="font-size: 1.1rem;">Distrito</label>
+        <select id="district" name="distrito" class="form-select" 
+            style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
+            <option value="">Seleccione Distrito</option>
+        </select>
+    </div>
+
+</div>
 
     <div id="map" style="height: 380px; width: 100%; border-radius: 12px; border: 1px solid #00c2cb;"></div>
     
@@ -133,13 +138,7 @@
                             </label>
 <textarea id="description" name="descripcion" rows="6" placeholder="Describe las características, estado, mantenimiento, etc." maxlength="1000" required></textarea>
 
-                            <!-- IA Button Wrapper (publish style) -->
-                            <div class="ia-button-wrapper">
-                                <button type="button" id="btn-ia-optimize" class="btn-ia">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Optimizar con IA
-                                </button>
-                                <span id="ia-credits-counter" class="ia-credits-badge">Cargando créditos...</span>
-                            </div>
+                           
                             <small class="help-text">Mínimo 30 caracteres para mejor visibilidad</small>
                         </div>
 
