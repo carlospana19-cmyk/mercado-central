@@ -100,8 +100,8 @@
 /* --- CARRUSEL DE CATEGORÍA EN RESULTADOS --- */
 .category-hero {
     position: relative;
-    height: 30vh;
-    min-height: 200px;
+    min-height: 400px;
+    height: auto;
     overflow: hidden;
     margin-bottom: 1rem;
 }
@@ -189,8 +189,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .category-hero {
-        height: 40vh;
-        min-height: 300px;
+        min-height: 400px;
     }
 
     .category-hero-content h1 {
