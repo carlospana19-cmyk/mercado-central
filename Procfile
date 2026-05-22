@@ -1,0 +1,1 @@
+web: gunicorn ia_server:app
