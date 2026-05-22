@@ -73,9 +73,9 @@ document.addEventListener('click', async function(e) {
         const response = await fetch(`${IA_URL}/optimizar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                titulo: tituloInput.value, 
-                descripcion: descInput.value 
+            body: JSON.stringify({
+                titulo: tituloInput.value,
+                descripcion: descInput.value
             })
         });
         
