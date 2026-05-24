@@ -11,14 +11,14 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": [
-    "https://www.mercadoscentral.com",
-    "https://mercadoscentral.com",
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-    "http://localhost:3000",
-    "https://mercado-central-9yqf.onrender.com"
-]}})
+CORS(app, origins=[
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'http://localhost:3000',
+    'https://mercado-central-9yqf.onrender.com',
+    'https://mercadoscentral.com',
+    'https://www.mercadoscentral.com'
+])
 
 # Límites por plan
 LIMITS = {
