@@ -1,4 +1,4 @@
-// likes-logic.js - Sistema de Likes para Mercado Central
+// likes-logic.js - Sistema de Likes para Mercados Central
 // Gestión de likes en tarjetas de productos
 
 import { supabase } from './supabase-client.js';

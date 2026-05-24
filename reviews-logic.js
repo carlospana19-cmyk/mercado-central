@@ -1,5 +1,5 @@
 // reviews-logic.js - Sistema de reseñas y calificaciones
-// Mercado Central
+// Mercados Central
 
 import { supabase } from './supabase-client.js';
 

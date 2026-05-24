@@ -2207,7 +2207,7 @@ body {
 }
 
 .gallery-thumbnails .thumbnail.active {
-    border-color: #00bfae; /* Verde de Mercado Central */
+    border-color: #00bfae; /* Verde de Mercados Central */
     opacity: 1;
     box-shadow: 0 2px 8px rgba(0, 191, 174, 0.3);
 }

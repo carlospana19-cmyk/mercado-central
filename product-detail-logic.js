@@ -372,7 +372,7 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         return;
     }
 
-    document.title = `${ad.titulo} - Mercado Central`;
+    document.title = `${ad.titulo} - Mercados Central`;
 
     // Rellenar datos de texto
     productNameEl.textContent = ad.titulo || 'Sin título';
