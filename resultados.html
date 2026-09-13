@@ -2,95 +2,98 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
-  <title>Resultados de Búsqueda - Mercados Central</title>
-    <!-- Fuentes de Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <title>Resultados de búsqueda | Mercados Central</title>
+  <meta name="description" content="Explora anuncios clasificados en Panamá: bienes raíces, vehículos, tecnología, hogar y más. Filtra por categoría, precio y ubicación.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="cards.css?v=207">
+
+  <!-- CSS NUEVO (Fase 2) — los viejos style/cards.css NO se borran todavía -->
+  <link rel="stylesheet" href="mc-base.css?v=1">
+  <link rel="stylesheet" href="mc-results.css?v=1">
 </head>
 <body>
     <!-- NAVBAR -->
-  <div id="navbar-container"></div>
+    <div id="navbar-container"></div>
 
-    <!-- HERO DE CATEGORÍA -->
-    <section class="category-hero">
-        <div class="category-hero-carousel">
-            <div class="swiper category-swiper">
-                <div class="swiper-wrapper" id="category-slides">
-                    <!-- Las imágenes se cargarán dinámicamente por JavaScript -->
-                </div>
-                <div class="swiper-pagination"></div>
-            </div>
+    <main class="results-page">
+
+        <!-- ENCABEZADO DE RESULTADOS (reemplaza al hero OPEN SHOP) -->
+        <div class="results-page-head">
+            <h1 id="section-page-title">Resultados</h1>
+            <div id="results-summary"><p>Cargando resultados…</p></div>
         </div>
-        <div class="category-hero-content">
-            <!-- Título movido a la sección blanca de resultados -->
-        </div>
-    </section>
 
-    <!-- TÍTULO DE SECCIÓN (en la sección blanca) -->
-    <section class="section-title-container">
-        <h1 id="section-page-title" class="section-main-title"></h1>
-    </section>
+        <div class="results-layout">
 
-    <!-- CONTENIDO PRINCIPAL DE LA PÁGINA DE RESULTADOS -->
-    <main class="results-page-container">
-        <div class="results-inner-wrapper">
+            <!-- Interruptor de filtros en móvil (sin JS: checkbox hack) -->
+            <input type="checkbox" id="filters-toggle" class="filters-toggle-check" hidden>
+            <label for="filters-toggle" class="filters-toggle-btn"><i class="fas fa-sliders-h"></i> Filtros</label>
+
             <!-- === SIDEBAR DE FILTROS === -->
             <aside id="filters-sidebar" class="filters-sidebar">
-                <h3>Filtrar Resultados</h3>
+                <h3>Filtrar resultados</h3>
 
-                <!-- Filtro de Categorías/Subcategorías (se llenará con JS) -->
                 <div class="filter-group">
                     <label id="category-filter-label">Categoría</label>
                     <div id="subcategory-filter-container">
-                        <p>Cargando...</p>
+                        <p>Cargando…</p>
                     </div>
-        </div>
+                </div>
 
-                <!-- Otros filtros (ejemplos) -->
                 <div class="filter-group">
-                    <label for="price-min">Precio Mín.</label>
-                    <input type="number" id="price-min" placeholder="ej: 5000">
-          </div>
-                <div class="filter-group">
-                    <label for="price-max">Precio Máx.</label>
-                    <input type="number" id="price-max" placeholder="ej: 20000">
-          </div>
+                    <label for="price-min">Precio mínimo (B/.)</label>
+                    <input type="number" id="price-min" placeholder="0" min="0">
+                </div>
 
-                <button id="apply-filters-btn" class="btn-apply-filters">Aplicar Filtros</button>
+                <div class="filter-group">
+                    <label for="price-max">Precio máximo (B/.)</label>
+                    <input type="number" id="price-max" placeholder="Cualquiera" min="0">
+                </div>
+
+                <button id="apply-filters-btn" class="btn-apply-filters">Aplicar filtros</button>
             </aside>
 
-            <!-- === CONTENEDOR DE RESULTADOS === -->
+            <!-- === RESULTADOS === -->
             <div class="results-content">
-                <div id="results-summary" style="margin-bottom: 2rem; font-size: 1.6rem; font-weight: 600; font-family: 'Poppins', sans-serif;">
-                    <p>Cargando resultados...</p>
-          </div>
 
-                <div id="results-container" class="box-container">
-                    <!-- Los resultados de la búsqueda se insertarán aquí con JavaScript -->
+                <div class="results-toolbar">
+                    <div class="sort-control">
+                        <label for="sort-select">Ordenar:</label>
+                        <select id="sort-select">
+                            <option value="recent">Más recientes</option>
+                            <option value="price-asc">Menor precio</option>
+                            <option value="price-desc">Mayor precio</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="pagination-controls" class="pagination-controls">
-                    <!-- Los controles de paginación se insertarán aquí con JavaScript -->
+
+                <div id="results-container" class="box-container results-grid">
+                    <!-- Los resultados se insertan aquí con JavaScript -->
                 </div>
+
+                <div id="pagination-controls" class="pagination-controls"></div>
             </div>
         </div>
     </main>
 
-    <!-- FOOTER PREMIUM -->
+    <!-- FOOTER -->
     <div id="footer-container"></div>
 
-    <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+    <!-- Scripts (mismos, mismo orden) -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
     <script type="module" src="main.js" defer></script>
     <script type="module" src="results-logic.js" defer></script>
+    <script type="module" src="navbar-logic.js"></script>
+    <script src="load-components.js" defer></script>
 
-    <!-- Definiciones SVG para badges metálicos -->
+    <!-- SVG defs para badges metálicos (los usa el JS — no borrar) -->
     <svg style="display: none;">
       <defs>
         <radialGradient id="shine" cx="50%" cy="35%" r="75%">
@@ -106,9 +109,5 @@
         <path id="star" d="M0,-8 L2.4,-2.6 L8, -2.6 L3.2,0.9 L5.0,6.4 L0,3.2 L-5.0,6.4 L-3.2,0.9 L-8,-2.6 L-2.4,-2.6 Z"/>
       </defs>
     </svg>
-
-<script type="module" src="navbar-logic.js"></script>
-<script src="load-components.js" defer></script>
-
 </body>
 </html>

@@ -2,177 +2,156 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
-  <title>Mercados Central - Plataforma de Anuncios</title>
-    
-    <!-- Fuentes de Google -->
+    <title>Mercados Central — Anuncios clasificados en Panamá</title>
+    <meta name="description" content="Compra, vende y publica gratis en Panamá: bienes raíces, vehículos, tecnología, hogar y más. Tu comunidad, tu mercado.">
+    <meta property="og:title" content="Mercados Central — Anuncios clasificados en Panamá">
+    <meta property="og:description" content="Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.">
+    <meta property="og:image" content="logo-mercado-central.jpg">
+    <meta property="og:type" content="website">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Iconos y Swiper -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    
-    <!-- Carga de Estilos Modulares (IMPORTANTE) -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="cards.css?v=207">
-    <link rel="stylesheet" href="home.css?v=275">
-    
-    <style>
-        /* Ocultar puntos de paginación del carrusel TOP */
-        .featured-pagination {
-            display: none !important;
-        }
-        
-        /* Contenedor del carrusel TOP: más ancho y sin flechas */
-        .featured-carousel-wrapper {
-            padding: 20px 24px !important; /* Padding extra para que las sombras no se corten */
-            position: relative !important;
-            margin-bottom: 4rem !important; /* Más espacio abajo */
-            overflow: visible !important; /* Permite que las sombras se vean */
-        }
 
-        /* Ajustes móviles para que las imágenes ocupen todo el ancho */
-        @media (max-width: 768px) {
-            .featured-carousel-wrapper {
-                padding: 15px 12px !important;
-                margin-bottom: 3rem !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .featured-carousel-wrapper {
-                padding: 10px 8px !important;
-                margin-bottom: 2.5rem !important;
-            }
-        }
-    </style>
+    <!-- CSS NUEVO (Fase 1) — los viejos style/cards/home.css NO se tocan todavía -->
+    <link rel="stylesheet" href="mc-base.css?v=3">
+    <link rel="stylesheet" href="mc-home.css?v=3">
 </head>
 <body id="index-page">
-    <!-- NAVBAR -->
+
+    <!-- NAVBAR (componente dinámico — sin cambios) -->
     <div id="navbar-container"></div>
 
-    <!-- HERO MODERNO CON CARRUSEL -->
-<section class="hero-search">
-    <!-- Carrusel de imágenes dinámico -->
-    <div class="hero-carousel">
-        <div class="swiper hero-swiper">
-            <div class="swiper-wrapper" id="hero-slides">
-                <!-- Las imágenes se cargarán dinámicamente por JavaScript -->
+    <!-- HERO -->
+    <section class="hero-search">
+        <div class="hero-carousel">
+            <div class="swiper hero-swiper">
+                <div class="swiper-wrapper" id="hero-slides"></div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
-            <div class="swiper-pagination"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
         </div>
-    </div>
 
-    <div class="hero-content">
+        <div class="hero-content">
             <div class="hero-text-content">
                 <h1 class="hero-title-animated">Tu comunidad, <span class="highlight-text">tu mercado</span></h1>
                 <p class="hero-subtitle">El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.</p>
             </div>
-        <div class="search-form-container">
-            <div class="search-field">
-                <i class="fas fa-search"></i>
-                    <input type="text" id="mainSearchInput" placeholder="¿Qué estás buscando?">
-            </div>
-            <div class="search-field">
-                <i class="fas fa-tags"></i>
-                <select id="categorySelect">
-                    <option value="all">Todas las Categorías</option>
-                </select>
-            </div>
-            <div class="search-field">
-                <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" id="locationInput" placeholder="Ubicación (ej: Panamá)">
-            </div>
-                <button id="searchButton" class="btn btn-search-hero">
+
+            <div class="search-form-container">
+                <div class="search-field">
                     <i class="fas fa-search"></i>
-                    <span>Buscar</span>
+                    <input type="text" id="mainSearchInput" placeholder="¿Qué estás buscando?">
+                </div>
+                <div class="search-field">
+                    <i class="fas fa-tags"></i>
+                    <select id="categorySelect">
+                        <option value="all">Todas las Categorías</option>
+                    </select>
+                </div>
+                <div class="search-field">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="locationInput" placeholder="Ubicación (ej: Panamá)">
+                </div>
+                <button id="searchButton" class="btn btn-search-hero">
+                    <i class="fas fa-search"></i><span>Buscar</span>
                 </button>
+            </div>
+
+                       <div class="hero-chips">
+                <button onclick="chipSearch('bicicleta')"><i class="fas fa-bicycle"></i> Bicicletas</button>
+                <button onclick="chipSearch('iPhone')"><i class="fas fa-mobile-alt"></i> iPhone</button>
+                <button onclick="chipSearch('apartamento')"><i class="fas fa-building"></i> Apartamentos</button>
+                <button onclick="chipSearch('moto')"><i class="fas fa-motorcycle"></i> Motos</button>
+                <button onclick="chipSearch('laptop')"><i class="fas fa-laptop"></i> Laptops</button>
+            </div>
+    </section>
+
+    <!-- CATEGORÍAS -->
+    <section class="categories-section">
+        <div class="categories-horizontal-bar">
+            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-home"></i></div><h3>Bienes Raíces</h3></a>
+            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-car"></i></div><h3>Vehículos</h3></a>
+            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-laptop"></i></div><h3>Electrónica</h3></a>
+            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-couch"></i></div><h3>Hogar</h3></a>
+            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-tshirt"></i></div><h3>Moda</h3></a>
+            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-briefcase"></i></div><h3>Servicios</h3></a>
+        </div>
+    </section>
+
+
+    <!-- ANUNCIOS -->
+    <section class="products" id="products">
+        <div class="box-container"></div>
+    </section>
+
+    <!-- BANDA DE CONFIANZA (nueva) -->
+    <section class="trust-band">
+        <div class="trust-row">
+            <div class="trust-item">
+                <i class="fas fa-shield-alt"></i>
+                <div><strong>Negocios seguros</strong><span>Consejos para operar con confianza.</span></div>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-check-circle"></i>
+                <div><strong>Vendedores reales</strong><span>Perfiles con historial y reseñas.</span></div>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-bolt"></i>
+                <div><strong>Publica en 2 minutos</strong><span>Gratis, desde el celular.</span></div>
             </div>
         </div>
     </section>
 
-    <div class="mobile-banner">
-        Bienvenido a Mercados Central
-    </div>
+    <!-- CTA VENDEDORES (nueva) -->
+    <section class="seller-cta">
+        <div class="seller-cta-in">
+            <div>
+                <h2>¿Tienes algo que vender?</h2>
+                <p>Publica tu anuncio gratis hoy y llega a miles de compradores en tu ciudad.</p>
+            </div>
+            <a href="publicar.html" class="btn btn-primary"><i class="fas fa-plus"></i> Publicar ahora</a>
+        </div>
+    </section>
 
-    <!-- ========== BARRA DE CATEGORÍAS HORIZONTAL ========== -->
-    <section class="categories-section">
-        <div class="categories-horizontal-bar">
-            <a href="#" class="category-item">
-                <div class="category-icon"><i class="fas fa-home"></i></div>
-                <h3>Bienes Raíces</h3>
-            </a>
-            <a href="#" class="category-item">
-                <div class="category-icon"><i class="fas fa-car"></i></div>
-                <h3>Vehículos</h3>
-            </a>
-            <a href="#" class="category-item">
-                <div class="category-icon"><i class="fas fa-laptop"></i></div>
-                <h3>Electrónica</h3>
-            </a>
-            <a href="#" class="category-item">
-                <div class="category-icon"><i class="fas fa-couch"></i></div>
-                <h3>Hogar</h3>
-            </a>
-            <a href="#" class="category-item">
-                <div class="category-icon"><i class="fas fa-tshirt"></i></div>
-                <h3>Moda</h3>
-            </a>
-            <a href="#" class="category-item">
-                <div class="category-icon"><i class="fas fa-briefcase"></i></div>
-                <h3>Servicios</h3>
-            </a>
-    </div>
-</section>
-
-    <!-- TÍTULO ELEGANTE TOP SELECCIÓN -->
-    <div class="section-header top-seleccion-premium">
-    <div class="header-line line-left"></div>
-    <div class="header-content">
-        <i class="fas fa-crown header-icon crown-svg-premium"></i>
-        <h2 class="header-title">TOP SELECCIÓN</h2>
-    </div>
-    <div class="header-line line-right"></div>
-</div>
-
-    <!-- ANUNCIOS DESTACADOS -->
-<section class="products" id="products">
-    <div class="box-container">
-        <!-- Las tarjetas se cargarán dinámicamente con JavaScript -->
-    </div>
-  </section>
-
-    <!-- FOOTER PREMIUM -->
+    <!-- FOOTER (componente dinámico — sin cambios) -->
     <div id="footer-container"></div>
 
-    <!-- Scripts -->
+    <!-- Scripts (mismos, mismo orden) -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
     <script type="module" src="main.js" defer></script>
+    <script type="module" src="navbar-logic.js"></script>
+    <script src="load-components.js" defer></script>
 
-    <!-- Definiciones SVG para badges metálicos -->
-    <svg style="display: none;">
-      <defs>
-        <radialGradient id="shine" cx="50%" cy="35%" r="75%">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
-          <stop offset="60%" stop-color="rgba(255,255,255,0.08)"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-        </radialGradient>
-        <linearGradient id="rimGloss" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.7)"/>
-          <stop offset="50%" stop-color="rgba(255,255,255,0.2)"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
-        </linearGradient>
-        <path id="star" d="M0,-8 L2.4,-2.6 L8, -2.6 L3.2,0.9 L5.0,6.4 L0,3.2 L-5.0,6.4 L-3.2,0.9 L-8,-2.6 L-2.4,-2.6 Z"/>
-      </defs>
+    <!-- SVG defs para badges metálicos (los usa main.js — no borrar) -->
+    <svg style="display:none">
+        <defs>
+            <radialGradient id="shine" cx="50%" cy="35%" r="75%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+                <stop offset="60%" stop-color="rgba(255,255,255,0.08)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+            <linearGradient id="rimGloss" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.7)"/>
+                <stop offset="50%" stop-color="rgba(255,255,255,0.2)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+            </linearGradient>
+            <path id="star" d="M0,-8 L2.4,-2.6 L8,-2.6 L3.2,0.9 L5.0,6.4 L0,3.2 L-5.0,6.4 L-3.2,0.9 L-8,-2.6 L-2.4,-2.6 Z"/>
+        </defs>
     </svg>
 
-<script type="module" src="navbar-logic.js"></script>
-<script src="load-components.js" defer></script>
-
+    <script>
+        // Chips del hero: llenan el buscador y disparan la búsqueda existente
+        function chipSearch(termo){
+            document.getElementById('mainSearchInput').value = termo;
+            document.getElementById('searchButton').click();
+        }
+    </script>
 </body>
 </html>

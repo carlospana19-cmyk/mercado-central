@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="form.css">
     <link rel="stylesheet" href="panel-unificado.css">
+        <link rel="stylesheet" href="mc-messages.css?v=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script type="module" src="messages-logic.js"></script>
 </head>
 <body id="panel-unificado-page">
     <!-- NAVBAR -->
@@ -58,9 +60,12 @@
         </section>
 
         <!-- TABS DE NAVEGACIÓN -->
-        <div class="panel-tabs">
+               <div class="panel-tabs">
             <button class="tab-btn active" data-tab="anuncios">
                 <i class="fas fa-list"></i> Mis Anuncios
+            </button>
+            <button class="tab-btn" data-tab="mensajes">
+                <i class="fas fa-envelope"></i> Mensajes
             </button>
             <button class="tab-btn" data-tab="perfil">
                 <i class="fas fa-user"></i> Mi Perfil
@@ -70,18 +75,28 @@
             </button>
         </div>
 
-        <!-- CONTENIDO DE ANUNCIOS -->
-        <section class="tab-content active" id="anuncios-tab">
-            <div class="anuncios-header">
-                <h2>Mis Anuncios</h2>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="todos">Todos</button>
-                    <button class="filter-btn" data-filter="activos">Activos</button>
-                    <button class="filter-btn" data-filter="vendidos">Vendidos</button>
+              <!-- CONTENIDO DE MENSAJES (Fase 4C) -->
+        <section class="tab-content" id="mensajes-tab">
+            <div class="messages-layout" id="messages-layout">
+                <!-- Lista de conversaciones -->
+                <div class="convs-list" id="convs-list">
+                    <p class="loading-message">Cargando conversaciones…</p>
                 </div>
-            </div>
-            <div id="my-ads-container" class="anuncios-grid">
-                <p class="loading-message">Cargando tus anuncios...</p>
+                <!-- Panel de chat -->
+                <div class="chat-panel">
+                    <div class="chat-empty" id="chat-empty">
+                        <i class="fas fa-comments"></i>
+                        <p>Selecciona una conversación para empezar a chatear.</p>
+                    </div>
+                    <div class="chat-active" id="chat-active" style="display:none">
+                        <div class="chat-header" id="chat-header"></div>
+                        <div class="chat-messages" id="chat-messages"></div>
+                        <form class="chat-form" id="chat-form" autocomplete="off">
+                            <input type="text" id="chat-input" placeholder="Escribe un mensaje…" maxlength="2000">
+                            <button type="submit" aria-label="Enviar"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </section>
 

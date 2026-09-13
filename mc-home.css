@@ -1,0 +1,277 @@
+/* =====================================================
+   MERCADOS CENTRAL — mc-home.css (Fase 1: solo index)
+   ===================================================== */
+
+/* ---------- HERO ---------- */
+.hero-search{position:relative;min-height:520px;display:flex;align-items:center;justify-content:center;padding:72px 20px 88px;overflow:hidden;background:var(--ink-900)}
+.hero-carousel{position:absolute;inset:0;z-index:0}
+.hero-swiper{width:100%;height:100%}
+.hero-swiper .swiper-slide img{width:100%;height:100%;object-fit:cover;filter:brightness(.42) saturate(.9)}
+.hero-search::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(18,33,41,.55) 0%,rgba(18,33,41,.12) 40%,rgba(18,33,41,.7) 100%)}
+.hero-content{position:relative;z-index:2;width:100%;max-width:960px;display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff}
+.hero-title-animated{font-size:clamp(2.3rem,5.4vw,3.9rem);font-weight:800;color:#fff;text-shadow:0 8px 30px rgba(0,0,0,.45);margin-bottom:14px}
+.highlight-text{color:var(--orange-500)}
+.hero-subtitle{font-size:clamp(1rem,1.8vw,1.2rem);color:rgba(255,255,255,.92);max-width:640px;margin:0 auto 32px}
+.hero-text-content{animation:fadeInUp .8s ease-out both}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+/* Buscador flotante glass */
+.search-form-container{width:100%;max-width:920px;display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:18px;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+@media(min-width:860px){.search-form-container{display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:8px;border-radius:16px}}
+.search-field{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:0 14px;height:52px}
+.search-field i{color:var(--ink-300);font-size:16px}
+.search-field input,.search-field select{border:none;outline:none;background:none;width:100%;font-size:16px;color:var(--ink-900)}
+.btn-search-hero{height:52px;border-radius:10px;background:var(--orange-500);color:#fff;font-weight:700;font-size:15.5px;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 26px;transition:all .2s}
+.btn-search-hero:hover{background:var(--orange-600);transform:translateY(-1px)}
+@media(max-width:859px){.btn-search-hero{width:100%}}
+.hero-swiper .swiper-button-next,.hero-swiper .swiper-button-prev{display:none}
+.hero-swiper .swiper-pagination-bullet{background:#fff;opacity:.55}
+.hero-swiper .swiper-pagination-bullet-active{background:var(--orange-500);opacity:1}
+@media(max-width:768px){.hero-search{padding:52px 16px 64px;min-height:490px}}
+
+/* Chips de búsquedas populares (nuevo) */
+.hero-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}
+.hero-chips button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:500;transition:background .2s}
+.hero-chips button:hover{background:rgba(255,255,255,.22)}
+
+/* ---------- CATEGORÍAS (pills) ---------- */
+.categories-section{background:var(--card);border-bottom:1px solid var(--line);padding:18px 0!important;margin:0!important}
+.categories-horizontal-bar{max-width:1240px;margin:0 auto;display:flex;gap:10px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+.categories-horizontal-bar::-webkit-scrollbar{display:none}
+.category-item{flex:0 0 auto;display:flex!important;flex-direction:row!important;align-items:center;gap:10px;padding:8px 18px 8px 9px!important;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:600;color:var(--ink-700);transition:all .2s}
+.category-item:hover{border-color:var(--teal-500);background:var(--teal-50);transform:translateY(-1px)}
+.category-item .category-icon{width:34px;height:34px;border-radius:50%;background:var(--teal-50);display:flex;align-items:center;justify-content:center}
+.category-item .category-icon i{font-size:15px;color:var(--teal-600)}
+.category-item h3{font-family:var(--font-ui);font-size:14px;font-weight:600;color:inherit;min-height:0;margin:0;line-height:1}
+.category-item.category-active{background:var(--teal-500);border-color:var(--teal-500);color:#fff}
+.category-item.category-active .category-icon{background:rgba(255,255,255,.18)}
+.category-item.category-active .category-icon i{color:#fff}
+
+/* ---------- TÍTULO TOP SELECCIÓN ---------- */
+.top-seleccion-premium{display:flex!important;align-items:center;gap:18px!important;max-width:1240px;margin:44px auto 8px!important;padding:0 20px!important}
+.top-seleccion-premium .header-line{flex:1;height:1.5px!important}
+.top-seleccion-premium .line-left{background:linear-gradient(to right,transparent,var(--gold))!important}
+.top-seleccion-premium .line-right{background:linear-gradient(to left,transparent,var(--gold))!important}
+.top-seleccion-premium .header-content{display:flex!important;align-items:center;gap:10px!important;flex-shrink:0}
+.header-icon-crown{color:var(--gold);font-size:22px}
+.top-seleccion-premium .header-title{font-family:var(--font-display);font-size:15px!important;font-weight:700!important;letter-spacing:.18em!important;text-transform:uppercase;color:var(--ink-900)!important;margin:0!important}
+
+/* ---------- GRID DE PRODUCTOS ---------- */
+.products{padding:8px 0 56px}
+.box-container{max-width:1240px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+@media(max-width:560px){.box-container{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px}}
+
+/* ---------- TARJETA UNIFICADA (box/property-card/ad-card/tarjeta-auto) ---------- */
+.box,.property-card,.ad-card,.tarjeta-auto{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;display:flex!important;flex-direction:column!important;width:100%;height:100%;min-width:0;position:relative;box-shadow:var(--shadow-sm);transition:transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s,border-color .25s;margin:0!important}
+@media(hover:hover){.box:hover,.property-card:hover,.ad-card:hover,.tarjeta-auto:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:#D5E3E0}}
+
+/* Imagen */
+.box .image-container,.property-card .property-image,.ad-card .image-container,.tarjeta-auto .image-container,.card-image-container{width:100%;aspect-ratio:4/3;min-height:0;height:auto!important;background:#EEF1F3;overflow:hidden;position:relative;flex-shrink:0;border-radius:0!important}
+.box .swiper,.product-swiper,.mini-gallery,.tarjeta-auto .product-swiper{width:100%;height:100%;overflow:hidden}
+.box .swiper-slide,.product-swiper .swiper-slide{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#EEF1F3}
+.box .image-container img,.property-card .property-image img,.ad-card .image-container img,.box .swiper-slide img,.product-swiper .swiper-slide img,.tarjeta-auto .image-container img{width:100%!important;height:100%!important;object-fit:cover!important;display:block;border-radius:0!important;transform:none!important;min-width:0!important}
+
+/* Flechas del carrusel interno de tarjeta */
+.box .swiper-button-next,.box .swiper-button-prev,.product-swiper .swiper-button-next,.product-swiper .swiper-button-prev{width:30px;height:30px;border-radius:50%;background:rgba(18,33,41,.55)!important;color:#fff!important;opacity:1!important;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:10}
+.box .swiper-button-prev,.product-swiper .swiper-button-prev{left:10px!important}
+.box .swiper-button-next,.product-swiper .swiper-button-next{right:10px!important}
+.box .swiper-button-next:hover,.box .swiper-button-prev:hover,.product-swiper .swiper-button-next:hover,.product-swiper .swiper-button-prev:hover{background:var(--teal-500)!important}
+@media(max-width:768px){.box .swiper-button-next,.box .swiper-button-prev,.product-swiper .swiper-button-next,.product-swiper .swiper-button-prev{display:none!important}}
+
+/* Contenido */
+.box .content,.property-card .content,.ad-card .content,.contenido-auto{padding:14px 16px 16px!important;display:flex!important;flex-direction:column!important;gap:6px!important;flex:1;justify-content:flex-start!important}
+.price-row,.box .content .price-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px;margin:0!important}
+.box .price,.property-price,.card-price,.cabecera-auto .precio{font-family:var(--font-display);font-weight:700;font-size:21px;color:var(--ink-900);letter-spacing:-.02em}
+.box h3,.property-title,.cabecera-auto h2{font-family:var(--font-ui);font-size:15px;font-weight:600;color:var(--ink-900);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0!important;min-height:0}
+.box .location,.property-location,.card-location,.ubicacion{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-500);margin-top:auto!important;padding-top:4px;border:none}
+.box .location i,.property-location i,.card-location i,.ubicacion i{color:var(--ink-300);font-size:12px;margin:0}
+
+/* Chips de atributos (todas las variantes) */
+.vehicle-details,.real-estate-details,.electronics-details,.home-furniture-details,.fashion-details,.sports-details,.pets-details,.services-details,.business-details,.community-details,.property-details,.property-attributes,.card-attributes{display:flex!important;flex-wrap:wrap;gap:6px!important;margin:4px 0 0!important;font-size:12px!important;color:var(--ink-700)!important}
+.vehicle-details span,.real-estate-details span,.electronics-details span,.home-furniture-details span,.fashion-details span,.sports-details span,.pets-details span,.services-details span,.business-details span,.community-details span,.property-details span,.property-attributes span,.card-attributes span{display:inline-flex!important;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:500;color:var(--ink-700)}
+.vehicle-details i,.real-estate-details i,.electronics-details i,.home-furniture-details i,.fashion-details i,.sports-details i,.pets-details i,.services-details i,.business-details i,.community-details i,.property-details i,.property-attributes i,.card-attributes i{font-size:11px;color:var(--teal-600)!important}
+.vehicle-details span:nth-child(n+4),.real-estate-details span:nth-child(n+4),.electronics-details span:nth-child(n+4),.home-furniture-details span:nth-child(n+4),.fashion-details span:nth-child(n+4),.sports-details span:nth-child(n+4),.pets-details span:nth-child(n+4),.services-details span:nth-child(n+4),.business-details span:nth-child(n+4),.community-details span:nth-child(n+4),.property-details span:nth-child(n+4),.property-attributes span:nth-child(n+4){display:none!important}
+
+/* Vendedor (avatar) */
+.vendor-avatar{width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--line);visibility:hidden;opacity:0;transition:transform .2s}
+.vendor-avatar.has-image{visibility:visible;opacity:1}
+.vendor-avatar:hover{transform:scale(1.1)}
+.vendor-avatar-img,.vendor-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important}
+.vendor-name-tooltip{position:absolute;bottom:-32px;right:0;background:var(--ink-900);color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.vendor-avatar:hover .vendor-name-tooltip{opacity:1}
+
+/* Descripción oculta en tarjetas */
+.box .description,.property-description,.card-description{display:none!important}
+
+/* Botón Contactar */
+.btn-contact,.btn-contact-card,.btn-ver-detalles{margin-top:12px!important;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;border-radius:var(--radius-sm);background:var(--orange-500);color:#fff;font-weight:600;font-size:14.5px;transition:all .2s;padding:0 16px!important;text-align:center;border:none;align-self:stretch}
+.btn-contact:hover,.btn-contact-card:hover,.btn-ver-detalles:hover{background:var(--orange-600)}
+
+/* ---------- CARRUSEL TOP SELECCIÓN ---------- */
+.featured-carousel-wrapper{position:relative;max-width:1240px;margin:0 auto;padding:8px 20px 28px!important;overflow:visible!important}
+.featured-swiper{overflow:visible!important;padding:4px!important}
+.featured-swiper .swiper-slide{height:auto;display:flex}
+.featured-swiper .swiper-slide>*{width:100%}
+.featured-prev,.featured-next{position:absolute;top:38%;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;color:var(--ink-700);z-index:20;transition:all .2s}
+.featured-prev{left:4px}.featured-next{right:4px}
+.featured-prev:hover,.featured-next:hover{background:var(--teal-500);color:#fff;border-color:var(--teal-500)}
+.featured-prev.swiper-button-disabled,.featured-next.swiper-button-disabled{opacity:0;pointer-events:none}
+@media(max-width:768px){.featured-prev,.featured-next{display:none!important}}
+.featured-pagination{display:none!important}
+
+/* Carrusel por filas (si el JS lo genera) */
+.carousel-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 20px 20px;scrollbar-width:none}
+.carousel-track::-webkit-scrollbar{display:none}
+.carousel-track>*{scroll-snap-align:start}
+
+/* ---------- BANDA DE CONFIANZA (nueva) ---------- */
+.trust-band{background:var(--card);border-block:1px solid var(--line);padding:26px 20px;margin-top:8px}
+.trust-row{max-width:1240px;margin:0 auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:12px;flex:1;min-width:220px}
+.trust-item i{width:44px;height:44px;border-radius:12px;background:var(--teal-50);color:var(--teal-600);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.trust-item strong{display:block;font-size:14.5px;color:var(--ink-900)}
+.trust-item span{font-size:13px;color:var(--ink-500)}
+
+/* ---------- CTA VENDEDORES (nueva) ---------- */
+.seller-cta{padding:52px 20px 64px}
+.seller-cta-in{max-width:1240px;margin:0 auto;background:linear-gradient(120deg,var(--teal-600),var(--teal-700));border-radius:24px;padding:clamp(32px,5vw,56px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.seller-cta-in h2{color:#fff;font-size:clamp(1.5rem,3vw,2.2rem);max-width:22ch}
+.seller-cta-in p{color:rgba(255,255,255,.75);margin-top:8px;max-width:52ch}
+.seller-cta .btn-primary{height:52px;padding:0 28px;font-size:15.5px}
+/* ================= ANEXO v1.2: EMBUDO DEL HOME ================= */
+.main-content-wrapper{max-width:1240px;margin:0 auto;padding:0 20px}
+.elite-banner-container{margin:10px 0 40px}
+.elite-banner-label{display:flex;align-items:center;gap:14px;margin:30px 0 16px}
+.elite-label-text{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-900)}
+.elite-label-text i{color:var(--gold)}
+.elite-label-line{flex:1;height:1.5px;background:linear-gradient(to right,var(--gold),transparent)}
+.elite-slider-wrapper{position:relative;height:440px;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-md);background:var(--ink-900)}
+.elite-banner-slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none;display:flex}
+.elite-banner-slide.active{opacity:1;pointer-events:auto;z-index:2}
+.elite-banner{display:grid;grid-template-columns:1fr 1fr;width:100%;height:100%;background:var(--card)}
+.elite-banner-image,.elite-banner-video-container{position:relative;overflow:hidden;min-height:0}
+.elite-banner-image img{width:100%;height:100%;object-fit:cover}
+.elite-video-bg{width:100%;height:100%;object-fit:cover}
+.video-playing-indicator{position:absolute;top:14px;left:14px;background:rgba(18,33,41,.7);color:#fff;font-size:12px;padding:5px 10px;border-radius:99px;display:flex;align-items:center;gap:6px;z-index:4}
+.elite-banner-content{padding:clamp(20px,3vw,40px);display:flex;flex-direction:column;gap:12px;justify-content:center;min-width:0}
+.elite-badge-gold{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:rgba(212,175,55,.14);color:#8a6d1a;font-size:11.5px;font-weight:700;letter-spacing:.08em;padding:5px 12px;border-radius:99px}
+.elite-banner-price{font-family:var(--font-display);font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:800;color:var(--ink-900);letter-spacing:-.02em}
+.elite-banner-title{font-family:var(--font-ui);font-size:16px;font-weight:600;color:var(--ink-900);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+.elite-banner-location{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink-500)}
+.elite-banner-attributes{display:flex;flex-wrap:wrap;gap:6px}
+.elite-attribute{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--ink-700)}
+.elite-banner-seller{display:flex;align-items:center;gap:10px}
+.elite-seller-avatar{width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--teal-50);flex-shrink:0}
+.elite-seller-avatar.has-image img{width:100%;height:100%;object-fit:cover}
+.elite-seller-info{display:flex;flex-direction:column}
+.elite-seller-name{font-size:13.5px;font-weight:600;color:var(--ink-900)}
+.elite-seller-rating{font-size:12px;color:var(--ink-500)}
+.elite-seller-rating i{color:var(--gold)}
+.elite-banner-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;align-self:flex-start;height:46px;padding:0 24px;border-radius:12px;background:var(--orange-500);color:#fff;font-weight:600;transition:background .2s}
+.elite-banner-btn:hover{background:var(--orange-600)}
+.elite-badge-urgent,.elite-badge-sold{position:absolute;top:14px;left:14px;z-index:5;font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
+.elite-badge-urgent{background:var(--orange-500);color:#fff}
+.elite-badge-sold{background:var(--ink-900);color:#fff}
+.sponsored-tag{position:absolute;top:14px;right:14px;z-index:5;background:rgba(18,33,41,.75);color:#fff;font-size:11px;padding:5px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
+.elite-banner-sold .elite-banner-image img,.elite-banner-sold .elite-video-bg{filter:grayscale(.6) brightness(.85)}
+.elite-slider-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.88);border:1px solid var(--line);color:var(--ink-900);display:flex;align-items:center;justify-content:center;z-index:6;transition:all .2s}
+.elite-slider-nav:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+.elite-slider-nav.prev{left:16px}.elite-slider-nav.next{right:16px}
+.elite-progress-indicators{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:6}
+.elite-progress-bar{width:48px;height:4px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden;cursor:pointer}
+.elite-progress-bar .progress-fill{display:block;width:0;height:100%;background:var(--orange-500)}
+.elite-progress-bar.active .progress-fill{animation:progressFill 6s linear forwards}
+.elite-progress-bar.completed .progress-fill{width:100%}
+@keyframes progressFill{from{width:0}to{width:100%}}
+.elite-slider-wrapper:hover .elite-progress-bar.active .progress-fill{animation-play-state:paused}
+@media(max-width:820px){
+  .elite-slider-wrapper{height:auto}
+  .elite-banner{grid-template-columns:1fr}
+  .elite-banner-image,.elite-banner-video-container{height:210px}
+  .elite-banner-content{padding:18px}
+  .elite-slider-nav{display:none}
+}
+
+/* Filas de columnas de impacto */
+.ads-row{max-width:1240px;margin:0 auto 28px;padding:0 20px;display:grid;gap:20px}
+.ads-row.row-3-cols{grid-template-columns:repeat(3,1fr)}
+@media(max-width:1024px){.ads-row.row-3-cols{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.ads-row.row-3-cols{grid-template-columns:1fr}}
+
+/* Títulos dorados de carruseles */
+.section-header-golden{display:flex;align-items:center;gap:14px;max-width:1240px;margin:36px auto 18px;padding:0 20px}
+.header-title-golden{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-900);white-space:nowrap;margin:0}
+.header-line-golden{flex:1;height:1.5px;background:linear-gradient(to right,transparent,var(--gold))}
+.header-line-golden:last-child{background:linear-gradient(to left,transparent,var(--gold))}
+
+/* Carruseles por fila + flechas estilo marketplace */
+.carousel-row-wrapper{position:relative;max-width:1240px;margin:0 auto 44px;padding:0 20px}
+.row-nav-prev,.row-nav-next{position:absolute;top:30%;width:42px;height:110px;background:rgba(255,255,255,.95);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-900);z-index:20;cursor:pointer;transition:all .2s;box-shadow:var(--shadow-sm)}
+.row-nav-prev{left:0;border-radius:0 12px 12px 0}
+.row-nav-next{right:0;border-radius:12px 0 0 12px}
+.row-nav-prev:hover,.row-nav-next:hover{background:var(--teal-500);border-color:var(--teal-500);color:#fff}
+@media(max-width:900px){.row-nav-prev,.row-nav-next{display:none}}
+
+/* Coronas de plan + badges sobre tarjetas */
+.card-crown-badge{position:absolute;top:10px;left:10px;z-index:6;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center}
+.card-crown-badge i{font-size:14px}
+.crown-gold{color:var(--gold)}.crown-silver{color:#9AA7A2}.crown-bronze{color:#CD7F32}.crown-diamond{color:var(--teal-500)}
+.card-actions{position:absolute;top:10px;right:10px;z-index:6}
+.badge-urgent{position:absolute;top:50px;left:10px;z-index:6;background:var(--orange-500);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px}
+.badge-sold-home{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:7;background:var(--ink-900);color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;padding:6px 14px;border-radius:99px;display:inline-flex;align-items:center;gap:6px}
+.card-sold .property-image{filter:grayscale(.7) brightness(.85)}
+
+/* Detalles internos de tarjeta */
+.property-seller-name{font-size:12px;color:var(--ink-500);font-weight:500;margin:0 0 2px}
+.property-price-and-tag{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-seller-info{display:flex;align-items:center;gap:8px;margin-top:8px}
+.card-seller-info .seller-photo{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.card-seller-info .seller-name{font-size:12.5px;color:var(--ink-500);margin:0}
+.like-button,.btn-like{background:#fff;border:1px solid var(--line);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--ink-500);transition:all .2s}
+.like-button:hover,.btn-like:hover{border-color:var(--orange-500);color:var(--orange-500)}
+/* ================= PATCH v1.3: CONTENEDOR NEUTRO ================= */
+/* El JS inyecta TODO el embudo dentro de .box-container, así que este
+   contenedor NO puede ser grid: debe ser columna. Los grids son las
+   filas internas (.ads-row) y los slides de los carruseles. */
+#index-page #products .box-container,
+.box-container{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:0 !important;
+  max-width:1400px !important;
+  width:100%;
+  margin:0 auto !important;
+  padding:0 !important;
+}
+
+/* Slides de carruseles: altura uniforme y tarjeta llenando el slide */
+.row-carousel .swiper-slide{height:auto !important;display:flex}
+.row-carousel .swiper-slide>*{width:100%}
+/* ============ PATCH v1.4: BLINDAJE ANCHOS BANNER ============ */
+.elite-banner-container,
+.elite-slider-wrapper{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  transform:none !important;
+  left:auto !important;
+  right:auto !important;
+  position:relative !important;
+}
+.main-content-wrapper{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:0 auto !important;
+  padding:0 20px !important;
+  display:block !important;
+}
+/* ============ PATCH v1.5: ICONOS CHIPS + PILLS CENTRADAS ============ */
+
+/* Iconos de los chips del hero */
+.hero-chips button{display:inline-flex;align-items:center;gap:8px}
+.hero-chips button i{font-size:13px;opacity:.9}
+
+/* Pills de categorías: centradas cuando caben, scroll normal cuando no */
+.categories-horizontal-bar{justify-content:flex-start}
+.category-item:first-child{margin-left:auto}
+.category-item:last-child{margin-right:auto}

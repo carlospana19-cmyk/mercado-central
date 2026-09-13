@@ -1,0 +1,54 @@
+/* ============ MERCADOS CENTRAL — mc-messages.css ============ */
+#mensajes-tab{
+  --teal-500:#0B9E8F; --teal-600:#087F73; --teal-50:#E6F7F5;
+  --orange-500:#FF8A3D;
+  --ink-900:#122129; --ink-700:#31413D; --ink-500:#5C6B66; --ink-300:#9AA7A2;
+  --line:#E8ECEF; --bg:#F6F8FA; --card:#fff;
+}
+.messages-layout{display:grid;grid-template-columns:320px 1fr;gap:16px;min-height:480px}
+.convs-list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow-y:auto;max-height:640px}
+.conv-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:none;background:none;border-bottom:1px solid var(--line);cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:background .15s}
+.conv-item:hover,.conv-item.active{background:var(--teal-50)}
+.conv-ad-img{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--bg)}
+.conv-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.conv-name{font-weight:700;font-size:14px;color:var(--ink-900)}
+.conv-ad-title{font-size:12.5px;color:var(--ink-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-unread{background:var(--orange-500);color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:99px;display:grid;place-items:center;padding:0 6px;flex-shrink:0}
+.convs-empty{text-align:center;padding:44px 20px;color:var(--ink-500)}
+.convs-empty i{font-size:36px;color:var(--ink-300);margin-bottom:10px;display:block}
+.convs-empty p{font-weight:600;color:var(--ink-900);margin:0 0 4px}
+.convs-empty span{font-size:13px}
+
+.chat-panel{background:var(--card);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden}
+.chat-empty{margin:auto;text-align:center;color:var(--ink-500);padding:30px}
+.chat-empty i{font-size:42px;color:var(--ink-300);margin-bottom:12px;display:block}
+.chat-active{display:flex;flex-direction:column;height:640px}
+.chat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.chat-back{display:none;border:none;background:none;font-size:16px;color:var(--ink-700);cursor:pointer;padding:4px}
+.chat-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.chat-avatar-ph{display:grid;place-items:center;background:var(--teal-50);color:var(--teal-500);font-size:15px}
+.chat-header-info{display:flex;flex-direction:column;min-width:0}
+.chat-header-info strong{font-size:14.5px;color:var(--ink-900)}
+.chat-header-info span{font-size:12px;color:var(--ink-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.chat-bubble-row{display:flex}
+.chat-bubble-row.mine{justify-content:flex-end}
+.chat-bubble{max-width:75%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
+.chat-bubble-row.mine .chat-bubble{background:var(--teal-500);color:#fff;border-bottom-right-radius:4px}
+.chat-bubble-row.theirs .chat-bubble{background:#fff;border:1px solid var(--line);color:var(--ink-900);border-bottom-left-radius:4px}
+.chat-time{display:block;font-size:10px;opacity:.7;margin-top:3px;text-align:right}
+.chat-form{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line)}
+.chat-form input{flex:1;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 16px;font-size:16px;outline:none;font-family:inherit;color:var(--ink-900);background:#fff}
+.chat-form input:focus{border-color:var(--teal-500)}
+.chat-form button{width:46px;height:46px;border-radius:12px;background:var(--teal-500);color:#fff;border:none;cursor:pointer;font-size:15px;flex-shrink:0;transition:background .2s}
+.chat-form button:hover{background:var(--teal-600)}
+.chat-loading{text-align:center;color:var(--ink-500);padding:20px;font-size:14px}
+
+@media(max-width:760px){
+  .messages-layout{grid-template-columns:1fr}
+  .chat-panel{display:none}
+  .messages-layout.chat-open .convs-list{display:none}
+  .messages-layout.chat-open .chat-panel{display:flex}
+  .chat-back{display:block}
+  .chat-active{height:72vh}
+}

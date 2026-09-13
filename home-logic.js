@@ -62,9 +62,26 @@ export function initializeHomePage() {
                 console.log(`---`);
             });
 
+                      // ✅ FALLBACK: si no hay destacados, mostrar los más recientes de cualquier plan
             if (!ads || ads.length === 0) {
-                container.innerHTML = '<p>No hay anuncios destacados en este momento.</p>';
-                return;
+                console.log('Sin destacados: cargando anuncios recientes como respaldo...');
+                const { data: recentAds, error: recentError } = await supabase
+                    .from('anuncios')
+                    .select('*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
+                    .order('created_at', { ascending: false })
+                    .limit(12);
+
+                if (recentError) {
+                    console.error('Error cargando recientes:', recentError);
+                    container.innerHTML = '<p class="no-ads-message">Aún no hay publicaciones. ¡Sé el primero en publicar!</p>';
+                    return;
+                }
+                ads = recentAds || [];
+
+                if (ads.length === 0) {
+                    container.innerHTML = '<p class="no-ads-message">Aún no hay publicaciones. ¡Sé el primero en publicar!</p>';
+                    return;
+                }
             }
 
             // ✅ Obtener estadísticas de reseñas de todos los vendedores únicos
@@ -372,7 +389,7 @@ ${(() => {
             // --- EL EMBUDO DE CASCADA PERFECTA ---
 
             // 1. Traemos 100 anuncios de Supabase (o más)
-            const allGoldAds = (premiumAds || []).sort((a, b) => {
+                        const allGoldAds = (ads || []).sort((a, b) => {
                 const dateA = new Date(a.created_at || a.fecha_publicacion || 0);
                 const dateB = new Date(b.created_at || b.fecha_publicacion || 0);
                 return dateB - dateA; // Los más recientes primero
@@ -979,6 +996,8 @@ function initializeRowCarousels() {
     
     // Inicializar carruseles de 4 columnas
     document.querySelectorAll('.row-4-swiper').forEach((swiperEl, index) => {
+        // Los carruseles con ID ya se inicializan más abajo (crear opciones por ID)
+        if (swiperEl.id && swiperEl.id.startsWith('row-carousel-')) return;
         const wrapper = swiperEl.closest('.carousel-row-wrapper');
         const prevBtn = wrapper?.querySelector('.row-nav-prev');
         const nextBtn = wrapper?.querySelector('.row-nav-next');

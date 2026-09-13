@@ -1,0 +1,176 @@
+/* =====================================================
+   MERCADOS CENTRAL — mc-detail.css (Fase 3: detalle)
+   ===================================================== */
+.detail-page{max-width:1280px;margin:0 auto;padding:20px clamp(16px,4vw,40px) 64px}
+.back-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-500);margin-bottom:14px;transition:color .2s}
+.back-link:hover{color:var(--teal-600)}
+.back-link i{font-size:12px}
+
+/* Encabezado */
+.detail-head{margin-bottom:20px}
+#product-name{font-family:var(--font-display);font-size:clamp(1.5rem,3.4vw,2.3rem);font-weight:700;color:var(--ink-900);letter-spacing:-.02em;line-height:1.2}
+.detail-meta{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;color:var(--ink-500)}
+.detail-meta i{color:var(--ink-300)}
+
+/* Layout maestro */
+.detail-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
+.detail-main{min-width:0;display:flex;flex-direction:column;gap:20px}
+.detail-side{position:sticky;top:84px;display:flex;flex-direction:column;gap:16px}
+@media(max-width:960px){
+  .detail-layout{grid-template-columns:1fr}
+  .detail-side{position:static}
+}
+
+/* Tarjeta base */
+.detail-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:clamp(18px,2.5vw,28px);box-shadow:var(--shadow-sm)}
+.detail-card h2{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--ink-900);display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.detail-card h2 i{color:var(--teal-500);font-size:15px}
+
+/* Galería */
+.gallery-card{padding:0!important;overflow:hidden}
+#gallery-wrapper{width:100%}
+#gallery-wrapper img,#main-product-image,.gallery-main img{width:100%;height:auto;max-height:520px;object-fit:contain;background:#EEF1F3;display:block}
+/* Swiper de galería generado por JS */
+.product-gallery-swiper{width:100%;height:auto;background:#EEF1F3;border-radius:0}
+.product-gallery-swiper .swiper-slide{display:flex;align-items:center;justify-content:center}
+.product-gallery-swiper .swiper-slide img{width:100%!important;height:auto!important;max-height:520px;object-fit:contain!important}
+.product-gallery-swiper .swiper-button-next,.product-gallery-swiper .swiper-button-prev{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92)!important;color:var(--ink-900)!important;box-shadow:var(--shadow-md);z-index:10}
+.product-gallery-swiper .swiper-button-next:hover,.product-gallery-swiper .swiper-button-prev:hover{background:var(--teal-500)!important;color:#fff!important}
+.product-gallery-swiper .swiper-pagination-bullet{background:rgba(255,255,255,.85)}
+.product-gallery-swiper .swiper-pagination-bullet-active{background:var(--orange-500)}
+/* Miniaturas si el JS las genera */
+.gallery-thumbs,.thumbs-container{display:flex;gap:8px;padding:10px;overflow-x:auto}
+.gallery-thumbs img,.thumbs-container img{width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid transparent;cursor:pointer;flex-shrink:0;max-height:72px!important}
+.gallery-thumbs img.active,.thumbs-container img.active{border-color:var(--teal-500)}
+
+/* Descripción */
+#product-description{font-size:15px;line-height:1.7;color:var(--ink-700);white-space:pre-line}
+
+/* Ficha técnica (catch-all de las clases que genera el JS) */
+.specs-grid-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.specs-grid-detail .universal-attr-item,.spec-item,.attr-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.specs-grid-detail i{font-size:18px;color:var(--teal-500)!important;margin-bottom:4px}
+.specs-grid-detail .attr-label,.spec-label{font-size:12px;color:var(--ink-500)!important;font-weight:500}
+.specs-grid-detail .attr-value,.spec-value{font-size:14.5px;font-weight:700;color:var(--ink-900)!important}
+
+/* Panel de precio */
+.price-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm)}
+.price-label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin-bottom:4px}
+.price-card .price{font-family:var(--font-display);font-size:clamp(1.8rem,3vw,2.3rem);font-weight:800;color:var(--ink-900);letter-spacing:-.02em;margin-bottom:18px}
+.visits-section{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-500)}
+
+/* WhatsApp protagonista */
+.btn-contact-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border-radius:12px;background:#25D366;color:#fff;font-weight:700;font-size:15.5px;transition:all .2s;box-shadow:0 4px 14px rgba(37,211,102,.35)}
+.btn-contact-wa:hover{background:#1EBE5A;transform:translateY(-1px)}
+.btn-contact-wa i{font-size:19px}
+.contact-secondary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.btn-secondary-contact{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink-700);font-weight:600;font-size:13.5px;transition:all .2s}
+.btn-secondary-contact:hover{border-color:var(--teal-500);color:var(--teal-600);background:var(--teal-50)}
+
+.safety-note{display:flex;gap:9px;align-items:flex-start;margin-top:16px;font-size:12.5px;line-height:1.5;color:var(--ink-500);background:var(--bg);border-radius:10px;padding:10px 12px}
+.safety-note i{color:var(--teal-500);margin-top:2px;flex-shrink:0}
+
+/* Mensaje directo (acordeón nativo) */
+.msg-direct{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.msg-direct summary{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-700);cursor:pointer;list-style:none}
+.msg-direct summary::-webkit-details-marker{display:none}
+.msg-direct summary i{color:var(--teal-500)}
+.msg-direct[open] summary{margin-bottom:12px}
+#contact-form textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:16px;font-family:var(--font-ui);color:var(--ink-900);resize:vertical;min-height:90px;outline:none;transition:border-color .2s}
+#contact-form textarea:focus{border-color:var(--teal-500)}
+.btn-send-msg{width:100%;height:46px;margin-top:10px;border-radius:10px;background:var(--ink-900);color:#fff;font-weight:600;font-size:14.5px;transition:background .2s}
+.btn-send-msg:hover{background:#000}
+
+/* Tarjeta de reseña */
+.review-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px}
+.review-card p{font-size:13.5px;color:var(--ink-500);line-height:1.5;margin-bottom:12px}
+.btn-review{width:100%;height:44px;border-radius:10px;background:var(--gold);color:#fff;font-weight:700;font-size:14px;transition:filter .2s}
+.btn-review:hover{filter:brightness(1.08)}
+
+/* Mapa */
+.map-card .detail-map{width:100%;height:300px;border-radius:12px;border:1px solid var(--line);overflow:hidden;margin-bottom:14px}
+.btn-route{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 22px;border-radius:10px;background:var(--teal-500);color:#fff;font-weight:600;font-size:14.5px;transition:background .2s}
+.btn-route:hover{background:var(--teal-600)}
+
+/* Reseñas (contenedores llenados por JS) */
+.reviews-stats{margin-bottom:16px;font-size:14.5px;color:var(--ink-700)}
+.reviews-list{display:flex;flex-direction:column;gap:14px}
+.reviews-list .review-item,.reviews-list>div{background:var(--bg);border-radius:12px;padding:16px}
+.no-reviews{font-size:14.5px;color:var(--ink-500);text-align:center;padding:24px}
+
+/* Móvil */
+@media(max-width:640px){
+  .detail-page{padding:16px 14px 56px}
+  #gallery-wrapper img,#main-product-image,.gallery-main img,.product-gallery-swiper .swiper-slide img{max-height:320px}
+  .price-card{padding:18px}
+}
+/* ============ PATCH v2 DETALLE: GALERÍA + ATRIBUTOS ============ */
+/* Imagen principal (vence los estilos inline del JS) */
+#main-product-image{width:100%!important;height:auto!important;min-height:0!important;max-height:520px!important;object-fit:contain!important;background:#EEF1F3;border-radius:0}
+@media(max-width:640px){#main-product-image{max-height:320px!important}}
+
+/* Miniaturas (clases REALES que genera el JS) */
+.gallery-main{position:relative}
+.gallery-thumbnails{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#fff}
+.thumbnail{width:72px;height:72px;flex-shrink:0;border-radius:8px;overflow:hidden;border:2px solid var(--line);cursor:pointer;transition:border-color .2s}
+.thumbnail:hover{border-color:var(--ink-300)}
+.thumbnail.active{border-color:var(--teal-500)}
+.thumbnail img{width:100%!important;height:100%!important;object-fit:cover!important;max-height:72px!important}
+
+/* Burbujas y lista de atributos (nuevas clases del JS) */
+.attr-bubbles-top{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:22px}
+.attr-bubble{display:flex;flex-direction:column;align-items:center;padding:16px 22px;background:var(--bg);border:1px solid var(--line);border-radius:14px;min-width:120px}
+.attr-bubble i{font-size:22px;color:var(--teal-500);margin-bottom:6px}
+.attr-bubble-value{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--ink-900);line-height:1.2}
+.attr-bubble-label{font-size:11px;color:var(--ink-500);text-transform:uppercase;font-weight:600;letter-spacing:.05em;margin-top:2px}
+.attr-list-bottom{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){.attr-list-bottom{grid-template-columns:1fr}}
+.attr-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bg);font-size:14px}
+.attr-row i{color:var(--teal-500);width:18px;flex-shrink:0;font-size:13px}
+.attr-row-label{color:var(--ink-500);font-weight:500;min-width:45%}
+.attr-row-value{font-weight:700;color:var(--ink-900)}
+
+/* Botón editar anuncio */
+.btn-edit-ad{display:inline-flex;align-items:center;gap:8px;margin-top:10px;height:38px;padding:0 16px;border-radius:9px;border:1.5px solid var(--line);background:#fff;color:var(--ink-700);font-size:13.5px;font-weight:600;transition:all .2s}
+.btn-edit-ad:hover{border-color:var(--teal-500);color:var(--teal-600);background:var(--teal-50)}
+/* ============ PATCH v3: ANCHO REAL DE PÁGINA ============ */
+/* Hijo de body (flex column) con margin auto → se encoge. width:100% lo fuerza a ocupar hasta el max-width */
+.detail-page{width:100%}
+/* ============ PATCH v4: VENDEDOR + BOTONES FLEX ============ */
+.seller-line{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-700);background:var(--teal-50);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.seller-line i{color:var(--teal-600);font-size:13px}
+/* ============ PATCH v5: AVATARES DE RESEÑAS ============ */
+.reviews-list img,
+.reviews-stats img{
+  width:44px!important;
+  height:44px!important;
+  max-width:44px!important;
+  max-height:44px!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  flex-shrink:0;
+}
+/* ============ PATCH v6: RESEÑAS HORIZONTALES ============ */
+/* Stats: promedio + barras lado a lado (mata el hueco vertical) */
+.reviews-stats .review-stats{display:flex;gap:clamp(20px,4vw,48px);align-items:center;flex-wrap:wrap}
+.reviews-stats .average-rating{display:flex;flex-direction:column;align-items:center;gap:5px;padding:18px 28px;background:var(--bg);border-radius:14px;min-width:150px}
+.reviews-stats .rating-number{font-family:var(--font-display);font-size:2.4rem;font-weight:800;color:var(--ink-900);line-height:1}
+.reviews-stats .stars{color:var(--gold);font-size:14px;display:flex;gap:2px}
+.reviews-stats .total-reviews{font-size:13px;color:var(--ink-500);font-weight:500}
+.reviews-stats .rating-breakdown{flex:1;min-width:250px;display:flex;flex-direction:column;gap:8px}
+.reviews-stats .rating-bar{display:flex;align-items:center;gap:10px;font-size:13px}
+.reviews-stats .rating-bar .star-count{min-width:10px;text-align:right;font-weight:600;color:var(--ink-700)}
+.reviews-stats .rating-bar i{color:var(--gold);font-size:11px}
+.reviews-stats .rating-bar .bar{flex:1;height:8px;background:var(--bg);border-radius:99px;overflow:hidden}
+.reviews-stats .rating-bar .fill{height:100%;background:var(--gold);border-radius:99px}
+.reviews-stats .rating-bar .count{min-width:18px;font-weight:600;color:var(--ink-700)}
+
+/* Items de reseña: avatar + nombre + estrellas + comentario */
+.reviews-list .review-item{background:var(--bg);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.reviews-list .review-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.reviews-list .reviewer-info{display:flex;align-items:center;gap:12px}
+.reviews-list .reviewer-avatar{width:44px!important;height:44px!important;border-radius:50%!important;object-fit:cover!important}
+.reviews-list .reviewer-name{font-weight:700;font-size:14.5px;color:var(--ink-900)}
+.reviews-list .review-date{font-size:12.5px;color:var(--ink-300)}
+.reviews-list .review-rating{color:var(--gold);font-size:13px;display:flex;gap:2px}
+.reviews-list .review-comment{margin-top:10px;font-size:14.5px;line-height:1.6;color:var(--ink-700)}

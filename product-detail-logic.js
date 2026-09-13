@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client.js';
 import { ReviewModal, hasUserReviewedSeller, getSellerReviews, getSellerReviewStats, generateReviewStatsHTML, generateReviewHTML } from './reviews-logic.js';
-
+import { initDetailChatForm } from './chat-logic.js';
 // Tu API Key de Google Maps
 const MAPS_API_KEY_DETALLE = 'AIzaSyBijfhc6uDfEfzAreBjH_tJpYpc1yDvFas';
 
@@ -194,9 +194,9 @@ function displayAllAttributesComprehensive(ad) {
 
     const topBurbujas = validEntries.filter(([key]) => topKeys.includes(key));
     
-    let htmlTop = '';
+        let htmlTop = '';
     if (topBurbujas.length > 0) {
-        htmlTop = '<div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 25px;">';
+        htmlTop = '<div class="attr-bubbles-top">';
         topBurbujas.forEach(([key, val]) => {
             const icon = iconMap[key] || 'fa-tag';
             const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -204,10 +204,10 @@ function displayAllAttributesComprehensive(ad) {
             if (key === 'kilometraje') value += ' km';
             else if (key === 'm2') value += ' m²';
             htmlTop += `
-                <div style="display: flex; flex-direction: column; align-items: center; padding: 16px 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 1px solid #dee2e6; border-radius: 12px; min-width: 120px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                    <i class="fas ${icon}" style="font-size: 1.8rem; color: #00bfae; margin-bottom: 6px;"></i>
-                    <span style="font-weight: 800; font-size: 1.3rem; color: #212529; line-height: 1.2;">${value}</span>
-                    <span style="font-size: 0.8rem; color: #6c757d; text-transform: uppercase; font-weight: 600;">${label}</span>
+                <div class="attr-bubble">
+                    <i class="fas ${icon}"></i>
+                    <span class="attr-bubble-value">${value}</span>
+                    <span class="attr-bubble-label">${label}</span>
                 </div>`;
         });
         htmlTop += '</div>';
@@ -215,16 +215,16 @@ function displayAllAttributesComprehensive(ad) {
 
     // GRUPO 2: LISTA 2 COL (resto attrs)
     const bottomEntries = validEntries.filter(([key]) => !topKeys.includes(key));
-    let htmlBottom = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 2px solid #e9ecef; padding-top: 18px;">';
+    let htmlBottom = '<div class="attr-list-bottom">';
     
     bottomEntries.forEach(([key, val]) => {
         const icon = iconMap[key] || 'fa-info-circle';
         const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         htmlBottom += `
-            <div style="display: flex; align-items: center; padding: 8px 12px; gap: 3px; border-bottom: 1px solid #f1f3f4; font-size: 0.95rem;">
-                <i class="fas ${icon}" style="color: #00bfae; width: 18px; flex-shrink: 0;"></i>
-                <span style="color: #6c757d; font-weight: 500; min-width: 45%;">${label}:</span>
-                <span style="font-weight: 700; color: #212529;">${val}</span>
+            <div class="attr-row">
+                <i class="fas ${icon}"></i>
+                <span class="attr-row-label">${label}:</span>
+                <span class="attr-row-value">${val}</span>
             </div>`;
     });
     htmlBottom += '</div>';
@@ -402,6 +402,10 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     try {
         if (typeof loadSellerContactInfo === 'function') loadSellerContactInfo(ad);
     } catch(e) { console.warn('Error con loadSellerContactInfo:', e); }
+        // ✅ FASE 4: conectar el formulario de mensaje directo al chat interno
+    try {
+        initDetailChatForm(ad);
+    } catch(e) { console.warn('Error iniciando chat:', e); }
 
     // Configurar botón de reseñas (opcional)
     try {
@@ -1319,23 +1323,11 @@ async function loadSellerContactInfo(ad) {
             .eq('id', ad.user_id)
             .single();
 
-        // ✅ Actualizar título del contacto con el nombre del vendedor
-        const contactTitleEl = document.querySelector('.contact-seller-box h3');
-        if (contactTitleEl) {
-            // Título estático limpio
-            contactTitleEl.innerHTML = `<i class="fas fa-comments" style="color: #0a2342;"></i> Contactar al Vendedor`;
-        }
-
-        // ✅ Añadir nombre del vendedor debajo del título con estilo prominence
-        const existingBadge = document.querySelector('.contact-seller-box .seller-name-badge');
-        if (!existingBadge && sellerProfile) {
+        // Nombre del vendedor (estructura Fase 3)
+        const sellerLineEl = document.getElementById('seller-line');
+        if (sellerLineEl && sellerProfile) {
             const sellerName = sellerProfile?.nombre_negocio || sellerProfile?.nombre_completo || 'Usuario Verificado';
-            const nameBadge = document.createElement('div');
-            nameBadge.className = 'seller-name-badge';
-            nameBadge.innerHTML = `<i class="fas fa-user"></i> ${sellerName}`;
-            if (contactTitleEl && contactTitleEl.parentNode) {
-                contactTitleEl.parentNode.insertBefore(nameBadge, contactTitleEl.nextSibling);
-            }
+            sellerLineEl.innerHTML = `<i class="fas fa-user"></i> ${sellerName}`;
         }
 
         if (error) {
@@ -1368,7 +1360,7 @@ async function loadSellerContactInfo(ad) {
             whatsappLinkEl.target = '_blank';
             whatsappLinkEl.rel = 'noopener noreferrer';
             console.log('URL de WhatsApp:', whatsappUrl);
-            whatsappLinkEl.style.display = 'inline-block';
+            whatsappLinkEl.style.display = 'flex';
         } else {
             if (whatsappLinkEl) whatsappLinkEl.style.display = 'none';
         }
@@ -1377,8 +1369,8 @@ async function loadSellerContactInfo(ad) {
         if (emailLinkEl && sellerProfile?.email) {
             const subject = encodeURIComponent(`Interesado en tu anuncio: ${ad.titulo}`);
             const body = encodeURIComponent(`Hola, estoy interesado en tu anuncio "${ad.titulo}" y me gustaría tener más detalles.`);
-            emailLinkEl.href = `mailto:${sellerProfile.email}?subject=${subject}&amp;body=${body}`;
-            emailLinkEl.style.display = 'inline-block';
+            emailLinkEl.href = `mailto:${sellerProfile.email}?subject=${subject}body=${body}`;
+            emailLinkEl.style.display = 'flex';
         } else {
             if (emailLinkEl) emailLinkEl.style.display = 'none';
         }
@@ -1386,7 +1378,7 @@ async function loadSellerContactInfo(ad) {
         // ✅ Teléfono: Enlace tel para llamar directamente
         if (phoneLinkEl && sellerProfile?.telefono) {
             phoneLinkEl.href = `tel:${sellerProfile.telefono}`;
-            phoneLinkEl.style.display = 'inline-block';
+            phoneLinkEl.style.display = 'flex';
         } else {
             if (phoneLinkEl) phoneLinkEl.style.display = 'none';
         }
@@ -1488,7 +1480,7 @@ function displayError(message) {
     console.error('Mostrando error:', message);
 
     // Verificar si existe el contenedor principal
-    const mainContainer = document.querySelector('.detalle-page-container');
+    const mainContainer = document.querySelector('.detail-page');
     if (mainContainer) {
         mainContainer.innerHTML = `
             <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">

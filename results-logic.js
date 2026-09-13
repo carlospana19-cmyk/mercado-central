@@ -10,12 +10,30 @@ function initializeCategoryHero() {
     const categorySubtitleEl = document.getElementById('category-subtitle');
     const sectionTitleEl = document.getElementById('section-page-title');
 
-    if (!categorySlidesContainer) return;
-
-    // Obtener parámetros de la URL
+        // Obtener parámetros de la URL (ANTES del return: el título funciona sin carrusel)
     const params = new URLSearchParams(window.location.search);
     const categoryParam = params.get('category') || 'all';
     const searchQuery = params.get('q') || '';
+
+    // Título dinámico aunque el hero ya no exista (Fase 2)
+    if (sectionTitleEl) {
+        if (searchQuery) {
+            sectionTitleEl.textContent = `Resultados para "${searchQuery}"`;
+        } else if (categoryParam !== 'all') {
+            const categoryNames = {
+                'Bienes Raíces': 'Bienes Raíces', 'Vehículos': 'Vehículos',
+                'Electrónica': 'Electrónica', 'Hogar y Muebles': 'Hogar y Muebles',
+                'Moda y Belleza': 'Moda y Belleza', 'Servicios': 'Servicios',
+                'Empleos y Servicios': 'Empleos y Servicios', 'Mascotas': 'Mascotas',
+                'Negocios': 'Negocios', 'Comunidad': 'Comunidad'
+            };
+            sectionTitleEl.textContent = categoryNames[categoryParam] || 'Resultados de Búsqueda';
+        } else {
+            sectionTitleEl.textContent = 'Todos los anuncios';
+        }
+    }
+
+    if (!categorySlidesContainer) return;
 
     // Configurar título y subtítulo según la categoría
     let categoryTitle = 'Resultados de Búsqueda';
@@ -315,7 +333,14 @@ async function loadAndFilterResults() {
         return dateB - dateA;
     });
 
-    // Load subcategories with counts for filtering
+    // === ORDENAMIENTO POR DROPDOWN (Fase 2) ===
+    const sortMode = document.getElementById('sort-select')?.value || 'recent';
+    if (sortMode === 'price-asc') {
+        products.sort((a, b) => (a.precio || 0) - (b.precio || 0));
+    } else if (sortMode === 'price-desc') {
+        products.sort((a, b) => (b.precio || 0) - (a.precio || 0));
+    }
+    // 'recent' conserva el orden jerárquico (planes → fecha) ya aplicado arriba
     let subcategoriesWithCounts = [];
     if (mainCategory !== 'all') {
         // When a specific category is selected, show its subcategories
@@ -385,12 +410,16 @@ function displaySubcategoryFilters(subcategoriesWithCounts) {
         labelEl.textContent = isMainCategories ? "Categorías" : "Subcategorías";
     }
 
-    container.innerHTML = subcategoriesWithCounts.map(item => `
+    // Ocultar categorías sin anuncios (Fase 2)
+    const conAnuncios = subcategoriesWithCounts.filter(item => item.count > 0);
+    if (conAnuncios.length === 0) {
+        container.innerHTML = "<p>Sin categorías con anuncios por ahora.</p>";
+        return;
+    }
+    container.innerHTML = conAnuncios.map(item => `
         <label class="subcategory-label">
             <input type="checkbox" name="subcategory" value="${item.nombre}">
-            ${item.nombre} ${item.count !== undefined && item.count !== null
-                ? `<span style="color:#7f8c8d; font-size:1.2rem;">(${item.count})</span>`
-                : ''}
+            ${item.nombre} <span class="cat-count">(${item.count})</span>
         </label>
     `).join('');
     }
@@ -1126,3 +1155,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadAndFilterResults();
     });
 });
+// === CONEXIÓN DEL DROPDOWN DE ORDENAMIENTO (Fase 2) ===
+const sortSelectEl = document.getElementById('sort-select');
+if (sortSelectEl) {
+    sortSelectEl.addEventListener('change', () => {
+        currentPage = 1;
+        loadAndFilterResults();
+    });
+}

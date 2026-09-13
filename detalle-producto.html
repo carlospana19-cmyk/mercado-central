@@ -4,145 +4,129 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="connect-src *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://fonts.googleapis.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://wa.me; child-src 'self' https://wa.me;">
-    <title>Detalle del Producto - Mercados Central</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Anuncio | Mercados Central</title>
+    <meta name="description" content="Ver detalles, fotos y contacto del vendedor. Compra y vende seguro en Mercados Central, Panamá.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+
+    <!-- CSS NUEVO (Fase 3) -->
+    <link rel="stylesheet" href="mc-base.css?v=1">
+    <link rel="stylesheet" href="mc-detail.css?v=6">
 </head>
-<body class="page-detalle">
-    <!-- =============================================================== -->
-    <!-- COPIA Y PEGA AQUÍ TU CÓDIGO COMPLETO DEL NAVBAR -->
-    <!-- =============================================================== -->
+<body>
     <div id="navbar-container"></div>
 
-<main class="detalle-page-container">
-    <!-- Título y Ubicación (ahora van arriba del todo) -->
-    <div class="detalle-header">
-        <h1 id="product-name">Cargando Título...</h1>
-        <div class="location-info">
-            <i class="fas fa-calendar-alt"></i>
-            <span id="product-date">Cargando...</span>
-        </div>
+    <main class="detail-page">
+
+        <a href="resultados.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver a resultados</a>
+
+        <!-- Título y fecha -->
+        <div class="detail-head">
+    <h1 id="product-name">Cargando título…</h1>
+    <div class="detail-meta">
+        <i class="fas fa-calendar-alt"></i>
+        <span id="product-date">Cargando…</span>
     </div>
 
-    <!-- Contenedor Principal de Grid -->
-    <div class="detalle-grid-premium">
-        <!-- Columna Izquierda: Galería de Imágenes -->
-        <div class="gallery-container-premium">
-            <div id="gallery-wrapper">
-                <!-- Imagen principal y miniaturas generadas por JS -->
-            </div>
+    <a id="edit-ad-button" href="#" class="btn-edit-ad" style="display:none">
+        <i class="fas fa-edit"></i> Editar mi anuncio
+    </a>
+</div>
+             
+        <div class="detail-layout">
 
-            <!-- Descripción justo debajo de la galería -->
-            <div class="description-below-gallery">
-                <div class="description-container">
-                    <h2>Descripción Detallada</h2>
-                    <p id="product-description" style="margin-bottom: 30px;">Cargando descripción...</p>
-                    
-                    <div class="specs-container-premium" style="margin-top: 30px; padding: 0px; background: #f8fbff; border-radius: 12px; border: 1px solid #e2e8f0;">
-                        <h2 style="font-size: 1.4em; color: #0a2342; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">
-                            <i class="fas fa-list-ul" style="color: #00bfae;"></i> Características y Detalles
-                        </h2>
-                        <div id="lista-detalles-completa" class="attributes-grid-detail" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; width: 100%;">
-                        </div>
-                    </div>
+            <!-- COLUMNA IZQUIERDA: galería + descripción + ficha -->
+            <div class="detail-main">
+                <div class="gallery-card">
+                    <div id="gallery-wrapper"></div>
+                </div>
+
+                <div class="detail-card">
+                    <h2>Descripción</h2>
+                    <p id="product-description">Cargando descripción…</p>
+                </div>
+
+                <div class="detail-card specs-card">
+                    <h2><i class="fas fa-list-ul"></i> Características y detalles</h2>
+                    <div id="lista-detalles-completa" class="specs-grid-detail"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- Columna Derecha: Información y Contacto -->
-        <div class="info-container-premium">
-            <div class="info-box-sticky">
-                <div class="price-section">
+            <!-- COLUMNA DERECHA: precio + contacto (sticky) -->
+            <aside class="detail-side">
+                <div class="price-card">                   
+                     <div class="seller-line" id="seller-line"></div>
                     <span class="price-label">Precio</span>
-                    <div class="price" id="product-price">$ --.--</div>
-                </div>
-                <div class="visits-section">
-                    <i class="fas fa-eye"></i>
-                    <span class="visits-label">Visitas</span>
-                    <div class="visits" id="product-visits">0</div>
-                </div>
-                <div class="contact-seller-box">
-                    <h3><i class="fas fa-comments" style="color: #0a2342;"></i> Contactar al Vendedor</h3>
+                    <div class="price" id="product-price">—</div>
 
-                    <!-- Botón de reseñas -->
-                    <div class="review-seller-section">
-                        <p style="font-size: 1.3em; color: #666; margin-bottom: 10px; text-align: center;">
-                            <i class="fas fa-info-circle" style="color: #0a2342;"></i> ¿Hiciste una compra? Ayuda a otros usuarios calificando al vendedor
-                        </p>
-                        <button id="leave-review-btn" class="btn btn-review-seller" style="display: none; width: 100%; margin-bottom: 15px;">
-                            <i class="fas fa-star"></i> Calificar al vendedor
-                        </button>
+                    <!-- Visitas: oculto para el público (poco tráfico = mala imagen).
+                         El JS sigue actualizando el valor sin error.
+                         Para reactivar en el futuro: quita el estilo display:none -->
+                    <div class="visits-section" style="display:none">
+                        <i class="fas fa-eye"></i>
+                        <span class="visits-label">Visitas</span>
+                        <span class="visits" id="product-visits">0</span>
                     </div>
 
-                    <div class="contact-options">
-                        <a class="btn btn-whatsapp" id="whatsapp-link" style="display: none; margin-bottom: 10px; text-decoration: none; cursor: pointer;">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
-                        </a>
-                        <a class="btn btn-email" id="email-link" style="display: none; margin-bottom: 10px; text-decoration: none; cursor: pointer;">
-                            <i class="fas fa-envelope"></i> Email
-                        </a>
-                        <a class="btn btn-phone" id="phone-link" style="display: none; text-decoration: none; cursor: pointer;">
-                            <i class="fas fa-phone-alt"></i> Teléfono
-                        </a>
+                    <a class="btn-contact-wa" id="whatsapp-link" style="display:none">
+                        <i class="fab fa-whatsapp"></i> Chat por WhatsApp
+                    </a>
+
+                    <div class="contact-secondary">
+                        <a id="email-link" class="btn-secondary-contact" style="display:none"><i class="fas fa-envelope"></i> Email</a>
+                        <a id="phone-link" class="btn-secondary-contact" style="display:none"><i class="fas fa-phone-alt"></i> Llamar</a>
                     </div>
-                    <div class="contact-form-section" style="margin-top: 20px; padding: 15px 0;">
-                        <h4 style="color: #0a2342; font-size: 16px; margin-bottom: 10px; font-weight: 600;">O envía un mensaje directo</h4>
+
+                    <p class="safety-note"><i class="fas fa-shield-alt"></i> Consejo: cita en lugares públicos y paga solo al recibir el producto.</p>
+
+                    <details class="msg-direct">
+                        <summary><i class="fas fa-comment-dots"></i> Enviar mensaje directo</summary>
                         <form id="contact-form">
-                            <textarea id="message-input" name="message"></textarea>
-                            <button type="submit" class="btn" style="background-color: #0a2342; width: 100%;">Enviar Mensaje</button>
+                            <textarea id="message-input" name="message" placeholder="Hola, ¿sigue disponible?" rows="4"></textarea>
+                            <button type="submit" class="btn-send-msg">Enviar mensaje</button>
                         </form>
-                    </div>
+                    </details>
                 </div>
-            </div>
+
+                <div class="review-card">
+                    <p>¿Hiciste una compra? Ayuda a otros calificando al vendedor.</p>
+                    <button id="leave-review-btn" class="btn-review" style="display:none">
+                        <i class="fas fa-star"></i> Calificar al vendedor
+                    </button>
+                </div>
+            </aside>
         </div>
-    </div>
 
+        <!-- Mapa -->
+        <section class="detail-card map-card" id="product-location-section" style="display:none">
+            <h2><i class="fas fa-map-marker-alt"></i> Ubicación del anuncio</h2>
+            <div id="mapa-detalles" class="detail-map"></div>
+            <a id="btn-navegar-maps" href="#" target="_blank" class="btn-route">
+                <i class="fas fa-directions"></i> Ver ruta / Cómo llegar
+            </a>
+        </section>
 
+        <!-- Reseñas del vendedor -->
+        <section class="detail-card reviews-card" id="seller-reviews-section" style="display:none">
+            <h2><i class="fas fa-star"></i> Opiniones sobre el vendedor</h2>
+            <div id="seller-reviews-stats" class="reviews-stats"></div>
+            <div id="seller-reviews-list" class="reviews-list"></div>
+        </section>
+    </main>
 
-    <!-- Mapa de Ubicación del Producto -->
-    <section class="product-location-section" id="product-location-section" style="display: none; padding: 20px; max-width: 1200px; margin: 20px auto;">
-        <h2 style="font-size: 1.3em; margin-bottom: 15px; color: #0a2342;"><i class="fas fa-map-marker-alt" style="color: #0a2342;"></i> Ubicación del anuncio</h2>
-        
-        <!-- Contenedor del mapa -->
-        <div id="mapa-detalles" style="width: 100%; height: 250px; border-radius: 12px; border: 2px solid #e0e0e0; margin-bottom: 15px; overflow: hidden;"></div>
-        
-        <!-- Botón de navegación -->
-        <a id="btn-navegar-maps" href="#" target="_blank" class="btn" style="display: inline-flex; align-items: center; gap: 8px; background: #00bfae; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 500;">
-            <i class="fas fa-directions"></i> Ver ruta / Cómo llegar
-        </a>
-    </section>
-</main>
-
-<!-- Sección de Opiniones sobre el Vendedor -->
-<section class="seller-reviews-section" id="seller-reviews-section" style="display: none;">
-    <div class="container">
-        <h2><i class="fas fa-star" style="color: #c5a059; font-size: 1.5rem;"></i> Opiniones sobre el vendedor</h2>
-        <div id="seller-reviews-stats" class="reviews-stats"></div>
-        <div id="seller-reviews-list" class="reviews-list"></div>
-    </div>
-</section>
-
-    <!-- =============================================================== -->
-    <!-- FOOTER PREMIUM -->
-    <!-- =============================================================== -->
     <div id="footer-container"></div>
 
-    <!-- Carga la librería de Supabase PRIMERO -->
+    <!-- Scripts (mismos, mismo orden) -->
     <script type="module" src="supabase-client.js" defer></script>
-
-    <!-- Inicialización centralizada -->
     <script type="module" src="main.js" defer></script>
-
-    <!-- Carga la lógica específica de detalle del producto -->
     <script type="module" src="product-detail-logic.js" defer></script>
-<script type="module" src="navbar-logic.js"></script>
-<script src="load-components.js" defer></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+    <script type="module" src="navbar-logic.js"></script>
+    <script src="load-components.js" defer></script>
 </body>
 </html>
