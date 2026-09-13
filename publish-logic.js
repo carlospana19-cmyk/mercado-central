@@ -360,7 +360,7 @@ function showLoginRequiredModal() {
             <div style="
                 width: 80px;
                 height: 80px;
-                background: linear-gradient(135deg, #00bfae, #00a896);
+                background: linear-gradient(135deg, #0B9E8F, #087F73);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -383,7 +383,7 @@ function showLoginRequiredModal() {
             ">Para publicar tu anuncio, primero debes iniciar sesión en tu cuenta. Es rápido y seguro.</p>
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                 <button id="go-to-login" style="
-                    background: linear-gradient(135deg, #00bfae, #00a896);
+                    background: linear-gradient(135deg, #0B9E8F, #087F73);
                     color: white;
                     border: none;
                     padding: 14px 32px;
@@ -397,8 +397,8 @@ function showLoginRequiredModal() {
                 </button>
                 <button id="go-to-register" style="
                     background: white;
-                    color: #00bfae;
-                    border: 2px solid #00bfae;
+                    color: #0B9E8F;
+                    border: 2px solid #0B9E8F;
                     padding: 12px 28px;
                     border-radius: 8px;
                     font-size: 16px;
@@ -1948,7 +1948,7 @@ window.previewCoverImage = function(event) {
     
     if (!file) {
         // Reset: restaurar borde discontinuo verde cuando no hay imagen
-        previewContainer.style.border = '2px dashed #00bfae';
+        previewContainer.style.border = '2px dashed #0B9E8F';
         previewContainer.style.background = 'transparent';
         return;
     }
@@ -1973,7 +1973,7 @@ window.previewCoverImage = function(event) {
         previewContainer.style.display = 'block';
         previewContainer.innerHTML = `
             <img src="${e.target.result}" 
-                 style="max-height: 200px; width: auto; display: block; margin: 0 auto; border-radius: 8px; border: 2px dashed #00bfae;">
+                 style="max-height: 200px; width: auto; display: block; margin: 0 auto; border-radius: 8px; border: 2px dashed #0B9E8F;">
         `;
         
         // 4. Activar el botón de publicar

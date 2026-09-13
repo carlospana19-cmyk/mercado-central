@@ -1,0 +1,353 @@
+/* =====================================================
+   MERCADOS CENTRAL — mc-publish.css (Fase 5: publicar)
+   Capa que viste el wizard SIN tocar la lógica
+   ===================================================== */
+.publish-wizard{max-width:1100px;margin:0 auto;padding:28px clamp(16px,4vw,40px) 64px;width:100%}
+
+/* ---------- STEPS ---------- */
+.progress-container{margin-bottom:36px}
+.progress-steps{display:flex;justify-content:center;gap:clamp(24px,8vw,80px)}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.45;transition:opacity .3s}
+.step.active{opacity:1}
+.step-circle{width:44px;height:44px;border-radius:50%;background:#fff;border:2px solid var(--line);display:grid;place-items:center;font-weight:700;color:var(--ink-500);transition:all .3s}
+.step.active .step-circle{background:var(--teal-500);border-color:var(--teal-500);color:#fff;box-shadow:0 4px 14px rgba(11,158,143,.35)}
+.step-title{font-size:13px;font-weight:600;color:var(--ink-700)}
+
+/* ---------- SECCIONES ---------- */
+.section-title{font-family:var(--font-display);font-size:clamp(1.3rem,2.6vw,1.7rem);font-weight:700;color:var(--ink-900);display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.section-title i{color:var(--teal-500)}
+.form-section.active{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- TARJETAS DE PLANES ---------- */
+.plans-container-horizontal{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-bottom:30px}
+@media(max-width:560px){.plans-container-horizontal{grid-template-columns:1fr}}
+.plan-card-h{background:#fff;border:1.5px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s,border-color .25s;position:relative}
+.plan-card-h:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+.plan-card-h:has(input[name="plan"]:checked){border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50),var(--shadow-md)}
+.plan-top-section{padding:20px 18px 14px;text-align:center;border-bottom:1px dashed var(--line)}
+.plan-badge-label{display:inline-block;background:var(--teal-50);color:var(--teal-600);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:8px}
+.plan-badge-label.premium-badge{background:rgba(255,138,61,.12);color:var(--orange-500)}
+.plan-badge-label.destacado-badge{background:rgba(212,175,55,.15);color:#8a6d1a}
+.plan-title-h{font-family:var(--font-display);font-size:19px;font-weight:800;color:var(--ink-900);letter-spacing:.02em;margin:0}
+.plan-price-h{font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--ink-900);margin:6px 0 2px}
+.plan-duration-h{font-size:12.5px;color:var(--ink-500);margin:0}
+.plan-middle-section{padding:16px 18px;flex:1}
+.benefits-list-h{list-style:none;display:flex;flex-direction:column;gap:9px;margin:0;padding:0}
+.benefits-list-h li{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--ink-700);line-height:1.4}
+.benefits-list-h i{color:var(--teal-500);font-size:13px;margin-top:2px}
+.plan-bottom-section{padding:14px 18px 18px}
+.plan-select-h{display:block;cursor:pointer}
+.plan-select-h input{position:absolute;opacity:0;pointer-events:none}
+.plan-button-h{display:flex;align-items:center;justify-content:center;height:44px;border-radius:11px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:14px;color:var(--ink-700);transition:all .2s}
+.plan-button-h:hover{border-color:var(--teal-500);color:var(--teal-600)}
+.plan-select-h input:checked + .plan-button-h{background:var(--teal-500);border-color:var(--teal-500);color:#fff}
+/* Inputs de token */
+.input-token{border:1.5px solid var(--line)!important;border-radius:10px!important;background:var(--bg)!important;font-size:13px!important;text-align:center!important}
+.input-token:focus{border-color:var(--teal-500)!important;outline:none}
+
+/* ---------- FORMULARIOS ---------- */
+.details-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:start}
+@media(max-width:900px){.details-layout{grid-template-columns:1fr}}
+.left-column,.right-column{display:flex;flex-direction:column;gap:22px;min-width:0}
+.classification-location-block,.primary-section,.section-block{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}
+.block-title{font-family:var(--font-display);font-size:15.5px;font-weight:700;color:var(--ink-900);margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.block-title i{color:var(--teal-500)}
+.internal-subtitle{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin:18px 0 10px;display:flex;align-items:center;gap:7px}
+.internal-subtitle:first-of-type{margin-top:0}
+.internal-subtitle i{color:var(--teal-500);font-size:12px}
+.subsection-title{font-family:var(--font-display);font-size:15.5px;font-weight:700;color:var(--ink-900);margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.subsection-title i{color:var(--teal-500)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13.5px;font-weight:600;color:var(--ink-900);margin-bottom:7px}
+.form-group input[type="text"],.form-group input[type="number"],.form-group input[type="tel"],.form-group input[type="email"],.form-group input[type="url"],.form-group select,.form-group textarea{width:100%;border:1.5px solid var(--line);border-radius:11px;background:#fff;padding:12px 14px;font-size:16px;font-family:var(--font-ui);color:var(--ink-900);outline:none;transition:border-color .2s,box-shadow .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50)}
+.form-group input:read-only{background:var(--bg);color:var(--ink-500)}
+.help-text,.form-text{display:block;font-size:12px;color:var(--ink-500);margin-top:5px}
+.char-count{font-size:11.5px;font-weight:500;color:var(--ink-300)}
+.required{color:var(--orange-500)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.form-row{grid-template-columns:1fr}}
+.form-row .flex-2{grid-column:span 1}
+.price-input-wrapper{position:relative;display:flex;align-items:center}
+.currency-symbol{position:absolute;left:14px;font-weight:700;color:var(--ink-500);pointer-events:none}
+.price-input-wrapper input{padding-left:30px!important}
+.attribute-section{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+.attribute-section h4{font-family:var(--font-display);font-size:14.5px;font-weight:700;color:var(--ink-900);margin:0 0 16px}
+
+/* ---------- BOTÓN IA ---------- */
+.ia-button-wrapper{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:-6px 0 18px}
+.btn-ia{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:11px;background:linear-gradient(120deg,#7C3AED,#A855F7);color:#fff;font-weight:600;font-size:13.5px;border:none;cursor:pointer;transition:filter .2s}
+.btn-ia:hover{filter:brightness(1.1)}
+
+/* ---------- UPLOAD ---------- */
+.btn-file-upload{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;border:1.5px dashed var(--teal-500);background:var(--teal-50);color:var(--teal-600);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .2s}
+.btn-file-upload:hover{background:var(--teal-500);color:#fff;border-style:solid}
+.file-name{font-size:12.5px;color:var(--ink-500);margin-left:8px}
+#cover-image-preview{border:2px dashed var(--teal-500)!important;border-radius:12px!important;padding:8px}
+#cover-image-preview img{width:100%;max-height:220px;object-fit:contain;border-radius:8px}
+.drop-area{border:2px dashed var(--line);border-radius:14px;padding:28px 16px;text-align:center;background:var(--bg);cursor:pointer;transition:border-color .2s,background .2s}
+.drop-area:hover,.drop-area.dragover{border-color:var(--teal-500);background:var(--teal-50)}
+.upload-icon i{font-size:28px;color:var(--teal-500)}
+.upload-text{font-size:14.5px;color:var(--ink-900);margin:8px 0 2px}
+.upload-subtext{font-size:12.5px;color:var(--ink-500);margin:0 0 6px}
+.upload-limit{font-size:11.5px;color:var(--ink-300)}
+.gallery-preview-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-top:14px}
+.gallery-preview-container img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+
+/* ---------- CONTACTO / TÉRMINOS ---------- */
+.terms-agreement label{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;font-weight:500;color:var(--ink-700);cursor:pointer}
+.terms-agreement input{width:17px;height:17px;accent-color:var(--teal-500);margin-top:2px;flex-shrink:0}
+.terms-agreement a{color:var(--teal-600);font-weight:600;text-decoration:underline}
+
+/* ---------- BOTONES DEL WIZARD ---------- */
+.btn-group{display:flex;justify-content:space-between;gap:14px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 26px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:var(--orange-500);color:#fff;box-shadow:0 4px 14px rgba(255,138,61,.35)}
+.btn-primary:hover{background:var(--orange-600);transform:translateY(-1px)}
+.btn-secondary{background:#fff;color:var(--ink-700);border:1.5px solid var(--line)}
+.btn-secondary:hover{border-color:var(--ink-300);color:var(--ink-900)}
+
+/* ---------- MAPA ---------- */
+#map-container{background:#fff}
+#province-map{border:1.5px solid var(--line)!important;border-radius:12px!important}
+.search-location-wrapper input{border:1.5px solid var(--line)!important;border-radius:11px!important}
+#selected-location-info{background:var(--teal-50)!important;border-radius:10px!important}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:640px){
+  .publish-wizard{padding:20px 14px 56px}
+  .classification-location-block,.primary-section,.section-block{padding:16px}
+  .step-circle{width:38px;height:38px}
+  .btn-group{flex-direction:column-reverse}
+  .btn-group .btn{width:100%}
+}
+/* ============ PATCH v2: NEUTRALIZA form.css VIEJO ============ */
+
+/* Fondo de página (form.css pinta degradado violeta) */
+body{background:var(--bg)!important}
+main.container.publish-wizard{background:transparent!important;box-shadow:none!important;max-width:1100px!important;width:100%!important;margin:0 auto!important;padding:28px clamp(16px,4vw,40px) 64px!important;border-radius:0!important}
+
+/* Títulos: sin bordes teal/violeta viejos */
+.section-title{border:none!important;font-size:clamp(1.3rem,2.6vw,1.7rem)!important;color:var(--ink-900)!important;text-align:left!important;margin-bottom:26px!important}
+.subsection-title{border:none!important;font-size:15.5px!important;color:var(--ink-900)!important}
+.classification-location-block .internal-subtitle{border-left:none!important}
+
+/* Bloque clasificación: sin borde teal permanente ni sombra */
+.classification-location-block{border:1px solid var(--line)!important;border-radius:14px!important;box-shadow:none!important;background:#fff!important;padding:22px!important}
+.classification-location-block:hover{box-shadow:none!important}
+
+/* Columnas: form.css las convierte en tarjetas blancas dobles → transparencia */
+.left-column,.right-column{background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+
+/* Drop zone galería: el ID de form.css (violeta) gana a mis clases */
+#gallery-drop-area{border:2px dashed var(--line)!important;border-radius:14px!important;background:var(--bg)!important;padding:28px 16px!important;margin-bottom:10px!important}
+#gallery-drop-area:hover{border-color:var(--teal-500)!important;background:var(--teal-50)!important}
+.images-block .upload-zone{border:2px dashed var(--line)!important;background:var(--bg)!important;border-radius:14px!important;padding:28px 16px!important}
+.images-block .upload-zone:hover{border:2px solid var(--teal-500)!important;background:var(--teal-50)!important;box-shadow:none!important;transform:none!important}
+.images-block .upload-zone.dragover{border-color:var(--teal-500)!important;background:var(--teal-50)!important}
+.upload-icon i{color:var(--teal-500)!important}
+
+/* Previsualización galería: quita caja con degradado y límite 500px */
+#gallery-preview-container{background:transparent!important;border:none!important;padding:0!important;max-width:none!important;grid-template-columns:repeat(auto-fill,minmax(90px,1fr))!important;min-height:0!important}
+
+/* Botones wizard: form.css usa .btn-group .btn-primary (2 clases) y gana */
+.btn-group .btn-primary{background:var(--orange-500)!important;color:#fff!important;border:none!important;box-shadow:0 4px 14px rgba(255,138,61,.35)!important;border-radius:12px!important;padding:0 26px!important;height:50px!important;font-size:15px!important}
+.btn-group .btn-primary:hover{background:var(--orange-600)!important;box-shadow:0 6px 18px rgba(255,138,61,.4)!important;transform:translateY(-1px)!important}
+.btn-group .btn-secondary{background:#fff!important;color:var(--ink-700)!important;border:1.5px solid var(--line)!important;border-radius:12px!important;height:50px!important;padding:0 26px!important;font-size:15px!important}
+.btn-group .btn-secondary:hover{border-color:var(--ink-300)!important;color:var(--ink-900)!important;background:#fff!important;transform:none!important}
+
+/* Secciones del form: fuera el fondo pastel turquesa (#F0FAFA) */
+.form-section{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important;border-radius:0!important;margin-bottom:0!important}
+
+/* Footer-navy del wizard → franja fina tinta */
+.wizard-footer-simple{background:var(--ink-900)!important;height:6px!important}
+
+/* Focus de campos: teal nuevo (form.css mezcla teal viejo y violeta) */
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important;background:#fff!important}
+.form-group select:hover,.form-group input:hover,.form-group textarea:hover{border-color:var(--teal-500)!important;box-shadow:none!important}
+
+/* Plan-limit-info y detalles con colores viejos */
+.plan-limit-info{background:var(--teal-50)!important;border-left:4px solid var(--teal-500)!important;color:var(--ink-700)!important}
+/* ============ PATCH v3: GANA LA GUERRA DE ESPECIFICIDAD ============ */
+
+/* Inputs: mata el padding 16px 1px (texto aplastado) y unifica */
+input[type="text"],input[type="email"],input[type="tel"],input[type="number"],textarea,select{
+  border:1.5px solid var(--line)!important;
+  border-radius:11px!important;
+  padding:12px 14px!important;
+  font-size:16px!important;
+  background:#fff!important;
+}
+input[type="text"]:focus,input[type="email"]:focus,input[type="tel"]:focus,input[type="number"]:focus,textarea:focus,select:focus{
+  border-color:var(--teal-500)!important;
+  box-shadow:0 0 0 3px var(--teal-50)!important;
+  background:#fff!important;
+}
+
+/* Labels de primary-section: visibles en TODAS las pantallas (bug blanco) */
+.primary-section label{color:var(--ink-900)!important}
+.primary-section label .required{color:var(--orange-500)!important}
+.primary-section label .char-count{color:var(--ink-300)!important}
+.contact-block label,.images-block label{color:var(--ink-900)!important}
+label{color:var(--ink-900)!important;font-size:13.5px!important;font-weight:600!important}
+
+/* Badges de planes: mostrarlos (estilo nuevo) */
+.plan-badge-label{display:inline-block!important;margin-bottom:8px}
+
+/* Drop zones: igualar especificidad del ID y recolorar */
+#gallery-drop-area.upload-zone{border:2px dashed var(--line)!important;background-color:var(--bg)!important;background-image:none!important;border-radius:14px!important}
+#gallery-drop-area.upload-zone:hover{border-color:var(--teal-500)!important;background-color:var(--teal-50)!important;box-shadow:none!important;transform:none!important}
+.file-input-wrapper{border:1.5px solid var(--line)!important;background:#fff!important;background-image:none!important;border-radius:14px!important}
+.file-input-wrapper:hover{border-color:var(--teal-500)!important;background:var(--teal-50)!important}
+.upload-placeholder-icon{color:var(--teal-500)!important}
+#cover-image-preview{border:2px dashed var(--teal-500)!important;background:var(--teal-50)!important;border-radius:12px!important}
+
+/* Contadores y detalles con color nuevo */
+.char-count{color:var(--ink-300)!important}
+.terms-agreement input[type="checkbox"]{accent-color:var(--teal-500)!important}
+.terms-agreement a{color:var(--teal-600)!important;border-bottom-color:var(--teal-600)!important}
+.benefits-list-h li{color:var(--ink-700)!important;font-size:13.5px!important;border-bottom:1px solid var(--bg)!important}
+
+/* Botón seleccionar plan: estados limpios */
+.plan-button-h{background:#fff!important;color:var(--ink-700)!important;border:1.5px solid var(--line)!important;border-radius:11px!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;height:44px;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.plan-card-h.selected .plan-button-h{background:var(--teal-500)!important;color:#fff!important;border-color:var(--teal-500)!important}
+.plan-card-h.selected{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important}
+
+/* Títulos de planes a tinta */
+.plan-title-h{color:var(--ink-900)!important;font-size:19px!important;letter-spacing:.02em!important}
+.plan-price-h{color:var(--ink-900)!important;font-size:30px!important}
+.plan-duration-h{color:var(--ink-500)!important;text-transform:none!important;font-size:12.5px!important}
+
+/* Secciones: sin degradados grises */
+.contact-block,.video-block,.images-block{background:#fff!important;border:1px solid var(--line)!important;border-radius:14px!important;box-shadow:none!important}
+.attribute-section{background:var(--bg)!important;border:1px solid var(--line)!important;border-radius:14px!important}
+.section-block:hover{box-shadow:var(--shadow-sm)!important}
+/* ============ PATCH v4: PRICING PRO ============ */
+
+/* 1. Cada tarjeta con su altura natural — adiós hueco vacío */
+.plans-container-horizontal{align-items:start!important}
+
+/* 2. Compactar: menos padding y aire interno */
+.plan-card-h{padding:22px 18px!important}
+.plan-top-section{padding:0 0 14px!important;border-bottom:none!important}
+.plan-middle-section{margin:14px 0 16px!important;padding:0!important}
+.benefits-list-h{gap:0!important}
+.benefits-list-h li{padding:7px 0!important;font-size:13px!important;gap:9px!important;border-bottom:1px solid var(--bg)!important;line-height:1.4!important}
+.benefits-list-h li i{font-size:12px!important}
+.plan-bottom-section{margin-top:0!important}
+
+/* 3. Tipografía del encabezado: nombre chiquito, precio protagonista */
+.plan-title-h{font-size:16px!important;letter-spacing:.08em!important}
+.plan-price-h{font-size:36px!important;line-height:1!important;margin:4px 0!important}
+.plan-duration-h{font-size:12px!important;margin:2px 0 0!important}
+.plan-title-h,.plan-price-h,.plan-duration-h{width:100%!important;text-align:center!important;margin-left:0!important;margin-right:0!important}
+
+/* 4. Botón seleccionar: full width, compacto */
+.plan-select-h .plan-button-h{height:42px!important;font-size:13.5px!important;font-weight:700!important}
+
+/* 5. HERO: el plan DESTACADO elevado con acento naranja (el más vendido) */
+.destacado-plan{
+  border-color:var(--orange-500)!important;
+  box-shadow:0 14px 40px rgba(255,138,61,.22)!important;
+  transform:translateY(-10px)!important;
+  z-index:2;
+}
+.destacado-plan .plan-badge-label{
+  background:var(--orange-500)!important;
+  color:#fff!important;
+}
+.destacado-plan .plan-price-h{color:var(--orange-500)!important}
+/* Al seleccionar el destacado, gana el teal (estado de elección) */
+.destacado-plan.selected{
+  border-color:var(--teal-500)!important;
+  box-shadow:0 0 0 3px var(--teal-50)!important;
+  transform:translateY(-10px)!important;
+}
+
+/* 6. Hover uniforme y sutil en todas */
+.plan-card-h:hover{transform:translateY(-4px)!important;box-shadow:var(--shadow-md)!important}
+.destacado-plan:hover{transform:translateY(-10px)!important}
+/* ============ PATCH v5: TARJETAS ALINEADAS ============ */
+
+/* 1. Todas las tarjetas a la misma altura (la del más alto) */
+.plans-container-horizontal{align-items:stretch!important}
+.plan-card-h{height:100%!important;transform:none!important}
+
+/* 2. El destacado se destaca por color, NO por elevación (para alinear precios) */
+.destacado-plan{box-shadow:0 10px 32px rgba(255,138,61,.20)!important}
+.destacado-plan:hover{transform:translateY(-4px)!important}
+
+/* 3. Los beneficios ocupan el espacio libre y el botón queda anclado abajo */
+.plan-middle-section{flex:1!important}
+.plan-bottom-section{margin-top:auto!important}
+
+/* 4. Botones de seleccionar a la misma altura en todas las tarjetas */
+.plan-select-h .plan-button-h{height:42px!important}
+/* ============ PATCH v6: LÍNEA DE PRECIOS PERFECTA ============ */
+
+/* Badge SIEMPRE en el flujo (el .premium-badge viejo era absolute y descuadraba) */
+.plan-card-h .plan-badge-label{
+  position:static!important;
+  top:auto!important;right:auto!important;left:auto!important;bottom:auto!important;
+  transform:none!important;
+  display:inline-block!important;
+  margin:0 auto 8px!important;
+}
+
+/* Zona superior con altura reservada: los 4 precios quedan en la misma línea */
+.plan-top-section{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  min-height:120px!important;
+}
+/* ============ PATCH v7: ANCHO REAL DEL WIZARD ============ */
+main.container.publish-wizard{width:100%!important}
+/* ============ PATCH v9: WRAPPER DE PRECIO LIMPIO ============ */
+/* Caja unida: $ a la izquierda compacto + input que fluye después (flex maneja el espacio) */
+.price-input-wrapper{
+  display:flex!important;
+  align-items:stretch!important;
+  border:1.5px solid var(--line)!important;
+  border-radius:11px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+.price-input-wrapper:focus-within{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important}
+
+/* El $ : compacto, altura completa, tipografía sobria */
+.price-input-wrapper .currency-symbol{
+  display:flex!important;
+  align-items:center!important;
+  padding:0 12px!important;
+  background:var(--bg)!important;
+  color:var(--ink-500)!important;
+  font-size:15px!important;
+  font-weight:700!important;
+  border-right:1.5px solid var(--line)!important;
+}
+
+/* El input: SIN padding-left extra (flex ya lo separa del $) y sin bordes propios */
+.price-input-wrapper input{
+  border:none!important;
+  padding:12px 14px!important;
+  flex:1!important;
+  min-width:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+/* ============ PATCH v10: $ EN SU LUGAR (mata absolute viejo) ============ */
+.price-input-wrapper .currency-symbol{
+  position:static!important;
+  inset:auto!important;
+  transform:none!important;
+  float:none!important;
+  width:auto!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.price-input-wrapper{position:relative!important}
+
+/* Botón IA: su neón se queda (es tu firma), solo normalizamos el estado */

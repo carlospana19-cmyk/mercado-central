@@ -119,3 +119,11 @@
 .cat-count{margin-left:auto;font-size:12.5px;color:var(--ink-300);font-weight:500}
 /* Prevención: mismo bug potencial de encogimiento */
 .results-page{width:100%}
+/* ============ PATCH v3: BOTÓN CONTACTAR SIEMPRE AL FONDO ============ */
+/* margin-top:auto ancla el botón al fondo; el gap del contenedor (6px)
+   garantiza el aire mínimo cuando hay muchos atributos */
+.btn-contact,.btn-contact-card,.btn-ver-detalles{
+  margin-top:auto!important;
+}
+/* Asegura que la zona de detalles estire para empujar el botón */
+.property-card .property-details,.box .content,.property-details{flex:1!important}

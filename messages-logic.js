@@ -30,11 +30,14 @@ export async function initMessagesSection(){
   await loadConversations();
   subscribeGlobal();
 
-  // Deep-link: panel-unificado.html?chat=<id>
-  const target = new URLSearchParams(window.location.search).get('chat');
+  // Deep-link: ?chat=<id> abre conversación; ?tab=mensajes abre el buzón
+  const params = new URLSearchParams(window.location.search);
+  const target = params.get('chat');
   if(target){
     document.querySelector('.tab-btn[data-tab="mensajes"]')?.click();
     openConversation(target);
+  } else if(params.get('tab') === 'mensajes'){
+    document.querySelector('.tab-btn[data-tab="mensajes"]')?.click();
   }
 }
 

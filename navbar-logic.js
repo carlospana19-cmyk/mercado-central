@@ -60,6 +60,14 @@ export async function initializeNavbar() {
         // Botón de publicar redirige directamente a publicar.html
         if (btnPublish) btnPublish.onclick = () => window.location.href = 'publicar.html';
     }
+            // FASE 4D: mostrar botón de mensajes y actualizar badge
+        const btnMessages = document.getElementById('btn-messages');
+        if (btnMessages) {
+            btnMessages.style.display = 'inline-block';
+            btnMessages.onclick = () => window.location.href = 'panel-unificado.html?tab=mensajes';
+        }
+        updateMessagesBadge();
+        subscribeMessagesBadge();
 
     function showGuestView() {
         // Mostrar botones de invitado
@@ -68,6 +76,8 @@ export async function initializeNavbar() {
         if (btnPublish) btnPublish.style.display = 'inline-block';
         if (btnDashboard) btnDashboard.style.display = 'none';
         if (btnLogout) btnLogout.style.display = 'none';
+                const btnMessagesGuest = document.getElementById('btn-messages');
+        if (btnMessagesGuest) btnMessagesGuest.style.display = 'none';
         // Botón de publicar redirige a planes para invitados
         if (btnPublish) btnPublish.onclick = () => window.location.href = 'publicar.html';
     }
@@ -95,6 +105,52 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
             }
         }
     }, 100);
+}
+// --- FASE 4D: BADGE DE MENSAJES SIN LEER ---
+async function updateMessagesBadge() {
+    const btnMessages = document.getElementById('btn-messages');
+    const badge = document.getElementById('messages-badge');
+    if (!btnMessages || !badge) return;
+
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // 1. Mis conversaciones (como comprador o vendedor)
+        const { data: convs } = await supabase
+            .from('conversaciones')
+            .select('id')
+            .or(`comprador_id.eq.${user.id},vendedor_id.eq.${user.id}`);
+
+        if (!convs || convs.length === 0) { badge.style.display = 'none'; return; }
+
+        // 2. Mensajes no leídos que no escribí yo
+        const { count } = await supabase
+            .from('mensajes')
+            .select('id', { count: 'exact', head: true })
+            .eq('leido', false)
+            .neq('emisor_id', user.id)
+            .in('conversacion_id', convs.map(c => c.id));
+
+        if (count && count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = 'grid';
+        } else {
+            badge.style.display = 'none';
+        }
+    } catch (e) {
+        console.warn('Error actualizando badge de mensajes:', e);
+    }
+}
+
+// El badge se actualiza en vivo: si llega un mensaje mientras navegas, suma solo
+function subscribeMessagesBadge() {
+    if (window._mcBadgeChannel) return;
+    window._mcBadgeChannel = supabase
+        .channel('mc-navbar-badge')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'mensajes' }, () => updateMessagesBadge())
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversaciones' }, () => updateMessagesBadge())
+        .subscribe();
 }
 
 // Exponer la función también en window para load-components.js
