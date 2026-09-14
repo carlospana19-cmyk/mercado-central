@@ -8,12 +8,11 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="form.css">
     <link rel="stylesheet" href="panel-unificado.css">
-        <link rel="stylesheet" href="mc-messages.css?v=1">
+    <link rel="stylesheet" href="mc-messages.css?v=1">
+    <link rel="stylesheet" href="mc-base.css?v=7">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="panel-unificado.css">
-    <link rel="stylesheet" href="mc-base.css?v=4">
-        <script type="module" src="messages-logic.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 </head>
 <body id="panel-unificado-page">
     <!-- NAVBAR -->
@@ -62,7 +61,7 @@
         </section>
 
         <!-- TABS DE NAVEGACIÓN -->
-               <div class="panel-tabs">
+        <div class="panel-tabs">
             <button class="tab-btn active" data-tab="anuncios">
                 <i class="fas fa-list"></i> Mis Anuncios
             </button>
@@ -77,14 +76,27 @@
             </button>
         </div>
 
-              <!-- CONTENIDO DE MENSAJES (Fase 4C) -->
+        <!-- CONTENIDO DE ANUNCIOS -->
+        <section class="tab-content active" id="anuncios-tab">
+            <div class="anuncios-header">
+                <h2>Mis Anuncios</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="todos">Todos</button>
+                    <button class="filter-btn" data-filter="activos">Activos</button>
+                    <button class="filter-btn" data-filter="vendidos">Vendidos</button>
+                </div>
+            </div>
+            <div id="my-ads-container" class="anuncios-grid">
+                <p class="loading-message">Cargando tus anuncios...</p>
+            </div>
+        </section>
+
+        <!-- CONTENIDO DE MENSAJES (Fase 4C) -->
         <section class="tab-content" id="mensajes-tab">
             <div class="messages-layout" id="messages-layout">
-                <!-- Lista de conversaciones -->
                 <div class="convs-list" id="convs-list">
                     <p class="loading-message">Cargando conversaciones…</p>
                 </div>
-                <!-- Panel de chat -->
                 <div class="chat-panel">
                     <div class="chat-empty" id="chat-empty">
                         <i class="fas fa-comments"></i>
@@ -107,11 +119,10 @@
             <div class="perfil-content">
                 <h2>Editar Mi Perfil</h2>
 
-                <!-- FORMULARIO DE DATOS DEL PERFIL -->
                 <form id="profile-form" class="profile-form-unified">
                     <div class="form-section">
                         <h3>Información Personal</h3>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="full-name">Nombre Completo</label>
@@ -143,7 +154,7 @@
 
                     <div class="form-section">
                         <h3>Información de Negocio</h3>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="business-name">Nombre del Negocio / Marca</label>
@@ -175,7 +186,7 @@
 
                     <div class="form-section">
                         <h3>Ubicación</h3>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="location-province">Provincia</label>
@@ -213,7 +224,6 @@
             <div class="reviews-content">
                 <h2>Mis Reseñas</h2>
 
-                <!-- SUBTABS PARA RESEÑAS RECIBIDAS Y DADAS -->
                 <div class="reviews-subtabs">
                     <button class="subtab-btn active" data-subtab="received">
                         <i class="fas fa-inbox"></i> Reseñas Recibidas
@@ -223,20 +233,16 @@
                     </button>
                 </div>
 
-                <!-- CONTENIDO DE RESEÑAS RECIBIDAS -->
                 <div class="subtab-content active" id="received-reviews">
                     <div class="reviews-header">
                         <h3>Reseñas de mis compradores</h3>
-                        <div id="seller-stats" class="seller-stats">
-                            <!-- Las estadísticas se cargarán aquí -->
-                        </div>
+                        <div id="seller-stats" class="seller-stats"></div>
                     </div>
                     <div id="received-reviews-list" class="reviews-list">
                         <p class="loading-message">Cargando reseñas...</p>
                     </div>
                 </div>
 
-                <!-- CONTENIDO DE RESEÑAS DADAS -->
                 <div class="subtab-content" id="given-reviews">
                     <div class="reviews-header">
                         <h3>Reseñas que he dado</h3>
@@ -250,13 +256,15 @@
         </section>
     </main>
 
-    <!-- FOOTER PREMIUM -->
+    <!-- FOOTER -->
     <div id="footer-container"></div>
 
+    <!-- SCRIPTS (todos juntos, al final) -->
     <script type="module" src="supabase-client.js"></script>
     <script type="module" src="panel-unificado-logic.js"></script>
-<script type="module" src="navbar-logic.js"></script>
-<script src="load-components.js" defer></script>
+    <script type="module" src="messages-logic.js"></script>
+    <script type="module" src="navbar-logic.js"></script>
+    <script src="load-components.js" defer></script>
 
 </body>
 </html>

@@ -1,5 +1,6 @@
 import { supabase } from './supabase-client.js';
 import { checkUserLoggedIn } from './auth-logic.js';
+import { districtsByProvince } from './config-locations.js';
 import {
     getSellerReviews,
     getSellerReviewStats,

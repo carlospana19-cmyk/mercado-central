@@ -168,7 +168,6 @@ function subscribeGlobal(){
   if(channelGlobal) return;
   channelGlobal = supabase.channel('mc-buzon')
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'mensajes' }, payload => {
-      // Mensaje en otra conversación → refrescar lista (badges y orden)
       if(payload.new.conversacion_id !== currentConvId) loadConversations();
     })
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'conversaciones' }, () => loadConversations())
@@ -187,7 +186,7 @@ function bindChatForm(){
     input.value = '';
     try{
       const msg = await sendMessage(currentConvId, text);
-      appendMessage(msg); // ID real de la BD → el anti-duplicados reconoce el del Realtime
+      appendMessage(msg);
       loadConversations();
     }catch(err){
       console.error('Error enviando:', err);

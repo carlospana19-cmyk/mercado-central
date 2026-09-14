@@ -10,8 +10,8 @@
   --radius-lg:16px; --radius-sm:10px;
   --shadow-sm:0 1px 2px rgba(18,33,41,.06),0 2px 8px rgba(18,33,41,.05);
   --shadow-md:0 6px 24px rgba(18,33,41,.10);
-  --font-ui:'Inter','Poppins',system-ui,sans-serif;
-  --font-display:'Poppins','Inter',system-ui,sans-serif;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+--font-display:'Poppins','Inter',system-ui,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -85,3 +85,50 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
 /* ============ VACUNA ANTI-ENCOGIMIENTO ============ */
 /* Todos los main son hijos flex del body: siempre ocupan todo el ancho */
 main{width:100%}
+/* ============ PATCH v6: FOOTER sobre style.css ============ */
+/* Fuentes: mata el selector universal * de style.css dentro del footer */
+.footer *:not(i){font-family:var(--font-ui)!important}
+.footer .footer-title,.footer .footer-col h4{font-family:var(--font-display)!important}
+
+/* Colores y estructura del footer nuevo, con escudo contra el viejo */
+.footer{background:var(--ink-900)!important;border-top:none!important;padding:56px clamp(16px,4vw,40px) 0!important}
+.footer-contenedor{display:grid!important;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:40px;max-width:1240px;margin:0 auto}
+.footer-title,.footer-col h4{color:#fff!important;font-size:14px!important;font-weight:600!important;margin-bottom:16px!important;letter-spacing:.1em!important}
+.footer-title::after,.footer-col h4::after{display:none!important}
+.footer-col p,.footer-col a,.footer-subtitle{color:#B7C4C0!important;font-size:14.5px!important}
+.footer-col a:hover{color:#2EC4B6!important;padding-left:0!important}
+.social-links a{display:inline-flex;align-items:center;gap:10px}
+.social-links a img{width:22px!important;height:22px!important;object-fit:contain}
+.payment-icons i{color:#8FA39E!important}
+.payment-icons i:hover{color:#2EC4B6!important}
+.store-badge-placeholder{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.12)!important;color:#B7C4C0!important}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08)!important;margin-top:40px!important;padding:20px 0!important}
+.footer-bottom p{margin:0;font-size:13.5px;color:#8FA39E!important}
+@media(max-width:900px){.footer-contenedor{grid-template-columns:1fr 1fr!important}}
+@media(max-width:560px){.footer-contenedor{grid-template-columns:1fr!important;gap:28px}}
+/* ============ PATCH v7: ACCIONES DE TARJETAS DEL PANEL ============ */
+.dashboard-card{display:flex!important;flex-direction:column!important;background:var(--card)!important;border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden!important;box-shadow:var(--shadow-sm)!important;position:relative}
+.dashboard-ad-actions{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:12px 14px!important;margin-top:auto!important;border-top:1px solid var(--line)!important;background:var(--bg)!important}
+.dashboard-ad-actions .btn-view,
+.dashboard-ad-actions .btn-edit,
+.dashboard-ad-actions .btn-sold,
+.dashboard-ad-actions .btn-delete{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+  height:36px!important;padding:0 12px!important;border-radius:9px!important;
+  font-weight:600!important;font-size:13px!important;font-family:var(--font-ui)!important;
+  border:1.5px solid var(--line)!important;background:#fff!important;color:var(--ink-700)!important;
+  cursor:pointer!important;text-decoration:none!important;transition:all .2s!important;opacity:1!important;visibility:visible!important;
+}
+.dashboard-ad-actions .btn-view:hover{border-color:var(--teal-500)!important;color:var(--teal-600)!important}
+.dashboard-ad-actions .btn-edit{background:var(--teal-500)!important;border-color:var(--teal-500)!important;color:#fff!important}
+.dashboard-ad-actions .btn-edit:hover{background:var(--teal-600)!important}
+.dashboard-ad-actions .btn-sold{border-color:var(--teal-500)!important;color:var(--teal-600)!important}
+.dashboard-ad-actions .btn-delete{border-color:rgba(220,53,69,.4)!important;color:#dc3545!important}
+.dashboard-ad-actions .btn-delete:hover{background:#dc3545!important;color:#fff!important}
+/* Título y precio de la tarjeta del panel */
+.dashboard-ad-title h3{font-family:var(--font-ui)!important;font-size:15px!important;font-weight:600!important;color:var(--ink-900)!important;margin:0!important;line-height:1.35!important}
+.dashboard-ad-price{font-family:var(--font-display)!important;font-size:19px!important;font-weight:700!important;color:var(--ink-900)!important}
+.dashboard-ad-category{font-size:12.5px!important;color:var(--ink-500)!important}
+.dashboard-ad-category i{color:var(--teal-500)!important}
+.badge-sold{position:absolute!important;top:10px!important;left:10px!important;z-index:5!important;background:var(--ink-900)!important;color:#fff!important;font-size:11px!important;font-weight:700!important;letter-spacing:.08em!important;padding:5px 12px!important;border-radius:99px!important}
+.dashboard-card.card-sold .dashboard-ad-image{filter:grayscale(.7) brightness(.85)!important}
