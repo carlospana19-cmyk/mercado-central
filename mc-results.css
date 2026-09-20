@@ -133,3 +133,58 @@
 
 /* Asegura altura de imagen consistente en tarjetas (por si el JS la referencian) */
 .ad-card img,.property-card img{width:100%;height:100%;object-fit:cover}
+/* ============ PATCH: FLECHAS ESTILO YOUTUBE (círculo blanco) ============ */
+/* Cubre TODAS las clases que generan carruseles dentro de tarjetas */
+.box .swiper-button-next,
+.box .swiper-button-prev,
+.product-swiper .swiper-button-next,
+.product-swiper .swiper-button-prev,
+.mini-gallery .swiper-button-next,
+.mini-gallery .swiper-button-prev,
+.product-gallery-swiper .swiper-button-next,
+.product-gallery-swiper .swiper-button-prev,
+.tarjeta-auto .swiper-button-next,
+.tarjeta-auto .swiper-button-prev{
+  width:36px!important;
+  height:36px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  box-shadow:0 2px 10px rgba(18,33,41,.30)!important;
+  opacity:1!important;
+  transition:transform .15s ease, box-shadow .15s ease!important;
+}
+/* El chevron: oscuro y grueso (Swiper usa la fuente swiper-icons con color) */
+.box .swiper-button-next::after,
+.box .swiper-button-prev::after,
+.product-swiper .swiper-button-next::after,
+.product-swiper .swiper-button-prev::after,
+.mini-gallery .swiper-button-next::after,
+.mini-gallery .swiper-button-prev::after,
+.product-gallery-swiper .swiper-button-next::after,
+.product-gallery-swiper .swiper-button-prev::after,
+.tarjeta-auto .swiper-button-next::after,
+.tarjeta-auto .swiper-button-prev::after{
+  font-size:15px!important;
+  font-weight:900!important;
+  color:var(--ink-900)!important;
+}
+/* Hover: crecen un pelito y la sombra sube */
+.box .swiper-button-next:hover,
+.box .swiper-button-prev:hover,
+.product-swiper .swiper-button-next:hover,
+.product-swiper .swiper-button-prev:hover,
+.mini-gallery .swiper-button-next:hover,
+.mini-gallery .swiper-button-prev:hover,
+.product-gallery-swiper .swiper-button-next:hover,
+.product-gallery-swiper .swiper-button-prev:hover,
+.tarjeta-auto .swiper-button-next:hover,
+.tarjeta-auto .swiper-button-prev:hover{
+  transform:scale(1.1)!important;
+  box-shadow:0 4px 14px rgba(18,33,41,.35)!important;
+  background:#fff!important;
+}
+/* Posición dentro de la imagen */
+.mini-gallery .swiper-button-prev,
+.product-gallery-swiper .swiper-button-prev{left:10px!important}
+.mini-gallery .swiper-button-next,
+.product-gallery-swiper .swiper-button-next{right:10px!important}

@@ -175,22 +175,26 @@ export async function getSellerReviewStats(sellerId) {
     }
 }
 
-// Verificar si el usuario ya reseñó a un vendedor
+// Verifica si el usuario ya calificó a este vendedor (consulta directa, sin RPC)
 export async function hasUserReviewedSeller(sellerId) {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return false;
 
         const { data, error } = await supabase
-            .rpc('has_user_reviewed_seller', {
-                reviewer_uuid: user.id,
-                seller_uuid: sellerId
-            });
+            .from('reviews')
+            .select('id')
+            .eq('reviewer_id', user.id)
+            .eq('seller_id', sellerId)
+            .maybeSingle();
 
-        if (error) throw error;
-        return data || false;
-    } catch (error) {
-        console.error('Error verificando reseña existente:', error);
+        if (error) {
+            console.error('Error verificando reseña existente:', error);
+            return false; // ante la duda, permitir el flujo
+        }
+        return !!data; // true si ya existe una reseña
+    } catch (e) {
+        console.error('Error verificando reseña existente:', e);
         return false;
     }
 }

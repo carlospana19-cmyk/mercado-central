@@ -71,13 +71,7 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
 .social-links a{display:inline-flex;align-items:center;gap:10px;margin-bottom:10px}
 .social-links i{width:20px;text-align:center;font-size:16px}
 .footer-bottom{max-width:1240px;margin:40px auto 0;padding:20px 0;border-top:1px solid rgba(255,255,255,.08);text-align:center;font-size:13.5px;color:#8FA39E}
-/* ============ PATCH: coexistencia con style.css (navbar) ============ */
-#btn-publish-logged-in{background:var(--orange-500)!important;color:#fff!important;border:none!important;box-shadow:0 4px 14px rgba(255,138,61,.35)!important}
-#btn-publish-logged-in:hover{background:var(--orange-600)!important;color:#fff!important}
-#btn-login{background:#fff!important;color:var(--teal-600)!important;border:1.5px solid var(--teal-500)!important}
-#btn-login:hover{background:var(--teal-50)!important;border-color:var(--teal-600)!important}
-#btn-dashboard,#btn-logout{background:transparent!important;color:var(--ink-500)!important;border:1.5px solid var(--line)!important}
-#btn-dashboard:hover,#btn-logout:hover{background:#fff!important;color:var(--ink-900)!important;border-color:var(--ink-300)!important}
+
 /* ============ FASE 4D: BOTÓN MENSAJES + BADGE ============ */
 #btn-messages{position:relative;background:transparent!important;color:var(--ink-700)!important;border:1.5px solid var(--line)!important}
 #btn-messages:hover{background:#fff!important;color:var(--teal-600)!important;border-color:var(--teal-500)!important}

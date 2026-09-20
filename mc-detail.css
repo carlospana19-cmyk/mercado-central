@@ -174,3 +174,144 @@
 .reviews-list .review-date{font-size:12.5px;color:var(--ink-300)}
 .reviews-list .review-rating{color:var(--gold);font-size:13px;display:flex;gap:2px}
 .reviews-list .review-comment{margin-top:10px;font-size:14.5px;line-height:1.6;color:var(--ink-700)}
+/* ============ MODAL DE RESEÑAS (ex-style.css, rediseñado) ============ */
+/* Overlay: fondo oscuro con blur, centrado absoluto */
+.review-modal-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10000!important;
+  background:rgba(18,33,41,.55)!important;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:20px!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  transition:opacity .25s ease!important;
+}
+.review-modal-overlay.active{
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+
+/* Tarjeta del modal */
+.review-modal{
+  background:#fff!important;
+  border-radius:18px!important;
+  width:min(480px,100%)!important;
+  max-height:90vh!important;
+  overflow-y:auto!important;
+  padding:24px!important;
+  box-shadow:0 24px 60px rgba(18,33,41,.35)!important;
+  transform:translateY(16px) scale(.97)!important;
+  transition:transform .25s ease!important;
+}
+.review-modal-overlay.active .review-modal{
+  transform:none!important;
+}
+
+/* Header */
+.review-modal .modal-header{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  margin-bottom:18px!important;
+}
+.review-modal .modal-header h3{
+  font-family:var(--font-display)!important;
+  font-size:19px!important;
+  font-weight:700!important;
+  color:var(--ink-900)!important;
+  margin:0!important;
+}
+.review-modal .modal-close{
+  width:36px!important;height:36px!important;
+  border-radius:50%!important;
+  border:1.5px solid var(--line)!important;
+  background:#fff!important;
+  display:grid!important;place-items:center!important;
+  cursor:pointer!important;color:var(--ink-500)!important;
+  transition:all .2s!important;
+}
+.review-modal .modal-close:hover{color:var(--ink-900)!important;border-color:var(--ink-300)!important}
+
+/* Sección de calificación */
+.review-modal .rating-section{margin-bottom:16px!important}
+.review-modal .rating-section label{
+  display:block!important;
+  font-size:13.5px!important;font-weight:600!important;
+  color:var(--ink-900)!important;margin-bottom:10px!important;
+}
+/* Estrellas (cubre las variantes de clase que StarRating pueda usar) */
+.star-rating-container{display:flex!important;gap:6px!important;justify-content:center!important}
+.star-rating-container i{
+  font-size:30px!important;
+  color:var(--ink-300)!important;
+  cursor:pointer!important;
+  transition:color .15s,transform .15s!important;
+}
+.star-rating-container i:hover{transform:scale(1.15)!important}
+.star-rating-container i.active,
+.star-rating-container i.filled,
+.star-rating-container i.selected,
+.star-rating-container i.on,
+.star-rating-container i.text-warning,
+.star-rating-container i.fas{
+  color:var(--gold)!important;
+}
+
+/* Comentario */
+.review-modal .comment-section label{
+  display:block!important;
+  font-size:13.5px!important;font-weight:600!important;
+  color:var(--ink-900)!important;margin-bottom:8px!important;
+}
+#review-comment{
+  width:100%!important;
+  border:1.5px solid var(--line)!important;
+  border-radius:11px!important;
+  padding:12px 14px!important;
+  font-size:16px!important;
+  font-family:var(--font-ui)!important;
+  color:var(--ink-900)!important;
+  background:#fff!important;
+  resize:vertical!important;min-height:100px!important;
+  outline:none!important;
+  transition:border-color .2s,box-shadow .2s!important;
+  box-sizing:border-box!important;
+}
+#review-comment:focus{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important}
+.review-modal .char-counter{
+  text-align:right!important;
+  font-size:12px!important;
+  color:var(--ink-300)!important;
+  margin-top:5px!important;
+}
+
+/* Footer + botones */
+.review-modal .modal-footer{
+  display:flex!important;
+  gap:10px!important;
+  justify-content:flex-end!important;
+  margin-top:18px!important;
+}
+#review-cancel{
+  height:44px!important;padding:0 20px!important;
+  border-radius:11px!important;
+  border:1.5px solid var(--line)!important;
+  background:#fff!important;color:var(--ink-700)!important;
+  font-weight:600!important;font-size:14px!important;cursor:pointer!important;
+}
+#review-cancel:hover{border-color:var(--ink-300)!important;color:var(--ink-900)!important}
+#review-submit{
+  height:44px!important;padding:0 22px!important;
+  border-radius:11px!important;border:none!important;
+  background:var(--teal-500)!important;color:#fff!important;
+  font-weight:700!important;font-size:14px!important;cursor:pointer!important;
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  transition:background .2s!important;
+}
+#review-submit:hover:not(:disabled){background:var(--teal-600)!important}
+#review-submit:disabled{opacity:.5!important;cursor:not-allowed!important}
