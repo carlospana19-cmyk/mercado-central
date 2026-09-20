@@ -275,3 +275,5 @@
 .categories-horizontal-bar{justify-content:flex-start}
 .category-item:first-child{margin-left:auto}
 .category-item:last-child{margin-right:auto}
+/* ============ TRANSPLANTE desde home.css (Fase 6) ============ */
+.mobile-banner{display:none!important}

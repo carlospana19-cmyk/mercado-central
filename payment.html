@@ -9,9 +9,37 @@
     <link rel="stylesheet" href="style.css">
       <link rel="stylesheet" href="mc-base.css?v=7">
   <link rel="stylesheet" href="mc-auth.css?v=1">
-    <link rel="stylesheet" href="publish.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
+                /* Badge de Yappy (marca: verde lima del Banco General) */
+        .yappy-badge{
+            display:inline-block;
+            background:#97D700;
+            color:#fff;
+            font-weight:800;
+            font-size:15px;
+            letter-spacing:0.5px;
+            padding:4px 14px;
+            border-radius:8px;
+            font-family:'Poppins',sans-serif;
+        }
+        /* Logos de tarjetas aceptadas */
+        .accepted-cards{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:12px;
+            margin-top:14px;
+            font-size:12px;
+            color:#666;
+        }
+        .accepted-cards i{
+            font-size:28px;
+            color:#555;
+        }
+        .accepted-cards .fa-cc-visa{color:#1A1F71}
+        .accepted-cards .fa-cc-mastercard{color:#EB001B}
+        .accepted-cards .fa-cc-amex{color:#2E77BC}
         .payment-container {
             max-width: 1000px;
             margin: 0 auto;
@@ -245,30 +273,12 @@
     </style>
 </head>
 <body>
+    
     <!-- NAVBAR MODERNO -->
-    <nav class="navbar-moderno">
-        <div class="logo-container">
-            <a href="index.html" class="logo-link">
-                <img src="logo-mercado-central.jpg" alt="Mercados Central" class="logo-img">
-                <span class="logo-text">Mercados Central</span>
-            </a>
-        </div>
+        <div id="navbar-container"></div>
+      
         
-        <div class="buttons-nav">
-            <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
-                <i class="fas fa-user"></i>
-            </button>
-            <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
-                <i class="fas fa-plus"></i> Publicar anuncio
-            </button>
-            <button id="btn-logout" class="nav-btn-user" style="display: none;">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </button>
-            <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
-                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-            </button>
-        </div>
-    </nav>
+       
 
     <!-- Payment Container -->
     <div class="payment-container">
@@ -311,12 +321,12 @@
             <div class="payment-form">
                 <h2>Información de Pago</h2>
                 
-                <div class="payment-methods">
+                                <div class="payment-methods">
                     <button class="payment-method-btn active" data-method="card">
-                        💳 Tarjeta
+                        <i class="fas fa-credit-card"></i> Tarjeta
                     </button>
-                    <button class="payment-method-btn" data-method="paypal">
-                        🅿️ PayPal
+                    <button class="payment-method-btn" data-method="paypal" id="yappyBtn">
+                        <span class="yappy-badge">Yappy</span>
                     </button>
                 </div>
 
@@ -348,7 +358,9 @@
                     </div>
                 </div>
 
-                <div id="paypalForm" style="display: none;">
+                                    <p style="font-size: 13px; color: #666; margin-top: 10px;">
+                        El pago con Yappy se habilitará próximamente. Mientras tanto, usa el pago con tarjeta.
+                    </p>
                     <div class="form-group">
                         <label>Email de PayPal</label>
                         <input type="email" id="paypalEmail" placeholder="tu@paypal.com">
@@ -366,6 +378,12 @@
                 </label>
 
                 <button class="btn-pay" id="processPaymentBtn">Pagar Ahora</button>
+                                <div class="accepted-cards">
+                    <i class="fab fa-cc-visa" title="Visa"></i>
+                    <i class="fab fa-cc-mastercard" title="MasterCard"></i>
+                    <i class="fab fa-cc-amex" title="American Express"></i>
+                    <span>Aceptamos estas tarjetas</span>
+                </div>
 
                 <a class="back-link" onclick="history.back()">← Volver</a>
             </div>
@@ -377,12 +395,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const selectedPlan = urlParams.get('plan');
 
-        const planDetails = {
-            'basico': { name: 'Plan Básico', price: 5.99 },
-            'premium': { name: 'Plan Premium', price: 9.99 },
-            'destacado': { name: 'Plan Destacado', price: 14.99 },
-            'top': { name: 'Plan Top', price: 19.99 }
-        };
+       const planDetails = {
+    'basico': { name: 'Plan Básico', price: 10.00 },
+    'premium': { name: 'Plan Premium', price: 20.00 },
+    'destacado': { name: 'Plan Destacado', price: 30.00 }
+};
 
         const plan = planDetails[selectedPlan];
 
@@ -390,7 +407,7 @@
             document.getElementById('planName').textContent = plan.name;
             document.getElementById('planPrice').textContent = `$${plan.price.toFixed(2)}`;
             
-            const tax = plan.price * 0.16; // 16% IVA
+            const tax = plan.price * 0.07; // ITBMS 7%
             document.getElementById('taxAmount').textContent = `$${tax.toFixed(2)}`;
             
             const total = plan.price + tax;
@@ -462,5 +479,8 @@
             e.target.value = value;
         });
     </script>
+        <script type="module" src="main.js" defer></script>
+    <script type="module" src="navbar-logic.js"></script>
+    <script src="load-components.js" defer></script>
 </body>
 </html>
