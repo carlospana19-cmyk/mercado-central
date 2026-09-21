@@ -126,23 +126,16 @@ async function markTokenAsUsed(tokenData) {
         return { success: true, message: 'Sin token que marcar' };
     }
     
-    try {
+       try {
         const { error: tokenUpdateError } = await supabase
-            .from('plan_tokens')
-            .update({
-                usado: true,
-                usado_por: tokenData.usuario_id
-            })
-            .eq('id', tokenData.id);
-        
+            .rpc('marcar_token_usado', { p_token_id: tokenData.id });
+
         if (tokenUpdateError) {
             console.error('Error marcando token como usado:', tokenUpdateError);
             return { success: false, error: tokenUpdateError };
         }
-        
-        console.log('Token marcado como usado despues de guardar anuncio');
+        console.log('Token marcado como usado tras guardar anuncio');
         return { success: true };
-        
     } catch (error) {
         console.error('Error en markTokenAsUsed:', error);
         return { success: false, error };
@@ -181,37 +174,34 @@ export { markTokenAsUsed, validatedToken };
  */
 async function validatePromoToken(tokenCode, selectedPlan) {
     const cleanToken = tokenCode.trim();
-    console.log(`🔎 Validando en Supabase: "${cleanToken}" para plan: ${selectedPlan}`);
+    console.log(`🔎 Validando token vía RPC: "${cleanToken}" para plan: ${selectedPlan}`);
 
     try {
-        // 1. Consulta usando el nombre real de la columna: 'codigo'
-        const { data, error } = await supabase
-            .from('plan_tokens')
-            .select('*')
-            .eq('codigo', cleanToken) 
-            .eq('usado', false);
+        // ✅ Validación vía RPC — el inventario ya no es legible por el cliente
+        const { data: result, error } = await supabase
+            .rpc('validar_token', { p_codigo: cleanToken });
 
         if (error) throw error;
 
-        // 2. Si no encuentra nada
-        if (!data || data.length === 0) {
+        if (!result || !result.success) {
             console.log("❌ Token no encontrado en la base de datos.");
             return { success: false, message: '❌ Token inválido o ya utilizado.' };
         }
 
-        const tokenData = data[0];
-        const planDelToken = tokenData.plan_tipo.toLowerCase();
+        const tokenData = {
+            id: result.id,
+            plan_tipo: result.plan_tipo,
+            duracion_dias: result.duracion_dias
+        };
+
+        const planNormalizado = tokenData.plan_tipo.toLowerCase() === 'top' ? 'destacado' : tokenData.plan_tipo.toLowerCase();
         const planSeleccionado = selectedPlan.toLowerCase();
 
-        // 3. Normalizar 'top' a 'destacado'
-        const planNormalizado = planDelToken === 'top' ? 'destacado' : planDelToken;
-
-        // 4. Comparar planes con return explícito
         if (planNormalizado === planSeleccionado) {
             console.log("✅ Token validado con éxito!");
             return { success: true, tokenData: tokenData };
         } else {
-            return { success: false, message: `Este token es para el plan ${planDelToken}` };
+            return { success: false, message: `Este token es para el plan ${tokenData.plan_tipo}` };
         }
     } catch (err) {
         console.error("❌ Error en la validación:", err);

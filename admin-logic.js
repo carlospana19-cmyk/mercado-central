@@ -427,43 +427,39 @@ window.cerrarSesion = async () => {
 
 window.asignarTokenDirecto = async (userId, phone) => {
     try {
-        console.log('Asignar token al usuario:', userId);
-        
-        // Obtener días de validez
-        const diasInput = prompt('¿Cuántos días de validez tendrá este token?', '30');
+        const planInput = prompt('¿Qué plan? (basico / premium / destacado / top)', 'basico');
+        if (!planInput) return;
+        const plan = planInput.toLowerCase().trim();
+        if (!['basico', 'premium', 'destacado', 'top'].includes(plan)) {
+            alert('Plan inválido. Usa: basico, premium, destacado o top');
+            return;
+        }
+
+        const diasInput = prompt('¿Cuántos días de validez?', '30');
         const duracionDias = parseInt(diasInput) || 30;
-        
-        // Generar código aleatorio
-        const codigo = 'MC-' + Math.random().toString(36).substring(2, 7).toUpperCase();
-        
-        // Insertar en la tabla plan_tokens
-        await supabase.from('plan_tokens').insert({
+
+        const codigo = 'MC-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        const { error } = await supabase.from('plan_tokens').insert({
             codigo: codigo,
-            plan_type: 'premium',
+            plan_tipo: plan,
             duracion_dias: duracionDias,
             usado: false,
-            activo: true
+            activo: true,
+            creado_por: currentAdminUser.id
         });
-        
-        // Mensaje de éxito con botón WhatsApp
-        const mensaje = `¡Token generado: ${codigo}!`;
-        const whatsappLink = `https://wa.me/${phone}?text=Hola!+Tu+codigo+de+regalo+para+Mercado+Central+es:+${codigo}`;
-        
-        // Crear modal o alerta custom
-        const confirmacion = confirm(`${mensaje}\n\n¿Deseas enviar el token por WhatsApp?`);
-        if (confirmacion && phone) {
-            window.open(whatsappLink, '_blank');
+        if (error) throw error;
+
+        const whatsappLink = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(`¡Hola! Tu código de regalo para Mercados Central es: ${codigo} (plan ${plan.toUpperCase()}, ${duracionDias} días)`)}`;
+
+        if (confirm(`Token generado: ${codigo}\n\n¿Enviar por WhatsApp?`)) {
+            if (phone) window.open(whatsappLink, '_blank');
         }
-        
-        // Recargar la lista de tokens
         await cargarTokens();
-        
-        // Navegar a la sección de tokens
         document.querySelector('[data-section="tokens"]').click();
-        
     } catch (error) {
         console.error('Error al generar token:', error);
-        alert('Hubo un error al generar el token');
+        alert('Error al generar el token: ' + error.message);
     }
 };
 
