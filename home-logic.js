@@ -4,6 +4,7 @@ import { supabase } from './supabase-client.js';
 import { generateAttributesHTML, UIComponents, cleanLocationString } from './UIComponents.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
 import { getSellerReviewStats } from './reviews-logic.js';
+import { HERO_ADS } from './hero-ads.js';
 
 export function initializeHomePage() {
 
@@ -21,6 +22,36 @@ export function initializeHomePage() {
             return;
         }
 
+       
+        // === PUBLICIDAD DEL HERO (hero-ads.js) ===
+        const hoy = new Date().toISOString().split('T')[0];
+        const adsActivos = HERO_ADS.filter(ad =>
+            ad.activo &&
+            (!ad.fecha_inicio || ad.fecha_inicio <= hoy) &&
+            (!ad.fecha_fin || ad.fecha_fin >= hoy)
+        );
+               if (adsActivos.length > 0) {
+            const slidesHTML = adsActivos.map(ad => `
+                <div class="swiper-slide">
+                    <img class="hero-ad-img" src="${ad.imagen}" alt="${ad.empresa || 'Publicidad'}" loading="eager">
+                    <span class="hero-ad-badge">Patrocinado</span>
+                    ${ad.link ? `<a class="hero-ad-cta" href="${ad.link}" target="_blank" rel="noopener">${ad.texto_cta || 'Conocer más'} <i class="fas fa-arrow-right"></i></a>` : ''}
+                </div>
+            `).join('');
+            document.getElementById('hero-slides').innerHTML = slidesHTML;
+            document.querySelector('.hero-text-content')?.remove();
+            document.querySelector('.hero-search')?.classList.add('has-paid-ad');
+
+            if (window.heroSwiper) window.heroSwiper.destroy();
+            window.heroSwiper = new Swiper('.hero-swiper', {
+                loop: false,
+                autoplay: { delay: 4000, disableOnInteraction: false },
+                pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+                effect: 'fade',
+                fadeEffect: { crossFade: true }
+            });
+            return;
+        }
         try {
             // ✅ CARGAR SOLO ANUNCIOS DESTACADOS PARA LA PÁGINA PRINCIPAL
             // Solo mostramos anuncios Destacados en la sección Recién Agregado
@@ -842,12 +873,11 @@ function initializeHeroCarousel() {
             window.heroSwiper.destroy();
         }
 
-        window.heroSwiper = new Swiper('.hero-swiper', {
-            loop: false,
+              window.heroSwiper = new Swiper('.hero-swiper', {
+            loop: true,
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,
-                stopOnLastSlide: true,
             },
             pagination: {
                 el: '.swiper-pagination',

@@ -341,3 +341,97 @@
     min-height:560px!important;
   }
 }
+/* ============ PUBLICIDAD DEL HERO ============ */
+.hero-ad-badge{
+  position:absolute!important;
+  top:16px!important;right:16px!important;
+  z-index:3!important;
+  background:rgba(18,33,41,.65)!important;
+  color:#fff!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+  padding:4px 12px!important;
+  border-radius:99px!important;
+  backdrop-filter:blur(6px);
+}
+.hero-ad-cta{
+  position:absolute!important;
+  right:20px!important;bottom:20px!important;
+  z-index:5!important;
+  background:#fff!important;
+  color:var(--ink-900)!important;
+  font-weight:700!important;font-size:13.5px!important;
+  padding:10px 18px!important;border-radius:99px!important;
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  box-shadow:var(--shadow-md)!important;
+  transition:transform .15s!important;
+}
+.hero-ad-cta:hover{transform:translateY(-2px)!important;color:var(--teal-600)!important}
+.hero-ad-cta i{font-size:11px!important}
+.hero-ad-img{
+  filter:brightness(.85) saturate(1)!important;
+}
+/* ============ HERO CON PUBLICIDAD (estilo Encuentra24) ============ */
+.hero-search.has-paid-ad{min-height:420px!important;padding:0!important}
+.search-below-hero{background:var(--card);padding:22px 20px;border-bottom:1px solid var(--line)}
+.search-below-hero .search-form-container{
+  background:var(--bg)!important;
+  border:1px solid var(--line)!important;
+  box-shadow:var(--shadow-sm)!important;
+}
+@media(max-width:859px){
+  .search-below-hero .search-form-container{border-radius:14px}
+}
+/* Fuerza imagen visible en hero con publicidad */
+.hero-search.has-paid-ad .hero-swiper .swiper-slide img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important}
+/* Buscador centrado */
+.search-below-hero .search-form-container{margin-inline:auto!important;max-width:760px!important}
+/* Fuerza imagen visible en hero con publicidad */
+.hero-search.has-paid-ad .hero-swiper .swiper-slide img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important}
+.search-below-hero .search-form-container{margin-inline:auto!important;max-width:760px!important}
+
+/* ============ SUGERENCIAS LIVE (estilo YouTube) ============ */
+.search-field:first-child{position:relative}
+.search-suggest{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow-md);overflow:hidden;display:none;z-index:50;
+}
+.search-suggest.open{display:block}
+.sg-item{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;font-size:14.5px;color:var(--ink-900)}
+.sg-item:hover,.sg-item.hl{background:var(--teal-50)}
+.sg-item img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#EEF1F3;flex-shrink:0}
+.sg-item .sg-info{display:flex;flex-direction:column;min-width:0}
+.sg-item .sg-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-item .sg-price{font-size:12.5px;color:var(--ink-500);font-weight:600}
+.sg-empty{padding:14px 16px;font-size:14px;color:var(--ink-500)}
+/* ============ BARRA DE BÚSQUEDA YOUTUBE-STYLE ============ */
+.search-below-hero{display:flex;justify-content:center;padding:26px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+.yt-search{position:relative;display:flex;align-items:center;width:100%;max-width:640px;height:48px;border:1px solid var(--line);border-radius:24px;background:var(--bg)}
+.yt-search input{flex:1;height:100%;border:none;background:none;padding:0 20px;font-size:15.5px;outline:none;color:var(--ink-900)}
+.yt-search input::placeholder{color:var(--ink-300)}
+.yt-search button{width:64px;height:48px;border:none;border-radius:0 24px 24px 0;background:var(--teal-500);color:#fff;cursor:pointer;flex-shrink:0;transition:background .2s}
+.yt-search button:hover{background:var(--teal-600)}
+.yt-search .search-suggest{top:calc(100% + 8px);left:0;right:0}
+/* Imagen visible en hero con publicidad */
+.hero-search.has-paid-ad .hero-swiper .swiper-slide img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important}
+/* ============ BARRA SLIM FIJA EN EL HERO (siempre) ============ */
+.hero-static-search{
+  position:relative!important;
+  display:flex!important;align-items:center!important;
+  width:100%!important;max-width:640px!important;height:48px!important;
+  margin:26px auto 0!important;
+  background:var(--bg)!important;border:1px solid var(--line)!important;
+  border-radius:24px!important;box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+.hero-static-search input{flex:1;height:100%;border:none;background:none;padding:0 20px;font-size:15.5px;outline:none;color:var(--ink-900)}
+.hero-static-search input::placeholder{color:var(--ink-300)}
+.hero-static-search .btn-search-hero{width:64px;height:48px;border-radius:0 24px 24px 0;padding:0;background:var(--teal-500);color:#fff;flex-shrink:0}
+.hero-static-search .btn-search-hero:hover{background:var(--teal-600)}
+/* Con publicidad: barra sobre fondo blanco (ya está fuera del hero? no — sigue dentro, así que estilo claro) */
+.hero-search.has-paid-ad .hero-static-search{background:#fff!important;border-color:var(--line)!important}
+/* En la franja blanca debajo del hero con publicidad, mantener coherencia */
+.search-below-hero .yt-search{background:var(--bg)}

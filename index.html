@@ -20,7 +20,7 @@
 
     <!-- CSS NUEVO (Fase 1) — los viejos style/cards/home.css NO se tocan todavía -->
     <link rel="stylesheet" href="mc-base.css?v=7">
-    <link rel="stylesheet" href="mc-home.css?v=7">
+    <link rel="stylesheet" href="mc-home.css?v=12">
 </head>
 <body id="index-page">
 
@@ -44,45 +44,26 @@
                 <p class="hero-subtitle">El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.</p>
             </div>
 
-            <div class="search-form-container">
-                <div class="search-field">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="mainSearchInput" placeholder="¿Qué estás buscando?">
-                </div>
-                <div class="search-field">
-                    <i class="fas fa-tags"></i>
-                    <select id="categorySelect">
-                        <option value="all">Todas las Categorías</option>
-                    </select>
-                </div>
-                <div class="search-field">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" id="locationInput" placeholder="Ubicación (ej: Panamá)">
-                </div>
-                <button id="searchButton" class="btn btn-search-hero">
-                    <i class="fas fa-search"></i><span>Buscar</span>
-                </button>
+                      <div class="yt-search hero-static-search">
+                <input type="text" id="mainSearchInput" placeholder="Buscar productos, marcas, provincias…" autocomplete="off">
+                <button id="searchButton" class="btn-search-hero" aria-label="Buscar"><i class="fas fa-search"></i></button>
+                <div id="search-suggest" class="search-suggest"></div>
             </div>
 
-                       <div class="hero-chips">
-                <button onclick="chipSearch('bicicleta')"><i class="fas fa-bicycle"></i> Bicicletas</button>
-                <button onclick="chipSearch('iPhone')"><i class="fas fa-mobile-alt"></i> iPhone</button>
-                <button onclick="chipSearch('apartamento')"><i class="fas fa-building"></i> Apartamentos</button>
-                <button onclick="chipSearch('moto')"><i class="fas fa-motorcycle"></i> Motos</button>
-                <button onclick="chipSearch('laptop')"><i class="fas fa-laptop"></i> Laptops</button>
-            </div>
+             
     </section>
 
     <!-- CATEGORÍAS -->
-    <section class="categories-section">
+    <        <section class="categories-section">
         <div class="categories-horizontal-bar">
-            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-home"></i></div><h3>Bienes Raíces</h3></a>
-            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-car"></i></div><h3>Vehículos</h3></a>
-            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-laptop"></i></div><h3>Electrónica</h3></a>
-            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-couch"></i></div><h3>Hogar</h3></a>
-            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-tshirt"></i></div><h3>Moda</h3></a>
-            <a href="#" class="category-item"><div class="category-icon"><i class="fas fa-briefcase"></i></div><h3>Servicios</h3></a>
+            <a href="resultados.html?category=Bienes%20Raíces" class="category-item"><div class="category-icon"><i class="fas fa-home"></i></div><h3>Bienes Raíces</h3></a>
+            <a href="resultados.html?category=Vehículos" class="category-item"><div class="category-icon"><i class="fas fa-car"></i></div><h3>Vehículos</h3></a>
+            <a href="resultados.html?category=Electrónica" class="category-item"><div class="category-icon"><i class="fas fa-laptop"></i></div><h3>Electrónica</h3></a>
+            <a href="resultados.html?category=Hogar%20y%20Muebles" class="category-item"><div class="category-icon"><i class="fas fa-couch"></i></div><h3>Hogar</h3></a>
+            <a href="resultados.html?category=Moda%20y%20Belleza" class="category-item"><div class="category-icon"><i class="fas fa-tshirt"></i></div><h3>Moda</h3></a>
+            <a href="resultados.html?category=Servicios" class="category-item"><div class="category-icon"><i class="fas fa-briefcase"></i></div><h3>Servicios</h3></a>
         </div>
+    </section>
     </section>
 
 
@@ -146,12 +127,71 @@
         </defs>
     </svg>
 
-    <script>
-        // Chips del hero: llenan el buscador y disparan la búsqueda existente
-        function chipSearch(termo){
-            document.getElementById('mainSearchInput').value = termo;
-            document.getElementById('searchButton').click();
+                 <script type="module">
+        import { supabase } from './supabase-client.js';
+
+        function bindSmartSearch(input, box) {
+            if (!input || !box) return;
+            if (input.dataset.bound) return;
+            input.dataset.bound = 'true';
+            let t = null;
+            input.addEventListener('input', () => {
+                clearTimeout(t);
+                const q = input.value.trim();
+                if (q.length < 2) { box.classList.remove('open'); box.innerHTML = ''; return; }
+                t = setTimeout(async () => {
+                    const { data } = await supabase.from('anuncios')
+                        .select('id, titulo, precio, url_portada, url_galeria')
+                        .or(`titulo.ilike.%${q}%,categoria.ilike.%${q}%,provincia.ilike.%${q}%,distrito.ilike.%${q}%`)
+                        .limit(6);
+                    if (!data || !data.length) {
+                        box.innerHTML = '<div class="sg-empty">Sin resultados — Enter para buscar todo</div>';
+                        box.classList.add('open'); return;
+                    }
+                    box.innerHTML = data.map(a => {
+                        const img = a.url_portada || (Array.isArray(a.url_galeria) && a.url_galeria[0]) || 'img/placeholder.jpg';
+                        return `<div class="sg-item" data-id="${a.id}">
+                            <img src="${img}" alt="" onerror="this.style.display='none'">
+                            <div class="sg-info"><span class="sg-title">${a.titulo}</span>
+                            <span class="sg-price">${a.precio ? 'B/. ' + Number(a.precio).toLocaleString('es-PA') : (a.provincia || '')}</span></div>
+                        </div>`;
+                    }).join('');
+                    box.classList.add('open');
+                    box.querySelectorAll('.sg-item').forEach(el =>
+                        el.addEventListener('click', () => window.location.href = `detalle-producto.html?id=${el.dataset.id}`));
+                }, 300);
+            });
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') window.location.href = input.value.trim() ? 'resultados.html?q=' + encodeURIComponent(input.value.trim()) : 'resultados.html';
+            });
+            document.addEventListener('click', e => { if (!input.contains(e.target) && !box.contains(e.target)) box.classList.remove('open'); });
         }
+
+        // Buscador del hero NORMAL (existe desde el inicio)
+        bindSmartSearch(document.getElementById('mainSearchInput'), document.getElementById('search-suggest'));
+
+        // Buscador de la barra con publicidad (se crea dinámicamente → esperar e intentar varias veces)
+        function bindYappyBar() {
+            const bar = document.getElementById('smartSearch');
+            if (bar) {
+                bindSmartSearch(bar, bar.parentElement.querySelector('.search-suggest'));
+            } else {
+                setTimeout(bindYappyBar, 300);
+            }
+        }
+        setTimeout(bindYappyBar, 300);
+
+        // Botón lupa de la barra con publicidad
+               document.addEventListener('click', e => {
+            if (e.target.closest('#smartSearchBtn')) {
+                const v = document.getElementById('smartSearch')?.value.trim();
+                window.location.href = v ? 'resultados.html?q=' + encodeURIComponent(v) : 'resultados.html';
+            }
+            if (e.target.closest('#searchButton')) {
+                const v = document.getElementById('mainSearchInput')?.value.trim();
+                window.location.href = v ? 'resultados.html?q=' + encodeURIComponent(v) : 'resultados.html';
+            }
+        });
     </script>
 </body>
 </html>

@@ -268,7 +268,7 @@ async function loadAndFilterResults() {
       .order('fecha_publicacion', { ascending: false });
 
     // Filtros existentes (mantener igual)
-    if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%`);
+        if (query) queryBuilder = queryBuilder.or(`titulo.ilike.%${query}%,descripcion.ilike.%${query}%,categoria.ilike.%${query}%,provincia.ilike.%${query}%,distrito.ilike.%${query}%`);
     if (location) queryBuilder = queryBuilder.ilike('ubicacion', `%${location}%`);
 
     // Category filtering logic
