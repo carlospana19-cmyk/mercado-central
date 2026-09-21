@@ -435,3 +435,23 @@
 .hero-search.has-paid-ad .hero-static-search{background:#fff!important;border-color:var(--line)!important}
 /* En la franja blanca debajo del hero con publicidad, mantener coherencia */
 .search-below-hero .yt-search{background:var(--bg)}
+/* ============ MÓVIL: SOLO PUNTOS, SIN FLECHAS ============ */
+@media(max-width:768px){
+  .mini-gallery .swiper-button-next,
+  .mini-gallery .swiper-button-prev,
+  .product-gallery-swiper .swiper-button-next,
+  .product-gallery-swiper .swiper-button-prev{
+    display:none!important;
+  }
+}
+/* ============ HERO MÓVIL: MENOS ZOOM, MÁS AIRE ============ */
+@media(max-width:768px){
+  /* Imágenes: se ven completas en vertical, sin zoom excesivo */
+    .hero-search .hero-swiper .swiper-slide img{
+    object-fit:contain!important;
+    object-position:center center!important;
+  }
+  
+  /* Menos altura de hero en móvil para que la proporción sea de paisaje */
+  .hero-search{min-height:420px!important;padding-top:40px!important;padding-bottom:48px!important}
+}
