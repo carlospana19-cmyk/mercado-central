@@ -29,7 +29,12 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
 .btn-primary:hover{background:var(--orange-600);transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,138,61,.4)}
 
 /* ---------- NAVBAR (mismo HTML del componente) ---------- */
-.navbar-moderno{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px clamp(16px,4vw,40px);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line);width:100%}
+.navbar-moderno{
+  position:sticky!important;
+  top:0!important;
+  z-index:1000!important;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px clamp(16px,4vw,40px);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line);width:100%
+}
 .logo-link{display:flex;align-items:center;gap:10px}
 .logo-img{height:44px;width:auto;border-radius:8px}
 .logo-text{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ink-900)}
@@ -126,3 +131,46 @@ main{width:100%}
 .dashboard-ad-category i{color:var(--teal-500)!important}
 .badge-sold{position:absolute!important;top:10px!important;left:10px!important;z-index:5!important;background:var(--ink-900)!important;color:#fff!important;font-size:11px!important;font-weight:700!important;letter-spacing:.08em!important;padding:5px 12px!important;border-radius:99px!important}
 .dashboard-card.card-sold .dashboard-ad-image{filter:grayscale(.7) brightness(.85)!important}
+
+/* ============ BUSCADOR GLOBAL EN NAVBAR ============ */
+.nav-search{
+  position:relative;
+  flex:1;
+  max-width:520px;
+  display:flex;
+  align-items:center;
+  gap:0;
+  height:38px;
+  padding:0;
+  background:#fff;
+  border:1.5px solid var(--ink-300);
+  border-radius:19px;
+  margin:0 20px;
+  overflow:hidden;
+  transition:border-color .2s, box-shadow .2s;
+}
+.nav-search:focus-within{border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50)}
+.nav-search i{color:var(--ink-300);font-size:15px}
+.nav-search input{flex:1;border:none;background:none;outline:none;font-size:14.5px;color:var(--ink-900);min-width:0;padding:0 18px}
+.nav-search input::placeholder{color:var(--ink-300)}
+.nav-search .search-suggest{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow-md);overflow:hidden;display:none;
+}
+.nav-search .search-suggest.open{display:block}
+@media(max-width:900px){
+  .nav-search{max-width:none;flex:1;margin:0 8px;height:40px}
+}
+
+/* Botón buscar dentro de la barra del navbar */
+.nav-search-btn{
+  width:48px;height:38px;flex-shrink:0;
+  border:none;
+  border-radius:0 19px 19px 0;
+  background:var(--teal-500);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:background .2s;
+  margin:-1px -1px -1px 0;
+}
+.nav-search-btn:hover{background:var(--teal-600)}
