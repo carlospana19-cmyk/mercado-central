@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     <!-- CSS NUEVO (Fase 1) — los viejos style/cards/home.css NO se tocan todavía -->
-    <link rel="stylesheet" href="mc-base.css?v=7">
+    <link rel="stylesheet" href="mc-base.css?v=10">
     <link rel="stylesheet" href="mc-home.css?v=14">
 </head>
 <body id="index-page">
@@ -44,14 +44,7 @@
                 <p class="hero-subtitle">El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.</p>
             </div>
 
-                      <div class="yt-search hero-static-search">
-                <input type="text" id="mainSearchInput" placeholder="Buscar productos, marcas, provincias…" autocomplete="off">
-                <button id="searchButton" class="btn-search-hero" aria-label="Buscar"><i class="fas fa-search"></i></button>
-                <div id="search-suggest" class="search-suggest"></div>
-            </div>
-
-             
-    </section>
+</section>
 
     <!-- CATEGORÍAS -->
     <        <section class="categories-section">
@@ -127,71 +120,6 @@
         </defs>
     </svg>
 
-                 <script type="module">
-        import { supabase } from './supabase-client.js';
-
-        function bindSmartSearch(input, box) {
-            if (!input || !box) return;
-            if (input.dataset.bound) return;
-            input.dataset.bound = 'true';
-            let t = null;
-            input.addEventListener('input', () => {
-                clearTimeout(t);
-                const q = input.value.trim();
-                if (q.length < 2) { box.classList.remove('open'); box.innerHTML = ''; return; }
-                t = setTimeout(async () => {
-                    const { data } = await supabase.from('anuncios')
-                        .select('id, titulo, precio, url_portada, url_galeria')
-                        .or(`titulo.ilike.%${q}%,categoria.ilike.%${q}%,provincia.ilike.%${q}%,distrito.ilike.%${q}%`)
-                        .limit(6);
-                    if (!data || !data.length) {
-                        box.innerHTML = '<div class="sg-empty">Sin resultados — Enter para buscar todo</div>';
-                        box.classList.add('open'); return;
-                    }
-                    box.innerHTML = data.map(a => {
-                        const img = a.url_portada || (Array.isArray(a.url_galeria) && a.url_galeria[0]) || 'img/placeholder.jpg';
-                        return `<div class="sg-item" data-id="${a.id}">
-                            <img src="${img}" alt="" onerror="this.style.display='none'">
-                            <div class="sg-info"><span class="sg-title">${a.titulo}</span>
-                            <span class="sg-price">${a.precio ? 'B/. ' + Number(a.precio).toLocaleString('es-PA') : (a.provincia || '')}</span></div>
-                        </div>`;
-                    }).join('');
-                    box.classList.add('open');
-                    box.querySelectorAll('.sg-item').forEach(el =>
-                        el.addEventListener('click', () => window.location.href = `detalle-producto.html?id=${el.dataset.id}`));
-                }, 300);
-            });
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') window.location.href = input.value.trim() ? 'resultados.html?q=' + encodeURIComponent(input.value.trim()) : 'resultados.html';
-            });
-            document.addEventListener('click', e => { if (!input.contains(e.target) && !box.contains(e.target)) box.classList.remove('open'); });
-        }
-
-        // Buscador del hero NORMAL (existe desde el inicio)
-        bindSmartSearch(document.getElementById('mainSearchInput'), document.getElementById('search-suggest'));
-
-        // Buscador de la barra con publicidad (se crea dinámicamente → esperar e intentar varias veces)
-        function bindYappyBar() {
-            const bar = document.getElementById('smartSearch');
-            if (bar) {
-                bindSmartSearch(bar, bar.parentElement.querySelector('.search-suggest'));
-            } else {
-                setTimeout(bindYappyBar, 300);
-            }
-        }
-        setTimeout(bindYappyBar, 300);
-
-        // Botón lupa de la barra con publicidad
-               document.addEventListener('click', e => {
-            if (e.target.closest('#smartSearchBtn')) {
-                const v = document.getElementById('smartSearch')?.value.trim();
-                window.location.href = v ? 'resultados.html?q=' + encodeURIComponent(v) : 'resultados.html';
-            }
-            if (e.target.closest('#searchButton')) {
-                const v = document.getElementById('mainSearchInput')?.value.trim();
-                window.location.href = v ? 'resultados.html?q=' + encodeURIComponent(v) : 'resultados.html';
-            }
-        });
-    </script>
+    <script type="module" src="search-global.js"></script>
 </body>
 </html>
