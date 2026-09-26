@@ -219,20 +219,16 @@ html,body{overflow-x:clip!important}
   body{padding-top:150px!important}
   
 }
-/* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
+/* ============ BOTÓN PRIMARIO NARANJA (global, seguro) ============ */
 .btn-primary{
-  background:var(--orange-500)!important;
-  color:#fff!important;
-  border:none!important;
-  border-radius:12px!important;
-  box-shadow:0 4px 14px rgba(255,138,61,.3)!important;
-  padding:12px 24px!important;
-  font-weight:700!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:8px!important;
-  cursor:pointer!important;
+  background:var(--orange-500);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  box-shadow:0 4px 14px rgba(255,138,61,.3);
+}
+.btn-primary:hover{
+  background:var(--orange-600);
 }
 /* ============ COMPATIBILIDAD TEMPORAL: variables legadas ============ */
 /* Mientras se migren los últimos restos de CSS viejo */
