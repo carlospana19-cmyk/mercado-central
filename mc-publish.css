@@ -351,3 +351,55 @@ main.container.publish-wizard{width:100%!important}
 .price-input-wrapper{position:relative!important}
 
 /* Botón IA: su neón se queda (es tu firma), solo normalizamos el estado */
+/* ============ NAVBAR SEARCH LIMPIO EN PUBLICAR ============ */
+.navbar-moderno .nav-search{
+  border:1.5px solid var(--ink-300)!important;
+  border-radius:19px!important;
+  background:#fff!important;
+  padding:0!important;
+  height:38px!important;
+  overflow:visible!important;
+}
+.navbar-moderno .nav-search input{
+  border:none!important;
+  background:none!important;
+  box-shadow:none!important;
+  height:38px!important;
+  padding:0 14px!important;
+  font-size:14px!important;
+  margin:0!important;
+}
+.navbar-moderno .nav-search .btn-search-hero{
+  border:none!important;
+  border-radius:0 19px 19px 0!important;
+  background:var(--teal-500)!important;
+  height:38px!important;
+  width:44px!important;
+  padding:0!important;
+}
+/* ============ DROPDOWN DEL NAVBAR LIMPIO EN PUBLICAR ============ */
+.navbar-moderno .sg-item{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  padding:11px 16px!important;
+}
+.navbar-moderno .sg-item img{
+  width:44px!important;
+  height:44px!important;
+  max-height:44px!important;
+  max-width:44px!important;
+  border-radius:8px!important;
+  object-fit:cover!important;
+  flex-shrink:0!important;
+}
+.navbar-moderno .sg-item .sg-info{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+}
+.navbar-moderno .sg-item .sg-title{
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
