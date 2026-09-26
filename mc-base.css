@@ -53,7 +53,7 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
 .nav-profile-btn:hover{background:var(--teal-600)}
 .profile-icon{width:20px;height:20px}
 @media(max-width:720px){
-  .logo-img{height:38px}.logo-text{font-size:17px}
+  .logo-img{height:55px}.logo-text{font-size:17px}
   .buttons-nav{gap:8px}
   .buttons-nav button{height:40px;padding:0 12px;font-size:13.5px}
 }
@@ -174,29 +174,19 @@ main{width:100%}
 }
 .nav-search-btn:hover{background:var(--teal-600)}
 
-/* ============ BUSCADOR EN NAVBAR ============ */
-.nav-search{
-  position:relative;flex:1;max-width:380px;display:flex;align-items:center;gap:0;
-  height:38px;background:#fff;border:1.5px solid var(--ink-300);
-  border-radius:19px;margin:0 12px;
-}
-.nav-search input{flex:1;height:100%;border:none;background:none;outline:none;font-size:14px;color:var(--ink-900);padding:0 14px;min-width:0}
-.nav-search-btn{width:44px;height:38px;flex-shrink:0;border:none;border-radius:0 19px 19px 0;background:var(--teal-500);color:#fff;cursor:pointer;transition:background .2s}
-.nav-search-btn:hover{background:var(--teal-600)}
-.nav-search .search-suggest{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-md);overflow:hidden;display:none;z-index:2000}
-.nav-search .search-suggest.open{display:block}
-.navbar-moderno{position:sticky!important;top:0!important;z-index:1000!important}
-html,body{overflow-x:clip!important}
-
-/* ============ BUSCADOR DEL HERO MOVIDO AL NAVBAR ============ */
+/* ============ BUSCADOR NAVBAR (versión única final) ============ */
 .nav-search{
   position:relative;flex:1;max-width:420px;display:flex;align-items:center;
   height:38px;background:#fff;border:1.5px solid var(--ink-300);
   border-radius:19px;margin:0 12px;
 }
+.nav-search input{
+  flex:1;height:100%;border:none;background:none;outline:none;
+  font-size:14px;color:var(--ink-900);padding:0 14px;min-width:0;
+}
 .nav-search .btn-search-hero{
-  width:44px;height:38px;flex-shrink:0;
-  border:none;border-radius:0 19px 19px 0;
+  width:44px;height:38px;flex-shrink:0;border:none;
+  border-radius:0 19px 19px 0;
   background:var(--teal-500);color:#fff;cursor:pointer;font-size:15px;
   transition:background .2s;
 }
@@ -204,21 +194,22 @@ html,body{overflow-x:clip!important}
 .nav-search .search-suggest{
   position:absolute;top:calc(100% + 8px);left:0;right:0;
   background:#fff;border:1px solid var(--line);border-radius:14px;
-  box-shadow:var(--shadow-md);overflow:hidden;display:none;z-index:2000;
+  box-shadow:var(--shadow-md);display:none;z-index:2000;
 }
 .nav-search .search-suggest.open{display:block}
-.navbar-moderno{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:1000!important}
-body{padding-top:120px!important}
+
+/* Navbar fijo (una sola definición, sticky — sin fixed ni padding del body) */
+.navbar-moderno{position:sticky!important;top:0!important;z-index:1000!important}
 html,body{overflow-x:clip!important}
-/* ============ NAVBAR MÓVIL: BUSCADOR EN FILA PROPIA ============ */
+
+/* Móvil: barra en fila propia, ancho completo */
 @media(max-width:720px){
   .navbar-moderno{flex-wrap:wrap;padding-bottom:10px!important}
   .logo-text{white-space:nowrap}
   .nav-search{order:3;width:100%;max-width:none;flex:none;margin:10px 0 0;height:40px}
   .nav-search .search-suggest{top:calc(100% + 6px)}
-  body{padding-top:150px!important}
-  
 }
+  
 /* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
 .btn-primary{
   background:var(--orange-500);
@@ -230,6 +221,8 @@ html,body{overflow-x:clip!important}
 .btn-primary:hover{
   background:var(--orange-600);
 }
+/* CTA vendedores: alineación vertical perfecta */
+.seller-cta-in{align-items:center!important}
 /* ============ COMPATIBILIDAD TEMPORAL: variables legadas ============ */
 /* Mientras se migren los últimos restos de CSS viejo */
 :root{
@@ -244,3 +237,11 @@ html,body{overflow-x:clip!important}
   --sombra-suave:0 1px 2px rgba(18,33,41,.06),0 2px 8px rgba(18,33,41,.05);
   --sombra-media:0 6px 24px rgba(18,33,41,.10);
 }
+/* ============ ITEMS DEL DROPDOWN (global) ============ */
+.sg-item{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;font-size:14.5px;color:var(--ink-900)}
+.sg-item:hover,.sg-item.hl{background:var(--teal-50)}
+.sg-item img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#EEF1F3;flex-shrink:0}
+.sg-item .sg-info{display:flex;flex-direction:column;min-width:0}
+.sg-item .sg-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-item .sg-price{font-size:12.5px;color:var(--ink-500);font-weight:600}
+.sg-empty{padding:14px 16px;font-size:14px;color:var(--ink-500)}

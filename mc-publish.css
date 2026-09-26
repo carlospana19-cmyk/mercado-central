@@ -351,3 +351,23 @@ main.container.publish-wizard{width:100%!important}
 .price-input-wrapper{position:relative!important}
 
 /* Botón IA: su neón se queda (es tu firma), solo normalizamos el estado */
+/* ============ NAVBAR SEARCH LIMPIO EN PUBLICAR ============ */
+.navbar-moderno .nav-search input{
+  border:none!important;
+  background:none!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.navbar-moderno .nav-search{
+  border:1.5px solid var(--ink-300)!important;
+  border-radius:19px!important;
+  background:#fff!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+.navbar-moderno .nav-search .btn-search-hero{
+  border:none!important;
+  border-radius:0 19px 19px 0!important;
+  background:var(--teal-500)!important;
+  height:38px!important;
+}
