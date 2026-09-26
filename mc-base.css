@@ -234,3 +234,17 @@ html,body{overflow-x:clip!important}
   gap:8px!important;
   cursor:pointer!important;
 }
+/* ============ COMPATIBILIDAD TEMPORAL: variables legadas ============ */
+/* Mientras se migren los últimos restos de CSS viejo */
+:root{
+  --color-primario:#0B9E8F;
+  --color-secundario:#087F73;
+  --color-acento:#FF8A3D;
+  --color-acento-claro:#FFD1B0;
+  --color-fondo:#F6F8FA;
+  --color-texto:#122129;
+  --color-blanco:#ffffff;
+  --color-gris:#5C6B66;
+  --sombra-suave:0 1px 2px rgba(18,33,41,.06),0 2px 8px rgba(18,33,41,.05);
+  --sombra-media:0 6px 24px rgba(18,33,41,.10);
+}
