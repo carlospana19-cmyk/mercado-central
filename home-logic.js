@@ -31,21 +31,33 @@ export function initializeHomePage() {
             (!ad.fecha_fin || ad.fecha_fin >= hoy)
         );
                if (adsActivos.length > 0) {
-            const slidesHTML = adsActivos.map(ad => `
-                <div class="swiper-slide">
-                    <img class="hero-ad-img" src="${ad.imagen}" alt="${ad.empresa || 'Publicidad'}" loading="eager">
-                    <span class="hero-ad-badge">Patrocinado</span>
-                    ${ad.link ? `<a class="hero-ad-cta" href="${ad.link}" target="_blank" rel="noopener">${ad.texto_cta || 'Conocer más'} <i class="fas fa-arrow-right"></i></a>` : ''}
-                </div>
-            `).join('');
+            const slidesHTML = adsActivos.map(ad => {
+                const imgSrc = window.innerWidth <= 820 ? (ad.imagen_movil || ad.imagen) : ad.imagen;
+                let media = '';
+                if (ad.tipo === 'video' && ad.video) {
+                    media = `
+                        <video class="hero-ad-img" autoplay muted loop playsinline src="${ad.video}"></video>`;
+                } else {
+                    media = `
+                        <img class="hero-ad-img" src="${imgSrc}" alt="${ad.empresa || 'Publicidad'}" loading="eager">`;
+                }
+                const cta = (ad.link && ad.tipo !== 'link')
+                    ? `<a class="hero-ad-cta" href="${ad.link}" target="_blank" rel="noopener">${ad.texto_cta || 'Conocer más'} <i class="fas fa-arrow-right"></i></a>` : '';
+                return `
+                    <div class="swiper-slide">
+                        ${media}
+                        <span class="hero-ad-badge">Patrocinado</span>
+                        ${cta}
+                    </div>`;
+            }).join('');
             document.getElementById('hero-slides').innerHTML = slidesHTML;
             document.querySelector('.hero-text-content')?.remove();
             document.querySelector('.hero-search')?.classList.add('has-paid-ad');
 
             if (window.heroSwiper) window.heroSwiper.destroy();
             window.heroSwiper = new Swiper('.hero-swiper', {
-                loop: false,
-                autoplay: { delay: 4000, disableOnInteraction: false },
+                loop: adsActivos.length > 1,
+                autoplay: { delay: 5000, disableOnInteraction: false },
                 pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
                 effect: 'fade',
                 fadeEffect: { crossFade: true }

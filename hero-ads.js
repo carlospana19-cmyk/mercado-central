@@ -1,67 +1,47 @@
 // =====================================================
 // hero-ads.js — PANTALLA DE PUBLICIDAD DEL HERO
 // =====================================================
-// CÓMO PUBLICAR UN ANUNCIO DE EMPRESA:
-//
-// 1. Sube la imagen/video a Supabase → Storage → imagenes_anuncios
-//    → carpeta "publicidad" → copia la URL pública
-//
-// 2. Copia un bloque { ... } de abajo, edítalo y descoméntalo
-//
-// 3. Campos:
-//    tipo:        'imagen' | 'video' | 'link' (link = solo abre la URL del cliente)
-//    activo:      true = visible | false = apagado
-//    imagen:      URL horizontal (PC) — OBLIGATORIA para tipo imagen/video
-//    imagen_movil: URL vertical (teléfono) — opcional, si no hay usa la horizontal
-//    video:       URL .mp4 del video (solo para tipo 'video')
-//    link:        página del cliente (opcional — muestra botón "Conocer más")
-//    empresa:     nombre (accesibilidad)
-//    texto_cta:   texto del botón (opcional, default "Conocer más")
-//    fecha_inicio:'AAAA-MM-DD' — no aparece antes
-//    fecha_fin:   'AAAA-MM-DD' — ¡expira solo!
+// Para publicar: agrega un bloque { ... } al array HERO_ADS.
+// Campos: tipo ('imagen'|'video'), activo, imagen, imagen_movil,
+// video, link, empresa, texto_cta, fecha_inicio, fecha_fin.
 // =====================================================
 
 export const HERO_ADS = [
-
-    /* ─── EJEMPLO IMAGEN (descomenta para publicar) ───
     {
         tipo: 'imagen',
-        activo: true,
-        imagen: 'https://URL-HORIZONTAL-1920x1080.jpg',
-        imagen_movil: 'https://URL-VERTICAL-1080x1350.jpg',
+        activo: false,
+        imagen: 'https://ldtomnicwnwituyensmn.supabase.co/storage/v1/object/public/imagenes_anuncios/publicidad/Gemini_Generated_Image_jjgrg3jjgrg3jjgr.png',
+        imagen_movil: 'https://ldtomnicwnwituyensmn.supabase.co/storage/v1/object/public/imagenes_anuncios/publicidad/Gemini_Generated_Image_jjgrg3jjgrg3jjgr.png',
         link: 'https://wa.me/50700000000',
         empresa: 'Energ Solutions',
         texto_cta: 'Cotiza tu energía solar',
         fecha_inicio: '2026-09-20',
-        fecha_fin: '2026-10-20'
+        fecha_fin: '2026-12-31'
     },
-    ─── ─── */
-
-    /* ─── EJEMPLO SOLO IMAGEN SIN BOTÓN (descomenta para publicar) ───
-    {
+        {
         tipo: 'imagen',
-        activo: true,
-        imagen: 'https://URL-HORIZONTAL.jpg',
-        imagen_movil: 'https://URL-VERTICAL.jpg',
-        empresa: 'Mi Empresa',
-        fecha_inicio: '2026-09-20',
-        fecha_fin: '2026-10-20'
+        activo: false,
+        imagen: 'https://ldtomnicwnwituyensmn.supabase.co/storage/v1/object/public/imagenes_anuncios/publicidad/seedream-5.0-pro_a_quiero_que_en_cada_c.jpeg',
+        imagen_movil: 'URL-VERTICAL-EMPRESA-2.jpg',
+        link: 'https://wa.me/50760000000',
+        empresa: 'Empresa 2',
+        texto_cta: 'Su texto de botón',
+        fecha_inicio: '2026-09-21',
+        fecha_fin: '2026-11-21'
     },
-    ─── ─── */
-
-    /* ─── EJEMPLO VIDEO (descomenta para publicar) ───
-    {
+        {
         tipo: 'video',
-        activo: true,
-        video: 'https://URL-DEL-VIDEO.mp4',
-        imagen: 'https://URL-PORTADA-HORIZONTAL.jpg',
-        imagen_movil: 'https://URL-PORTADA-VERTICAL.jpg',
+        activo: false,
+        video: 'https://ldtomnicwnwituyensmn.supabase.co/storage/v1/object/public/imagenes_anuncios/publicidad/videoplayback.mp4',
+        imagen: 'URL-PORTADA-HORIZONTAL.jpg',
+        imagen_movil: 'URL-PORTADA-VERTICAL.jpg',
         link: 'https://wa.me/50700000000',
-        empresa: 'Mi Empresa',
+        empresa: 'Empresa con Video',
         texto_cta: 'Conocer más',
-        fecha_inicio: '2026-09-20',
-        fecha_fin: '2026-10-20'
-    },
-    ─── ─── */
-
+        fecha_inicio: '2026-09-21',
+        fecha_fin: '2026-12-21'
+    }
 ];
+   
+    
+    
