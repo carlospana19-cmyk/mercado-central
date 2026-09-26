@@ -217,4 +217,20 @@ html,body{overflow-x:clip!important}
   .nav-search{order:3;width:100%;max-width:none;flex:none;margin:10px 0 0;height:40px}
   .nav-search .search-suggest{top:calc(100% + 6px)}
   body{padding-top:150px!important}
+  
+}
+/* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
+.btn-primary{
+  background:var(--orange-500)!important;
+  color:#fff!important;
+  border:none!important;
+  border-radius:12px!important;
+  box-shadow:0 4px 14px rgba(255,138,61,.3)!important;
+  padding:12px 24px!important;
+  font-weight:700!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  cursor:pointer!important;
 }

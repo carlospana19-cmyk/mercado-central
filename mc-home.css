@@ -402,4 +402,5 @@
 /* ============ HERO VIDEO PUBLICITARIO ============ */
 .hero-search .hero-swiper .swiper-slide video.hero-ad-img{
   width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;
+  
 }
