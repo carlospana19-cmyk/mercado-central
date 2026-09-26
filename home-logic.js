@@ -33,7 +33,7 @@ export function initializeHomePage() {
                if (adsActivos.length > 0) {
             const slidesHTML = adsActivos.map(ad => `
                 <div class="swiper-slide">
-                    <img class="hero-ad-img" src="${window.matchMedia('(max-width: 720px)').matches ? (ad.imagen_movil || ad.imagen) : ad.imagen}" alt="${ad.empresa || 'Publicidad'}" loading="eager">
+                    <img class="hero-ad-img" src="${window.innerWidth <= 820 ? (ad.imagen_movil || ad.imagen) : ad.imagen}" alt="${ad.empresa || 'Publicidad'}" loading="eager">
                     <span class="hero-ad-badge">Patrocinado</span>
                     ${ad.link ? `<a class="hero-ad-cta" href="${ad.link}" target="_blank" rel="noopener">${ad.texto_cta || 'Conocer más'} <i class="fas fa-arrow-right"></i></a>` : ''}
                 </div>
