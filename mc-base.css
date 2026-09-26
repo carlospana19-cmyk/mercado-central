@@ -219,7 +219,7 @@ html,body{overflow-x:clip!important}
   body{padding-top:150px!important}
   
 }
-/* ============ BOTÓN PRIMARIO NARANJA (global, seguro) ============ */
+/* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
 .btn-primary{
   background:var(--orange-500);
   color:#fff;
