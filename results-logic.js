@@ -311,7 +311,7 @@ async function loadAndFilterResults() {
             if (!planStr) return 1;
             // 4 Puntos (ORO)
             if (planStr.includes('top') || planStr.includes('destacado') || planStr.includes('oro')) return 4;
-            // 3 Puntos (PLATA) -> ¡Aquí faltaba "premium"!
+            // 3 Puntos (PLATA) -> Se agregaron "premium" y "plus" a la lógica para Platinum
             if (planStr.includes('premium') || planStr.includes('plus') || planStr.includes('plata')) return 3;
             // 2 Puntos (BRONCE)
             if (planStr.includes('basico') || planStr.includes('básico') || planStr.includes('bronce')) return 2;

@@ -209,3 +209,10 @@ html,body{overflow-x:clip!important}
 .nav-search .search-suggest.open{display:block}
 .navbar-moderno{position:sticky!important;top:0!important;z-index:1000!important}
 html,body{overflow-x:clip!important}
+/* ============ NAVBAR MÓVIL: BUSCADOR EN FILA PROPIA ============ */
+@media(max-width:720px){
+  .navbar-moderno{flex-wrap:wrap;padding-bottom:10px!important}
+  .logo-text{white-space:nowrap}
+  .nav-search{order:3;width:100%;max-width:none;flex:none;margin:10px 0 0;height:40px}
+  .nav-search .search-suggest{top:calc(100% + 6px)}
+}
