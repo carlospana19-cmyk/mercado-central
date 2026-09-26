@@ -399,3 +399,7 @@
   /* Menos altura de hero en móvil para que la proporción sea de paisaje */
   .hero-search{min-height:420px!important;padding-top:40px!important;padding-bottom:48px!important}
 }
+/* ============ HERO VIDEO PUBLICITARIO ============ */
+.hero-search .hero-swiper .swiper-slide video.hero-ad-img{
+  width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;
+}
