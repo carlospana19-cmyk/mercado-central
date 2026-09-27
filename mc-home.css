@@ -125,7 +125,7 @@
 
 /* ---------- CTA VENDEDORES (nueva) ---------- */
 .seller-cta{padding:52px 20px 64px}
-.seller-cta-in{max-width:1240px;margin:0 auto;background:linear-gradient(120deg,var(--teal-600),var(--teal-700));border-radius:24px;padding:clamp(32px,5vw,56px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.seller-cta-in{max-width:1240px;margin:0 auto;background:linear-gradient(120deg,var(--teal-600),var(--teal-700));border-radius:24px;padding:clamp(32px,5vw,56px);display:flex!important;align-items:center!important;justify-content:space-between!important;gap:24px!important;flex-wrap:wrap!important}
 .seller-cta-in h2{color:#fff;font-size:clamp(1.5rem,3vw,2.2rem);max-width:22ch}
 .seller-cta-in p{color:rgba(255,255,255,.75);margin-top:8px;max-width:52ch}
 .seller-cta .btn-primary{height:52px;padding:0 28px;font-size:15.5px}
@@ -398,6 +398,14 @@
   
   /* Menos altura de hero en móvil para que la proporción sea de paisaje */
   .hero-search{min-height:420px!important;padding-top:40px!important;padding-bottom:48px!important}
+}
+.seller-cta-in .btn.btn-primary{
+  margin:0!important;
+  align-self:center!important;
+}
+@media(max-width:560px){
+  .seller-cta-in{flex-direction:column!important;align-items:flex-start!important;text-align:left}
+  .seller-cta-in .btn.btn-primary{align-self:flex-start!important}
 }
 /* ============ HERO VIDEO PUBLICITARIO ============ */
 .hero-search .hero-swiper .swiper-slide video.hero-ad-img{

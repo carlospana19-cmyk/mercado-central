@@ -36,7 +36,7 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
   display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px clamp(16px,4vw,40px);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line);width:100%
 }
 .logo-link{display:flex;align-items:center;gap:10px}
-.logo-img{height:44px;width:auto;border-radius:8px}
+.logo-img{height:55px;width:auto;border-radius:8px}
 .logo-text{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ink-900)}
 .buttons-nav{display:flex;align-items:center;gap:10px}
 .buttons-nav button{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;border-radius:10px;font-weight:600;font-size:14.5px;white-space:nowrap;transition:all .2s}
