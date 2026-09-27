@@ -1,0 +1,247 @@
+/* =====================================================
+   MERCADOS CENTRAL — mc-base.css (Fase 1)
+   Fundaciones + Navbar + Footer (mismo HTML, nuevo estilo)
+   ===================================================== */
+:root{
+  --teal-500:#0B9E8F; --teal-600:#087F73; --teal-700:#065F57; --teal-50:#E6F7F5;
+  --orange-500:#FF8A3D; --orange-600:#F2731F;
+  --ink-900:#122129; --ink-700:#31413D; --ink-500:#5C6B66; --ink-300:#9AA7A2;
+  --line:#E8ECEF; --bg:#F6F8FA; --card:#FFFFFF; --gold:#D4AF37;
+  --radius-lg:16px; --radius-sm:10px;
+  --shadow-sm:0 1px 2px rgba(18,33,41,.06),0 2px 8px rgba(18,33,41,.05);
+  --shadow-md:0 6px 24px rgba(18,33,41,.10);
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+--font-display:'Poppins','Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--ink-900);font-size:16px;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font:inherit;font-size:16px;color:inherit}
+:focus-visible{outline:2px solid var(--teal-500);outline-offset:2px;border-radius:6px}
+h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
+
+/* ============ HERO VIDEO PUBLICITARIO ============ */
+.hero-search .hero-swiper .swiper-slide video.hero-ad-img{
+  width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;
+}
+
+/* ---------- NAVBAR (mismo HTML del componente) ---------- */
+.navbar-moderno{
+  position:sticky!important;
+  top:0!important;
+  z-index:1000!important;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px clamp(16px,4vw,40px);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line);width:100%
+}
+.logo-link{display:flex;align-items:center;gap:10px}
+.logo-img{height:44px;width:auto;border-radius:8px}
+.logo-text{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ink-900)}
+.buttons-nav{display:flex;align-items:center;gap:10px}
+.buttons-nav button{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;border-radius:10px;font-weight:600;font-size:14.5px;white-space:nowrap;transition:all .2s}
+.buttons-nav button i{font-size:15px}
+.buttons-nav button:hover{transform:translateY(-1px)}
+#btn-publish-logged-in{background:var(--orange-500);color:#fff;box-shadow:0 4px 14px rgba(255,138,61,.35)}
+#btn-publish-logged-in:hover{background:var(--orange-600)}
+#btn-login{background:#fff;color:var(--teal-600);border:1.5px solid var(--teal-500)}
+#btn-login:hover{background:var(--teal-50);border-color:var(--teal-600)}
+#btn-dashboard,#btn-logout{background:transparent;color:var(--ink-500);border:1.5px solid var(--line)}
+#btn-dashboard:hover,#btn-logout:hover{color:var(--ink-900);border-color:var(--ink-300);background:#fff}
+.nav-icon-btn{width:42px;padding:0!important}
+.nav-profile-btn{width:42px;height:42px;padding:0;border-radius:50%;background:var(--teal-500);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.nav-profile-btn:hover{background:var(--teal-600)}
+.profile-icon{width:20px;height:20px}
+@media(max-width:720px){
+  .logo-img{height:55px}.logo-text{font-size:17px}
+  .buttons-nav{gap:8px}
+  .buttons-nav button{height:40px;padding:0 12px;font-size:13.5px}
+}
+@media(max-width:560px){
+  .buttons-nav button{font-size:0;gap:0;width:40px;padding:0;justify-content:center}
+  .buttons-nav button i{font-size:16px}
+}
+
+/* ---------- FOOTER (mismo HTML del componente) ---------- */
+.footer{background:var(--ink-900);color:#B7C4C0;padding:56px clamp(16px,4vw,40px) 0;margin-top:auto}
+.footer-contenedor{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:40px}
+@media(max-width:900px){.footer-contenedor{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.footer-contenedor{grid-template-columns:1fr;gap:28px}}
+.footer-title,.footer-col h4{font-family:var(--font-display);color:#fff;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+.footer-col p{font-size:14.5px;line-height:1.7;color:#9DB0AB}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:10px}
+.footer-col a{color:#B7C4C0;font-size:14.5px;transition:color .2s}
+.footer-col a:hover{color:#2EC4B6}
+.social-links a{display:inline-flex;align-items:center;gap:10px;margin-bottom:10px}
+.social-links i{width:20px;text-align:center;font-size:16px}
+.footer-bottom{max-width:1240px;margin:40px auto 0;padding:20px 0;border-top:1px solid rgba(255,255,255,.08);text-align:center;font-size:13.5px;color:#8FA39E}
+
+/* ============ FASE 4D: BOTÓN MENSAJES + BADGE ============ */
+#btn-messages{position:relative;background:transparent!important;color:var(--ink-700)!important;border:1.5px solid var(--line)!important}
+#btn-messages:hover{background:#fff!important;color:var(--teal-600)!important;border-color:var(--teal-500)!important}
+.nav-badge{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--orange-500);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;line-height:1}
+/* ============ VACUNA ANTI-ENCOGIMIENTO ============ */
+/* Todos los main son hijos flex del body: siempre ocupan todo el ancho */
+main{width:100%}
+/* ============ PATCH v6: FOOTER sobre style.css ============ */
+/* Fuentes: mata el selector universal * de style.css dentro del footer */
+.footer *:not(i){font-family:var(--font-ui)!important}
+.footer .footer-title,.footer .footer-col h4{font-family:var(--font-display)!important}
+
+/* Colores y estructura del footer nuevo, con escudo contra el viejo */
+.footer{background:var(--ink-900)!important;border-top:none!important;padding:56px clamp(16px,4vw,40px) 0!important}
+.footer-contenedor{display:grid!important;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:40px;max-width:1240px;margin:0 auto}
+.footer-title,.footer-col h4{color:#fff!important;font-size:14px!important;font-weight:600!important;margin-bottom:16px!important;letter-spacing:.1em!important}
+.footer-title::after,.footer-col h4::after{display:none!important}
+.footer-col p,.footer-col a,.footer-subtitle{color:#B7C4C0!important;font-size:14.5px!important}
+.footer-col a:hover{color:#2EC4B6!important;padding-left:0!important}
+.social-links a{display:inline-flex;align-items:center;gap:10px}
+.social-links a img{width:22px!important;height:22px!important;object-fit:contain}
+.payment-icons i{color:#8FA39E!important}
+.payment-icons i:hover{color:#2EC4B6!important}
+.store-badge-placeholder{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.12)!important;color:#B7C4C0!important}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08)!important;margin-top:40px!important;padding:20px 0!important}
+.footer-bottom p{margin:0;font-size:13.5px;color:#8FA39E!important}
+@media(max-width:900px){.footer-contenedor{grid-template-columns:1fr 1fr!important}}
+@media(max-width:560px){.footer-contenedor{grid-template-columns:1fr!important;gap:28px}}
+/* ============ PATCH v7: ACCIONES DE TARJETAS DEL PANEL ============ */
+.dashboard-card{display:flex!important;flex-direction:column!important;background:var(--card)!important;border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden!important;box-shadow:var(--shadow-sm)!important;position:relative}
+.dashboard-ad-actions{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:12px 14px!important;margin-top:auto!important;border-top:1px solid var(--line)!important;background:var(--bg)!important}
+.dashboard-ad-actions .btn-view,
+.dashboard-ad-actions .btn-edit,
+.dashboard-ad-actions .btn-sold,
+.dashboard-ad-actions .btn-delete{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+  height:36px!important;padding:0 12px!important;border-radius:9px!important;
+  font-weight:600!important;font-size:13px!important;font-family:var(--font-ui)!important;
+  border:1.5px solid var(--line)!important;background:#fff!important;color:var(--ink-700)!important;
+  cursor:pointer!important;text-decoration:none!important;transition:all .2s!important;opacity:1!important;visibility:visible!important;
+}
+.dashboard-ad-actions .btn-view:hover{border-color:var(--teal-500)!important;color:var(--teal-600)!important}
+.dashboard-ad-actions .btn-edit{background:var(--teal-500)!important;border-color:var(--teal-500)!important;color:#fff!important}
+.dashboard-ad-actions .btn-edit:hover{background:var(--teal-600)!important}
+.dashboard-ad-actions .btn-sold{border-color:var(--teal-500)!important;color:var(--teal-600)!important}
+.dashboard-ad-actions .btn-delete{border-color:rgba(220,53,69,.4)!important;color:#dc3545!important}
+.dashboard-ad-actions .btn-delete:hover{background:#dc3545!important;color:#fff!important}
+/* Título y precio de la tarjeta del panel */
+.dashboard-ad-title h3{font-family:var(--font-ui)!important;font-size:15px!important;font-weight:600!important;color:var(--ink-900)!important;margin:0!important;line-height:1.35!important}
+.dashboard-ad-price{font-family:var(--font-display)!important;font-size:19px!important;font-weight:700!important;color:var(--ink-900)!important}
+.dashboard-ad-category{font-size:12.5px!important;color:var(--ink-500)!important}
+.dashboard-ad-category i{color:var(--teal-500)!important}
+.badge-sold{position:absolute!important;top:10px!important;left:10px!important;z-index:5!important;background:var(--ink-900)!important;color:#fff!important;font-size:11px!important;font-weight:700!important;letter-spacing:.08em!important;padding:5px 12px!important;border-radius:99px!important}
+.dashboard-card.card-sold .dashboard-ad-image{filter:grayscale(.7) brightness(.85)!important}
+
+/* ============ BUSCADOR GLOBAL EN NAVBAR ============ */
+.nav-search{
+  position:relative;
+  flex:1;
+  max-width:520px;
+  display:flex;
+  align-items:center;
+  gap:0;
+  height:38px;
+  padding:0;
+  background:#fff;
+  border:1.5px solid var(--ink-300);
+  border-radius:19px;
+  margin:0 20px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.nav-search:focus-within{border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50)}
+.nav-search i{color:var(--ink-300);font-size:15px}
+.nav-search input{flex:1;border:none;background:none;outline:none;font-size:14.5px;color:var(--ink-900);min-width:0;padding:0 18px}
+.nav-search input::placeholder{color:var(--ink-300)}
+.nav-search .search-suggest{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow-md);overflow:hidden;display:none;
+}
+.nav-search .search-suggest.open{display:block}
+@media(max-width:900px){
+  .nav-search{max-width:none;flex:1;margin:0 8px;height:40px}
+}
+
+/* Botón buscar dentro de la barra del navbar */
+.nav-search-btn{
+  width:48px;height:38px;flex-shrink:0;
+  border:none;
+  border-radius:0 19px 19px 0;
+  background:var(--teal-500);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:background .2s;
+  margin:-1px -1px -1px 0;
+}
+.nav-search-btn:hover{background:var(--teal-600)}
+
+/* ============ BUSCADOR NAVBAR (versión única final) ============ */
+.nav-search{
+  position:relative;flex:1;max-width:420px;display:flex;align-items:center;
+  height:38px;background:#fff;border:1.5px solid var(--ink-300);
+  border-radius:19px;margin:0 12px;
+}
+.nav-search input{
+  flex:1;height:100%;border:none;background:none;outline:none;
+  font-size:14px;color:var(--ink-900);padding:0 14px;min-width:0;
+}
+.nav-search .btn-search-hero{
+  width:44px;height:38px;flex-shrink:0;border:none;
+  border-radius:0 19px 19px 0;
+  background:var(--teal-500);color:#fff;cursor:pointer;font-size:15px;
+  transition:background .2s;
+}
+.nav-search .btn-search-hero:hover{background:var(--teal-600)}
+.nav-search .search-suggest{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow-md);display:none;z-index:2000;
+}
+.nav-search .search-suggest.open{display:block}
+
+/* Navbar fijo (una sola definición, sticky — sin fixed ni padding del body) */
+.navbar-moderno{position:sticky!important;top:0!important;z-index:1000!important}
+html,body{overflow-x:clip!important}
+
+/* Móvil: barra en fila propia, ancho completo */
+@media(max-width:720px){
+  .navbar-moderno{flex-wrap:wrap;padding-bottom:10px!important}
+  .logo-text{white-space:nowrap}
+  .nav-search{order:3;width:100%;max-width:none;flex:none;margin:10px 0 0;height:40px}
+  .nav-search .search-suggest{top:calc(100% + 6px)}
+}
+  
+/* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
+.btn-primary{
+  background:var(--orange-500);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  box-shadow:0 4px 14px rgba(255,138,61,.3);
+}
+.btn-primary:hover{
+  background:var(--orange-600);
+}
+/* CTA vendedores: alineación vertical perfecta */
+.seller-cta-in{align-items:center!important}
+/* ============ COMPATIBILIDAD TEMPORAL: variables legadas ============ */
+/* Mientras se migren los últimos restos de CSS viejo */
+:root{
+  --color-primario:#0B9E8F;
+  --color-secundario:#087F73;
+  --color-acento:#FF8A3D;
+  --color-acento-claro:#FFD1B0;
+  --color-fondo:#F6F8FA;
+  --color-texto:#122129;
+  --color-blanco:#ffffff;
+  --color-gris:#5C6B66;
+  --sombra-suave:0 1px 2px rgba(18,33,41,.06),0 2px 8px rgba(18,33,41,.05);
+  --sombra-media:0 6px 24px rgba(18,33,41,.10);
+}
+/* ============ ITEMS DEL DROPDOWN (global) ============ */
+.sg-item{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;font-size:14.5px;color:var(--ink-900)}
+.sg-item:hover,.sg-item.hl{background:var(--teal-50)}
+.sg-item img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#EEF1F3;flex-shrink:0}
+.sg-item .sg-info{display:flex;flex-direction:column;min-width:0}
+.sg-item .sg-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-item .sg-price{font-size:12.5px;color:var(--ink-500);font-weight:600}
+.sg-empty{padding:14px 16px;font-size:14px;color:var(--ink-500)}
