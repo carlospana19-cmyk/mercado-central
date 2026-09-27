@@ -263,3 +263,8 @@ html,body{overflow-x:clip!important}
 }
 body{padding-top:76px!important}
 @media(max-width:720px){body{padding-top:150px!important}}
+.vehicle-details i,.real-estate-details i,.electronics-details i,
+.home-furniture-details i,.fashion-details i,.sports-details i,
+.pets-details i,.services-details i,.business-details i,
+.community-details i,.property-attributes i,.card-attributes i,
+.property-specs i{display:none!important}
