@@ -13,6 +13,45 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  Future<void> _signUp() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Completa el correo y una contraseña de al menos 6 caracteres'),
+            backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('¡Cuenta creada! Revisa tu correo para confirmar.'),
+              backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   Future<void> _signIn() async {
     print('=== INICIANDO LOGIN ===');
     print('Email: ${_emailController.text.trim()}');
@@ -174,6 +213,21 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('¿No tienes cuenta?',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                  TextButton(
+                    onPressed: _isLoading ? null : _signUp,
+                    child: const Text('Regístrate',
+                        style: TextStyle(
+                            color: Color(0xFF0B9E8F),
+                            fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
             ],
           ),
