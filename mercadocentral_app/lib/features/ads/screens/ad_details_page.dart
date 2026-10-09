@@ -1,5 +1,8 @@
 import 'dart:convert'; // NUEVO: Para decodificar los atributos clave
 import 'package:flutter/material.dart';
+import 'package:mercadocentral_app/features/chat/chat_page.dart';
+import 'package:mercadocentral_app/services/chat_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../ad_attributes_grid.dart';
@@ -16,6 +19,7 @@ class AdDetailsPage extends StatefulWidget {
 class _AdDetailsPageState extends State<AdDetailsPage> {
   int _currentImageIndex = 0;
   List<String> _allImages = [];
+  bool _isOpeningChat = false;
 
   @override
   void initState() {
@@ -108,6 +112,62 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _openInternalChat() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Inicia sesión para contactar al vendedor.'),
+        ),
+      );
+      return;
+    }
+
+    final ad = widget.ad;
+    final rawAdId = ad['id'];
+    final anuncioId =
+        rawAdId is int ? rawAdId : int.tryParse(rawAdId?.toString() ?? '');
+    final vendedorId = ad['user_id']?.toString();
+
+    if (anuncioId == null || vendedorId == null || vendedorId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se encontraron los datos del anuncio o vendedor.'),
+        ),
+      );
+      return;
+    }
+
+    if (user.id == vendedorId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No puedes iniciar un chat contigo mismo.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isOpeningChat = true);
+    try {
+      final conversationId =
+          await ChatService.getOrCreateConversation(anuncioId, vendedorId);
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ChatPage(conversationId: conversationId),
+        ),
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se pudo iniciar el chat: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isOpeningChat = false);
     }
   }
 
@@ -369,34 +429,55 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
           ],
         ),
         child: SafeArea(
-          child:           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: Colors.green[600], // Verde estilo WhatsApp
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            icon: const Icon(Icons.chat, color: Colors.white),
-            label: const Text(
-              'Contactar por WhatsApp',
-              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            onPressed: () async {
-              // Extraemos el número del anuncio (o usamos uno de prueba por ahora)
-              // Nota: El número debe tener el código de país sin el símbolo '+' (Ej: 50761234567 para Panamá)
-              final String phone = ad['contact_phone'] ?? '50760000000';
-
-              // Armamos el mensaje automático
-              final String title = ad['titulo'] ?? 'producto';
-              final String message = 'Hola, estoy interesado en tu anuncio: "$title" que vi en Mercado Central.';
-
-              // Creamos el enlace oficial de WhatsApp
-              final Uri url = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
-
-              // Lanzamos la aplicación externa
-              if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                debugPrint('No se pudo abrir WhatsApp');
-              }
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isOpeningChat ? null : _openInternalChat,
+                  icon: _isOpeningChat
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.forum_outlined),
+                  label: const Text('Chat interno'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.green[600],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.chat, color: Colors.white),
+                  label: const Text(
+                    'Contactar por WhatsApp',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () => _openWhatsApp(context),
+                ),
+              ),
+            ],
           ),
         ),
       ),

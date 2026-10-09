@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mercadocentral_app/core/theme/app_colors.dart';
 import 'package:mercadocentral_app/features/home/widgets/featured_ads.dart';
 import 'package:mercadocentral_app/features/home/widgets/hero_banner.dart';
+import 'package:mercadocentral_app/features/chat/messages_page.dart';
 import 'package:mercadocentral_app/features/search/delegates/mercado_search_delegate.dart';
 import 'package:mercadocentral_app/features/search/screens/all_categories_page.dart';
 
@@ -40,9 +41,7 @@ class _HomePageState extends State<HomePage> {
       _buildHomeContent(), // Index 0: Inicio
       FavoritesPage(key: favoritesPageKey), // Index 1: Favoritos
       const UploadPage(), // Index 2: Publicar
-      const Center(
-          child:
-              Text('Mis Mensajes', style: TextStyle(fontSize: 20))), // Index 3
+      const MessagesPage(), // Index 3: Chats
       const ProfilePage(), // Index 4: Tu perfil
     ];
 
