@@ -125,7 +125,7 @@ async function loadMessages(convId){
   box.innerHTML = '<p class="chat-loading">Cargando mensajes…</p>';
   const { data, error } = await supabase
     .from('mensajes')
-    .select('id, emisor_id, contenido, created_at')
+    .select('id, emisor_id, contenido, created_at, borrado')
     .eq('conversacion_id', convId)
     .order('created_at', { ascending:true })
     .limit(200);
@@ -150,9 +150,101 @@ function appendMessage(msg){
   el.className = 'chat-bubble-row ' + (mine ? 'mine' : 'theirs');
   el.dataset.msgId = msg.id;
   const time = new Date(msg.created_at).toLocaleTimeString('es-PA', { hour:'2-digit', minute:'2-digit' });
-  el.innerHTML = `<div class="chat-bubble">${esc(msg.contenido)}<span class="chat-time">${time}</span></div>`;
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  if(msg.borrado){
+    markMessageDeleted(el);
+  } else {
+    const content = document.createElement('span');
+    content.className = 'chat-message-content';
+    content.textContent = msg.contenido ?? '';
+    bubble.appendChild(content);
+    const timestamp = document.createElement('span');
+    timestamp.className = 'chat-time';
+    timestamp.textContent = time;
+    bubble.appendChild(timestamp);
+    el.appendChild(bubble);
+
+    if(mine) addDeleteButton(el, msg.id);
+  }
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
+}
+
+function markMessageDeleted(message){
+  if(!message || message.dataset.deleted === 'true') return;
+  message.dataset.deleted = 'true';
+  message.replaceChildren();
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble chat-bubble-deleted';
+  bubble.textContent = 'Mensaje eliminado';
+  message.appendChild(bubble);
+}
+
+function mcDialogoConfirmar(){
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999';
+    overlay.innerHTML = `
+      <div role="dialog" aria-modal="true" aria-labelledby="mc-dialog-title" style="background:#fff;border-radius:16px;max-width:340px;width:90%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)">
+        <h3 id="mc-dialog-title" style="margin:0 0 8px;font-size:17px;color:#222">Eliminar mensaje</h3>
+        <p style="margin:0 0 18px;font-size:14px;color:#555">Se ocultará para los dos. ¿Continuar?</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" data-action="cancel" style="padding:8px 16px;border-radius:20px;border:1px solid #ccc;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
+          <button type="button" data-action="confirm" style="padding:8px 16px;border-radius:20px;border:none;background:#0B9E8F;color:#fff;font-size:14px;cursor:pointer">Eliminar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    const close = confirmed => {
+      document.removeEventListener('keydown', onKeyDown);
+      overlay.remove();
+      resolve(confirmed);
+    };
+    const onKeyDown = event => {
+      if(event.key === 'Escape') close(false);
+    };
+    overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+    overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => close(true));
+    overlay.addEventListener('click', event => {
+      if(event.target === overlay) close(false);
+    });
+    document.addEventListener('keydown', onKeyDown);
+    overlay.querySelector('[data-action="confirm"]').focus();
+  });
+}
+
+function addDeleteButton(message, messageId){
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'chat-delete-message';
+  button.title = 'Eliminar mensaje';
+  button.setAttribute('aria-label', 'Eliminar mensaje');
+  button.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i>';
+  button.addEventListener('click', async event => {
+    event.stopPropagation();
+    if(!(await mcDialogoConfirmar())) return;
+
+    try{
+      const { data, error } = await supabase.rpc('fn_borrar_mensaje', {
+        p_mensaje_id: String(messageId)
+      });
+      if(error){
+        alert('No se pudo eliminar: ' + error.message);
+        return;
+      }
+      if(data === 'ok'){
+        markMessageDeleted(message);
+      } else if(data === 'no_autorizado'){
+        alert('Solo puedes eliminar los mensajes que tú escribiste.');
+      } else {
+        alert('No se pudo eliminar (' + data + ').');
+      }
+    }catch(error){
+      console.error('Error eliminando mensaje:', error);
+      alert('No se pudo eliminar el mensaje. Intenta de nuevo.');
+    }
+  });
+  message.appendChild(button);
 }
 
 function subscribeConversation(convId){
@@ -161,6 +253,14 @@ function subscribeConversation(convId){
     .on('postgres_changes',
       { event:'INSERT', schema:'public', table:'mensajes', filter:`conversacion_id=eq.${convId}` },
       payload => appendMessage(payload.new))
+    .on('postgres_changes',
+      { event:'UPDATE', schema:'public', table:'mensajes', filter:`conversacion_id=eq.${convId}` },
+      payload => {
+        if(payload.new?.borrado){
+          const message = document.querySelector(`[data-msg-id="${payload.new.id}"]`);
+          if(message) markMessageDeleted(message);
+        }
+      })
     .subscribe();
 }
 

@@ -36,6 +36,9 @@
 .chat-bubble{max-width:75%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
 .chat-bubble-row.mine .chat-bubble{background:var(--teal-500);color:#fff;border-bottom-right-radius:4px}
 .chat-bubble-row.theirs .chat-bubble{background:#fff;border:1px solid var(--line);color:var(--ink-900);border-bottom-left-radius:4px}
+.chat-bubble-deleted{background:#eceff1!important;color:#90a4ae!important;font-style:italic}
+.chat-delete-message{align-self:center;background:none;border:none;color:var(--ink-500);cursor:pointer;font-size:13px;opacity:.55;padding:4px 6px}
+.chat-delete-message:hover,.chat-delete-message:focus-visible{color:#d33;opacity:1}
 .chat-time{display:block;font-size:10px;opacity:.7;margin-top:3px;text-align:right}
 .chat-form{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line)}
 .chat-form input{flex:1;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 16px;font-size:16px;outline:none;font-family:inherit;color:var(--ink-900);background:#fff}
