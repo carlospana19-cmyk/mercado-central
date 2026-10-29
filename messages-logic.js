@@ -103,16 +103,37 @@ async function openConversation(convId){
   document.getElementById('chat-active').style.display = 'flex';
 
   const other = otherOf(conv);
-  const avatar = other?.url_foto_perfil;
+  const avatarCandidates = [other?.url_foto_perfil, adImgOf(conv), PLACEHOLDER]
+    .filter((src, index, sources) => src && sources.indexOf(src) === index);
   document.getElementById('chat-header').innerHTML = `
     <button class="chat-back" id="chat-back" aria-label="Volver"><i class="fas fa-arrow-left"></i></button>
-    ${avatar?`<img class="chat-avatar" src="${avatar}" alt="">`:`<span class="chat-avatar chat-avatar-ph"><i class="fas fa-user"></i></span>`}
+    <img class="chat-avatar" id="chat-avatar" alt="">
+    <span class="chat-avatar chat-avatar-ph" id="chat-avatar-placeholder" style="display:none"><i class="fas fa-user"></i></span>
     <div class="chat-header-info">
       <strong>${esc(nameOf(conv))}</strong>
       <span>${esc(conv.anuncios?.titulo||'')}</span>
-    </div>`;
+    </div>
+    <button class="chat-delete-conversation" id="chat-delete-conversation" type="button" aria-label="Eliminar conversación" title="Eliminar conversación">
+      <i class="fas fa-trash-alt" aria-hidden="true"></i>
+    </button>`;
+  const avatarImage = document.getElementById('chat-avatar');
+  const avatarPlaceholder = document.getElementById('chat-avatar-placeholder');
+  let avatarSourceIndex = 0;
+  avatarImage.addEventListener('error', () => {
+    avatarSourceIndex += 1;
+    if(avatarSourceIndex < avatarCandidates.length){
+      avatarImage.src = avatarCandidates[avatarSourceIndex];
+    } else {
+      avatarImage.hidden = true;
+      avatarPlaceholder.style.display = 'grid';
+    }
+  });
+  avatarImage.src = avatarCandidates[0] || PLACEHOLDER;
   document.getElementById('chat-back').addEventListener('click', ()=>{
     document.getElementById('messages-layout').classList.remove('chat-open');
+  });
+  document.getElementById('chat-delete-conversation').addEventListener('click', ()=>{
+    mcBorrarConversacion(convId);
   });
 
   document.querySelectorAll('.conv-item').forEach(b=>b.classList.toggle('active', b.dataset.conv===convId));
@@ -181,17 +202,21 @@ function markMessageDeleted(message){
   message.appendChild(bubble);
 }
 
-function mcDialogoConfirmar(){
+function mcDialogoConfirmar(
+  titulo = 'Eliminar mensaje',
+  texto = 'Se ocultará para los dos. ¿Continuar?',
+  boton = 'Eliminar'
+){
   return new Promise(resolve => {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999';
     overlay.innerHTML = `
       <div role="dialog" aria-modal="true" aria-labelledby="mc-dialog-title" style="background:#fff;border-radius:16px;max-width:340px;width:90%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)">
-        <h3 id="mc-dialog-title" style="margin:0 0 8px;font-size:17px;color:#222">Eliminar mensaje</h3>
-        <p style="margin:0 0 18px;font-size:14px;color:#555">Se ocultará para los dos. ¿Continuar?</p>
+        <h3 id="mc-dialog-title" style="margin:0 0 8px;font-size:17px;color:#222">${titulo}</h3>
+        <p style="margin:0 0 18px;font-size:14px;color:#555">${texto}</p>
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button type="button" data-action="cancel" style="padding:8px 16px;border-radius:20px;border:1px solid #ccc;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
-          <button type="button" data-action="confirm" style="padding:8px 16px;border-radius:20px;border:none;background:#0B9E8F;color:#fff;font-size:14px;cursor:pointer">Eliminar</button>
+          <button type="button" data-action="confirm" style="padding:8px 16px;border-radius:20px;border:none;background:#0B9E8F;color:#fff;font-size:14px;cursor:pointer">${boton}</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -211,6 +236,34 @@ function mcDialogoConfirmar(){
     document.addEventListener('keydown', onKeyDown);
     overlay.querySelector('[data-action="confirm"]').focus();
   });
+}
+
+async function mcBorrarConversacion(idConv){
+  if(!(await mcDialogoConfirmar(
+    'Eliminar conversación',
+    'Se borrará toda la conversación para los dos. ¿Continuar?',
+    'Eliminar'
+  ))) return;
+
+  try{
+    const { data, error } = await supabase.rpc('fn_borrar_conversacion', {
+      p_conversacion_id: String(idConv)
+    });
+    if(error){
+      alert('No se pudo eliminar: ' + error.message);
+      return;
+    }
+    if(data === 'ok'){
+      window.location.reload();
+    } else if(data === 'no_autorizado'){
+      alert('No puedes eliminar esta conversación.');
+    } else {
+      alert('No se pudo eliminar (' + data + ').');
+    }
+  }catch(error){
+    console.error('Error eliminando conversación:', error);
+    alert('No se pudo eliminar la conversación. Intenta de nuevo.');
+  }
 }
 
 function addDeleteButton(message, messageId){
@@ -271,6 +324,19 @@ function subscribeGlobal(){
       if(payload.new.conversacion_id !== currentConvId) loadConversations();
     })
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'conversaciones' }, () => loadConversations())
+    .on('postgres_changes', { event:'DELETE', schema:'public', table:'conversaciones' }, payload => {
+      if(String(payload.old?.id ?? '') === currentConvId){
+        currentConvId = null;
+        if(channelConv){
+          supabase.removeChannel(channelConv);
+          channelConv = null;
+        }
+        document.getElementById('messages-layout').classList.remove('chat-open');
+        document.getElementById('chat-active').style.display = 'none';
+        document.getElementById('chat-empty').style.display = '';
+      }
+      loadConversations();
+    })
     .subscribe();
 }
 
