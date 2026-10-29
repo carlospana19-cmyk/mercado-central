@@ -128,7 +128,7 @@
 .seller-cta-in{max-width:1240px;margin:0 auto;background:linear-gradient(120deg,var(--teal-600),var(--teal-700));border-radius:24px;padding:clamp(32px,5vw,56px);display:flex!important;align-items:center!important;justify-content:space-between!important;gap:24px!important;flex-wrap:wrap!important}
 .seller-cta-in h2{color:#fff;font-size:clamp(1.5rem,3vw,2.2rem);max-width:22ch}
 .seller-cta-in p{color:rgba(255,255,255,.75);margin-top:8px;max-width:52ch}
-.seller-cta .btn-primary{height:52px;padding:0 28px;font-size:15.5px}
+.seller-cta .btn-primary{display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 28px;font-size:15.5px;line-height:1}
 /* ================= ANEXO v1.2: EMBUDO DEL HOME ================= */
 .main-content-wrapper{max-width:1240px;margin:0 auto;padding:0 20px}
 .elite-banner-container{margin:10px 0 40px}
