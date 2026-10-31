@@ -212,15 +212,15 @@ html,body{overflow-x:clip!important}
 
 /* Navbar compacto en móviles estrechos: logo y acciones arriba, buscador debajo */
 @media(max-width:560px){
-  .navbar-moderno{display:grid!important;grid-template-columns:1fr;padding:6px 12px 8px!important;column-gap:8px;row-gap:0!important}
-  .logo-container{position:absolute;top:2px;left:50%;transform:translateX(-50%)}
+  .navbar-moderno{display:grid!important;grid-template-columns:auto minmax(0,1fr);padding:6px 12px 8px!important;column-gap:8px;row-gap:0!important}
+  .logo-container{position:static;grid-column:1;grid-row:1;justify-self:start;transform:none}
   .logo-link{gap:0}
   .logo-img{height:44px!important}
   .logo-text{display:none!important}
-  .buttons-nav{grid-column:1;grid-row:1;display:flex!important;align-items:center;justify-content:flex-start;width:100%;min-height:36px;gap:6px!important;margin:0!important}
+  .buttons-nav{grid-column:2;grid-row:1;display:flex!important;align-items:center;justify-content:flex-end;width:auto;min-width:0;min-height:36px;gap:6px!important;margin:0!important}
   .buttons-nav button{width:36px!important;height:36px!important}
-  #btn-logout,#btn-login{margin-left:auto!important}
-  .nav-search{grid-column:1;grid-row:2;width:100%;margin:4px 0 0!important;height:36px!important}
+  #btn-logout,#btn-login{margin-left:0!important}
+  .nav-search{grid-column:1 / -1;grid-row:2;width:100%;margin:4px 0 0!important;height:36px!important}
   .nav-search .btn-search-hero{width:40px!important;height:34px!important}
 }
   
