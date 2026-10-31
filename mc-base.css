@@ -209,6 +209,20 @@ html,body{overflow-x:clip!important}
   .nav-search{order:3;width:100%;max-width:none;flex:none;margin:10px 0 0;height:40px}
   .nav-search .search-suggest{top:calc(100% + 6px)}
 }
+
+/* Navbar compacto en móviles estrechos: logo y acciones arriba, buscador debajo */
+@media(max-width:560px){
+  .navbar-moderno{display:grid!important;grid-template-columns:1fr;padding:6px 12px 8px!important;column-gap:8px;row-gap:0!important}
+  .logo-container{position:absolute;top:2px;left:50%;transform:translateX(-50%)}
+  .logo-link{gap:0}
+  .logo-img{height:44px!important}
+  .logo-text{display:none!important}
+  .buttons-nav{grid-column:1;grid-row:1;display:flex!important;align-items:center;justify-content:flex-start;width:100%;min-height:36px;gap:6px!important;margin:0!important}
+  .buttons-nav button{width:36px!important;height:36px!important}
+  #btn-logout,#btn-login{margin-left:auto!important}
+  .nav-search{grid-column:1;grid-row:2;width:100%;margin:4px 0 0!important;height:36px!important}
+  .nav-search .btn-search-hero{width:40px!important;height:34px!important}
+}
   
 /* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
 .btn-primary{
