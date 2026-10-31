@@ -2,15 +2,17 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../theme/mc_colores.dart';
 
 class PhotoUploadStep extends StatefulWidget {
   final List<XFile> images;
+  final int maxImages;
   final VoidCallback onImagesChanged;
 
   const PhotoUploadStep({
     super.key,
     required this.images,
+    required this.maxImages,
     required this.onImagesChanged,
   });
 
@@ -21,19 +23,33 @@ class PhotoUploadStep extends StatefulWidget {
 class _PhotoUploadStepState extends State<PhotoUploadStep> {
   final ImagePicker _picker = ImagePicker();
 
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 80, // Comprimimos un poco para ahorrar datos
-      );
+  void _notifyLimit() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Tu plan permite hasta ${widget.maxImages} fotos.'),
+      ),
+    );
+  }
 
-      if (pickedFile != null) {
-        setState(() {
-          widget.images.add(pickedFile);
-        });
-        widget.onImagesChanged();
+  Future<void> _pickImage(ImageSource source) async {
+    if (widget.images.length >= widget.maxImages) return _notifyLimit();
+    try {
+      final List<XFile> picked;
+      if (source == ImageSource.gallery) {
+        picked = await _picker.pickMultiImage(imageQuality: 80);
+      } else {
+        final photo = await _picker.pickImage(
+          source: source,
+          imageQuality: 80, // Comprimimos un poco para ahorrar datos
+        );
+        picked = photo == null ? [] : [photo];
       }
+
+      if (picked.isEmpty) return;
+      final room = widget.maxImages - widget.images.length;
+      setState(() => widget.images.addAll(picked.take(room)));
+      if (picked.length > room) _notifyLimit();
+      widget.onImagesChanged();
     } catch (e) {
       debugPrint("Error al seleccionar imagen: $e");
     }
@@ -60,9 +76,9 @@ class _PhotoUploadStepState extends State<PhotoUploadStep> {
           ),
         ),
         const SizedBox(height: 5),
-        const Text(
-          'Agrega fotos nítidas para vender más rápido.',
-          style: TextStyle(color: Colors.grey),
+        Text(
+          'La primera foto es la portada. ${widget.images.length}/${widget.maxImages} fotos.',
+          style: const TextStyle(color: Mc.grisSuave),
         ),
         const SizedBox(height: 20),
 
@@ -78,7 +94,7 @@ class _PhotoUploadStepState extends State<PhotoUploadStep> {
                   style: TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: Mc.naranja,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
               ),
@@ -87,12 +103,13 @@ class _PhotoUploadStepState extends State<PhotoUploadStep> {
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: () => _pickImage(ImageSource.gallery),
-                icon: const Icon(Icons.photo_library, color: AppColors.primary),
+                icon: const Icon(Icons.photo_library, color: Mc.naranja),
                 label: const Text(
                   'GALERÍA',
-                  style: TextStyle(color: AppColors.primary),
+                  style: TextStyle(color: Mc.naranja),
                 ),
                 style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Mc.naranja),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
               ),
@@ -155,6 +172,29 @@ class _PhotoUploadStepState extends State<PhotoUploadStep> {
                             fit: BoxFit.cover,
                           ), // Para Celular Real
                   ),
+                  if (index == 0)
+                    Positioned(
+                      left: 5,
+                      bottom: 5,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Mc.naranja,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'PORTADA',
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                   Positioned(
                     top: 5,
                     right: 5,

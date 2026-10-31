@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mercadocentral_app/core/theme/app_colors.dart';
+import 'package:mercadocentral_app/theme/mc_colores.dart';
 import 'package:mercadocentral_app/features/home/widgets/featured_ads.dart';
 import 'package:mercadocentral_app/features/home/widgets/hero_banner.dart';
 import 'package:mercadocentral_app/features/search/delegates/mercado_search_delegate.dart';
@@ -9,6 +10,7 @@ import 'package:mercadocentral_app/features/search/screens/all_categories_page.d
 import 'package:mercadocentral_app/features/publish/screens/upload_page.dart';
 import 'package:mercadocentral_app/features/profile/screens/profile_page.dart';
 import 'package:mercadocentral_app/features/favorites/screens/favorites_page.dart';
+import 'package:mercadocentral_app/features/chat/screens/chat_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +20,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<FavoritesPageState> _favoritesPageKey =
+      GlobalKey<FavoritesPageState>();
   int _selectedIndex = 0;
   String _selectedCategory = 'Todos';
 
@@ -38,11 +42,9 @@ class _HomePageState extends State<HomePage> {
     // 🚨 REEMPLAZA TU LISTA _PAGES EXACTAMENTE POR ESTA:
     final List<Widget> _pages = [
       _buildHomeContent(), // Index 0: Inicio
-      FavoritesPage(key: favoritesPageKey), // Index 1: Favoritos
+      FavoritesPage(key: _favoritesPageKey), // Index 1: Favoritos
       const UploadPage(), // Index 2: Publicar
-      const Center(
-          child:
-              Text('Mis Mensajes', style: TextStyle(fontSize: 20))), // Index 3
+      const ChatPage(), // Index 3: Chats
       const ProfilePage(), // Index 4: Tu perfil
     ];
 
@@ -58,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         width: 65,
         height: 65,
         child: FloatingActionButton(
-          backgroundColor: const Color(0xFF00BFAE),
+          backgroundColor: Mc.naranja,
           elevation: 4,
           shape: const CircleBorder(),
           onPressed: () =>
@@ -104,7 +106,7 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         // 🚀 FORZAMOS LA RECARGA SI TOCAN FAVORITOS
         if (index == 1) {
-          favoritesPageKey.currentState?.fetchFavorites();
+          _favoritesPageKey.currentState?.fetchFavorites();
         }
         setState(() => _selectedIndex = index);
       },
@@ -114,10 +116,10 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(isSelected ? activeIcon : icon,
-                color: isSelected ? const Color(0xFF00BFAE) : Colors.grey),
+                color: isSelected ? AppColors.primary : Colors.grey),
             Text(label,
                 style: TextStyle(
-                    color: isSelected ? const Color(0xFF00BFAE) : Colors.grey,
+                    color: isSelected ? AppColors.primary : Colors.grey,
                     fontSize: 11)),
           ],
         ),
@@ -131,7 +133,8 @@ class _HomePageState extends State<HomePage> {
         SliverAppBar(
           pinned: true,
           elevation: 0,
-          backgroundColor: const Color(0xFF00BFAE),
+          backgroundColor: Mc.naranja,
+          surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           toolbarHeight: 80,
           title: _buildSearchBubble(),
@@ -148,8 +151,8 @@ class _HomePageState extends State<HomePage> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF00BFAE),
-                      const Color(0xFF00BFAE).withOpacity(0.05)
+                      Mc.naranja,
+                      Mc.naranja.withOpacity(0.05)
                     ],
                   ),
                 ),
@@ -204,9 +207,8 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             CircleAvatar(
                               radius: 28,
-                              backgroundColor: isSelected
-                                  ? const Color(0xFF00BFAE)
-                                  : Colors.white,
+                              backgroundColor:
+                                  isSelected ? AppColors.primary : Colors.white,
                               child: Icon(cat['icon'],
                                   color: isSelected
                                       ? Colors.white
@@ -217,7 +219,7 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: isSelected
-                                        ? const Color(0xFF00BFAE)
+                                        ? AppColors.primary
                                         : Colors.black87)),
                           ],
                         ),
@@ -239,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const Text('Ver todos',
-                        style: TextStyle(color: Color(0xFF00BFAE))),
+                        style: TextStyle(color: AppColors.primary)),
                   ],
                 ),
               ),

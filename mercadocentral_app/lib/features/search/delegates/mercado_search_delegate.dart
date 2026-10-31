@@ -38,15 +38,61 @@ class MercadoSearchDelegate extends SearchDelegate {
         onPressed: () => close(context, null));
   }
 
+  String _normalize(String input) {
+    final Map<String, String> diacritics = {
+      'á': 'a',
+      'à': 'a',
+      'â': 'a',
+      'ä': 'a',
+      'ã': 'a',
+      'å': 'a',
+      'é': 'e',
+      'è': 'e',
+      'ê': 'e',
+      'ë': 'e',
+      'í': 'i',
+      'ì': 'i',
+      'î': 'i',
+      'ï': 'i',
+      'ó': 'o',
+      'ò': 'o',
+      'ô': 'o',
+      'ö': 'o',
+      'õ': 'o',
+      'ú': 'u',
+      'ù': 'u',
+      'û': 'u',
+      'ü': 'u',
+      'ñ': 'n',
+      'ç': 'c',
+    };
+    var result = input.toLowerCase();
+    diacritics.forEach((char, replacement) {
+      result = result.replaceAll(char, replacement);
+    });
+    return result;
+  }
+
   Future<List<Map<String, dynamic>>> _buscarEnSupabase(String texto) async {
     if (texto.isEmpty) return [];
     final response = await Supabase.instance.client
         .from('anuncios')
-        .select('*, imagenes(url_imagen)')
+        .select(
+            '*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
         .eq('activo', true)
         .ilike('titulo', '%$texto%')
-        .limit(20);
-    return List<Map<String, dynamic>>.from(response);
+        .limit(50);
+    final rawAds = List<Map<String, dynamic>>.from(response);
+
+    // Filtro sin acentos en Dart: compara normalizando ambos lados
+    final queryNorm = _normalize(texto);
+    final filtered = rawAds.where((ad) {
+      final titulo = _normalize(ad['titulo']?.toString() ?? '');
+      final categoria = _normalize(ad['categoria']?.toString() ?? '');
+      return titulo.contains(queryNorm) || categoria.contains(queryNorm);
+    }).toList();
+
+    return filtered;
   }
 
   @override

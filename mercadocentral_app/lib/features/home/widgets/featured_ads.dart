@@ -36,7 +36,8 @@ class _FeaturedAdsState extends State<FeaturedAds> {
   Future<List<Map<String, dynamic>>> _fetchAds() async {
     var query = Supabase.instance.client
         .from('anuncios')
-        .select('*, imagenes(url_imagen)')
+        .select(
+            '*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
         .eq('activo', true)
         .eq('is_sold', false);
 
@@ -108,22 +109,12 @@ class _FeaturedAdsState extends State<FeaturedAds> {
 
         final ads = snapshot.data!;
 
-        return GridView.builder(
+        return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio:
-                0.64, // REDUCIMOS PARA DARLE MÁS ALTURA A LA TARJETA
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
-          ),
           itemCount: ads.length,
-          itemBuilder: (context, index) {
-            final ad = ads[index];
-            return AdCard(anuncio: ad);
-          },
+          itemBuilder: (context, index) => AdCard(anuncio: ads[index]),
         );
       },
     );

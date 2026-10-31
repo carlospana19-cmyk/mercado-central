@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mercadocentral_app/search_result_card.dart';
-
-// 🚀 LLAVE MAESTRA DECLARADA GLOBALMENTE
-final GlobalKey<FavoritesPageState> favoritesPageKey =
-    GlobalKey<FavoritesPageState>();
+import '../../../core/theme/app_colors.dart';
 
 class FavoritesPage extends StatefulWidget {
   // Constructor estándar
@@ -88,7 +85,7 @@ class FavoritesPageState extends State<FavoritesPage> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF00BFAE)))
+              child: CircularProgressIndicator(color: AppColors.primary))
           : _favoriteAds.isEmpty
               ? _buildEmptyState()
               : ListView.builder(

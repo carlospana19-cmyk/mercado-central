@@ -1,8 +1,55 @@
 import 'dart:convert'; // NUEVO: Para decodificar los atributos clave
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:mercadocentral_app/features/chat/screens/chat_page.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../ad_attributes_grid.dart';
+
+class _SellerMessageDialog extends StatefulWidget {
+  const _SellerMessageDialog();
+
+  @override
+  State<_SellerMessageDialog> createState() => _SellerMessageDialogState();
+}
+
+class _SellerMessageDialogState extends State<_SellerMessageDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Escribe al vendedor'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        minLines: 2,
+        maxLines: 4,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: const InputDecoration(
+          hintText: 'Hola, me interesa este anuncio…',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _controller.text.trim()),
+          child: const Text('Enviar'),
+        ),
+      ],
+    );
+  }
+}
 
 class AdDetailsPage extends StatefulWidget {
   final Map<String, dynamic> ad;
@@ -111,6 +158,69 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
     }
   }
 
+  Future<void> _startChat() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inicia sesión para enviar un mensaje.')),
+      );
+      return;
+    }
+
+    final adId = widget.ad['id']?.toString();
+    final sellerId = widget.ad['user_id']?.toString();
+    if (adId == null || adId.isEmpty || sellerId == null || sellerId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo identificar al vendedor.')),
+      );
+      return;
+    }
+
+    final initialMessage = await showDialog<String>(
+      context: context,
+      builder: (_) => const _SellerMessageDialog(),
+    );
+
+    final content = initialMessage?.trim();
+    if (!mounted || content == null || content.isEmpty) return;
+
+    try {
+      final conversationId = await ChatService.getOrCreateConversation(
+        anuncioId: adId,
+        vendedorId: sellerId,
+      );
+      await ChatService.sendMessage(
+        conversationId: conversationId,
+        content: content,
+      );
+
+      final profile = widget.ad['profiles'] is Map
+          ? Map<String, dynamic>.from(widget.ad['profiles'] as Map)
+          : <String, dynamic>{};
+      final participantName = (profile['nombre_negocio'] ??
+              profile['nombre_completo'] ??
+              'Vendedor')
+          .toString();
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ChatConversationPage(
+            conversationId: conversationId,
+            participantName: participantName,
+            adTitle: widget.ad['titulo']?.toString() ?? 'Anuncio',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      final reason = error is PostgrestException
+          ? '${error.message}${error.code == null ? '' : ' (${error.code})'}'
+          : error.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo iniciar el chat: $reason')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ad = widget.ad;
@@ -152,23 +262,23 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                               _currentImageIndex = index;
                             });
                           },
-                           itemBuilder: (context, index) {
-                             return Transform.scale(
-                               scaleX: -1.0,
-                               child: Image.network(
-                                 _allImages[index],
-                                 fit: BoxFit.cover,
-                                 errorBuilder: (c, e, s) => Container(
-                                   color: Colors.grey[200],
-                                   child: const Icon(
-                                     Icons.broken_image,
-                                     size: 50,
-                                     color: Colors.grey,
-                                   ),
-                                 ),
-                               ),
-                             );
-                           },
+                          itemBuilder: (context, index) {
+                            return Transform.scale(
+                              scaleX: -1.0,
+                              child: Image.network(
+                                _allImages[index],
+                                fit: BoxFit.cover,
+                                errorBuilder: (c, e, s) => Container(
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                 ),
 
@@ -253,27 +363,30 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                   Text(
-                     ad['descripcion'] ?? 'Sin descripción proporcionada.',
-                     style: const TextStyle(
-                       fontSize: 15,
-                       height: 1.5,
-                       color: Colors.black87,
-                     ),
-                   ),
+                  Text(
+                    ad['descripcion'] ?? 'Sin descripción proporcionada.',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                  ),
 
-                   // 3. LA ZONA DE ATRIBUTOS
-                   const Text('Especificaciones', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                   const SizedBox(height: 10),
-                   AdAttributesGrid(anuncio: ad), // <-- Nuestro nuevo componente
-                   const SizedBox(height: 25),
+                  // 3. LA ZONA DE ATRIBUTOS
+                  const Text('Especificaciones',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  AdAttributesGrid(anuncio: ad), // <-- Nuestro nuevo componente
+                  const SizedBox(height: 25),
 
-                   // 🧩 4. DIBUJAMOS LOS ATRIBUTOS DINÁMICOS
+                  // 🧩 4. DIBUJAMOS LOS ATRIBUTOS DINÁMICOS
                   Builder(
                     builder: (context) {
                       final attributes = _getAttributes();
                       if (attributes.isEmpty)
-                        return const SizedBox.shrink(); // Si no hay atributos, no mostramos nada
+                        return const SizedBox
+                            .shrink(); // Si no hay atributos, no mostramos nada
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,14 +411,12 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                             runSpacing: 10, // Espacio vertical
                             children: attributes.entries.map((entry) {
                               // Limpiamos la clave (ej: "memoria_ram" -> "MEMORIA RAM")
-                              final key = entry.key
-                                  .replaceAll('_', ' ')
-                                  .toUpperCase();
+                              final key =
+                                  entry.key.replaceAll('_', ' ').toUpperCase();
                               final value = entry.value.toString();
 
                               return Container(
-                                width:
-                                    (MediaQuery.of(context).size.width / 2) -
+                                width: (MediaQuery.of(context).size.width / 2) -
                                     25, // Dos columnas perfectas
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
@@ -345,6 +456,16 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                     },
                   ),
 
+                  if (ad['user_id']?.toString() !=
+                      Supabase.instance.client.auth.currentUser?.id)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _startChat,
+                        icon: const Icon(Icons.chat_bubble_outline),
+                        label: const Text('Enviar mensaje al vendedor'),
+                      ),
+                    ),
                   const SizedBox(
                     height: 100,
                   ), // Espacio final para el botón de WhatsApp
@@ -369,16 +490,20 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
           ],
         ),
         child: SafeArea(
-          child:           ElevatedButton.icon(
+          child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: Colors.green[600], // Verde estilo WhatsApp
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             icon: const Icon(Icons.chat, color: Colors.white),
             label: const Text(
               'Contactar por WhatsApp',
-              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
             ),
             onPressed: () async {
               // Extraemos el número del anuncio (o usamos uno de prueba por ahora)
@@ -387,10 +512,12 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
 
               // Armamos el mensaje automático
               final String title = ad['titulo'] ?? 'producto';
-              final String message = 'Hola, estoy interesado en tu anuncio: "$title" que vi en Mercado Central.';
+              final String message =
+                  'Hola, estoy interesado en tu anuncio: "$title" que vi en Mercado Central.';
 
               // Creamos el enlace oficial de WhatsApp
-              final Uri url = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
+              final Uri url = Uri.parse(
+                  'https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
 
               // Lanzamos la aplicación externa
               if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
