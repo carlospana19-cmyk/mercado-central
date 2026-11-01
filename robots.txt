@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /panel-unificado.html
+
+Sitemap: https://www.mercadoscentral.com/sitemap.xml
