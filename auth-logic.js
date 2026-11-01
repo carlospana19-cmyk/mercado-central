@@ -182,8 +182,16 @@ export async function checkUserLoggedIn() {
         const currentPath = window.location.pathname;
         
         // ✅ PÁGINAS PÚBLICAS (sin protección de autenticación)
-        const publicPages = ['index.html', 'resultados.html', 'detalle-producto.html'];
-        const isPublicPage = publicPages.some(page => currentPath.includes(page));
+        const publicPages = ['index.html', 'resultados.html', 'detalle-producto.html', '/', '/index.html', '/privacidad.html', '/terminos.html'];
+        // Minúsculas, sin barra final ni .html; '/' solo coincide con la raíz
+        const normalizePath = p => p.toLowerCase().replace(/\/+$/, '').replace(/\.html$/, '') || '/';
+        const normalizedPath = normalizePath(currentPath);
+        const isPublicPage = publicPages.some(page => {
+            const normalizedPage = normalizePath(page);
+            return normalizedPage === '/'
+                ? normalizedPath === '/'
+                : normalizedPath === normalizedPage || normalizedPath.endsWith('/' + normalizedPage.replace(/^\//, ''));
+        });
         
         // ✅ Si es página pública, permitir acceso sin login
         if (isPublicPage) {

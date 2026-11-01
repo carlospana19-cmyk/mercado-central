@@ -259,6 +259,10 @@ const convertToFullUrl = (imagePath) => {
 // product-detail-logic.js (VERSIÓN CON GALERÍA Y MEJOR MANEJO DE ERRORES)
 
 document.addEventListener('DOMContentLoaded', async () => {
+    var _id = new URLSearchParams(location.search).get('id');
+    if (_id) document.getElementById('mc-canonical').href =
+      'https://www.mercadoscentral.com/detalle-producto.html?id=' + encodeURIComponent(_id);
+
     console.log('🔔 DOMContentLoaded disparado - Iniciando carga del detalle...');
     
     // Poner esto apenas inicia la carga de la página de detalle
