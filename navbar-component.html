@@ -10,11 +10,13 @@
         </a>
     </div>
     <div class="nav-search">
+        <button type="button" class="nav-search-close" aria-label="Cerrar búsqueda"><i class="fas fa-times"></i></button>
         <input type="text" id="mainSearchInput" placeholder="Buscar productos, marcas, provincias…" autocomplete="off">
         <button class="btn-search-hero" aria-label="Buscar"><i class="fas fa-search"></i></button>
         <div id="search-suggest" class="search-suggest"></div>
     </div>
     <div class="buttons-nav">
+        <button type="button" id="btn-search-toggle" class="nav-search-toggle" aria-label="Buscar" aria-expanded="false"><i class="fas fa-search"></i></button>
         <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
             <i class="fas fa-user"></i>
         </button>

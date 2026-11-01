@@ -210,20 +210,6 @@ html,body{overflow-x:clip!important}
   .nav-search .search-suggest{top:calc(100% + 6px)}
 }
 
-/* Navbar compacto en móviles estrechos: logo y acciones arriba, buscador debajo */
-@media(max-width:560px){
-  .navbar-moderno{display:grid!important;grid-template-columns:auto minmax(0,1fr);padding:6px 12px 8px!important;column-gap:8px;row-gap:0!important}
-  .logo-container{position:static;grid-column:1;grid-row:1;justify-self:start;transform:none}
-  .logo-link{gap:0}
-  .logo-img{height:44px!important}
-  .logo-text{display:none!important}
-  .buttons-nav{grid-column:2;grid-row:1;display:flex!important;align-items:center;justify-content:flex-end;width:auto;min-width:0;min-height:36px;gap:6px!important;margin:0!important}
-  .buttons-nav button{width:36px!important;height:36px!important}
-  #btn-logout,#btn-login{margin-left:0!important}
-  .nav-search{grid-column:1 / -1;grid-row:2;width:100%;margin:4px 0 0!important;height:36px!important}
-  .nav-search .btn-search-hero{width:40px!important;height:34px!important}
-}
-  
 /* ============ BOTÓN PRIMARIO NARANJA (global) ============ */
 .btn-primary{
   background:var(--orange-500);
@@ -282,3 +268,24 @@ body{padding-top:76px!important}
 .pets-details i,.services-details i,.business-details i,
 .community-details i,.property-attributes i,.card-attributes i,
 .property-specs i{display:none!important}
+
+/* ============ NAVBAR MÓVIL: UNA FILA + LUPA ============ */
+.buttons-nav .nav-search-toggle,.nav-search-close{display:none}
+@media(max-width:560px){
+  .navbar-moderno{flex-wrap:nowrap!important;gap:8px;padding:6px 12px!important}
+  .logo-link{gap:0}
+  .logo-img{height:44px!important}
+  .logo-text{display:none!important}
+  .buttons-nav{gap:6px!important;margin-left:auto}
+  .buttons-nav button{width:36px!important;height:36px!important}
+  .buttons-nav .nav-search-toggle{display:inline-flex;background:var(--teal-50);color:var(--teal-600)}
+  body{padding-top:56px!important}
+
+  .navbar-moderno .nav-search{display:none!important}
+  .navbar-moderno.search-open .nav-search{display:flex!important;position:absolute;inset:0;z-index:2;width:auto;max-width:none;height:auto!important;margin:0!important;padding:0 12px!important;gap:8px;align-items:center;border:none!important;border-radius:0!important;background:#fff!important}
+  .navbar-moderno.search-open .nav-search input{flex:1;height:38px!important;border:1.5px solid var(--ink-300)!important;border-radius:19px!important;padding:0 14px!important;font-size:16px!important;background:#fff!important}
+  .navbar-moderno.search-open .nav-search input:focus{border-color:var(--teal-500)!important}
+  .navbar-moderno.search-open .nav-search .btn-search-hero{width:38px!important;height:38px!important;border-radius:50%!important}
+  .navbar-moderno.search-open .nav-search .nav-search-close{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0;border-radius:10px;color:var(--ink-500)}
+  .navbar-moderno.search-open .nav-search .search-suggest{left:12px;right:12px}
+}

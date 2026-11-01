@@ -411,7 +411,7 @@
   .hero-search .hero-ad-cta{right:12px!important;bottom:12px!important;background:var(--orange-500)!important;color:#fff!important;font-size:13px!important;font-weight:500!important;padding:8px 14px!important;box-shadow:none!important}
   .hero-search .hero-ad-cta:hover{color:#fff!important}
 }
-@media(max-width:560px){body#index-page{padding-top:90px!important}}
+@media(max-width:560px){body#index-page{padding-top:56px!important}.hero-search{padding-top:12px!important}}
 .seller-cta-in .btn.btn-primary{
   margin:0!important;
   align-self:center!important;

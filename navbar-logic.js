@@ -155,3 +155,18 @@ function subscribeMessagesBadge() {
 
 // Exponer la función también en window para load-components.js
 window.initializeNavbar = initializeNavbar;
+
+// Lupa móvil: delegado a document porque el navbar se inyecta dinámicamente
+function setSearchOpen(open) {
+    const nav = document.querySelector('.navbar-moderno');
+    if (!nav) return;
+    nav.classList.toggle('search-open', open);
+    document.getElementById('btn-search-toggle')?.setAttribute('aria-expanded', String(open));
+    if (open) document.getElementById('mainSearchInput')?.focus();
+}
+document.addEventListener('click', e => {
+    if (e.target.closest('#btn-search-toggle')) setSearchOpen(true);
+    else if (e.target.closest('.nav-search-close')) setSearchOpen(false);
+    else if (!e.target.closest('.nav-search')) setSearchOpen(false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setSearchOpen(false); });
