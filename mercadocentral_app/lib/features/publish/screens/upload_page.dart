@@ -45,6 +45,13 @@ class _UploadPageState extends State<UploadPage> {
   // FUNCIÓN CONECTADA A SUPABASE
   Future<void> _submitAd() async {
     // Mismas validaciones obligatorias de la web
+    final isPaidPlan = ['basico', 'premium', 'destacado'].contains(_selectedPlan);
+    if (isPaidPlan && _tokenData?['id'] == null) {
+      return _showError(
+        'El pago aún no está habilitado. Aplica un token válido o elige GRATIS.',
+      );
+    }
+
     final title = (_adData['titulo'] ?? '').toString().trim();
     final price = double.tryParse((_adData['precio'] ?? '').toString()) ?? 0;
     if (_adData['categoria'] == null)

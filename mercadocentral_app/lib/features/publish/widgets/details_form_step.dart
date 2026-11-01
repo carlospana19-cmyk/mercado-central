@@ -4,14 +4,14 @@ import '../../../theme/mc_colores.dart';
 import '../../ads/widgets/location_picker.dart';
 import '../../search/models/category_catalog.dart';
 
-class _AttrField {
+class AttrField {
   final String key;
   final String label;
   final String? hint;
   final bool numeric;
   final List<String>? options;
 
-  const _AttrField(
+  const AttrField(
     this.key,
     this.label, {
     this.hint,
@@ -28,83 +28,83 @@ const _conditions = [
   'Necesita reparaciones',
 ];
 
-const _vehicleFields = [
-  _AttrField('marca', 'Marca', hint: 'Ej: Toyota'),
-  _AttrField('modelo', 'Modelo', hint: 'Ej: Hilux 2.4 CD 4x4'),
-  _AttrField('anio', 'Año', hint: 'Ej: 2020', numeric: true),
-  _AttrField('kilometraje', 'Kilometraje', hint: 'Ej: 50000', numeric: true),
-  _AttrField('transmision', 'Transmisión', options: ['Automática', 'Manual']),
-  _AttrField(
+const vehicleAttrFields = [
+  AttrField('marca', 'Marca', hint: 'Ej: Toyota'),
+  AttrField('modelo', 'Modelo', hint: 'Ej: Hilux 2.4 CD 4x4'),
+  AttrField('anio', 'Año', hint: 'Ej: 2020', numeric: true),
+  AttrField('kilometraje', 'Kilometraje', hint: 'Ej: 50000', numeric: true),
+  AttrField('transmision', 'Transmisión', options: ['Automática', 'Manual']),
+  AttrField(
     'combustible',
     'Combustible',
     options: ['Gasolina', 'Diesel', 'Híbrido', 'Eléctrico'],
   ),
-  _AttrField('color', 'Color', hint: 'Ej: Blanco'),
-  _AttrField('puertas', 'Puertas', options: ['2', '3', '4', '5']),
-  _AttrField('vidrios', 'Vidrios', options: ['Eléctricos', 'Manuales']),
-  _AttrField('rines', 'Rines', hint: 'Ej: 16 pulgadas'),
-  _AttrField('tapiz', 'Tapiz', options: ['Tela', 'Cuero', 'Vinilo']),
-  _AttrField(
+  AttrField('color', 'Color', hint: 'Ej: Blanco'),
+  AttrField('puertas', 'Puertas', options: ['2', '3', '4', '5']),
+  AttrField('vidrios', 'Vidrios', options: ['Eléctricos', 'Manuales']),
+  AttrField('rines', 'Rines', hint: 'Ej: 16 pulgadas'),
+  AttrField('tapiz', 'Tapiz', options: ['Tela', 'Cuero', 'Vinilo']),
+  AttrField(
     'direccion',
     'Dirección',
     options: ['Asistida', 'Hidráulica', 'Eléctrica'],
   ),
-  _AttrField('frenos', 'Frenos', options: ['ABS', 'Discos', 'Tambores']),
-  _AttrField('airbags', 'Airbags', options: _yesNo),
-  _AttrField('estado', 'Estado', options: _conditions),
+  AttrField('frenos', 'Frenos', options: ['ABS', 'Discos', 'Tambores']),
+  AttrField('airbags', 'Airbags', options: _yesNo),
+  AttrField('estado', 'Estado', options: _conditions),
 ];
 
-const _propertyFields = [
-  _AttrField('m2', 'Metros cuadrados (m²)', hint: 'Ej: 120', numeric: true),
-  _AttrField('habitaciones', 'Habitaciones', hint: 'Ej: 3', numeric: true),
-  _AttrField('banos', 'Baños', hint: 'Ej: 2', numeric: true),
-  _AttrField('piso', 'Piso', hint: 'Ej: 5', numeric: true),
-  _AttrField(
+const propertyAttrFields = [
+  AttrField('m2', 'Metros cuadrados (m²)', hint: 'Ej: 120', numeric: true),
+  AttrField('habitaciones', 'Habitaciones', hint: 'Ej: 3', numeric: true),
+  AttrField('banos', 'Baños', hint: 'Ej: 2', numeric: true),
+  AttrField('piso', 'Piso', hint: 'Ej: 5', numeric: true),
+  AttrField(
     'estacionamiento',
     'Estacionamientos',
     hint: 'Ej: 1',
     numeric: true,
   ),
-  _AttrField('amueblado', 'Amueblado', options: ['Sí', 'No', 'Parcialmente']),
-  _AttrField('ascensor', 'Ascensor', options: _yesNo),
-  _AttrField('jardin', 'Jardín', options: _yesNo),
-  _AttrField('piscina', 'Piscina', options: _yesNo),
-  _AttrField(
+  AttrField('amueblado', 'Amueblado', options: ['Sí', 'No', 'Parcialmente']),
+  AttrField('ascensor', 'Ascensor', options: _yesNo),
+  AttrField('jardin', 'Jardín', options: _yesNo),
+  AttrField('piscina', 'Piscina', options: _yesNo),
+  AttrField(
     'tipo_propiedad',
     'Tipo de propiedad',
     options: ['Casa', 'Apartamento', 'Local', 'Oficina', 'Terreno'],
   ),
-  _AttrField(
+  AttrField(
     'anio_construccion',
     'Año de construcción',
     hint: 'Ej: 2020',
     numeric: true,
   ),
-  _AttrField(
+  AttrField(
     'estado_conservacion',
     'Estado de conservación',
     options: _conditions,
   ),
-  _AttrField('calefaccion', 'Calefacción',
+  AttrField('calefaccion', 'Calefacción',
       options: ['Sí', 'No', 'Eléctrica', 'Gas']),
-  _AttrField(
+  AttrField(
     'aire_acondicionado',
     'Aire acondicionado',
     options: ['Sí', 'No', 'Central', 'Split'],
   ),
-  _AttrField(
+  AttrField(
     'seguridad',
     'Seguridad',
     options: ['Portero', 'Cámaras', 'Alarmas', 'Conserje', 'Básica'],
   ),
-  _AttrField(
+  AttrField(
     'orientacion',
     'Orientación',
     options: ['Norte', 'Sur', 'Este', 'Oeste'],
   ),
-  _AttrField('mascotas', 'Mascotas permitidas',
+  AttrField('mascotas', 'Mascotas permitidas',
       options: ['Sí', 'No', 'Pequeñas']),
-  _AttrField('gimnasio', 'Gimnasio', options: _yesNo),
+  AttrField('gimnasio', 'Gimnasio', options: _yesNo),
 ];
 
 class DetailsFormStep extends StatefulWidget {
@@ -191,7 +191,7 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         ),
       );
 
-  Widget _attrInput(_AttrField field) {
+  Widget _attrInput(AttrField field) {
     final current = _attrs[field.key]?.toString();
     if (field.options != null) {
       return DropdownButtonFormField<String>(
@@ -212,7 +212,7 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
     );
   }
 
-  Widget _attributeGrid(String title, List<_AttrField> fields) {
+  Widget _attributeGrid(String title, List<AttrField> fields) {
     final rows = <Widget>[];
     for (var i = 0; i < fields.length; i += 2) {
       rows.add(
@@ -328,9 +328,9 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
           onChanged: (val) => _updateField('descripcion', val),
         ),
         if (cat == 'Vehículos')
-          _attributeGrid('Especificaciones del vehículo', _vehicleFields),
+          _attributeGrid('Especificaciones del vehículo', vehicleAttrFields),
         if (cat == 'Inmuebles')
-          _attributeGrid('Especificaciones del inmueble', _propertyFields),
+          _attributeGrid('Especificaciones del inmueble', propertyAttrFields),
         const Divider(),
         _section(Icons.account_circle_outlined, 'Información de contacto'),
         TextFormField(

@@ -13,65 +13,94 @@ class AdSpecHighlights extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Lógica de "Top 3" de tu product-detail-logic.js
-    List<String> topKeys = ['anio', 'kilometraje', 'combustible']; // Default
-    final cat = categoria.toLowerCase();
+    final visibleAttributes = Map<String, dynamic>.fromEntries(
+      attributes.entries.where((entry) {
+        final key = entry.key.toLowerCase();
+        final value = entry.value?.toString().trim() ?? '';
+        const excludedKeys = [
+          'step',
+          'categoria',
+          'subcategoria',
+          'provincia',
+          'distrito',
+          'attr-',
+        ];
+        return !excludedKeys.any((part) => key.contains(part)) &&
+            value.isNotEmpty &&
+            value != '0' &&
+            value != 'N/A' &&
+            value != '{}';
+      }),
+    );
+    if (visibleAttributes.isEmpty) return const SizedBox.shrink();
 
-    if (cat.contains('inmuebl')) {
+    final cat = categoria
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u');
+
+    final List<String> topKeys;
+    if (cat.contains('inmuebl') ||
+        cat.contains('casa') ||
+        cat.contains('apart')) {
       topKeys = ['m2', 'habitaciones', 'banos'];
-    } else if ([
-      'electronica',
-      'celular',
-      'computadora',
-    ].any((c) => cat.contains(c))) {
+    } else if (['electronica', 'celular', 'computadora'].any(cat.contains)) {
       topKeys = ['condicion', 'almacenamiento', 'memoria_ram'];
-    } else if (['mascota', 'perro', 'gato'].any((c) => cat.contains(c))) {
+    } else if (['mascota', 'perro', 'gato'].any(cat.contains)) {
       topKeys = ['raza', 'genero', 'edad_mascota'];
+    } else if (cat.contains('veh') ||
+        cat.contains('auto') ||
+        cat.contains('moto')) {
+      topKeys = ['anio', 'kilometraje', 'combustible'];
+    } else {
+      topKeys = visibleAttributes.keys.take(3).toList();
     }
 
-    // Filtramos los que existen en este anuncio
-    final highlights = attributes.entries
-        .where(
-          (e) => topKeys.contains(e.key) && e.value != null && e.value != '',
-        )
+    final highlights = topKeys
+        .where(visibleAttributes.containsKey)
+        .map((key) => MapEntry(key, visibleAttributes[key]))
+        .toList();
+    final remaining = visibleAttributes.entries
+        .where((entry) => !topKeys.contains(entry.key))
         .toList();
 
     return Column(
       children: [
-        // FILA DE BURBUJAS (Igual a tu Web)
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: highlights
-                .map((e) => _buildBubble(e.key, e.value.toString()))
+        if (highlights.isNotEmpty) ...[
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: highlights
+                  .map((entry) =>
+                      _buildBubble(entry.key, entry.value.toString()))
+                  .toList(),
+            ),
+          ),
+          if (remaining.isNotEmpty) const SizedBox(height: 20),
+        ],
+        if (remaining.isNotEmpty) ...[
+          const Divider(),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            childAspectRatio: 3,
+            children: remaining
+                .map((entry) =>
+                    _buildSecondaryAttr(entry.key, entry.value.toString()))
                 .toList(),
           ),
-        ),
-        const SizedBox(height: 20),
-        const Divider(),
-        // RESTO DE ATRIBUTOS EN 2 COLUMNAS
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          childAspectRatio: 3,
-          children: attributes.entries
-              .where(
-                (e) =>
-                    !topKeys.contains(e.key) &&
-                    e.value != null &&
-                    e.value != '',
-              )
-              .map((e) => _buildSecondaryAttr(e.key, e.value.toString()))
-              .toList(),
-        ),
+        ],
       ],
     );
   }
 
   Widget _buildBubble(String key, String value) {
-    String displayValue = value;
+    var displayValue = value;
     if (key == 'kilometraje') displayValue += ' km';
     if (key == 'm2') displayValue += ' m²';
 
@@ -80,12 +109,15 @@ class AdSpecHighlights extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.grey.shade50!, Colors.grey.shade200!],
+          colors: [Colors.grey.shade50, Colors.grey.shade200],
         ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300!),
+        border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+          ),
         ],
       ),
       child: Column(

@@ -20,6 +20,11 @@ class PublishService {
         debugPrint('Error: No hay usuario autenticado');
         return false;
       }
+      if (['basico', 'premium', 'destacado'].contains(selectedPlan) &&
+          token?['id'] == null) {
+        debugPrint('Error: No hay token validado para el plan de pago');
+        return false;
+      }
 
       // 2. Subir imágenes al Storage de Supabase
       List<String> imageUrls = [];

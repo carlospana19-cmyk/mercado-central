@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../theme/mc_colores.dart';
 
 class MyReviewsPage extends StatefulWidget {
   const MyReviewsPage({super.key});
@@ -10,180 +10,233 @@ class MyReviewsPage extends StatefulWidget {
 }
 
 class _MyReviewsPageState extends State<MyReviewsPage> {
-  final _supabase = Supabase.instance.client;
+  final _client = Supabase.instance.client;
+  bool _received = true;
   late Future<List<Map<String, dynamic>>> _reviewsFuture;
 
   @override
   void initState() {
     super.initState();
-    _reviewsFuture = _fetchMyReviews();
+    _reviewsFuture = _fetchReviews();
   }
 
-  Future<List<Map<String, dynamic>>> _fetchMyReviews() async {
-    try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception("No hay sesión iniciada");
+  Future<List<Map<String, dynamic>>> _fetchReviews() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return [];
 
-      final response = await _supabase
-          .from('reviews')
-          .select('*')
-          .eq(
-            'seller_id',
-            user.id,
-          ) // Filtramos las reseñas RECIBIDAS por este usuario
-          .order('created_at', ascending: false);
-
-      // CHIVATO: Esto imprimirá en tu consola cuántas reseñas encontró
-      debugPrint('🔍 Buscando reseñas para el ID: ${user.id}');
-      debugPrint('✅ Reseñas encontradas: ${response.length}');
-
-      return List<Map<String, dynamic>>.from(response);
-    } catch (e) {
-      debugPrint("❌ Error cargando reseñas: $e");
-      throw e;
-    }
+    final response = _received
+        ? await _client
+            .from('reviews')
+            .select(
+              'id, rating, comment, created_at, '
+              'reviewer:reviewer_id(id, nombre_negocio, url_foto_perfil)',
+            )
+            .eq('seller_id', user.id)
+            .order('created_at', ascending: false)
+        : await _client
+            .from('reviews')
+            .select(
+                'id, rating, comment, created_at, seller:seller_id(id, nombre_negocio)')
+            .eq('reviewer_id', user.id)
+            .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(response);
   }
 
-  // 🔄 Función para recargar al deslizar hacia abajo
   Future<void> _refresh() async {
-    setState(() {
-      _reviewsFuture = _fetchMyReviews();
-    });
-    await _reviewsFuture; // Esperamos a que termine para ocultar la ruedita
+    setState(() => _reviewsFuture = _fetchReviews());
+    await _reviewsFuture;
   }
 
-  Widget _buildStars(int rating) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (index) {
-        return Icon(
-          index < rating ? Icons.star : Icons.star_border,
-          color: Colors.amber,
-          size: 18,
-        );
-      }),
-    );
+  void _selectTab(bool received) {
+    if (_received == received) return;
+    setState(() {
+      _received = received;
+      _reviewsFuture = _fetchReviews();
+    });
   }
+
+  Map<String, dynamic> _nestedMap(dynamic value) {
+    if (value is Map) return Map<String, dynamic>.from(value);
+    if (value is List && value.isNotEmpty && value.first is Map) {
+      return Map<String, dynamic>.from(value.first as Map);
+    }
+    return {};
+  }
+
+  Widget _stars(int rating) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          5,
+          (index) => Icon(
+            index < rating ? Icons.star : Icons.star_border,
+            color: const Color(0xFFD4AF37),
+            size: 17,
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
-        title: const Text(
-          'Mis Reseñas',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Mis reseñas'),
         backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black),
+        foregroundColor: Mc.texto,
+        surfaceTintColor: Colors.transparent,
       ),
-      // 🚨 AGREGAMOS REFRESH INDICATOR
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        onRefresh: _refresh,
-        child: FutureBuilder<List<Map<String, dynamic>>>(
-          future: _reviewsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
-            }
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment(value: true, label: Text('Recibidas')),
+                ButtonSegment(value: false, label: Text('Enviadas')),
+              ],
+              selected: {_received},
+              onSelectionChanged: (selection) => _selectTab(selection.first),
+              style: SegmentedButton.styleFrom(
+                selectedBackgroundColor: Mc.naranja,
+                selectedForegroundColor: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              color: Mc.naranja,
+              onRefresh: _refresh,
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _reviewsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Mc.naranja),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return _emptyContent(
+                      'No se pudieron cargar las reseñas.',
+                      icon: Icons.error_outline,
+                    );
+                  }
 
-            if (snapshot.hasError) {
-              return SingleChildScrollView(
-                physics:
-                    const AlwaysScrollableScrollPhysics(), // Permite hacer pull-to-refresh incluso si hay error
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 100,
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Error de conexión: ${snapshot.error}',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              );
-            }
+                  final reviews = snapshot.data ?? [];
+                  if (reviews.isEmpty) {
+                    return _emptyContent(
+                      _received
+                          ? 'Aún no has recibido reseñas.'
+                          : 'Aún no has enviado reseñas.',
+                      icon:
+                          _received ? Icons.star_outline : Icons.send_outlined,
+                    );
+                  }
 
-            final reviews = snapshot.data ?? [];
+                  return ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    itemCount: reviews.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) =>
+                        _reviewCard(reviews[index]),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-            if (reviews.isEmpty) {
-              return SingleChildScrollView(
-                physics:
-                    const AlwaysScrollableScrollPhysics(), // Permite hacer pull-to-refresh incluso si está vacío
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 100,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.star_border_purple500,
-                        size: 80,
-                        color: Colors.grey[300],
-                      ),
-                      const SizedBox(height: 15),
-                      const Text(
-                        'Aún no tienes reseñas',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        '¡Desliza hacia abajo para actualizar!',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
+  Widget _emptyContent(String message, {required IconData icon}) => ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.55,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 58, color: const Color(0xFFB8C0C5)),
+                  const SizedBox(height: 12),
+                  Text(message, style: const TextStyle(color: Mc.grisSuave)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
 
-            return ListView.separated(
-              physics:
-                  const AlwaysScrollableScrollPhysics(), // Obligatorio para el pull-to-refresh
-              padding: const EdgeInsets.all(20),
-              itemCount: reviews.length,
-              separatorBuilder: (context, index) =>
-                  const Divider(height: 30, color: Color(0xFFF0F0F0)),
-              itemBuilder: (context, index) {
-                final review = reviews[index];
-                final int rating = review['rating'] ?? 5;
-                final String comment = review['comment'] ?? 'Sin comentario';
+  Widget _reviewCard(Map<String, dynamic> review) {
+    final person =
+        _nestedMap(_received ? review['reviewer'] : review['seller']);
+    final personName = _received
+        ? (person['nombre_negocio'] ?? 'Usuario').toString()
+        : (person['nombre_negocio'] ?? 'Vendedor').toString();
+    final photo = _received ? person['url_foto_perfil']?.toString() : null;
+    final rating = (review['rating'] as num?)?.toInt() ?? 0;
+    final comment = review['comment']?.toString().trim() ?? '';
+    final date = DateTime.tryParse(review['created_at']?.toString() ?? '');
 
-                return Column(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE8ECEF)),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: const Color(0xFFF1F3F5),
+                backgroundImage:
+                    photo == null || photo.isEmpty ? null : NetworkImage(photo),
+                child: photo == null || photo.isEmpty
+                    ? const Icon(Icons.person_outline, color: Mc.grisSuave)
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildStars(rating),
-                        const Text(
-                          'Comprador Verificado',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
                     Text(
-                      comment,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                        height: 1.4,
-                      ),
+                      _received ? personName : 'Tu reseña',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
+                    if (!_received)
+                      Text(
+                        'Para: $personName',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Mc.grisSuave,
+                        ),
+                      ),
+                    if (date != null)
+                      Text(
+                        '${date.toLocal().day}/${date.toLocal().month}/${date.toLocal().year}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Mc.grisSuave,
+                        ),
+                      ),
                   ],
-                );
-              },
-            );
-          },
-        ),
+                ),
+              ),
+              _stars(rating),
+            ],
+          ),
+          if (comment.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(comment, style: const TextStyle(height: 1.4)),
+          ],
+        ],
       ),
     );
   }

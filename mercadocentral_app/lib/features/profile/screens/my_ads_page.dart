@@ -13,6 +13,7 @@ class MyAdsPage extends StatefulWidget {
 class _MyAdsPageState extends State<MyAdsPage> {
   final _supabase = Supabase.instance.client;
   late Future<List<Map<String, dynamic>>> _myAdsFuture;
+  String _filter = 'todos';
 
   @override
   void initState() {
@@ -101,8 +102,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
       // 🚨 AQUÍ ESTÁ LA MAGIA: USAMOS 'is_sold' IGUAL QUE EN VERCEL
       await _supabase
           .from('anuncios')
-          .update({'is_sold': newSoldStatus})
-          .eq('id', id);
+          .update({'is_sold': newSoldStatus}).eq('id', id);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -147,9 +147,15 @@ class _MyAdsPageState extends State<MyAdsPage> {
             );
           }
 
-          final ads = snapshot.data ?? [];
+          final allAds = snapshot.data ?? [];
+          final ads = allAds.where((ad) {
+            final sold = ad['is_sold'] == true;
+            if (_filter == 'activos') return !sold;
+            if (_filter == 'vendidos') return sold;
+            return true;
+          }).toList();
 
-          if (ads.isEmpty) {
+          if (allAds.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -169,165 +175,218 @@ class _MyAdsPageState extends State<MyAdsPage> {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(15),
-            itemCount: ads.length,
-            separatorBuilder: (context, index) =>
-                const Divider(height: 30, color: Color(0xFFF0F0F0)),
-            itemBuilder: (context, index) {
-              final ad = ads[index];
-              final bool isSold = ad['is_sold'] == true;
-
-              String? imageUrl;
-              if (ad['url_portada'] != null &&
-                  ad['url_portada'].toString().isNotEmpty) {
-                imageUrl = ad['url_portada'].toString();
-              } else if (ad['imagenes'] != null &&
-                  (ad['imagenes'] as List).isNotEmpty) {
-                imageUrl = ad['imagenes'][0]['url_imagen'].toString();
-              }
-
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: imageUrl != null
-                          ? Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (c, e, s) => const Icon(
-                                Icons.broken_image,
-                                color: Colors.grey,
-                              ),
-                            )
-                          : const Icon(Icons.camera_alt, color: Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ad['titulo'] ?? 'Sin título',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 12, 15, 0),
+                child: Row(
+                  children: [
+                    for (final option in const {
+                      'todos': 'Todos',
+                      'activos': 'Activos',
+                      'vendidos': 'Vendidos',
+                    }.entries)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(option.value),
+                          selected: _filter == option.key,
+                          selectedColor: const Color(0xFFFF8A3D),
+                          labelStyle: TextStyle(
+                            color: _filter == option.key
+                                ? Colors.white
+                                : Colors.black87,
+                            fontWeight: FontWeight.w600,
                           ),
+                          onSelected: (_) =>
+                              setState(() => _filter = option.key),
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '\$${ad['precio']}',
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                      ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ads.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No hay anuncios en esta categoría.',
+                          style: TextStyle(color: Colors.grey),
                         ),
-                        const SizedBox(height: 5),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(15),
+                        itemCount: ads.length,
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 30, color: Color(0xFFF0F0F0)),
+                        itemBuilder: (context, index) {
+                          final ad = ads[index];
+                          final bool isSold = ad['is_sold'] == true;
 
-                        // 🚨 LA ETIQUETA VISUAL
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: (isSold ? Colors.grey : Colors.green)
-                                .withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Text(
-                            isSold ? 'VENDIDO' : 'ACTIVO',
-                            style: TextStyle(
-                              color: isSold ? Colors.grey : Colors.green,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                          String? imageUrl;
+                          if (ad['url_portada'] != null &&
+                              ad['url_portada'].toString().isNotEmpty) {
+                            imageUrl = ad['url_portada'].toString();
+                          } else if (ad['imagenes'] != null &&
+                              (ad['imagenes'] as List).isNotEmpty) {
+                            imageUrl =
+                                ad['imagenes'][0]['url_imagen'].toString();
+                          }
 
-                  PopupMenuButton<String>(
-                    onSelected: (value) async {
-                      if (value == 'delete') {
-                        _deleteAd(ad['id']); // Pasamos el ID directamente
-                      } else if (value == 'sold') {
-                        _markAsSold(
-                          ad['id'],
-                          isSold,
-                        ); // Pasamos 'isSold', NO isActive
-                      } else if (value == 'edit') {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditAdPage(ad: ad),
-                          ),
-                        );
-                        // Si el usuario guardó los cambios, recargamos la lista
-                        if (result == true) {
-                          _refreshList();
-                        }
-                      }
-                    },
-                    itemBuilder: (context) {
-                      return [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.edit, size: 20, color: Colors.grey),
-                              SizedBox(width: 10),
-                              Text('Editar'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'sold',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.sell,
-                                size: 20,
-                                color: isSold ? Colors.green : Colors.orange,
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: imageUrl != null
+                                      ? Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (c, e, s) => const Icon(
+                                            Icons.broken_image,
+                                            color: Colors.grey,
+                                          ),
+                                        )
+                                      : const Icon(Icons.camera_alt,
+                                          color: Colors.grey),
+                                ),
                               ),
-                              SizedBox(width: 10),
-                              Text(isSold ? 'Reactivar' : 'Marcar Vendido'),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, size: 20, color: Colors.red),
-                              SizedBox(width: 10),
-                              Text(
-                                'Eliminar',
-                                style: TextStyle(color: Colors.red),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      ad['titulo'] ?? 'Sin título',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      '\$${ad['precio']}',
+                                      style: const TextStyle(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+
+                                    // 🚨 LA ETIQUETA VISUAL
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: (isSold
+                                                ? Colors.grey
+                                                : Colors.green)
+                                            .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Text(
+                                        isSold ? 'VENDIDO' : 'ACTIVO',
+                                        style: TextStyle(
+                                          color: isSold
+                                              ? Colors.grey
+                                              : Colors.green,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuButton<String>(
+                                onSelected: (value) async {
+                                  if (value == 'delete') {
+                                    _deleteAd(
+                                        ad['id']); // Pasamos el ID directamente
+                                  } else if (value == 'sold') {
+                                    _markAsSold(
+                                      ad['id'],
+                                      isSold,
+                                    ); // Pasamos 'isSold', NO isActive
+                                  } else if (value == 'edit') {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditAdPage(ad: ad),
+                                      ),
+                                    );
+                                    // Si el usuario guardó los cambios, recargamos la lista
+                                    if (result == true) {
+                                      _refreshList();
+                                    }
+                                  }
+                                },
+                                itemBuilder: (context) {
+                                  return [
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit,
+                                              size: 20, color: Colors.grey),
+                                          SizedBox(width: 10),
+                                          Text('Editar'),
+                                        ],
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'sold',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.sell,
+                                            size: 20,
+                                            color: isSold
+                                                ? Colors.green
+                                                : Colors.orange,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(isSold
+                                              ? 'Reactivar'
+                                              : 'Marcar Vendido'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete,
+                                              size: 20, color: Colors.red),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Eliminar',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ];
+                                },
                               ),
                             ],
-                          ),
-                        ),
-                      ];
-                    },
-                  ),
-                ],
-              );
-            },
+                          );
+                        },
+                      ),
+              ),
+            ],
           );
         },
       ),

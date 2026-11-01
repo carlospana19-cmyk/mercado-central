@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mercadocentral_app/features/chat/screens/chat_page.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../ad_attributes_grid.dart';
+import 'package:mercadocentral_app/features/profile/screens/edit_ad_page.dart';
+import '../../../core/services/review_service.dart';
+import '../../../theme/mc_colores.dart';
+import '../widgets/ad_spec_highlights.dart';
+import '../widgets/seller_reviews_widget.dart';
 
 class _SellerMessageDialog extends StatefulWidget {
   const _SellerMessageDialog();
@@ -51,6 +54,74 @@ class _SellerMessageDialogState extends State<_SellerMessageDialog> {
   }
 }
 
+class _SellerReviewDialog extends StatefulWidget {
+  const _SellerReviewDialog();
+
+  @override
+  State<_SellerReviewDialog> createState() => _SellerReviewDialogState();
+}
+
+class _SellerReviewDialogState extends State<_SellerReviewDialog> {
+  final _commentController = TextEditingController();
+  int _rating = 0;
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Calificar al vendedor'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                5,
+                (index) => IconButton(
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => setState(() => _rating = index + 1),
+                  icon: Icon(
+                    index < _rating ? Icons.star : Icons.star_border,
+                    color: const Color(0xFFD4AF37),
+                  ),
+                ),
+              ),
+            ),
+            TextField(
+              controller: _commentController,
+              minLines: 2,
+              maxLines: 4,
+              maxLength: 500,
+              decoration: const InputDecoration(
+                hintText: 'Cuéntales a otros cómo fue tu experiencia',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: _rating == 0
+                ? null
+                : () => Navigator.pop(context, {
+                      'rating': _rating,
+                      'comment': _commentController.text.trim(),
+                    }),
+            style: FilledButton.styleFrom(backgroundColor: Mc.naranja),
+            child: const Text('Enviar reseña'),
+          ),
+        ],
+      );
+}
+
 class AdDetailsPage extends StatefulWidget {
   final Map<String, dynamic> ad;
 
@@ -62,12 +133,114 @@ class AdDetailsPage extends StatefulWidget {
 
 class _AdDetailsPageState extends State<AdDetailsPage> {
   int _currentImageIndex = 0;
+  final PageController _galleryController = PageController();
   List<String> _allImages = [];
+  Map<String, dynamic> _sellerProfile = {};
+  int _reviewsVersion = 0;
+  final _reviewService = ReviewService();
 
   @override
   void initState() {
     super.initState();
     _extractAllImages();
+    _loadSellerProfile();
+  }
+
+  @override
+  void dispose() {
+    _galleryController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSellerProfile() async {
+    final sellerId = widget.ad['user_id']?.toString();
+    if (sellerId == null || sellerId.isEmpty) return;
+
+    try {
+      final profile = await Supabase.instance.client
+          .from('profiles')
+          .select(
+            'telefono, email, nombre_negocio, nombre_completo, url_foto_perfil',
+          )
+          .eq('id', sellerId)
+          .maybeSingle();
+      if (mounted && profile != null) {
+        setState(() => _sellerProfile = Map<String, dynamic>.from(profile));
+      }
+    } catch (error) {
+      debugPrint('No se pudo cargar el contacto del vendedor: $error');
+    }
+  }
+
+  String _formatPrice(dynamic rawPrice) {
+    final price = num.tryParse(rawPrice?.toString() ?? '');
+    if (price == null) return 'Consultar';
+    final fixed = price.toStringAsFixed(2).split('.');
+    final grouped = fixed.first.replaceAllMapped(
+      RegExp(r'\B(?=(\d{3})+(?!\d))'),
+      (_) => ',',
+    );
+    return 'B/. $grouped.${fixed.last}';
+  }
+
+  String _publishedDate() {
+    final value = widget.ad['fecha_publicacion'] ?? widget.ad['created_at'];
+    final date = DateTime.tryParse(value?.toString() ?? '');
+    if (date == null) return 'Fecha no disponible';
+    final days = DateTime.now().difference(date.toLocal()).inDays;
+    if (days <= 0) return 'Publicado hoy';
+    if (days == 1) return 'Publicado hace 1 día';
+    if (days < 30) return 'Publicado hace $days días';
+    if (days < 60) return 'Publicado hace 1 mes';
+    return 'Publicado hace ${days ~/ 30} meses';
+  }
+
+  bool get _isOwner =>
+      widget.ad['user_id']?.toString() ==
+      Supabase.instance.client.auth.currentUser?.id;
+
+  bool get _hasSellerPhone =>
+      (widget.ad['contact_phone'] ?? _sellerProfile['telefono'])
+          ?.toString()
+          .trim()
+          .isNotEmpty ??
+      false;
+
+  String _locationText(Map<String, dynamic> ad) {
+    final district = ad['distrito']?.toString().trim() ?? '';
+    final province = ad['provincia']?.toString().trim() ?? '';
+    if (district.isEmpty) return province.isEmpty ? 'Panamá' : province;
+    if (province.isEmpty || district.toLowerCase() == province.toLowerCase()) {
+      return district;
+    }
+    return '$district, $province';
+  }
+
+  Future<void> _editAd() async {
+    final updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => EditAdPage(ad: widget.ad),
+      ),
+    );
+    if (updated != true || !mounted) return;
+
+    try {
+      final refreshed = await Supabase.instance.client
+          .from('anuncios')
+          .select('*')
+          .eq('id', widget.ad['id'].toString())
+          .maybeSingle();
+      if (refreshed != null) {
+        widget.ad.addAll(Map<String, dynamic>.from(refreshed));
+        _allImages = [];
+        _currentImageIndex = 0;
+        _extractAllImages();
+        await _loadSellerProfile();
+        if (mounted) setState(() {});
+      }
+    } catch (error) {
+      _showContactError('No se pudieron actualizar los detalles: $error');
+    }
   }
 
   // 🧩 DECODIFICADOR INTELIGENTE DE ATRIBUTOS
@@ -107,8 +280,9 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
       }
     } else if (ad['imagenes'] != null && ad['imagenes'] is List) {
       for (var img in ad['imagenes']) {
-        if (img['url_imagen'] != null)
+        if (img['url_imagen'] != null) {
           _allImages.add(img['url_imagen'].toString());
+        }
       }
     }
 
@@ -118,7 +292,9 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
 
   // 🟢 LA MAGIA DE WHATSAPP
   Future<void> _openWhatsApp(BuildContext context) async {
-    String phone = widget.ad['contact_phone']?.toString() ?? '';
+    String phone = (widget.ad['contact_phone'] ?? _sellerProfile['telefono'])
+            ?.toString() ??
+        '';
 
     if (phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -158,6 +334,110 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
     }
   }
 
+  Future<void> _openEmail() async {
+    final email = _sellerProfile['email']?.toString().trim() ?? '';
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El vendedor no ha proporcionado email.')),
+      );
+      return;
+    }
+    final title = widget.ad['titulo']?.toString() ?? 'anuncio';
+    final uri = Uri(
+      scheme: 'mailto',
+      path: email,
+      queryParameters: {
+        'subject': 'Interesado en tu anuncio: $title',
+        'body': 'Hola, estoy interesado en tu anuncio "$title".',
+      },
+    );
+    if (!await launchUrl(uri)) _showContactError('No se pudo abrir el email.');
+  }
+
+  Future<void> _callSeller() async {
+    final phone = (widget.ad['contact_phone'] ?? _sellerProfile['telefono'])
+            ?.toString()
+            .trim() ??
+        '';
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('El vendedor no ha proporcionado teléfono.')),
+      );
+      return;
+    }
+    if (!await launchUrl(Uri(scheme: 'tel', path: phone))) {
+      _showContactError('No se pudo abrir la llamada.');
+    }
+  }
+
+  Future<void> _openMap() async {
+    final lat = widget.ad['latitud']?.toString();
+    final lng = widget.ad['longitud']?.toString();
+    final location = [
+      widget.ad['direccion_exacta'],
+      widget.ad['distrito'],
+      widget.ad['provincia'],
+      'Panamá',
+    ]
+        .where((part) => part != null && part.toString().trim().isNotEmpty)
+        .join(', ');
+    final query = lat != null && lng != null ? '$lat,$lng' : location;
+    final uri = Uri.https('www.google.com', '/maps/search/', {
+      'api': '1',
+      'query': query,
+    });
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      _showContactError('No se pudo abrir el mapa.');
+    }
+  }
+
+  void _showContactError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _leaveReview() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    final sellerId = widget.ad['user_id']?.toString();
+    if (user == null || sellerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inicia sesión para dejar una reseña.')),
+      );
+      return;
+    }
+    if (user.id == sellerId) return;
+
+    try {
+      final alreadyReviewed =
+          await _reviewService.hasUserReviewedSeller(sellerId);
+      if (!mounted) return;
+      if (alreadyReviewed) {
+        _showContactError('Ya calificaste a este vendedor.');
+        return;
+      }
+      final result = await showDialog<Map<String, dynamic>>(
+        context: context,
+        builder: (_) => const _SellerReviewDialog(),
+      );
+      if (result == null || !mounted) return;
+
+      await _reviewService.createReview(
+        sellerId: sellerId,
+        rating: result['rating'] as int,
+        comment: result['comment'] as String?,
+      );
+      if (!mounted) return;
+      setState(() => _reviewsVersion++);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gracias, tu reseña fue publicada.')),
+      );
+    } catch (error) {
+      _showContactError('No se pudo publicar la reseña: $error');
+    }
+  }
+
   Future<void> _startChat() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
@@ -193,12 +473,10 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
         conversationId: conversationId,
         content: content,
       );
+      if (!mounted) return;
 
-      final profile = widget.ad['profiles'] is Map
-          ? Map<String, dynamic>.from(widget.ad['profiles'] as Map)
-          : <String, dynamic>{};
-      final participantName = (profile['nombre_negocio'] ??
-              profile['nombre_completo'] ??
+      final participantName = (_sellerProfile['nombre_negocio'] ??
+              _sellerProfile['nombre_completo'] ??
               'Vendedor')
           .toString();
       await Navigator.of(context).push(
@@ -235,11 +513,51 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          if (_isOwner)
+            IconButton(
+              tooltip: 'Editar mi anuncio',
+              onPressed: _editAd,
+              icon: const Icon(Icons.edit_outlined),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ad['titulo']?.toString() ?? 'Sin título',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      height: 1.2,
+                      fontWeight: FontWeight.w700,
+                      color: Mc.texto,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today_outlined,
+                          size: 14, color: Mc.grisSuave),
+                      const SizedBox(width: 7),
+                      Text(
+                        _publishedDate(),
+                        style: const TextStyle(
+                          color: Mc.grisSuave,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             // 📸 1. CARRUSEL DE IMÁGENES (GALERÍA)
             Stack(
               children: [
@@ -256,6 +574,7 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                           ),
                         )
                       : PageView.builder(
+                          controller: _galleryController,
                           itemCount: _allImages.length,
                           onPageChanged: (index) {
                             setState(() {
@@ -263,18 +582,15 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                             });
                           },
                           itemBuilder: (context, index) {
-                            return Transform.scale(
-                              scaleX: -1.0,
-                              child: Image.network(
-                                _allImages[index],
-                                fit: BoxFit.cover,
-                                errorBuilder: (c, e, s) => Container(
-                                  color: Colors.grey[200],
-                                  child: const Icon(
-                                    Icons.broken_image,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  ),
+                            return Image.network(
+                              _allImages[index],
+                              fit: BoxFit.contain,
+                              errorBuilder: (c, e, s) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  size: 50,
+                                  color: Colors.grey,
                                 ),
                               ),
                             );
@@ -293,7 +609,7 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -308,6 +624,47 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                   ),
               ],
             ),
+            if (_allImages.length > 1)
+              SizedBox(
+                height: 82,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _allImages.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () => _galleryController.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOut,
+                    ),
+                    child: Container(
+                      width: 68,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: index == _currentImageIndex
+                              ? Mc.naranja
+                              : const Color(0xFFE8ECEF),
+                          width: index == _currentImageIndex ? 2 : 1,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.network(
+                        _allImages[index],
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.broken_image_outlined,
+                          color: Mc.grisSuave,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
             // 2. DETALLES DEL PRODUCTO
             Padding(
@@ -316,19 +673,11 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '\$${ad['precio']}',
+                    _formatPrice(ad['precio']),
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    ad['titulo'] ?? 'Sin título',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      color: Mc.texto,
                     ),
                   ),
                   const SizedBox(height: 15),
@@ -342,11 +691,13 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                         size: 18,
                       ),
                       const SizedBox(width: 5),
-                      Text(
-                        '${ad['provincia'] ?? 'Panamá'}, ${ad['distrito'] ?? ''}',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
+                      Expanded(
+                        child: Text(
+                          _locationText(ad),
+                          style: const TextStyle(
+                            color: Mc.grisSuave,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ],
@@ -372,103 +723,229 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                     ),
                   ),
 
-                  // 3. LA ZONA DE ATRIBUTOS
-                  const Text('Especificaciones',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  AdAttributesGrid(anuncio: ad), // <-- Nuestro nuevo componente
-                  const SizedBox(height: 25),
-
-                  // 🧩 4. DIBUJAMOS LOS ATRIBUTOS DINÁMICOS
+                  // Características dinámicas, con el orden de la web.
                   Builder(
                     builder: (context) {
                       final attributes = _getAttributes();
-                      if (attributes.isEmpty)
-                        return const SizedBox
-                            .shrink(); // Si no hay atributos, no mostramos nada
+                      if (attributes.isEmpty) return const SizedBox.shrink();
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Divider(
-                            height: 40,
+                            height: 36,
                             thickness: 1,
                             color: Color(0xFFEEEEEE),
                           ),
                           const Text(
-                            'Características',
+                            'Características y detalles',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 15),
-
-                          // Grilla de cuadritos
-                          Wrap(
-                            spacing: 10, // Espacio horizontal
-                            runSpacing: 10, // Espacio vertical
-                            children: attributes.entries.map((entry) {
-                              // Limpiamos la clave (ej: "memoria_ram" -> "MEMORIA RAM")
-                              final key =
-                                  entry.key.replaceAll('_', ' ').toUpperCase();
-                              final value = entry.value.toString();
-
-                              return Container(
-                                width: (MediaQuery.of(context).size.width / 2) -
-                                    25, // Dos columnas perfectas
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.grey[200]!),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      key,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey[500],
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      value,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
+                          AdSpecHighlights(
+                            categoria: ad['categoria']?.toString() ?? '',
+                            attributes: attributes,
                           ),
                         ],
                       );
                     },
                   ),
 
-                  if (ad['user_id']?.toString() !=
-                      Supabase.instance.client.auth.currentUser?.id)
+                  const SizedBox(height: 22),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFE8ECEF)),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: const Color(0xFFF6F8FA),
+                              backgroundImage:
+                                  (_sellerProfile['url_foto_perfil']
+                                              ?.toString()
+                                              .isNotEmpty ??
+                                          false)
+                                      ? NetworkImage(
+                                          _sellerProfile['url_foto_perfil']
+                                              .toString(),
+                                        )
+                                      : null,
+                              child: (_sellerProfile['url_foto_perfil']
+                                          ?.toString()
+                                          .isNotEmpty ??
+                                      false)
+                                  ? null
+                                  : const Icon(Icons.person_outline),
+                            ),
+                            const SizedBox(width: 11),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Vendedor',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Mc.grisSuave,
+                                    ),
+                                  ),
+                                  Text(
+                                    (_sellerProfile['nombre_negocio'] ??
+                                            _sellerProfile['nombre_completo'] ??
+                                            'Usuario verificado')
+                                        .toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Mc.texto,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (!_isOwner) ...[
+                          const SizedBox(height: 14),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              if ((ad['contact_phone'] ??
+                                          _sellerProfile['telefono'])
+                                      ?.toString()
+                                      .trim()
+                                      .isNotEmpty ??
+                                  false)
+                                OutlinedButton.icon(
+                                  onPressed: () => _openWhatsApp(context),
+                                  icon: const Icon(Icons.chat, size: 18),
+                                  label: const Text('WhatsApp'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: const Color(0xFF168A4A),
+                                  ),
+                                ),
+                              if ((_sellerProfile['telefono']
+                                      ?.toString()
+                                      .trim()
+                                      .isNotEmpty ??
+                                  false))
+                                OutlinedButton.icon(
+                                  onPressed: _callSeller,
+                                  icon: const Icon(Icons.phone_outlined,
+                                      size: 18),
+                                  label: const Text('Llamar'),
+                                ),
+                              if ((_sellerProfile['email']
+                                      ?.toString()
+                                      .trim()
+                                      .isNotEmpty ??
+                                  false))
+                                OutlinedButton.icon(
+                                  onPressed: _openEmail,
+                                  icon: const Icon(Icons.email_outlined,
+                                      size: 18),
+                                  label: const Text('Email'),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(11),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF6F8FA),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Text(
+                              'Consejo: reúnete en un lugar público y paga solo al recibir el producto.',
+                              style: TextStyle(
+                                color: Mc.grisSuave,
+                                fontSize: 12,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  if (!_isOwner)
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: _startChat,
                         icon: const Icon(Icons.chat_bubble_outline),
-                        label: const Text('Enviar mensaje al vendedor'),
+                        label: const Text('Enviar mensaje directo'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Mc.naranjaOscuro,
+                          side: const BorderSide(color: Mc.naranja),
+                        ),
                       ),
                     ),
-                  const SizedBox(
-                    height: 100,
-                  ), // Espacio final para el botón de WhatsApp
+                  if ((ad['direccion_exacta'] ??
+                          ad['distrito'] ??
+                          ad['provincia']) !=
+                      null) ...[
+                    const SizedBox(height: 18),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color(0xFFE8ECEF)),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Ubicación del anuncio',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(_locationText(ad)),
+                          const SizedBox(height: 10),
+                          OutlinedButton.icon(
+                            onPressed: _openMap,
+                            icon: const Icon(Icons.directions_outlined),
+                            label: const Text('Ver ruta / Cómo llegar'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Mc.naranjaOscuro,
+                              side: const BorderSide(color: Mc.naranja),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (ad['user_id']?.toString().isNotEmpty ?? false) ...[
+                    const SizedBox(height: 18),
+                    SellerReviewsWidget(
+                      key: ValueKey('${ad['user_id']}_$_reviewsVersion'),
+                      sellerId: ad['user_id'].toString(),
+                      onLeaveReview: !_isOwner &&
+                              Supabase.instance.client.auth.currentUser != null
+                          ? _leaveReview
+                          : null,
+                    ),
+                  ],
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -477,56 +954,39 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
       ),
 
       // 3. BARRA INFERIOR FIJA CON EL BOTÓN DE WHATSAPP
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
+      bottomNavigationBar: _isOwner || !_hasSellerPhone
+          ? null
+          : Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: const Color(0xFF25D366),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.chat),
+                  label: const Text(
+                    'Chat por WhatsApp',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () => _openWhatsApp(context),
+                ),
+              ),
             ),
-          ],
-        ),
-        child: SafeArea(
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: Colors.green[600], // Verde estilo WhatsApp
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            icon: const Icon(Icons.chat, color: Colors.white),
-            label: const Text(
-              'Contactar por WhatsApp',
-              style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
-            ),
-            onPressed: () async {
-              // Extraemos el número del anuncio (o usamos uno de prueba por ahora)
-              // Nota: El número debe tener el código de país sin el símbolo '+' (Ej: 50761234567 para Panamá)
-              final String phone = ad['contact_phone'] ?? '50760000000';
-
-              // Armamos el mensaje automático
-              final String title = ad['titulo'] ?? 'producto';
-              final String message =
-                  'Hola, estoy interesado en tu anuncio: "$title" que vi en Mercado Central.';
-
-              // Creamos el enlace oficial de WhatsApp
-              final Uri url = Uri.parse(
-                  'https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
-
-              // Lanzamos la aplicación externa
-              if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                debugPrint('No se pudo abrir WhatsApp');
-              }
-            },
-          ),
-        ),
-      ),
     );
   }
 }
