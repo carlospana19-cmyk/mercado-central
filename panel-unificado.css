@@ -652,7 +652,19 @@
     }
 
     .profile-header-stats {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .profile-header-stats .stat-item {
+        min-width: 0;
+        padding: 1rem 0.4rem;
+    }
+
+    .stat-label {
+        overflow-wrap: anywhere;
     }
 
     .anuncios-header {
@@ -674,11 +686,53 @@
     }
 
     .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        min-width: 0;
+    }
+
+    .form-group,
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 
 @media (max-width: 480px) {
+    .panel-unificado-container {
+        padding: 0 0.75rem;
+    }
+
+    .profile-header-card {
+        padding: 1rem;
+    }
+
+    .profile-header-stats .stat-item {
+        padding: 0.8rem 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        letter-spacing: 0;
+    }
+
+    #perfil-tab {
+        padding: 1rem;
+    }
+
+    #perfil-tab .form-section {
+        padding: 1rem;
+        min-width: 0;
+    }
+
     .panel-tabs {
         padding: 0.5rem;
         gap: 0.5rem;

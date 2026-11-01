@@ -32,7 +32,9 @@ export function initializeHomePage() {
         );
                if (adsActivos.length > 0) {
             const slidesHTML = adsActivos.map(ad => {
-                const imgSrc = window.innerWidth <= 820 ? (ad.imagen_movil || ad.imagen) : ad.imagen;
+                const imgSrc = window.innerWidth <= 768
+                    ? ([ad.imagen, ad.imagen_movil].find(u => u && u.startsWith('http')) || ad.imagen)
+                    : ad.imagen;
                 let media = '';
                 if (ad.tipo === 'video' && ad.video) {
                     media = `
