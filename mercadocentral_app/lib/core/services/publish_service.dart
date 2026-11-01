@@ -79,10 +79,11 @@ class PublishService {
             : text;
       });
 
-      // Planes de pago duran 60 días (o lo que indique el token); el gratis, 30
       final isPaid = ['basico', 'premium', 'destacado'].contains(selectedPlan);
-      final days =
-          (token?['duracion_dias'] as num?)?.toInt() ?? (isPaid ? 60 : 30);
+      final now = DateTime.now().toUtc();
+      final tokenDays = int.tryParse(token?['duracion_dias']?.toString() ?? '');
+      final planDays = tokenDays != null && tokenDays > 0 ? tokenDays : 30;
+      final expirationDays = isPaid ? 60 : 30;
       final phone = (adData['contact_phone'] ?? '').toString().trim();
 
       final insertData = {
@@ -108,18 +109,49 @@ class PublishService {
         'is_sold': false,
         'user_id': userId,
         if (phone.isNotEmpty) 'contact_phone': phone,
-        'fecha_publicacion': DateTime.now().toUtc().toIso8601String(),
+        'fecha_publicacion': now.toIso8601String(),
         'fecha_eliminacion':
-            DateTime.now().toUtc().add(Duration(days: days)).toIso8601String(),
+            now.add(Duration(days: expirationDays)).toIso8601String(),
         // La primera foto es la portada, el resto va a la galería
         'url_portada': imageUrls.isNotEmpty ? imageUrls.first : null,
         'url_galeria': imageUrls.length > 1 ? imageUrls.sublist(1) : [],
       };
 
-      // 5. Inserción en la base de datos
-      await _supabase.from('anuncios').insert(insertData);
+      // 5. Registrar la vigencia del plan pago, como lo hace la web.
+      dynamic courtesyId;
+      if (isPaid && token?['id'] != null) {
+        final courtesy = await _supabase
+            .from('cortesias_aplicadas')
+            .insert({
+              'user_id': userId,
+              'plan_tipo': selectedPlan,
+              'metodo': 'token',
+              'activo': true,
+              'fecha_fin': now.add(Duration(days: planDays)).toIso8601String(),
+            })
+            .select('id')
+            .single();
+        courtesyId = courtesy['id'];
+      }
 
-      // 6. El token se confirma solo después de guardar el anuncio
+      // 6. Inserción en la base de datos
+      try {
+        await _supabase.from('anuncios').insert(insertData);
+      } catch (_) {
+        if (courtesyId != null) {
+          try {
+            await _supabase
+                .from('cortesias_aplicadas')
+                .delete()
+                .eq('id', courtesyId);
+          } catch (cleanupError) {
+            debugPrint('No se pudo revertir la cortesía: $cleanupError');
+          }
+        }
+        rethrow;
+      }
+
+      // 7. El token se confirma solo después de guardar el anuncio
       if (token?['id'] != null) {
         try {
           await _supabase
