@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/location_helper.dart';
 import '../../../theme/mc_colores.dart';
+import '../../ads/widgets/location_map_picker.dart';
 import '../../publish/widgets/details_form_step.dart'
     show AttrField, propertyAttrFields, vehicleAttrFields;
 import '../../search/models/category_catalog.dart';
@@ -52,6 +53,9 @@ class _EditAdPageState extends State<EditAdPage> {
   String? _subcategory;
   String? _province;
   String? _district;
+  double? _lat;
+  double? _lng;
+  String? _address;
   bool _saving = false;
 
   @override
@@ -74,6 +78,9 @@ class _EditAdPageState extends State<EditAdPage> {
             LocationHelper.getDistricts(_province!).contains(district)
         ? district
         : null;
+    _lat = double.tryParse(ad['latitud']?.toString() ?? '');
+    _lng = double.tryParse(ad['longitud']?.toString() ?? '');
+    _address = ad['direccion_exacta']?.toString();
 
     _loadImages();
     _loadAttributes(_parseAttributes(ad['atributos_clave']));
@@ -252,6 +259,9 @@ class _EditAdPageState extends State<EditAdPage> {
         'subcategoria': _subcategory ?? '',
         'provincia': _province ?? '',
         'distrito': _district ?? '',
+        'latitud': _lat,
+        'longitud': _lng,
+        'direccion_exacta': _address ?? '',
         if (attrs.isNotEmpty) 'atributos_clave': jsonEncode(attrs),
         'url_portada': images.first,
         'url_galeria': images.length > 1 ? images.sublist(1) : <String>[],
@@ -585,6 +595,21 @@ class _EditAdPageState extends State<EditAdPage> {
                         ? null
                         : (value) => setState(() => _district = value),
                   ),
+                  if (_province != null) ...[
+                    const SizedBox(height: 12),
+                    LocationMapPicker(
+                      province: _province,
+                      district: _district,
+                      initialLat: _lat,
+                      initialLng: _lng,
+                      initialAddress: _address,
+                      onChanged: (lat, lng, address) {
+                        _lat = lat;
+                        _lng = lng;
+                        _address = address;
+                      },
+                    ),
+                  ],
                   _section(Icons.edit_note, 'Información del anuncio'),
                   TextFormField(
                     controller: _titleController,

@@ -93,6 +93,12 @@ class PublishService {
         'subcategoria': adData['subcategoria'] ?? '',
         'provincia': adData['provincia'],
         'distrito': adData['distrito'],
+        if (adData['latitud'] != null && adData['longitud'] != null) ...{
+          'latitud': adData['latitud'],
+          'longitud': adData['longitud'],
+        },
+        if ((adData['direccion_exacta'] ?? '').toString().trim().isNotEmpty)
+          'direccion_exacta': adData['direccion_exacta'].toString().trim(),
         // 🚨 OJO AQUÍ: Tu web guarda los atributos dinámicos como un String JSON
         'atributos_clave': jsonEncode(attrs),
         'selected_plan': selectedPlan,

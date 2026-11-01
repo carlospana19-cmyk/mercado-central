@@ -3,7 +3,12 @@ import '../../../core/utils/location_helper.dart';
 
 class LocationPicker extends StatefulWidget {
   final Function(String province, String district) onSelected;
-  const LocationPicker({super.key, required this.onSelected});
+  final ValueChanged<String?>? onProvinceChanged;
+  const LocationPicker({
+    super.key,
+    required this.onSelected,
+    this.onProvinceChanged,
+  });
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -28,6 +33,7 @@ class _LocationPickerState extends State<LocationPicker> {
               _selectedProvince = val;
               _selectedDistrict = null; // Reset district
             });
+            widget.onProvinceChanged?.call(val);
           },
         ),
         const SizedBox(height: 15),
@@ -38,8 +44,8 @@ class _LocationPickerState extends State<LocationPicker> {
           items: _selectedProvince == null
               ? null
               : LocationHelper.getDistricts(_selectedProvince!)
-                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                    .toList(),
+                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                  .toList(),
           onChanged: (val) {
             setState(() => _selectedDistrict = val);
             if (_selectedProvince != null && val != null) {

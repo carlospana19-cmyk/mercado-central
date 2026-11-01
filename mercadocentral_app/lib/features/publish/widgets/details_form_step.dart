@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../theme/mc_colores.dart';
 import '../../ads/widgets/location_picker.dart';
+import '../../ads/widgets/location_map_picker.dart';
 import '../../search/models/category_catalog.dart';
 
 class AttrField {
@@ -123,6 +124,8 @@ class DetailsFormStep extends StatefulWidget {
 
 class _DetailsFormStepState extends State<DetailsFormStep> {
   late final String _email;
+  String? _mapProvince;
+  String? _mapDistrict;
 
   Map<String, dynamic> get _attrs =>
       widget.formData['atributos_clave'] as Map<String, dynamic>;
@@ -292,11 +295,31 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         ),
         const SizedBox(height: 14),
         LocationPicker(
+          onProvinceChanged: (province) => setState(() {
+            widget.formData['provincia'] = null;
+            widget.formData['distrito'] = null;
+            _mapProvince = province;
+            _mapDistrict = null;
+          }),
           onSelected: (province, district) {
+            setState(() => _mapDistrict = district);
             _updateField('provincia', province);
             _updateField('distrito', district);
           },
         ),
+        if (_mapProvince != null) ...[
+          const SizedBox(height: 14),
+          LocationMapPicker(
+            province: _mapProvince,
+            district: _mapDistrict,
+            onChanged: (lat, lng, address) {
+              widget.formData['latitud'] = lat;
+              widget.formData['longitud'] = lng;
+              widget.formData['direccion_exacta'] = address ?? '';
+              widget.onDataChanged();
+            },
+          ),
+        ],
         const SizedBox(height: 14),
         _section(Icons.edit_note, 'Información del anuncio'),
         TextFormField(
