@@ -36,7 +36,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["appAuthRedirectScheme"] = "mercadoscentral"
+        manifestPlaceholders["appAuthRedirectScheme"] =
+            "com.googleusercontent.apps.413248794803-r8t33drpt54ct3gqpbcmfcavv0goema3"
         manifestPlaceholders["MAPS_API_KEY"] = localProps.getProperty("MAPS_API_KEY") ?: ""
     }
 

@@ -118,7 +118,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _googleSignIn() async {
     const clientId =
         '413248794803-r8t33drpt54ct3gqpbcmfcavv0goema3.apps.googleusercontent.com';
-    const redirectUrl = 'mercadoscentral://login-callback';
+    const redirectUrl =
+        'com.googleusercontent.apps.413248794803-r8t33drpt54ct3gqpbcmfcavv0goema3:/oauth2redirect';
 
     setState(() => _isLoading = true);
 
