@@ -23,15 +23,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     currentUserId = user.id;
 
-    // Cargar datos iniciales
+    // Las opciones deben existir antes de asignar los valores guardados del perfil.
+    await loadLocationOptions();
     await loadUserProfile();
     await loadUserAds();
     
     // Inicializar event listeners
     initializeEventListeners();
     
-    // Cargar opciones de ubicación
-    await loadLocationOptions();
 });
 
 // ========================================
@@ -68,7 +67,11 @@ async function loadUserProfile() {
             document.getElementById('business-name').value = profile.nombre_negocio || '';
             document.getElementById('business-type').value = profile.tipo_negocio || '';
             document.getElementById('description').value = profile.descripcion || '';
-            document.getElementById('location-province').value = profile.provincia || '';
+            const provinceSelect = document.getElementById('location-province');
+            if (profile.provincia && !Array.from(provinceSelect.options).some(option => option.value === profile.provincia)) {
+                provinceSelect.add(new Option(profile.provincia, profile.provincia));
+            }
+            provinceSelect.value = profile.provincia || '';
             document.getElementById('location-address').value = profile.direccion || '';
 
             if (profile.url_foto_perfil) {
@@ -77,7 +80,12 @@ async function loadUserProfile() {
 
             if (profile.provincia) {
                 await updateDistricts(profile.provincia);
-                document.getElementById('location-district').value = profile.distrito || '';
+                const districtSelect = document.getElementById('location-district');
+                if (profile.distrito && !Array.from(districtSelect.options).some(option => option.value === profile.distrito)) {
+                    districtSelect.add(new Option(profile.distrito, profile.distrito));
+                    districtSelect.disabled = false;
+                }
+                districtSelect.value = profile.distrito || '';
             }
 
             updateCharCounts();
@@ -386,28 +394,36 @@ function updateCharCounts() {
 // CARGAR OPCIONES DE UBICACIÓN
 // ========================================
 async function loadLocationOptions() {
+    const provinceSelect = document.getElementById('location-province');
+    if (!provinceSelect) return;
+
+    let databaseProvinces = [];
     try {
         const { data: provinces, error } = await supabase
             .from('provincias')
             .select('*')
             .order('nombre', { ascending: true });
 
-        if (error) {
-            console.error('Error al cargar provincias:', error);
-            return;
-        }
-
-        const provinceSelect = document.getElementById('location-province');
-        provinceSelect.innerHTML = '<option value="">Selecciona provincia</option>';
-        
-        provinces.forEach(prov => {
-            const option = document.createElement('option');
-            option.value = prov.nombre;
-            option.textContent = prov.nombre;
-            provinceSelect.appendChild(option);
-        });
+        if (error) throw error;
+        databaseProvinces = (provinces || []).map(province => province.nombre).filter(Boolean);
     } catch (err) {
-        console.error('Error en loadLocationOptions:', err);
+        console.warn('Usando la lista local de provincias:', err);
+    }
+
+    const provinceNames = [...new Set([
+        ...Object.keys(districtsByProvince),
+        ...databaseProvinces
+    ])].sort((a, b) => a.localeCompare(b, 'es'));
+
+    provinceSelect.innerHTML = '<option value="">Selecciona provincia</option>';
+    provinceNames.forEach(name => {
+        provinceSelect.add(new Option(name, name));
+    });
+
+    const districtSelect = document.getElementById('location-district');
+    if (districtSelect) {
+        districtSelect.innerHTML = '<option value="">Selecciona primero una provincia</option>';
+        districtSelect.disabled = true;
     }
 }
 
@@ -415,6 +431,16 @@ async function loadLocationOptions() {
 // ACTUALIZAR DISTRITOS
 // ========================================
 async function updateDistricts(province) {
+    const districtSelect = document.getElementById('location-district');
+    if (!districtSelect) return;
+
+    districtSelect.innerHTML = '<option value="">Selecciona distrito</option>';
+    if (!province) {
+        districtSelect.disabled = true;
+        return;
+    }
+
+    let districtNames = [];
     try {
         const { data: districts, error } = await supabase
             .from('distritos')
@@ -422,23 +448,20 @@ async function updateDistricts(province) {
             .eq('provincia', province)
             .order('nombre', { ascending: true });
 
-        if (error) {
-            console.error('Error al cargar distritos:', error);
-            return;
-        }
-
-        const districtSelect = document.getElementById('location-district');
-        districtSelect.innerHTML = '<option value="">Selecciona distrito</option>';
-        
-        districts.forEach(dist => {
-            const option = document.createElement('option');
-            option.value = dist.nombre;
-            option.textContent = dist.nombre;
-            districtSelect.appendChild(option);
-        });
+        if (error) throw error;
+        districtNames = (districts || []).map(district => district.nombre).filter(Boolean);
     } catch (err) {
-        console.error('Error en updateDistricts:', err);
+        console.warn(`Usando la lista local de distritos para ${province}:`, err);
     }
+
+    if (!districtNames.length) {
+        districtNames = districtsByProvince[province] || [];
+    }
+
+    districtSelect.disabled = districtNames.length === 0;
+    districtNames.forEach(name => {
+        districtSelect.add(new Option(name, name));
+    });
 }
 
 // ========================================
@@ -478,9 +501,7 @@ function initializeEventListeners() {
 
     // Cambio de provincia
     document.getElementById('location-province').addEventListener('change', async (e) => {
-        if (e.target.value) {
-            await updateDistricts(e.target.value);
-        }
+        await updateDistricts(e.target.value);
     });
 
     // Envío del formulario de perfil
