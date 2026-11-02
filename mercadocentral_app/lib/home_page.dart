@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mercadocentral_app/core/theme/app_colors.dart';
 import 'package:mercadocentral_app/theme/mc_colores.dart';
@@ -11,6 +13,7 @@ import 'package:mercadocentral_app/features/publish/screens/upload_page.dart';
 import 'package:mercadocentral_app/features/profile/screens/profile_page.dart';
 import 'package:mercadocentral_app/features/favorites/screens/favorites_page.dart';
 import 'package:mercadocentral_app/features/chat/screens/chat_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,11 +22,14 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final GlobalKey<FavoritesPageState> _favoritesPageKey =
       GlobalKey<FavoritesPageState>();
   int _selectedIndex = 0;
   String _selectedCategory = 'Todos';
+  int _unreadMessages = 0;
+  RealtimeChannel? _messageChannel;
+  Timer? _unreadRefreshTimer;
 
   // 1. Lista de burbujas en el home (reducida a 6 populares + "Ver más")
   final List<Map<String, dynamic>> _categories = [
@@ -36,6 +42,70 @@ class _HomePageState extends State<HomePage> {
     // 👇 ESTA ES LA FLECHA TÁCTICA DE VER MÁS
     {'name': 'Ver más', 'icon': Icons.arrow_forward_ios_rounded},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshUnreadMessages();
+    _subscribeToMessages();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshUnreadMessages();
+  }
+
+  Future<void> _refreshUnreadMessages() async {
+    try {
+      final count = await ChatService.loadUnreadCount();
+      if (mounted && count != _unreadMessages) {
+        setState(() => _unreadMessages = count);
+      }
+    } catch (_) {
+      // Conserva el último contador si la conexión falla temporalmente.
+    }
+  }
+
+  void _scheduleUnreadRefresh() {
+    _unreadRefreshTimer?.cancel();
+    _unreadRefreshTimer = Timer(
+      const Duration(milliseconds: 250),
+      _refreshUnreadMessages,
+    );
+  }
+
+  void _subscribeToMessages() {
+    final client = Supabase.instance.client;
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return;
+
+    _messageChannel = client
+        .channel('home-message-badge-$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'mensajes',
+          callback: (_) => _scheduleUnreadRefresh(),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'mensajes',
+          callback: (_) => _scheduleUnreadRefresh(),
+        )
+        .subscribe();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _unreadRefreshTimer?.cancel();
+    final channel = _messageChannel;
+    if (channel != null)
+      unawaited(Supabase.instance.client.removeChannel(channel));
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +172,39 @@ class _HomePageState extends State<HomePage> {
   Widget _buildNavItem(
       int index, IconData icon, IconData activeIcon, String label) {
     bool isSelected = _selectedIndex == index;
+    final navIcon = Icon(isSelected ? activeIcon : icon,
+        color: isSelected ? AppColors.primary : Colors.grey);
+    final iconWithBadge = index == 3 && _unreadMessages > 0
+        ? Stack(
+            clipBehavior: Clip.none,
+            children: [
+              navIcon,
+              Positioned(
+                top: -7,
+                right: -10,
+                child: Container(
+                  constraints:
+                      const BoxConstraints(minWidth: 18, minHeight: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD93025),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    _unreadMessages > 99 ? '99+' : '$_unreadMessages',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
+        : navIcon;
     return GestureDetector(
       onTap: () {
         // 🚀 FORZAMOS LA RECARGA SI TOCAN FAVORITOS
@@ -115,8 +218,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(isSelected ? activeIcon : icon,
-                color: isSelected ? AppColors.primary : Colors.grey),
+            iconWithBadge,
             Text(label,
                 style: TextStyle(
                     color: isSelected ? AppColors.primary : Colors.grey,
@@ -150,10 +252,7 @@ class _HomePageState extends State<HomePage> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Mc.naranja,
-                      Mc.naranja.withOpacity(0.05)
-                    ],
+                    colors: [Mc.naranja, Mc.naranja.withOpacity(0.05)],
                   ),
                 ),
                 child: const Padding(
@@ -260,26 +359,37 @@ class _HomePageState extends State<HomePage> {
   // 🚀 BUSCADOR CONEXIÓN REAL
   Widget _buildSearchBubble() {
     return GestureDetector(
-      onTap: () => showSearch(
-        context: context,
-        delegate: MercadoSearchDelegate(),
-      ),
+      onTap: _openSearch,
       child: Container(
         height: 45,
         width: double.infinity,
-        alignment:
-            Alignment.centerLeft, // Mantiene el texto alineado a la izquierda
         decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(30)),
-        // 🚨 Lupa eliminada, solo queda el texto con un buen margen
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'Buscar en Mercado Central',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: const Row(
+          children: [
+            SizedBox(width: 20),
+            Expanded(
+              child: Text(
+                'Buscar en Mercados Central',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Icon(Icons.search, color: Colors.grey),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  void _openSearch() {
+    showSearch(
+      context: context,
+      delegate: MercadoSearchDelegate(),
     );
   }
 }

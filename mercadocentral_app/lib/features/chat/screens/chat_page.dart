@@ -18,6 +18,18 @@ class ChatService {
   static Map<String, dynamic> _asMap(dynamic value) =>
       value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
 
+  static Future<int> loadUnreadCount() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return 0;
+
+    final rows = await _client
+        .from('mensajes')
+        .select('borrado')
+        .eq('leido', false)
+        .neq('emisor_id', user.id);
+    return (rows as List).where((row) => row['borrado'] != true).length;
+  }
+
   static Future<List<Map<String, dynamic>>> loadConversations() async {
     final user = _client.auth.currentUser;
     if (user == null) return [];
@@ -209,23 +221,48 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   List<Map<String, dynamic>> _conversations = [];
   RealtimeChannel? _inboxChannel;
+  Timer? _inboxRefreshTimer;
+  bool _refreshingConversations = false;
   bool _loading = true;
   String? _error;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadConversations();
     _subscribeToInbox();
+    _startInboxRefresh();
+  }
+
+  void _startInboxRefresh() {
+    _inboxRefreshTimer?.cancel();
+    _inboxRefreshTimer = Timer.periodic(
+      const Duration(seconds: 10),
+      (_) => _loadConversations(),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadConversations();
+      _startInboxRefresh();
+    } else {
+      _inboxRefreshTimer?.cancel();
+      _inboxRefreshTimer = null;
+    }
   }
 
   Future<void> _loadConversations() async {
+    if (_refreshingConversations) return;
+    _refreshingConversations = true;
     if (mounted) {
       setState(() {
-        _loading = _conversations.isEmpty;
+        _loading = _loading && _conversations.isEmpty;
         _error = null;
       });
     }
@@ -235,6 +272,7 @@ class _ChatPageState extends State<ChatPage> {
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
     } finally {
+      _refreshingConversations = false;
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -407,6 +445,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _inboxRefreshTimer?.cancel();
     final channel = _inboxChannel;
     if (channel != null)
       unawaited(Supabase.instance.client.removeChannel(channel));
@@ -492,12 +532,15 @@ class ChatConversationPage extends StatefulWidget {
   State<ChatConversationPage> createState() => _ChatConversationPageState();
 }
 
-class _ChatConversationPageState extends State<ChatConversationPage> {
+class _ChatConversationPageState extends State<ChatConversationPage>
+    with WidgetsBindingObserver {
   final _client = Supabase.instance.client;
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   final List<Map<String, dynamic>> _messages = [];
   RealtimeChannel? _channel;
+  Timer? _messageRefreshTimer;
+  bool _refreshingMessages = false;
   bool _loading = true;
   bool _sending = false;
   String? _error;
@@ -505,23 +548,57 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadMessages();
     _subscribeToMessages();
+    _startMessageRefresh();
+  }
+
+  void _startMessageRefresh() {
+    _messageRefreshTimer?.cancel();
+    _messageRefreshTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _loadMessages(),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadMessages();
+      _startMessageRefresh();
+    } else {
+      _messageRefreshTimer?.cancel();
+      _messageRefreshTimer = null;
+    }
   }
 
   Future<void> _loadMessages() async {
+    if (_refreshingMessages) return;
+    _refreshingMessages = true;
     try {
       final messages = await ChatService.loadMessages(widget.conversationId);
       if (!mounted) return;
+      final changed = _messages.length != messages.length ||
+          List.generate(_messages.length, (index) => index).any((index) =>
+              _messages[index]['id']?.toString() !=
+                  messages[index]['id']?.toString() ||
+              _messages[index]['contenido'] != messages[index]['contenido'] ||
+              _messages[index]['borrado'] != messages[index]['borrado']);
+      if (changed) {
+        setState(() {
+          _messages
+            ..clear()
+            ..addAll(messages);
+        });
+        _scrollToBottom();
+        await ChatService.markMessagesRead(widget.conversationId);
+      }
+      if (!mounted) return;
       setState(() {
-        _messages
-          ..clear()
-          ..addAll(messages);
         _error = null;
         _loading = false;
       });
-      _scrollToBottom();
-      ChatService.markMessagesRead(widget.conversationId);
     } catch (error) {
       if (mounted) {
         setState(() {
@@ -529,6 +606,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
           _loading = false;
         });
       }
+    } finally {
+      _refreshingMessages = false;
     }
   }
 
@@ -725,6 +804,8 @@ class _ChatConversationPageState extends State<ChatConversationPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _messageRefreshTimer?.cancel();
     _messageController.dispose();
     _scrollController.dispose();
     final channel = _channel;

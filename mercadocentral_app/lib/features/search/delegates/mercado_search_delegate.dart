@@ -20,7 +20,7 @@ class MercadoSearchDelegate extends SearchDelegate {
   }
 
   @override
-  String get searchFieldLabel => 'Buscar en Mercado Central...';
+  String get searchFieldLabel => 'Buscar en Mercados Central...';
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -74,18 +74,28 @@ class MercadoSearchDelegate extends SearchDelegate {
   }
 
   Future<List<Map<String, dynamic>>> _buscarEnSupabase(String texto) async {
-    if (texto.isEmpty) return [];
-    final response = await Supabase.instance.client
-        .from('anuncios')
-        .select(
-            '*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
-        .eq('activo', true)
-        .ilike('titulo', '%$texto%')
-        .limit(50);
+    final trimmed = texto.trim();
+    final response = trimmed.isEmpty
+        ? await Supabase.instance.client
+            .from('anuncios')
+            .select(
+                '*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
+            .eq('activo', true)
+            .order('fecha_publicacion', ascending: false)
+            .limit(50)
+        : await Supabase.instance.client
+            .from('anuncios')
+            .select(
+                '*, imagenes(url_imagen), profiles(id, nombre_negocio, url_foto_perfil, nombre_completo)')
+            .eq('activo', true)
+            .ilike('titulo', '%$trimmed%')
+            .limit(50);
     final rawAds = List<Map<String, dynamic>>.from(response);
 
+    if (trimmed.isEmpty) return rawAds;
+
     // Filtro sin acentos en Dart: compara normalizando ambos lados
-    final queryNorm = _normalize(texto);
+    final queryNorm = _normalize(trimmed);
     final filtered = rawAds.where((ad) {
       final titulo = _normalize(ad['titulo']?.toString() ?? '');
       final categoria = _normalize(ad['categoria']?.toString() ?? '');
@@ -100,10 +110,6 @@ class MercadoSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    if (query.isEmpty)
-      return const Center(
-          child: Text('Escribe el nombre de un producto...',
-              style: TextStyle(color: Colors.grey)));
     return _construirListaDeResultados();
   }
 
@@ -119,10 +125,16 @@ class MercadoSearchDelegate extends SearchDelegate {
               child: Text('Error en el radar.',
                   style: TextStyle(color: Colors.red)));
         final ads = snapshot.data ?? [];
-        if (ads.isEmpty)
+        if (ads.isEmpty) {
           return Center(
-              child: Text('No encontramos "$query"',
-                  style: const TextStyle(color: Colors.grey)));
+            child: Text(
+              query.trim().isEmpty
+                  ? 'No hay anuncios disponibles.'
+                  : 'No encontramos "$query"',
+              style: const TextStyle(color: Colors.grey),
+            ),
+          );
+        }
 
         // Lógica de ordenamiento (ejecutarla JUSTO ANTES de construir el ListView)
         ads.sort((a, b) {

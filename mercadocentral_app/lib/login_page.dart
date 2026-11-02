@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_appauth/flutter_appauth.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'theme/mc_colores.dart';
 
 class LoginPage extends StatefulWidget {
@@ -116,33 +115,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _googleSignIn() async {
-    const clientId =
-        '413248794803-r8t33drpt54ct3gqpbcmfcavv0goema3.apps.googleusercontent.com';
-    const redirectUrl =
-        'com.googleusercontent.apps.413248794803-r8t33drpt54ct3gqpbcmfcavv0goema3:/oauth2redirect';
-
     setState(() => _isLoading = true);
 
     try {
-      final result = await const FlutterAppAuth().authorizeAndExchangeCode(
-        AuthorizationTokenRequest(
-          clientId,
-          redirectUrl,
-          discoveryUrl:
-              'https://accounts.google.com/.well-known/openid-configuration',
-          scopes: ['openid', 'email', 'profile'],
-        ),
+      final launched = await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'mercadoscentral://login-callback',
       );
-
-      final idToken = result.idToken;
-      if (idToken == null) throw Exception('No se recibió el token de Google');
-
-      await Supabase.instance.client.auth.signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-      );
-
-      if (mounted) Navigator.pushReplacementNamed(context, '/home');
+      if (!launched) throw Exception('No se pudo abrir el inicio de sesión.');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -272,10 +252,10 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
                   OutlinedButton.icon(
                     onPressed: _isLoading ? null : _googleSignIn,
-                    icon: const FaIcon(
-                      FontAwesomeIcons.google,
-                      size: 18,
-                      color: Color(0xFF3C4043),
+                    icon: SvgPicture.asset(
+                      'assets/images/google_g.svg',
+                      width: 20,
+                      height: 20,
                     ),
                     label: const Text(
                       'Continuar con Google',

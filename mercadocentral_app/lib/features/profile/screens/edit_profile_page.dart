@@ -15,6 +15,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _client = Supabase.instance.client;
   final _picker = ImagePicker();
+  final _emailController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _whatsappController = TextEditingController();
@@ -22,7 +23,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
 
-  String _email = '';
   String _businessType = '';
   String? _province;
   String? _district;
@@ -47,6 +47,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   void dispose() {
+    _emailController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
     _whatsappController.dispose();
@@ -71,7 +72,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           .maybeSingle();
       if (!mounted) return;
 
-      _email = user.email ?? '';
+      _emailController.text =
+          (profile?['email'] ?? user.email ?? '').toString();
       if (profile != null) {
         _nameController.text = (profile['nombre_completo'] ?? '').toString();
         _phoneController.text = (profile['telefono'] ?? '').toString();
@@ -146,6 +148,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       await _client.from('profiles').upsert({
         'id': user.id,
+        'email': _emailController.text.trim(),
         'nombre_completo': _nameController.text.trim(),
         'telefono': _phoneController.text.trim(),
         'whatsapp': _whatsappController.text.trim(),
@@ -277,11 +280,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    initialValue: _email,
-                    readOnly: true,
-                    decoration: _decoration('Email').copyWith(
-                      helperText: 'No se puede cambiar desde aquí.',
-                    ),
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textCapitalization: TextCapitalization.none,
+                    autofillHints: const [AutofillHints.email],
+                    decoration: _decoration('Correo electrónico de contacto'),
+                    validator: (value) {
+                      final email = value?.trim() ?? '';
+                      if (email.isNotEmpty &&
+                          !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                              .hasMatch(email)) {
+                        return 'Ingresa un correo electrónico válido.';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   TextFormField(

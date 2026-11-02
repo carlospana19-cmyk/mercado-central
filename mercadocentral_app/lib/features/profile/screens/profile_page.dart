@@ -187,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 _menuItem(
                   Icons.logout,
                   'Cerrar sesión',
-                  'Salir de tu cuenta de Mercado Central.',
+                  'Salir de tu cuenta de Mercados Central.',
                   _logout,
                   isDanger: true,
                 ),
@@ -208,6 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .toString();
     final business = (profile['nombre_negocio'] ?? '').toString().trim();
     final phone = (profile['telefono'] ?? '').toString().trim();
+    final email = (profile['email'] ?? user?.email ?? '').toString().trim();
     final photo = profile['url_foto_perfil']?.toString();
 
     return Container(
@@ -251,9 +252,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Mc.grisSuave),
                   ),
-                if ((user?.email ?? '').isNotEmpty)
+                if (email.isNotEmpty)
                   Text(
-                    user!.email!,
+                    email,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
