@@ -29,6 +29,7 @@ export async function initMessagesSection(){
   bindChatForm();
   await loadConversations();
   subscribeGlobal();
+  window.updateMessagesBadge?.();
 
   // Deep-link: ?chat=<id> abre conversación; ?tab=mensajes abre el buzón
   const params = new URLSearchParams(window.location.search);
@@ -160,7 +161,11 @@ async function loadMessages(convId){
     .eq('conversacion_id', convId)
     .eq('leido', false)
     .neq('emisor_id', me.id)
-    .then(()=> loadConversations());
+    .then(async ({ error })=>{
+      if(error) return;
+      await loadConversations();
+      window.updateMessagesBadge?.();
+    });
 }
 
 function appendMessage(msg){

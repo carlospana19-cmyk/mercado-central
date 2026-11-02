@@ -60,14 +60,10 @@ export async function initializeNavbar() {
         // Botón de publicar redirige directamente a publicar.html
         if (btnPublish) btnPublish.onclick = () => window.location.href = 'publicar.html';
     }
-            // FASE 4D: mostrar botón de mensajes y actualizar badge
-        const btnMessages = document.getElementById('btn-messages');
-        if (btnMessages) {
-            btnMessages.style.display = 'inline-block';
-            btnMessages.onclick = () => window.location.href = 'panel-unificado.html?tab=mensajes';
+        if (session) {
+            updateMessagesBadge();
+            subscribeMessagesBadge();
         }
-        updateMessagesBadge();
-        subscribeMessagesBadge();
 
     function showGuestView() {
         // Mostrar botones de invitado
@@ -108,36 +104,46 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 }
 // --- FASE 4D: BADGE DE MENSAJES SIN LEER ---
 async function updateMessagesBadge() {
-    const btnMessages = document.getElementById('btn-messages');
-    const badge = document.getElementById('messages-badge');
-    if (!btnMessages || !badge) return;
+    const badges = [
+        document.getElementById('profile-message-badge'),
+        document.getElementById('messages-tab-badge')
+    ].filter(Boolean);
+    if (!badges.length) return;
+
+    const hideBadges = () => badges.forEach(badge => { badge.style.display = 'none'; });
+    hideBadges();
 
     try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
         if (!user) return;
 
-        // 1. Mis conversaciones (como comprador o vendedor)
-        const { data: convs } = await supabase
+        const { data: convs, error: conversationsError } = await supabase
             .from('conversaciones')
             .select('id')
             .or(`comprador_id.eq.${user.id},vendedor_id.eq.${user.id}`);
+        if (conversationsError) throw conversationsError;
 
-        if (!convs || convs.length === 0) { badge.style.display = 'none'; return; }
+        const conversationIds = (convs || []).map(conversation => conversation.id);
+        if (!conversationIds.length) return;
 
-        // 2. Mensajes no leídos que no escribí yo
-        const { count } = await supabase
+        const { data: unreadMessages, error: unreadError } = await supabase
             .from('mensajes')
-            .select('id', { count: 'exact', head: true })
+            .select('id, borrado')
             .eq('leido', false)
             .neq('emisor_id', user.id)
-            .in('conversacion_id', convs.map(c => c.id));
+            .in('conversacion_id', conversationIds);
+        if (unreadError) throw unreadError;
 
-        if (count && count > 0) {
-            badge.textContent = count > 99 ? '99+' : count;
-            badge.style.display = 'grid';
-        } else {
-            badge.style.display = 'none';
-        }
+        const count = (unreadMessages || []).filter(message => message.borrado !== true).length;
+        if (!count) return;
+
+        badges.forEach(badge => {
+            badge.textContent = count > 99 ? '99+' : String(count);
+            badge.title = `${count} mensaje${count === 1 ? '' : 's'} sin leer`;
+            badge.setAttribute('aria-label', badge.title);
+            badge.style.display = badge.id === 'messages-tab-badge' ? 'inline-flex' : 'grid';
+        });
     } catch (e) {
         console.warn('Error actualizando badge de mensajes:', e);
     }
@@ -155,6 +161,7 @@ function subscribeMessagesBadge() {
 
 // Exponer la función también en window para load-components.js
 window.initializeNavbar = initializeNavbar;
+window.updateMessagesBadge = updateMessagesBadge;
 
 // Lupa móvil: delegado a document porque el navbar se inyecta dinámicamente
 function setSearchOpen(open) {
