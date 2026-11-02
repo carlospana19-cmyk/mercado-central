@@ -833,3 +833,272 @@
         bottom: -30px;
     }
 }
+
+@media (max-width: 640px) {
+    .profile-header-card {
+        padding: 1.125rem;
+        border-radius: 16px;
+    }
+
+    .profile-header-content {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .profile-header-left {
+        margin: 0;
+    }
+
+    .profile-photo-wrapper {
+        width: 72px;
+        height: 72px;
+    }
+
+    .upload-photo-btn-header {
+        width: 34px;
+        height: 34px;
+        border-width: 3px;
+        font-size: 1rem;
+    }
+
+    .profile-header-info {
+        min-width: 0;
+    }
+
+    .profile-header-info h1 {
+        margin-bottom: 0.2rem;
+        font-size: 1.2rem;
+        line-height: 1.25;
+    }
+
+    .business-name-header {
+        margin-bottom: 0.55rem;
+        font-size: 0.875rem;
+    }
+
+    .header-contact-info {
+        gap: 0.35rem;
+        min-width: 0;
+        font-size: 0.8rem;
+    }
+
+    .header-contact-info span {
+        min-width: 0;
+        gap: 0.5rem;
+        line-height: 1.35;
+    }
+
+    .header-contact-info > span > span {
+        display: block;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .header-contact-info i {
+        width: 16px;
+        flex: 0 0 16px;
+    }
+
+    .profile-header-stats {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        padding: 0.65rem 0.25rem;
+        border: 1px solid #e8ecef;
+        border-radius: 14px;
+        background: #fff;
+    }
+
+    .profile-header-stats .stat-item {
+        min-width: 0;
+        padding: 0.8rem 0.3rem;
+        border: 0;
+        border-right: 1px solid #e8ecef;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .profile-header-stats .stat-item:last-child {
+        border-right: 0;
+    }
+
+    .profile-header-stats .stat-number {
+        margin-bottom: 0.25rem;
+        color: #f2731f;
+        font-size: 1.3rem;
+        line-height: 1.15;
+    }
+
+    .profile-header-stats .stat-label {
+        font-size: 0.77rem;
+        line-height: 1.35;
+        letter-spacing: 0.02em;
+        overflow-wrap: anywhere;
+    }
+
+}
+
+/* Perfil: formulario ligero, alineado con la app móvil */
+#perfil-tab.tab-content.active {
+    padding: clamp(1rem, 3vw, 2rem);
+    background: #f7f8fa;
+    border-radius: 0 0 1.2rem 1.2rem;
+    box-shadow: none;
+}
+
+#perfil-tab .perfil-content {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#perfil-tab .perfil-content h2 {
+    margin: 0 0 1.5rem;
+    color: #122129;
+    font-size: clamp(1.5rem, 2.4vw, 1.8rem);
+    letter-spacing: -0.02em;
+}
+
+#perfil-tab .profile-form-unified {
+    gap: 1rem;
+}
+
+#perfil-tab .form-section {
+    min-width: 0;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    background: #fff;
+    border: 1px solid #e8ecef;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(18, 33, 41, 0.035);
+}
+
+#perfil-tab .form-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 1.25rem;
+    color: #122129;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+#perfil-tab .form-section h3::before {
+    width: 4px;
+    height: 18px;
+    flex: 0 0 4px;
+    border-radius: 4px;
+    background: #ff8a3d;
+    content: "";
+}
+
+#perfil-tab .form-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#perfil-tab .form-row.single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+#perfil-tab .form-group {
+    min-width: 0;
+}
+
+#perfil-tab .form-group label {
+    margin-bottom: 0.45rem;
+    color: #31413d;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+#perfil-tab .form-group input,
+#perfil-tab .form-group select,
+#perfil-tab .form-group textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #e1e5e8;
+    border-radius: 10px;
+    background: #fff;
+    color: #122129;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#perfil-tab .form-group textarea {
+    min-height: 112px;
+    padding-block: 0.75rem;
+    resize: vertical;
+}
+
+#perfil-tab .form-group input:focus,
+#perfil-tab .form-group select:focus,
+#perfil-tab .form-group textarea:focus {
+    border-color: #ff8a3d;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 138, 61, 0.14);
+}
+
+#perfil-tab .form-group input:disabled {
+    border-color: #e8ecef;
+    background: #f5f7f8;
+    color: #89938f;
+}
+
+#perfil-tab .char-count,
+#perfil-tab .help-text {
+    margin-top: 0.35rem;
+    color: #89938f;
+    font-size: 0.72rem;
+}
+
+#perfil-tab .char-count {
+    text-align: right;
+}
+
+#perfil-tab .form-actions {
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+}
+
+#perfil-tab .form-actions .btn-primary {
+    min-height: 46px;
+    padding: 0 1.5rem;
+    border-radius: 10px;
+    background: #ff8a3d;
+    box-shadow: 0 4px 12px rgba(255, 138, 61, 0.2);
+    font-size: 0.9rem;
+}
+
+#perfil-tab .form-actions .btn-primary:hover {
+    background: #f2731f;
+    box-shadow: 0 6px 16px rgba(255, 138, 61, 0.25);
+}
+
+@media (max-width: 640px) {
+    #perfil-tab .form-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.85rem;
+    }
+
+    #perfil-tab .form-section {
+        padding: 1rem;
+    }
+
+    #perfil-tab .form-actions .btn-primary {
+        width: 100%;
+    }
+
+    #perfil-tab .perfil-content h2 {
+        margin-bottom: 1.125rem;
+        font-size: 1.35rem;
+    }
+}
