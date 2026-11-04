@@ -81,3 +81,11 @@
   .form-box{padding:26px 20px}
   .login-center-container{padding:24px 14px}
 }
+
+/* Login: botón y enlaces en naranja de marca */
+#pagina-login .form-box button[type="submit"]{background:var(--orange-500);box-shadow:0 4px 14px rgba(255,138,61,.3)}
+#pagina-login .form-box button[type="submit"]:hover{background:var(--orange-600)}
+#pagina-login .form-box a,
+#pagina-login .form-box a[href="forgot-password.html"]{color:var(--orange-500)!important}
+#pagina-login .form-box a:hover,
+#pagina-login .form-box a[href="forgot-password.html"]:hover{color:var(--orange-600)!important}
