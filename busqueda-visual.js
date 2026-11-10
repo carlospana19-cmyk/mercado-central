@@ -224,7 +224,7 @@
     btn.title = "Buscar con una foto";
     btn.setAttribute("aria-label", "Buscar con una foto");
     btn.innerHTML = '<i class="fas fa-camera" aria-hidden="true"></i>';
-    btn.style.cssText = "position:absolute;right:48px;top:50%;transform:translateY(-50%);" +
+    btn.style.cssText = "position:absolute;right:12px;top:50%;transform:translateY(-50%);" +
       "width:30px;height:30px;border:none;background:transparent;color:#8a8a8a;cursor:pointer;" +
       "font-size:16px;padding:0;line-height:30px;z-index:5;";
     btn.addEventListener("mouseenter", function () { btn.style.color = "#222"; });

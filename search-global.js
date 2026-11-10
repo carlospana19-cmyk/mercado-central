@@ -41,7 +41,7 @@ function bind(input, box) {
     input.addEventListener('keydown', e => {
         if (e.key === 'Enter') window.location.href = input.value.trim() ? 'resultados.html?q=' + encodeURIComponent(input.value.trim()) : 'resultados.html';
     });
-    const btn = input.parentElement.querySelector('.btn-search-hero');
+    const btn = input.closest('.nav-search')?.querySelector('.btn-search-hero');
     if (btn) btn.addEventListener('click', () => {
         window.location.href = input.value.trim() ? 'resultados.html?q=' + encodeURIComponent(input.value.trim()) : 'resultados.html';
     });
