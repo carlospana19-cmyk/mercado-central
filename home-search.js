@@ -47,7 +47,9 @@ async function loadDynamicStats() {
     try {
       const { count: profilesCount, error: profilesError } = await supabase
         .from('profiles')
-        .select('*', { count: 'exact', head: true });
+        // 'id' (columna concedida a anon): suficiente para el count exacto.
+        // select=* ya no es fiable con column-grants de la migración 0002.
+        .select('id', { count: 'exact', head: true });
 
       usersError = profilesError;
 

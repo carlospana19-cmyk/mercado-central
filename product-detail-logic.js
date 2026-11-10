@@ -764,7 +764,7 @@ async function loadSellerContactInfo(ad) {
         // Obtener información del usuario vendedor desde la tabla profiles
         const { data: sellerProfile, error } = await supabase
             .from('profiles')
-            .select('telefono, email, nombre_negocio, nombre_completo, url_foto_perfil')
+            .select('telefono, nombre_negocio, nombre_completo, url_foto_perfil')
             .eq('id', ad.user_id)
             .single();
         // Nombre del vendedor (estructura Fase 3) + enlace a su perfil (FASE 2)
@@ -789,20 +789,15 @@ async function loadSellerContactInfo(ad) {
             console.warn('Error al obtener información del vendedor:', error);
             // Fallback: mostrar datos no disponibles
             const sellerPhoneEl = document.getElementById('seller-phone');
-            const sellerEmailEl = document.getElementById('seller-email');
             const whatsappLinkEl = document.getElementById('whatsapp-link');
-            const emailLinkEl = document.getElementById('email-link');
 
             if (sellerPhoneEl) sellerPhoneEl.textContent = 'No disponible';
-            if (sellerEmailEl) sellerEmailEl.textContent = 'No disponible';
             if (whatsappLinkEl) whatsappLinkEl.style.display = 'none';
-            if (emailLinkEl) emailLinkEl.style.display = 'none';
             return;
         }
 
         // Mostrar información de contacto
         const whatsappLinkEl = document.getElementById('whatsapp-link');
-        const emailLinkEl = document.getElementById('email-link');
         const phoneLinkEl = document.getElementById('phone-link');
 
         // ✅ WhatsApp: Enlace directo con mensaje prellenado
@@ -818,16 +813,6 @@ async function loadSellerContactInfo(ad) {
             whatsappLinkEl.style.display = 'flex';
         } else {
             if (whatsappLinkEl) whatsappLinkEl.style.display = 'none';
-        }
-
-        // ✅ Email: Enlace mailto con asunto y cuerpo
-        if (emailLinkEl && sellerProfile?.email) {
-            const subject = encodeURIComponent(`Interesado en tu anuncio: ${ad.titulo}`);
-            const body = encodeURIComponent(`Hola, estoy interesado en tu anuncio "${ad.titulo}" y me gustaría tener más detalles.`);
-            emailLinkEl.href = `mailto:${sellerProfile.email}?subject=${subject}body=${body}`;
-            emailLinkEl.style.display = 'flex';
-        } else {
-            if (emailLinkEl) emailLinkEl.style.display = 'none';
         }
 
         // ✅ Teléfono: Enlace tel para llamar directamente

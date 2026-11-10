@@ -160,7 +160,7 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
       final profile = await Supabase.instance.client
           .from('profiles')
           .select(
-            'telefono, email, nombre_negocio, nombre_completo, url_foto_perfil',
+            'telefono, nombre_negocio, nombre_completo, url_foto_perfil',
           )
           .eq('id', sellerId)
           .maybeSingle();
@@ -332,26 +332,6 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
         );
       }
     }
-  }
-
-  Future<void> _openEmail() async {
-    final email = _sellerProfile['email']?.toString().trim() ?? '';
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El vendedor no ha proporcionado email.')),
-      );
-      return;
-    }
-    final title = widget.ad['titulo']?.toString() ?? 'anuncio';
-    final uri = Uri(
-      scheme: 'mailto',
-      path: email,
-      queryParameters: {
-        'subject': 'Interesado en tu anuncio: $title',
-        'body': 'Hola, estoy interesado en tu anuncio "$title".',
-      },
-    );
-    if (!await launchUrl(uri)) _showContactError('No se pudo abrir el email.');
   }
 
   Future<void> _callSeller() async {
@@ -846,17 +826,6 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                                   icon: const Icon(Icons.phone_outlined,
                                       size: 18),
                                   label: const Text('Llamar'),
-                                ),
-                              if ((_sellerProfile['email']
-                                      ?.toString()
-                                      .trim()
-                                      .isNotEmpty ??
-                                  false))
-                                OutlinedButton.icon(
-                                  onPressed: _openEmail,
-                                  icon: const Icon(Icons.email_outlined,
-                                      size: 18),
-                                  label: const Text('Email'),
                                 ),
                             ],
                           ),
