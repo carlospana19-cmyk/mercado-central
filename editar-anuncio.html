@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="css/all.min.css">
         <link rel="stylesheet" href="mc-base.css?v=26">
-    <link rel="stylesheet" href="mc-publish.css?v=11">
+    <link rel="stylesheet" href="mc-publish.css?v=13">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -79,32 +79,30 @@
                            
                         </div>
 
-      <div class="form-section" style="border: 2px solid #00c2cb; border-top: 1px solid #00c2cb; margin-top: -22px; margin-bottom: -22px; border-radius: 0; padding: 25px; background-color: #ffffff;">
-    <h4 class="mb-4" style="color: #0a2342; font-weight: bold; border-bottom: 2px solid #00c2cb; padding-bottom: 10px;">
-        <i class="bi bi-geo-alt-fill me-2"></i>Información de Ubicación
+      <div class="location-block">
+    <h4 class="block-title">
+        <i class="fas fa-location-dot"></i> Información de Ubicación
     </h4>
 
- <div style="display: flex; gap: 20px; width: 100%; margin-bottom: 20px;">
+    <div class="form-row">
     
-    <div style="flex: 1;">
-        <label for="province" class="form-label fw-bold" style="font-size: 1.1rem;">Provincia</label>
-        <select id="province" name="provincia" class="form-select" 
-            style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
-            <option value="">Seleccione Provincia</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="province">Provincia</label>
+            <select id="province" name="provincia">
+                <option value="">Seleccione Provincia</option>
+            </select>
+        </div>
 
-    <div style="flex: 1;">
-        <label for="district" class="form-label fw-bold" style="font-size: 1.1rem;">Distrito</label>
-        <select id="district" name="distrito" class="form-select" 
-            style="border: 1px solid #00c2cb; height: 50px; padding: 5px 15px; font-size: 16px; border-radius: 10px; background-color: #f9f9f9; color: #333;">
-            <option value="">Seleccione Distrito</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="district">Distrito</label>
+            <select id="district" name="distrito">
+                <option value="">Seleccione Distrito</option>
+            </select>
+        </div>
 
 </div>
 
-    <div id="map" style="height: 380px; width: 100%; border-radius: 12px; border: 1px solid #00c2cb;"></div>
+    <div id="map" class="location-map"></div>
     
     <input type="hidden" id="latitud" name="latitud">
     <input type="hidden" id="longitud" name="longitud">

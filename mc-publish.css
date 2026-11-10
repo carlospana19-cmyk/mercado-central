@@ -403,3 +403,17 @@ main.container.publish-wizard{width:100%!important}
   overflow:hidden!important;
   text-overflow:ellipsis!important;
 }
+
+/* ============ PATCH v11: BLOQUE DE UBICACIÓN COMO TARJETA (editar-anuncio) ============ */
+/* El bloque de ubicación usaba class="form-section" + estilos inline, pero la regla global
+   .form-section{...!important} del PATCH v2 los anulaba: sin fondo, borde ni padding el
+   contenido quedaba a ancho completo, fuera de la tarjeta (visible en móvil).
+   Ahora es una tarjeta propia, igual que .classification-location-block. */
+.location-block{background:#fff!important;border:1px solid var(--line)!important;border-radius:14px!important;box-shadow:none!important;padding:22px!important;margin:0!important}
+.location-block:hover{box-shadow:none!important}
+/* Título usa .block-title (igual que "Clasificación y Lugar"): icono #374151, sin subrayado */
+.location-map{height:380px;width:100%;border-radius:12px;border:1.5px solid var(--line);background:var(--bg)}
+@media(max-width:640px){
+  .location-block{padding:16px!important}
+  .location-map{height:300px}
+}
