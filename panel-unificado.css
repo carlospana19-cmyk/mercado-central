@@ -1,12 +1,46 @@
 /* ============================================
    PANEL UNIFICADO - ESTILOS MODERNOS
+   Superficies neutras + naranja como único acento (tokens)
    ============================================ */
-
 #panel-unificado-page {
+    /* Superficies */
+    --bg: #F8FAFC;          /* fondo general del panel */
+    --surface: #FFFFFF;     /* tarjetas, modales, inputs */
+    --surface-2: #F1F5F9;   /* filas hover, zonas hundidas */
+    --border: #E2E8F0;      /* bordes de tarjetas, inputs, divisores */
+
+    /* Texto */
+    --text: #0F172A;        /* títulos y texto principal */
+    --text-2: #64748B;      /* texto de apoyo, labels, metadata */
+
+    /* Marca (único acento) */
+    --brand: #F97316;
+    --brand-hover: #EA580C;
+    --brand-soft: #FFF7ED;  /* fondo naranja muy suave para destacados */
+    --brand-text: #C2410C;  /* naranja como texto pequeño (AA >= 4.5:1) */
+
+    /* Semánticos (solo estados) */
+    --success: #16A34A;
+    --warning: #D97706;
+    --danger:  #DC2626;
+    --warning-hover: #B45309;
+    --danger-hover: #B91C1C;
+
+    /* Focus ring */
+    --focus-ring: #FDBA74;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, .04);
+    --shadow-md: 0 8px 24px rgba(15, 23, 42, .06);
+
+    /* Radios */
+    --radius: 12px;         /* tarjetas */
+    --radius-sm: 8px;       /* inputs, botones, badges */
+
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--bg);
 }
 
 /* ============================================
@@ -24,12 +58,12 @@
    TARJETA DE PERFIL SUPERIOR
    ============================================ */
 .profile-header-card {
-    background: white;
-    border-radius: 2rem;
-    padding: 3rem;
-    margin-bottom: 3rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 191, 174, 0.1);
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
 }
 
 .profile-header-content {
@@ -54,8 +88,8 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #00bfae;
-    background: white;
+    border: 4px solid var(--border);
+    background: var(--surface);
     display: block;
 }
 
@@ -66,54 +100,55 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #00bfae, #008f88);
-    border: 4px solid white;
+    background: var(--brand);
+    border: 4px solid var(--surface);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.3);
-    color: white;
-    font-size: 1.4rem;
+    transition: background 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: var(--shadow-sm);
+    color: #fff;
+    font-size: 1.125rem;
 }
 
 .upload-photo-btn-header:hover {
-    background: linear-gradient(135deg, #008f88, #006b64);
+    background: var(--brand-hover);
     transform: scale(1.15);
-    box-shadow: 0 6px 16px rgba(0, 191, 174, 0.4);
+    box-shadow: var(--shadow-md);
 }
 
 .profile-header-info h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #1a1a1a;
-    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 0 0 0.25rem 0;
 }
 
 .business-name-header {
-    font-size: 1.4rem;
-    color: #00bfae;
+    font-size: 1rem;
+    color: var(--text-2);
     font-weight: 600;
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 1rem 0;
 }
 
 .header-contact-info {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    font-size: 1.3rem;
+    gap: 0.5rem;
+    font-size: 0.875rem;
 }
 
 .header-contact-info span {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    color: #666;
+    gap: 0.5rem;
+    color: var(--text-2);
 }
 
 .header-contact-info i {
-    color: #00bfae;
+    color: var(--text-2);
     width: 20px;
     text-align: center;
 }
@@ -126,24 +161,24 @@
 
 .stat-item {
     text-align: center;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f0fffe 0%, #e0fffe 100%);
-    border-radius: 1.2rem;
-    border: 1px solid rgba(0, 191, 174, 0.2);
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
 }
 
 .stat-number {
     display: block;
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: #00bfae;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
     margin-bottom: 0.5rem;
 }
 
 .stat-label {
     display: block;
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 0.75rem;
+    color: var(--text-2);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -155,44 +190,44 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-    background: white;
-    border-radius: 1.5rem 1.5rem 0 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
     padding: 0;
     overflow-x: auto;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 1.5rem 2rem;
+    padding: 1rem 1.5rem;
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
     cursor: pointer;
-    font-size: 1.4rem;
+    font-size: 0.9375rem;
     font-weight: 600;
-    color: #666;
-    transition: all 0.3s ease;
+    color: var(--text-2);
+    transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.8rem;
+    gap: 0.5rem;
     white-space: nowrap;
 }
 
 .tab-btn i {
-    font-size: 1.6rem;
+    font-size: 1rem;
 }
 
 .tab-btn:hover {
-    color: #00bfae;
-    background: rgba(0, 191, 174, 0.05);
+    color: var(--brand-text);
+    background: var(--surface-2);
 }
 
 .tab-btn.active {
-    color: #00bfae;
-    border-bottom-color: #00bfae;
-    background: rgba(0, 191, 174, 0.05);
+    color: var(--brand-text);
+    border-bottom-color: var(--brand);
+    background: var(--brand-soft);
 }
 
 .tab-btn[data-tab="mensajes"] {
@@ -210,7 +245,7 @@
     justify-content: center;
     border: 1.5px solid #fff;
     border-radius: 999px;
-    background: #d93025;
+    background: var(--danger);
     color: #fff;
     font-size: 0.72rem;
     font-weight: 700;
@@ -221,12 +256,12 @@
    CONTENIDO DE TABS
    ============================================ */
 .tab-content {
-    background: white;
-    border-radius: 0 0 1.5rem 1.5rem;
-    padding: 2.5rem;
+    background: var(--surface);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 1.5rem;
     display: none;
     animation: fadeIn 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
 }
 
 .tab-content.active {
@@ -248,39 +283,40 @@
 }
 
 .anuncios-header h2 {
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #1a1a1a;
+    letter-spacing: -0.01em;
+    color: var(--text);
     margin: 0;
 }
 
 .filter-buttons {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
 }
 
 .filter-btn {
-    padding: 0.8rem 1.6rem;
-    background: #f0f0f0;
-    border: 2px solid transparent;
-    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 1.3rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: #666;
-    transition: all 0.3s ease;
+    color: var(--text-2);
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .filter-btn:hover {
-    background: rgba(0, 191, 174, 0.1);
-    color: #00bfae;
+    background: var(--surface-2);
+    color: var(--brand-text);
 }
 
 .filter-btn.active {
-    background: #00bfae;
-    color: white;
-    border-color: #00bfae;
+    background: var(--brand);
+    color: #fff;
+    border-color: var(--brand);
 }
 
 .anuncios-grid {
@@ -293,11 +329,12 @@
    TARJETAS DE ANUNCIOS UNIFICADAS
    ============================================ */
 .unified-card {
-    background: white;
-    border-radius: 1.2rem;
+    background: var(--surface);
+    border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -305,13 +342,13 @@
 }
 
 .unified-card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .unified-card.card-sold {
     opacity: 0.7;
-    background: #f9f9f9;
+    background: var(--surface-2);
 }
 
 .unified-card.card-sold:hover {
@@ -330,30 +367,30 @@
 }
 
 .dashboard-ad-info {
-    padding: 1.5rem;
+    padding: 1.25rem;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.5rem;
 }
 
 .dashboard-ad-title h3 {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     margin: 0;
-    color: #1a1a1a;
+    color: var(--text);
     line-height: 1.4;
 }
 
 .dashboard-ad-price {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #00bfae;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text);
 }
 
 .dashboard-ad-category {
-    font-size: 1.2rem;
-    color: #999;
+    font-size: 0.8125rem;
+    color: var(--text-2);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -363,82 +400,82 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 2rem;
-    font-size: 1.1rem;
+    background: var(--danger);
+    color: #fff;
+    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
     font-weight: 700;
     z-index: 10;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    box-shadow: var(--shadow-sm);
 }
 
 .dashboard-ad-actions {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 0.6rem;
-    padding: 1rem;
-    background: #f9f9f9;
-    border-top: 1px solid #eee;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
 }
 
 .btn-view, .btn-edit, .btn-sold, .btn-delete {
-    padding: 0.8rem 1rem;
-    border: none;
-    border-radius: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    background: var(--surface);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.375rem;
     text-decoration: none;
 }
 
-.btn-view {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-}
-
 .btn-view:hover {
-    background: linear-gradient(135deg, #2980b9, #1a5276);
-    transform: translateY(-2px);
+    border-color: var(--brand);
+    color: var(--brand-text);
 }
 
 .btn-edit {
-    background: linear-gradient(135deg, #00bfae, #008f88);
-    color: white;
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
 }
 
 .btn-edit:hover {
-    background: linear-gradient(135deg, #008f88, #006b64);
-    transform: translateY(-2px);
+    background: var(--brand-hover);
+    border-color: var(--brand-hover);
 }
 
 .btn-sold {
-    background: linear-gradient(135deg, #ffc107, #ff9800);
-    color: white;
+    color: var(--warning-hover);
+    border-color: var(--border);
 }
 
 .btn-sold:hover {
-    background: linear-gradient(135deg, #ff9800, #f57c00);
-    transform: translateY(-2px);
+    background: var(--surface-2);
+    border-color: var(--warning);
+    color: var(--warning-hover);
 }
 
 .btn-delete {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-    color: white;
+    color: var(--danger);
+    border-color: var(--border);
 }
 
 .btn-delete:hover {
-    background: linear-gradient(135deg, #ee5a6f, #e74c3c);
-    transform: translateY(-2px);
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
 }
 
 .btn-view i, .btn-edit i, .btn-sold i, .btn-delete i {
-    font-size: 1.2rem;
+    font-size: 0.875rem;
 }
 
 /* Enlaces clickeables en tarjetas */
@@ -457,17 +494,18 @@
 }
 
 .card-title-link:hover h3 {
-    color: #00bfae;
+    color: var(--brand-text);
 }
 
 /* ============================================
    SECCIÓN DE PERFIL
    ============================================ */
 .perfil-content h2 {
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 2rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
 }
 
 .profile-form-unified {
@@ -477,16 +515,17 @@
 }
 
 .form-section {
-    padding: 1.8rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 1.2rem;
-    background: #fafafa;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
 }
 
 .form-section h3 {
-    font-size: 1.5rem;
-    margin: 0 0 1.5rem 0;
-    color: #008f88;
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+    color: var(--text);
+    font-weight: 700;
 }
 
 .form-row {
@@ -510,48 +549,50 @@
 }
 
 .form-group label {
-    font-size: 1.3rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    margin-bottom: 0.8rem;
-    color: #333;
+    margin-bottom: 0.5rem;
+    color: var(--text-2);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-    padding: 1rem 1.2rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 0.8rem;
-    font-size: 1.3rem;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9375rem;
     font-family: inherit;
-    transition: all 0.3s ease;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
     outline: none;
-    border-color: #00bfae;
-    box-shadow: 0 0 0 3px rgba(0, 191, 174, 0.1);
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
 .form-group input:disabled {
-    background: #f5f5f5;
-    color: #999;
+    background: var(--surface-2);
+    color: var(--text-2);
     cursor: not-allowed;
 }
 
 .char-count {
-    font-size: 1.1rem;
-    color: #999;
-    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-2);
+    margin-top: 0.375rem;
     text-align: right;
 }
 
 .help-text {
-    font-size: 1.1rem;
-    color: #999;
-    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-2);
+    margin-top: 0.375rem;
 }
 
 .form-actions {
@@ -561,25 +602,25 @@
 }
 
 .form-actions .btn-primary {
-    background: linear-gradient(135deg, #00bfae, #008f88);
-    color: white;
-    padding: 1.2rem 2.5rem;
+    background: var(--brand);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 0.8rem;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 1.3rem;
+    font-size: 0.9375rem;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: background 0.18s ease, box-shadow 0.18s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.8rem;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .form-actions .btn-primary:hover {
-    background: linear-gradient(135deg, #008f88, #006b64);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.3);
+    background: var(--brand-hover);
+    box-shadow: var(--shadow-md);
 }
 
 /* ============================================
@@ -590,8 +631,8 @@
 .error-message {
     text-align: center;
     padding: 3rem 2rem;
-    font-size: 1.4rem;
-    color: #666;
+    font-size: 0.9375rem;
+    color: var(--text-2);
     grid-column: 1 / -1;
 }
 
@@ -607,8 +648,8 @@
     content: '';
     width: 40px;
     height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #00bfae;
+    border: 4px solid var(--border);
+    border-top: 4px solid var(--brand);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -619,7 +660,7 @@
 }
 
 .no-ads-message a {
-    color: #00bfae;
+    color: var(--brand-text);
     font-weight: 600;
     text-decoration: none;
 }
@@ -670,7 +711,7 @@
     }
 
     .profile-header-info h1 {
-        font-size: 1.6rem;
+        font-size: 1.25rem;
     }
 
     .profile-header-stats {
@@ -704,7 +745,7 @@
 
     .tab-btn {
         padding: 1rem 1.2rem;
-        font-size: 1.2rem;
+        font-size: 0.875rem;
     }
 
     .form-row {
@@ -762,7 +803,7 @@
 
     .tab-btn {
         padding: 0.8rem 1rem;
-        font-size: 1rem;
+        font-size: 0.8125rem;
     }
 
     .tab-btn i {
@@ -770,7 +811,7 @@
     }
 
     .profile-header-info h1 {
-        font-size: 1.4rem;
+        font-size: 1.125rem;
     }
 
     .anuncios-grid {
@@ -778,12 +819,12 @@
     }
 
     .stat-number {
-        font-size: 1.8rem;
+        font-size: 1.25rem;
     }
 
     .btn-edit, .btn-sold, .btn-delete {
-        font-size: 1rem;
-        padding: 0.6rem 0.8rem;
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.75rem;
     }
 }
 
@@ -798,17 +839,17 @@
     height: 60px;
     border-radius: 50%;
     background: white;
-    border: 3px solid var(--color-primario, #00bfae);
+    border: 3px solid var(--surface);
     overflow: hidden;
     z-index: 10;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 191, 174, 0.2);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .vendor-avatar:hover {
     transform: scale(1.15);
-    box-shadow: 0 6px 20px rgba(0, 191, 174, 0.35);
+    box-shadow: var(--shadow-md);
 }
 
 .vendor-avatar-img {
@@ -859,7 +900,7 @@
 @media (max-width: 640px) {
     .profile-header-card {
         padding: 1.125rem;
-        border-radius: 16px;
+        border-radius: var(--radius);
     }
 
     .profile-header-content {
@@ -930,16 +971,16 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 0;
         padding: 0.65rem 0.25rem;
-        border: 1px solid #e8ecef;
-        border-radius: 14px;
-        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
     }
 
     .profile-header-stats .stat-item {
         min-width: 0;
         padding: 0.8rem 0.3rem;
         border: 0;
-        border-right: 1px solid #e8ecef;
+        border-right: 1px solid var(--border);
         border-radius: 0;
         background: transparent;
     }
@@ -950,8 +991,8 @@
 
     .profile-header-stats .stat-number {
         margin-bottom: 0.25rem;
-        color: #f2731f;
-        font-size: 1.3rem;
+        color: var(--text);
+        font-size: 1.125rem;
         line-height: 1.15;
     }
 
@@ -967,8 +1008,8 @@
 /* Perfil: formulario ligero, alineado con la app móvil */
 #perfil-tab.tab-content.active {
     padding: clamp(1rem, 3vw, 2rem);
-    background: #f7f8fa;
-    border-radius: 0 0 1.2rem 1.2rem;
+    background: var(--bg);
+    border-radius: 0 0 var(--radius) var(--radius);
     box-shadow: none;
 }
 
@@ -980,9 +1021,9 @@
 
 #perfil-tab .perfil-content h2 {
     margin: 0 0 1.5rem;
-    color: #122129;
-    font-size: clamp(1.5rem, 2.4vw, 1.8rem);
-    letter-spacing: -0.02em;
+    color: var(--text);
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    letter-spacing: -0.01em;
 }
 
 #perfil-tab .profile-form-unified {
@@ -992,10 +1033,10 @@
 #perfil-tab .form-section {
     min-width: 0;
     padding: clamp(1rem, 2.5vw, 1.5rem);
-    background: #fff;
-    border: 1px solid #e8ecef;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(18, 33, 41, 0.035);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
 }
 
 #perfil-tab .form-section h3 {
@@ -1003,7 +1044,7 @@
     align-items: center;
     gap: 10px;
     margin: 0 0 1.25rem;
-    color: #122129;
+    color: var(--text);
     font-size: 1rem;
     font-weight: 700;
 }
@@ -1013,7 +1054,7 @@
     height: 18px;
     flex: 0 0 4px;
     border-radius: 4px;
-    background: #ff8a3d;
+    background: var(--brand);
     content: "";
 }
 
@@ -1033,7 +1074,7 @@
 
 #perfil-tab .form-group label {
     margin-bottom: 0.45rem;
-    color: #31413d;
+    color: var(--text-2);
     font-size: 0.82rem;
     font-weight: 600;
 }
@@ -1046,10 +1087,10 @@
     min-width: 0;
     min-height: 44px;
     padding: 0.7rem 0.85rem;
-    border: 1px solid #e1e5e8;
-    border-radius: 10px;
-    background: #fff;
-    color: #122129;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
     font-size: 0.9rem;
     line-height: 1.45;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -1061,24 +1102,24 @@
     resize: vertical;
 }
 
-#perfil-tab .form-group input:focus,
-#perfil-tab .form-group select:focus,
-#perfil-tab .form-group textarea:focus {
-    border-color: #ff8a3d;
+#perfil-tab .form-group input:focus-visible,
+#perfil-tab .form-group select:focus-visible,
+#perfil-tab .form-group textarea:focus-visible {
+    border-color: var(--brand);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 138, 61, 0.14);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
 #perfil-tab .form-group input:disabled {
-    border-color: #e8ecef;
-    background: #f5f7f8;
-    color: #89938f;
+    border-color: var(--border);
+    background: var(--surface-2);
+    color: var(--text-2);
 }
 
 #perfil-tab .char-count,
 #perfil-tab .help-text {
     margin-top: 0.35rem;
-    color: #89938f;
+    color: var(--text-2);
     font-size: 0.72rem;
 }
 
@@ -1094,15 +1135,15 @@
 #perfil-tab .form-actions .btn-primary {
     min-height: 46px;
     padding: 0 1.5rem;
-    border-radius: 10px;
-    background: #ff8a3d;
-    box-shadow: 0 4px 12px rgba(255, 138, 61, 0.2);
+    border-radius: var(--radius-sm);
+    background: var(--brand);
+    box-shadow: var(--shadow-sm);
     font-size: 0.9rem;
 }
 
 #perfil-tab .form-actions .btn-primary:hover {
-    background: #f2731f;
-    box-shadow: 0 6px 16px rgba(255, 138, 61, 0.25);
+    background: var(--brand-hover);
+    box-shadow: var(--shadow-md);
 }
 
 @media (max-width: 640px) {
@@ -1121,6 +1162,440 @@
 
     #perfil-tab .perfil-content h2 {
         margin-bottom: 1.125rem;
-        font-size: 1.35rem;
+        font-size: 1.125rem;
     }
+}
+
+/* ============================================
+   FOCUS VISIBLE (ring suave)
+   ============================================ */
+#panel-unificado-page .tab-btn:focus-visible,
+#panel-unificado-page .filter-btn:focus-visible,
+#panel-unificado-page .upload-photo-btn-header:focus-visible,
+#panel-unificado-page .btn-view:focus-visible,
+#panel-unificado-page .btn-edit:focus-visible,
+#panel-unificado-page .btn-sold:focus-visible,
+#panel-unificado-page .btn-delete:focus-visible,
+#panel-unificado-page .btn-primary:focus-visible,
+#panel-unificado-page .subtab-btn:focus-visible,
+#panel-unificado-page .vendor-avatar:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   OVERRIDES CON SCOPE DEL PANEL
+   mc-base.css (PATCH v7 y footer) usa !important y colores
+   propios; aquí se unifican a los tokens SOLO en este panel.
+   ============================================ */
+#panel-unificado-page .dashboard-card {
+    border-radius: var(--radius)!important;
+}
+#panel-unificado-page .dashboard-ad-actions {
+    background: var(--bg)!important;
+    border-top: 1px solid var(--border)!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-view,
+#panel-unificado-page .dashboard-ad-actions .btn-edit,
+#panel-unificado-page .dashboard-ad-actions .btn-sold,
+#panel-unificado-page .dashboard-ad-actions .btn-delete {
+    padding: 0.5rem 0.75rem!important;
+    border-radius: var(--radius-sm)!important;
+    font-size: 0.8125rem!important;
+    border-width: 1px!important;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-view {
+    background: var(--surface)!important;
+    border-color: var(--border)!important;
+    color: var(--text)!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-view:hover {
+    background: var(--surface)!important;
+    border-color: var(--brand)!important;
+    color: var(--brand-text)!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-edit {
+    background: var(--brand)!important;
+    border-color: var(--brand)!important;
+    color: #fff!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-edit:hover {
+    background: var(--brand-hover)!important;
+    border-color: var(--brand-hover)!important;
+    color: #fff!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-sold {
+    background: var(--surface)!important;
+    border-color: var(--border)!important;
+    color: var(--warning-hover)!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-sold:hover {
+    background: var(--surface-2)!important;
+    border-color: var(--warning)!important;
+    color: var(--warning-hover)!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-delete {
+    background: var(--surface)!important;
+    border-color: var(--border)!important;
+    color: var(--danger)!important;
+}
+#panel-unificado-page .dashboard-ad-actions .btn-delete:hover {
+    background: var(--danger)!important;
+    border-color: var(--danger)!important;
+    color: #fff!important;
+}
+#panel-unificado-page .dashboard-ad-title h3 {
+    color: var(--text)!important;
+}
+#panel-unificado-page .dashboard-ad-price {
+    color: var(--text)!important;
+}
+#panel-unificado-page .dashboard-ad-category,
+#panel-unificado-page .dashboard-ad-category i {
+    color: var(--text-2)!important;
+}
+#panel-unificado-page .badge-sold {
+    background: var(--danger)!important;
+    border-radius: 999px!important;
+}
+/* Botón primario global (mc-base.css) con el token del panel */
+#panel-unificado-page .btn-primary {
+    background: var(--brand);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+#panel-unificado-page .btn-primary:hover {
+    background: var(--brand-hover);
+}
+/* Footer: hover turquesa de mc-base.css neutralizado solo en el panel */
+#panel-unificado-page .footer-col a:hover {
+    color: var(--brand)!important;
+}
+#panel-unificado-page .payment-icons i:hover {
+    color: var(--text-2)!important;
+}
+
+/* ============================================
+   RESEÑAS (tab del panel)
+   ============================================ */
+.reviews-content h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+}
+.reviews-subtabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+.subtab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-2);
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.subtab-btn:hover {
+    background: var(--surface-2);
+    color: var(--brand-text);
+}
+.subtab-btn.active {
+    background: var(--brand-soft);
+    border-color: var(--brand);
+    color: var(--brand-text);
+}
+.subtab-content {
+    display: none;
+}
+.subtab-content.active {
+    display: block;
+}
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+.reviews-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.25rem 0;
+}
+.reviews-subtitle {
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    margin: 0;
+}
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+.reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-2);
+    display: grid;
+    place-items: center;
+    color: var(--text-2);
+    flex-shrink: 0;
+}
+.reviewer-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+}
+.review-date {
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+.review-rating {
+    color: var(--warning);
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+.review-rating .far {
+    color: var(--border);
+}
+.review-comment {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text);
+    line-height: 1.55;
+}
+
+/* Estadísticas del vendedor (resumen de reseñas) */
+.review-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.review-stats .average-rating {
+    text-align: center;
+}
+.review-stats .rating-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+}
+.review-stats .stars {
+    color: var(--warning);
+    font-size: 0.875rem;
+}
+.review-stats .stars .far {
+    color: var(--border);
+}
+.review-stats .total-reviews {
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+.review-stats .rating-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    flex: 1;
+    min-width: 200px;
+}
+.review-stats .rating-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+.review-stats .rating-bar .bar {
+    width: 120px;
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.review-stats .rating-bar .fill {
+    height: 100%;
+    background: var(--warning);
+    border-radius: 999px;
+}
+.empty-message {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.9375rem;
+    color: var(--text-2);
+}
+
+/* ============================================
+   MODAL DE RESEÑA (se abre desde el panel)
+   ============================================ */
+.review-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(15, 23, 42, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.review-modal-overlay.active {
+    display: flex;
+}
+.review-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    max-width: 480px;
+    padding: 1.5rem;
+}
+.review-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.review-modal .modal-header h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+}
+.review-modal .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-2);
+    font-size: 1.125rem;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+.review-modal .modal-close:hover {
+    color: var(--text);
+}
+.review-modal .rating-section label,
+.review-modal .comment-section label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-2);
+    margin-bottom: 0.5rem;
+}
+.review-modal .comment-section {
+    margin-top: 1rem;
+}
+.review-modal textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 96px;
+    resize: vertical;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-family: inherit;
+}
+.review-modal textarea:focus-visible {
+    border-color: var(--brand);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+.review-modal .char-counter {
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--text-2);
+    text-align: right;
+}
+.review-modal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+}
+.review-modal .btn-secondary {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+.review-modal .btn-secondary:hover {
+    background: var(--surface-2);
+}
+.review-modal .btn-primary {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+.review-modal .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.star-rating {
+    display: inline-flex;
+    align-items: center;
+}
+.star-rating .star {
+    color: var(--border);
+    font-size: 1.25rem;
+    padding: 0 2px;
+}
+.star-rating .star.active {
+    color: var(--warning);
+}
+.star-rating.interactive .star {
+    cursor: pointer;
+}
+.star-rating .rating-text {
+    font-size: 0.75rem;
+    color: var(--text-2);
+    margin-left: 0.5rem;
 }
