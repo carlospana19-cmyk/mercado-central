@@ -1,0 +1,64 @@
+/* =====================================================
+   MERCADOS CENTRAL — mc-tarjeta-2026.css (FASE 1)
+   Tarjeta limpia estilo 2026 (foto 4:3, precio naranja,
+   título 1 línea) + grid 2 móvil / 3 tablet / 4 escritorio.
+   Se carga DESPUÉS de mc-home.css y mc-results.css.
+   ===================================================== */
+
+/* ---------- Tarjeta (toda clicable; el cursor lo pone aquí) ---------- */
+.mc-card{position:relative;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(18,33,41,.05),0 1px 6px rgba(18,33,41,.04);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;-webkit-tap-highlight-color:transparent}
+@media(hover:hover){.mc-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:#DDE5E3}}
+.mc-card:focus-visible{outline:2px solid #374151;outline-offset:2px}
+.mc-card.card-sold{cursor:default}
+.mc-card.card-sold:hover{transform:none;box-shadow:0 1px 2px rgba(18,33,41,.05),0 1px 6px rgba(18,33,41,.04)}
+
+/* ---------- Foto: proporción fija 4:3, fondo gris mientras carga ---------- */
+.mc-card-foto{position:relative;width:100%;aspect-ratio:4/3;min-height:0;background:#EEF1F3;overflow:hidden;flex-shrink:0}
+.mc-card-foto .product-swiper,.mc-card-foto .mini-gallery{width:100%;height:100%;overflow:hidden}
+.mc-card-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.card-sold .mc-card-foto{filter:grayscale(.7) brightness(.85)}
+
+/* Sin foto: fondo gris con la inicial del título centrada */
+.mc-card-foto-vacia{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:42px;font-weight:700;color:#AEBBB8;background:#EEF1F3;user-select:none}
+
+/* FASE 1-B: sin carrusel en la tarjeta (el carrusel vive solo en el detalle).
+   Conteo de fotos cuando hay 2 o más: información, no controles */
+.mc-foto-conteo{position:absolute;top:8px;right:8px;z-index:6;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
+.mc-foto-conteo i{font-size:10px}
+
+/* ---------- Badges flotantes sobre la foto, SOLO si aplican ---------- */
+.mc-badges{position:absolute;top:8px;left:8px;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
+.mc-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;line-height:1.2;letter-spacing:.02em}
+.mc-badge i{font-size:10px}
+.mc-badge-destacado{background:#FA6406;color:#fff;box-shadow:0 2px 6px rgba(250,100,6,.35)}
+.mc-badge-nuevo{background:#E8F7EE;color:#1F8B4C;border:1px solid #C4E8D0}
+.mc-badge-urgente{background:#FFF3E0;color:#B25E00;border:1px solid #F5D9A8}
+
+/* ---------- Cuerpo blanco: precio → título → ubicación (FASE 1-B: un solo tono de texto) ---------- */
+.mc-card-cuerpo{display:flex;flex-direction:column;gap:4px;background:#fff;padding:10px 12px 12px;flex:1;min-width:0}
+.mc-card-precio{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mc-precio-valor{font-family:var(--font-ui);font-size:16px;font-weight:700;color:#1F2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-precio-vacio{font-family:var(--font-ui);font-size:16px;font-weight:700;color:#6B7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-card-titulo{font-family:var(--font-ui);font-size:14px;font-weight:400;color:#1F2937;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+.mc-card-meta{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#6B7280;margin:0;white-space:nowrap;overflow:hidden}
+.mc-card-meta i{color:var(--ink-300);font-size:11px;flex-shrink:0}
+.mc-card-meta span{overflow:hidden;text-overflow:ellipsis}
+
+/* Me gusta dentro del cuerpo, junto al precio (nunca sobre la foto).
+   FASE 1-B: contorno gris discreto; se rellena solo al hacer clic */
+.mc-card-precio .like-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;width:28px;height:28px;padding:0;border-radius:50%;border:1px solid #E5E7EB;background:#fff;color:#9CA3AF;font-size:12px;flex-shrink:0;transition:all .2s}
+.mc-card-precio .like-btn:hover{border-color:#9CA3AF;color:#6B7280}
+.mc-card-precio .like-btn.liked{border-color:#FA6406;color:#FA6406}
+.mc-card-precio .like-btn .likes-count{display:none}
+
+/* ---------- Grid: tarjetas grandes que llenan el espacio (FASE 1-B) ---------- */
+#results-container.results-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+@media(max-width:760px){#results-container.results-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Filas de impacto de la home (3 tarjetas): llenan el ancho; 2 columnas en móvil */
+.ads-row.row-3-cols{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:760px){.ads-row.row-3-cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* FASE 1-B: un solo color de acción en todo el sitio — "Aplicar filtros" pasa de accion a naranja */
+.btn-apply-filters{background:#FA6406}
+.btn-apply-filters:hover{background:#E05A00}

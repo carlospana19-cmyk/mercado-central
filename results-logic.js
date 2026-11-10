@@ -2,6 +2,9 @@ import { supabase } from './supabase-client.js';
 import { generateAttributesHTML, UIComponents, cleanLocationString } from './UIComponents.js';
 import { DEFAULT_CATEGORIES } from './config-categories.js';
 import { generateLikeButtonHTML, initializeAllCardLikes, setupLikesObserver } from './likes-logic.js';
+import { urlDetalle, precioTexto, badgeDe, inicialDe } from './utilidades-ui.js';
+import { tarjetaAnuncioHTML } from './tarjeta-anuncio.js';
+
 
 // --- CARRUSEL DE CATEGORÍA ---
 function initializeCategoryHero() {
@@ -824,131 +827,10 @@ function displayFilteredProducts(ads) {
             }
         }
 
-        console.log('Anuncio:', ad.featured_plan, ad.url_portada, ad.url_galeria);
-
-        // ✅ Si está vendido, no permite ir a detalles
-        const soldClass = ad.is_sold ? 'card-sold' : '';
-        const soldBadgeResults = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
-        
-        // ✅ Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
-        const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
-        const vendorFullName = vendorProfile?.nombre_completo || '';
-        const vendorPhoto = vendorProfile?.url_foto_perfil;
-        const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
-        // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
-        const vendorAvatar = vendorPhoto 
-            ? `<div class="vendor-avatar has-image" title="${vendorName}">
-                <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-                <span class="vendor-name-tooltip">${vendorName}</span>
-            </div>` 
-            : `<div class="vendor-avatar" title="${vendorName}"></div>`;
-
-return `
-        <div class="property-card card ${cardExtraClass} ${soldClass}" style="${ad.is_sold ? 'cursor: default;' : 'cursor: pointer;'}">
-                ${crownBadgeHTML}
-                ${urgentBadge}
-                ${soldBadgeResults}
-                <div class="card-actions">
-                    <button class="like-btn" data-anuncio-id="${ad.id}" data-liked="false" title="Dar me gusta">
-                        <i class="far fa-heart"></i>
-                        <span class="likes-count">0</span>
-                    </button>
-                </div>
-                <div class="property-image">
-                        ${['premium','destacado','top'].includes(ad.featured_plan)
-                                    ? (() => {
-                                        // Fallback estricto para tarjetas Premium (igual que en UIComponents y product-detail)
-                                        const getImgUrl = (ad) => {
-                                            if (ad.imagen_portada) return ad.imagen_portada;
-                                            if (ad.url_portada && ad.url_portada.trim() !== '') return ad.url_portada;
-                                            if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) return ad.url_galeria[0];
-                                            if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') return ad.url_galeria;
-                                            return 'https://via.placeholder.com/500x400?text=Sin+Imagen';
-                                        };
-                                        // PRIMERO obtener imagen_portada como imagen principal
-                                        let galleryImages = [];
-                                        const portadaUrl = getImgUrl(ad); // imagen_portada > url_portada > url_galeria
-                                        galleryImages = [portadaUrl];
-                                        // Luego agregar imágenes adicionales de url_galeria si existen y son diferentes
-                                        if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) {
-                                            ad.url_galeria.forEach(url => {
-                                                if (!galleryImages.includes(url)) {
-                                                    galleryImages.push(url);
-                                                }
-                                            });
-                                        }
-                                        const hasMultipleImages = galleryImages.length > 1 || videoEmbedUrl;
-                                        return `
-                                    <div class="tarjeta-auto">
-                                    <div class="swiper product-gallery-swiper mini-gallery" id="swiper-${ad.id}">
-                                        <div class="swiper-wrapper">
-                                            ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe></div>` : ''}
-                                            ${galleryImages.map(img =>
-                                                `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'"></div>`
-                                            ).join('')}
-                                        </div>
-                                        <div class="swiper-pagination"></div>
-                                        ${hasMultipleImages ? `
-                                        <div class="swiper-button-next"></div>
-                                        <div class="swiper-button-prev"></div>
-                                        ` : ''}
-                                        </div>
-                                    </div>`;
-                                    })()
-                            : `<img src="${(() => {
-                                if (ad.imagen_portada) return ad.imagen_portada;
-                                if (ad.url_portada && ad.url_portada.trim() !== '') return ad.url_portada;
-                                if (Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0) return ad.url_galeria[0];
-                                if (typeof ad.url_galeria === 'string' && ad.url_galeria.trim() !== '') return ad.url_galeria;
-                                return 'https://via.placeholder.com/500x400?text=Sin+Imagen';
-                            })()}" alt="${ad.titulo}" class="dashboard-ad-image" loading="lazy" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">`}
-                </div>
-        
-                <div class="property-details">
-                        <div class="property-header">
-                                <div class="property-seller-name">${ad.contact_name || vendorFullName || 'Usuario Verificado'}</div>
-                                <div class="property-price-and-tag">
-                                        <span class="property-price">${priceFormatted}</span>
-                                        ${ad.enhancements && ad.enhancements.is_urgent ? '<span class="tag-oportunidad">Oportunidad</span>' : ''}
-                                        ${vendorAvatar}
-                                </div>
-                                <h2 class="property-title">${ad.titulo}</h2>
-                                <div class="property-location">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        ${cleanLocationString(ad.direccion_exacta || (ad.provincia || 'Panamá') + ', ' + (ad.distrito || ad.ubicacion || 'N/A'))}
-                                </div>
-                        </div>
-            
-${(() => {
-                                try {
-                                    // 1. Asegurar que los atributos sean un objeto válido
-                                    let attrs = ad.atributos_clave;
-                                    if (typeof attrs === 'string') {
-                                        attrs = JSON.parse(attrs);
-                                    }
-                                    
-                                    // 2. Generar el HTML
-                                    const attrHTML = generateAttributesHTML(attrs, ad.categoria, attrs?.subcategoria);
-                                    
-                                    // 3. Forzar visibilidad en caso de que el CSS de la página principal lo oculte
-                                    if (attrHTML && attrHTML.trim() !== '' && attrHTML !== '<span></span>') {
-                                        return `<div class="property-attributes card-attributes" style="display: flex !important; flex-wrap: wrap; gap: 8px; margin-top: 8px; font-size: 0.9em; color: #555;">${attrHTML}</div>`;
-                                    }
-                                    return '';
-                                } catch (error) {
-                                    console.error("Error renderizando atributos para ID " + ad.id, error);
-                                    return '';
-                                }
-                            })()}
-            
-            <button class="btn-contact-card" data-contact-id="${ad.id}" data-contact-phone="${ad.contact_phone || ''}">
-                Contactar
-            </button>
-                </div>
-        </div>
-`;
+        // ✅ FASE 2: la tarjeta vive en un archivo compartido (tarjeta-anuncio.js)
+        // — mismo HTML que el perfil del vendedor y la sección "Más anuncios" del detalle.
+        return tarjetaAnuncioHTML(ad);
     }).join('');
-
     container.innerHTML = adsHTML;
 
     // ✅ FIJAR: Destruir Swipers previos y guardar referencias
@@ -991,46 +873,53 @@ ${(() => {
       window.activeGallerySwipers.push(swiper);
     });
 
-    // ✅ FIJAR: Usar event delegation en lugar de listeners duplicados
-    if (container._propertyImageListener) {
-        container.removeEventListener('click', container._propertyImageListener);
+    // ✅ FASE 1: la tarjeta completa es clicable (delegación de eventos)
+    if (container._cardPointerDownListener) {
+        container.removeEventListener('pointerdown', container._cardPointerDownListener);
+        container._cardPointerDownListener = null;
     }
-    
-    container._propertyImageListener = (e) => {
-      if (e.target.closest('.property-image')) {
-        e.stopPropagation();
-      }
-    };
-    container.addEventListener('click', container._propertyImageListener);
-    
-    // ✅ Evento unificado para botones Contactar y tarjetas
-    // Solo el botón de contactar debe redirigir a detalles
-    container.addEventListener('click', (e) => {
-      // Si hace click en el botón de contactar
-      const contactLink = e.target.closest('.btn-contact-card');
-      if (contactLink) {
-        e.preventDefault();
-        const contactId = contactLink.dataset.contactId;
-        if (contactId) {
-          window.location.href = `detalle-producto.html?id=${contactId}`;
+    if (container._cardClickListener) {
+        container.removeEventListener('click', container._cardClickListener);
+        container._cardClickListener = null;
+    }
+    if (container._cardKeydownListener) {
+        container.removeEventListener('keydown', container._cardKeydownListener);
+        container._cardKeydownListener = null;
+    }
+
+    // Si el usuario arrastró el carrusel de la foto, el "click" que sigue no navega
+    container._cardPointerDownListener = (e) => { container._puntoInicio = { x: e.clientX, y: e.clientY }; };
+    container.addEventListener('pointerdown', container._cardPointerDownListener, true);
+
+    container._cardClickListener = (e) => {
+        const inicio = container._puntoInicio;
+        if (inicio && Math.abs(e.clientX - inicio.x) + Math.abs(e.clientY - inicio.y) > 12) return;
+
+        // El botón de me gusta funciona solo (no navega)
+        const btnLike = e.target.closest('.like-btn, .like-button, .btn-like');
+        if (btnLike) return;
+
+        // Las flechas y la paginación del carrusel de la foto funcionan solas
+        const carouselNav = e.target.closest('.swiper-button-next, .swiper-button-prev, .swiper-pagination');
+        if (carouselNav) return;
+
+        const tarjeta = e.target.closest('.mc-card');
+        if (tarjeta && !tarjeta.classList.contains('card-sold')) {
+            window.location.href = tarjeta.dataset.url || urlDetalle(tarjeta.dataset.adId);
         }
-        return;
-      }
-      
-      // Si hace click en el botón de like, permitir que funcione
-      const btnLike = e.target.closest('.like-button, .btn-like');
-      if (btnLike) {
-        return; // No prevenimos el comportamiento
-      }
-      
-      // Si hace click en las flechas del carrusel, permitir que funcionen
-      const carouselNav = e.target.closest('.swiper-button-next, .swiper-button-prev');
-      if (carouselNav) {
-        return;
-      }
-      
-      // La tarjeta en sí ya no es clickeable - solo el botón Contactar debe funcionar
-    });
+    };
+    container.addEventListener('click', container._cardClickListener);
+
+    // Accesibilidad: Enter o Espacio sobre la tarjeta enfocada abre el detalle
+    container._cardKeydownListener = (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const tarjeta = e.target.closest('.mc-card');
+        if (tarjeta && !tarjeta.classList.contains('card-sold')) {
+            e.preventDefault();
+            window.location.href = tarjeta.dataset.url || urlDetalle(tarjeta.dataset.adId);
+        }
+    };
+    container.addEventListener('keydown', container._cardKeydownListener);
 
     // Inicializar likes en todas las tarjetas
     console.log('Inicializando likes en tarjetas...');

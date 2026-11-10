@@ -1,6 +1,6 @@
 /* ============ MERCADOS CENTRAL — mc-messages.css ============ */
 #mensajes-tab{
-  --teal-500:#0B9E8F; --teal-600:#087F73; --teal-50:#E6F7F5;
+  --accion-500:#FA6406; --accion-600:#E05A00; --accion-50:#FFF1E8;
   --orange-500:#FF8A3D;
   --ink-900:#122129; --ink-700:#31413D; --ink-500:#5C6B66; --ink-300:#9AA7A2;
   --line:#E8ECEF; --bg:#F6F8FA; --card:#fff;
@@ -8,7 +8,7 @@
 .messages-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;min-height:480px}
 .convs-list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow-y:auto;max-height:640px}
 .conv-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:none;background:none;border-bottom:1px solid var(--line);cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:background .15s}
-.conv-item:hover,.conv-item.active{background:var(--teal-50)}
+.conv-item:hover,.conv-item.active{background:#F3F4F6}
 .conv-ad-img{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--bg)}
 .conv-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .conv-name{font-weight:700;font-size:14px;color:var(--ink-900)}
@@ -26,7 +26,7 @@
 .chat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
 .chat-back{display:none;border:none;background:none;font-size:16px;color:var(--ink-700);cursor:pointer;padding:4px}
 .chat-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.chat-avatar-ph{display:grid;place-items:center;background:var(--teal-50);color:var(--teal-500);font-size:15px}
+.chat-avatar-ph{display:grid;place-items:center;background:#F3F4F6;color:#6B7280;font-size:15px}
 .chat-header-info{display:flex;flex-direction:column;min-width:0}
 .chat-header-info strong{font-size:14.5px;color:var(--ink-900)}
 .chat-header-info span{font-size:12px;color:var(--ink-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -36,7 +36,7 @@
 .chat-bubble-row{display:flex}
 .chat-bubble-row.mine{justify-content:flex-end}
 .chat-bubble{max-width:75%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
-.chat-bubble-row.mine .chat-bubble{background:var(--teal-500);color:#fff;border-bottom-right-radius:4px}
+.chat-bubble-row.mine .chat-bubble{background:var(--ink-900);color:#fff;border-bottom-right-radius:4px}
 .chat-bubble-row.theirs .chat-bubble{background:#fff;border:1px solid var(--line);color:var(--ink-900);border-bottom-left-radius:4px}
 .chat-bubble-deleted{background:#eceff1!important;color:#90a4ae!important;font-style:italic}
 .chat-delete-message{align-self:center;background:none;border:none;color:var(--ink-500);cursor:pointer;font-size:13px;opacity:.55;padding:4px 6px}
@@ -44,9 +44,9 @@
 .chat-time{display:block;font-size:10px;opacity:.7;margin-top:3px;text-align:right}
 .chat-form{display:flex;gap:10px;width:100%;min-width:0;padding:12px;border-top:1px solid var(--line)}
 .chat-form input{flex:1 1 0;min-width:0;width:0;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 16px;font-size:16px;outline:none;font-family:inherit;color:var(--ink-900);background:#fff}
-.chat-form input:focus{border-color:var(--teal-500)}
-.chat-form button{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:var(--teal-500);color:#fff;border:none;cursor:pointer;font-size:15px;transition:background .2s}
-.chat-form button:hover{background:var(--teal-600)}
+.chat-form input:focus{border-color:#9CA3AF}
+.chat-form button{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:var(--ink-900);color:#fff;border:none;cursor:pointer;font-size:15px;transition:background .2s}
+.chat-form button:hover{background:#2A3B45}
 .chat-loading{text-align:center;color:var(--ink-500);padding:20px;font-size:14px}
 
 @media(max-width:760px){

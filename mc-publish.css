@@ -10,12 +10,12 @@
 .step{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.45;transition:opacity .3s}
 .step.active{opacity:1}
 .step-circle{width:44px;height:44px;border-radius:50%;background:#fff;border:2px solid var(--line);display:grid;place-items:center;font-weight:700;color:var(--ink-500);transition:all .3s}
-.step.active .step-circle{background:var(--teal-500);border-color:var(--teal-500);color:#fff;box-shadow:0 4px 14px rgba(11,158,143,.35)}
+.step.active .step-circle{background:var(--accion-500);border-color:var(--accion-500);color:#fff;box-shadow:0 4px 14px rgba(250,100,6,.35)}
 .step-title{font-size:13px;font-weight:600;color:var(--ink-700)}
 
 /* ---------- SECCIONES ---------- */
 .section-title{font-family:var(--font-display);font-size:clamp(1.3rem,2.6vw,1.7rem);font-weight:700;color:var(--ink-900);display:flex;align-items:center;gap:10px;margin-bottom:26px}
-.section-title i{color:var(--teal-500)}
+.section-title i{color:#374151}
 .form-section.active{animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
@@ -24,9 +24,9 @@
 @media(max-width:560px){.plans-container-horizontal{grid-template-columns:1fr}}
 .plan-card-h{background:#fff;border:1.5px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s,border-color .25s;position:relative}
 .plan-card-h:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
-.plan-card-h:has(input[name="plan"]:checked){border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50),var(--shadow-md)}
+.plan-card-h:has(input[name="plan"]:checked){border-color:var(--accion-500);box-shadow:0 0 0 3px var(--accion-50),var(--shadow-md)}
 .plan-top-section{padding:20px 18px 14px;text-align:center;border-bottom:1px dashed var(--line)}
-.plan-badge-label{display:inline-block;background:var(--teal-50);color:var(--teal-600);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:8px}
+.plan-badge-label{display:inline-block;background:#F3F4F6;color:#374151;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:8px}
 .plan-badge-label.premium-badge{background:rgba(255,138,61,.12);color:var(--orange-500)}
 .plan-badge-label.destacado-badge{background:rgba(212,175,55,.15);color:#8a6d1a}
 .plan-title-h{font-family:var(--font-display);font-size:19px;font-weight:800;color:var(--ink-900);letter-spacing:.02em;margin:0}
@@ -35,16 +35,16 @@
 .plan-middle-section{padding:16px 18px;flex:1}
 .benefits-list-h{list-style:none;display:flex;flex-direction:column;gap:9px;margin:0;padding:0}
 .benefits-list-h li{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--ink-700);line-height:1.4}
-.benefits-list-h i{color:var(--teal-500);font-size:13px;margin-top:2px}
+.benefits-list-h i{color:#374151;font-size:13px;margin-top:2px}
 .plan-bottom-section{padding:14px 18px 18px}
 .plan-select-h{display:block;cursor:pointer}
 .plan-select-h input{position:absolute;opacity:0;pointer-events:none}
 .plan-button-h{display:flex;align-items:center;justify-content:center;height:44px;border-radius:11px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:14px;color:var(--ink-700);transition:all .2s}
-.plan-button-h:hover{border-color:var(--teal-500);color:var(--teal-600)}
-.plan-select-h input:checked + .plan-button-h{background:var(--teal-500);border-color:var(--teal-500);color:#fff}
+.plan-button-h:hover{border-color:#9CA3AF;color:#1F2937}
+.plan-select-h input:checked + .plan-button-h{background:var(--accion-500);border-color:var(--accion-500);color:#fff}
 /* Inputs de token */
 .input-token{border:1.5px solid var(--line)!important;border-radius:10px!important;background:var(--bg)!important;font-size:13px!important;text-align:center!important}
-.input-token:focus{border-color:var(--teal-500)!important;outline:none}
+.input-token:focus{border-color:#9CA3AF!important;outline:none}
 
 /* ---------- FORMULARIOS ---------- */
 .details-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:start}
@@ -52,16 +52,16 @@
 .left-column,.right-column{display:flex;flex-direction:column;gap:22px;min-width:0}
 .classification-location-block,.primary-section,.section-block{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}
 .block-title{font-family:var(--font-display);font-size:15.5px;font-weight:700;color:var(--ink-900);margin:0 0 16px;display:flex;align-items:center;gap:8px}
-.block-title i{color:var(--teal-500)}
+.block-title i{color:#374151}
 .internal-subtitle{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin:18px 0 10px;display:flex;align-items:center;gap:7px}
 .internal-subtitle:first-of-type{margin-top:0}
-.internal-subtitle i{color:var(--teal-500);font-size:12px}
+.internal-subtitle i{color:#374151;font-size:12px}
 .subsection-title{font-family:var(--font-display);font-size:15.5px;font-weight:700;color:var(--ink-900);margin:0 0 16px;display:flex;align-items:center;gap:8px}
-.subsection-title i{color:var(--teal-500)}
+.subsection-title i{color:#374151}
 .form-group{margin-bottom:16px}
 .form-group label{display:block;font-size:13.5px;font-weight:600;color:var(--ink-900);margin-bottom:7px}
 .form-group input[type="text"],.form-group input[type="number"],.form-group input[type="tel"],.form-group input[type="email"],.form-group input[type="url"],.form-group select,.form-group textarea{width:100%;border:1.5px solid var(--line);border-radius:11px;background:#fff;padding:12px 14px;font-size:16px;font-family:var(--font-ui);color:var(--ink-900);outline:none;transition:border-color .2s,box-shadow .2s}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#9CA3AF;box-shadow:0 0 0 3px rgba(31,41,55,.05)}
 .form-group input:read-only{background:var(--bg);color:var(--ink-500)}
 .help-text,.form-text{display:block;font-size:12px;color:var(--ink-500);margin-top:5px}
 .char-count{font-size:11.5px;font-weight:500;color:var(--ink-300)}
@@ -81,14 +81,14 @@
 .btn-ia:hover{filter:brightness(1.1)}
 
 /* ---------- UPLOAD ---------- */
-.btn-file-upload{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;border:1.5px dashed var(--teal-500);background:var(--teal-50);color:var(--teal-600);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .2s}
-.btn-file-upload:hover{background:var(--teal-500);color:#fff;border-style:solid}
+.btn-file-upload{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;border:1.5px dashed #9CA3AF;background:#F9FAFB;color:#374151;font-weight:600;font-size:13.5px;cursor:pointer;transition:all .2s}
+.btn-file-upload:hover{background:var(--ink-900);color:#fff;border-style:solid}
 .file-name{font-size:12.5px;color:var(--ink-500);margin-left:8px}
-#cover-image-preview{border:2px dashed var(--teal-500)!important;border-radius:12px!important;padding:8px}
+#cover-image-preview{border:2px dashed #D1D5DB!important;border-radius:12px!important;padding:8px}
 #cover-image-preview img{width:100%;max-height:220px;object-fit:contain;border-radius:8px}
 .drop-area{border:2px dashed var(--line);border-radius:14px;padding:28px 16px;text-align:center;background:var(--bg);cursor:pointer;transition:border-color .2s,background .2s}
-.drop-area:hover,.drop-area.dragover{border-color:var(--teal-500);background:var(--teal-50)}
-.upload-icon i{font-size:28px;color:var(--teal-500)}
+.drop-area:hover,.drop-area.dragover{border-color:#9CA3AF;background:#F9FAFB}
+.upload-icon i{font-size:28px;color:#9CA3AF}
 .upload-text{font-size:14.5px;color:var(--ink-900);margin:8px 0 2px}
 .upload-subtext{font-size:12.5px;color:var(--ink-500);margin:0 0 6px}
 .upload-limit{font-size:11.5px;color:var(--ink-300)}
@@ -97,8 +97,8 @@
 
 /* ---------- CONTACTO / TÉRMINOS ---------- */
 .terms-agreement label{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;font-weight:500;color:var(--ink-700);cursor:pointer}
-.terms-agreement input{width:17px;height:17px;accent-color:var(--teal-500);margin-top:2px;flex-shrink:0}
-.terms-agreement a{color:var(--teal-600);font-weight:600;text-decoration:underline}
+.terms-agreement input{width:17px;height:17px;accent-color:var(--accion-500);margin-top:2px;flex-shrink:0}
+.terms-agreement a{color:#374151;font-weight:600;text-decoration:underline}
 
 /* ---------- BOTONES DEL WIZARD ---------- */
 .btn-group{display:flex;justify-content:space-between;gap:14px;margin-top:28px}
@@ -112,7 +112,7 @@
 #map-container{background:#fff}
 #province-map{border:1.5px solid var(--line)!important;border-radius:12px!important}
 .search-location-wrapper input{border:1.5px solid var(--line)!important;border-radius:11px!important}
-#selected-location-info{background:var(--teal-50)!important;border-radius:10px!important}
+#selected-location-info{background:#F9FAFB!important;border-radius:10px!important}
 
 /* ---------- RESPONSIVE ---------- */
 @media(max-width:640px){
@@ -128,12 +128,12 @@
 body{background:var(--bg)!important}
 main.container.publish-wizard{background:transparent!important;box-shadow:none!important;max-width:1100px!important;width:100%!important;margin:0 auto!important;padding:28px clamp(16px,4vw,40px) 64px!important;border-radius:0!important}
 
-/* Títulos: sin bordes teal/violeta viejos */
+/* Títulos: sin bordes accion/violeta viejos */
 .section-title{border:none!important;font-size:clamp(1.3rem,2.6vw,1.7rem)!important;color:var(--ink-900)!important;text-align:left!important;margin-bottom:26px!important}
 .subsection-title{border:none!important;font-size:15.5px!important;color:var(--ink-900)!important}
 .classification-location-block .internal-subtitle{border-left:none!important}
 
-/* Bloque clasificación: sin borde teal permanente ni sombra */
+/* Bloque clasificación: sin borde accion permanente ni sombra */
 .classification-location-block{border:1px solid var(--line)!important;border-radius:14px!important;box-shadow:none!important;background:#fff!important;padding:22px!important}
 .classification-location-block:hover{box-shadow:none!important}
 
@@ -142,11 +142,11 @@ main.container.publish-wizard{background:transparent!important;box-shadow:none!i
 
 /* Drop zone galería: el ID de form.css (violeta) gana a mis clases */
 #gallery-drop-area{border:2px dashed var(--line)!important;border-radius:14px!important;background:var(--bg)!important;padding:28px 16px!important;margin-bottom:10px!important}
-#gallery-drop-area:hover{border-color:var(--teal-500)!important;background:var(--teal-50)!important}
+#gallery-drop-area:hover{border-color:#9CA3AF!important;background:#F9FAFB!important}
 .images-block .upload-zone{border:2px dashed var(--line)!important;background:var(--bg)!important;border-radius:14px!important;padding:28px 16px!important}
-.images-block .upload-zone:hover{border:2px solid var(--teal-500)!important;background:var(--teal-50)!important;box-shadow:none!important;transform:none!important}
-.images-block .upload-zone.dragover{border-color:var(--teal-500)!important;background:var(--teal-50)!important}
-.upload-icon i{color:var(--teal-500)!important}
+.images-block .upload-zone:hover{border:2px solid #9CA3AF!important;background:#F9FAFB!important;box-shadow:none!important;transform:none!important}
+.images-block .upload-zone.dragover{border-color:#9CA3AF!important;background:#F9FAFB!important}
+.upload-icon i{color:#9CA3AF!important}
 
 /* Previsualización galería: quita caja con degradado y límite 500px */
 #gallery-preview-container{background:transparent!important;border:none!important;padding:0!important;max-width:none!important;grid-template-columns:repeat(auto-fill,minmax(90px,1fr))!important;min-height:0!important}
@@ -163,12 +163,12 @@ main.container.publish-wizard{background:transparent!important;box-shadow:none!i
 /* Footer-navy del wizard → franja fina tinta */
 .wizard-footer-simple{background:var(--ink-900)!important;height:6px!important}
 
-/* Focus de campos: teal nuevo (form.css mezcla teal viejo y violeta) */
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important;background:#fff!important}
-.form-group select:hover,.form-group input:hover,.form-group textarea:hover{border-color:var(--teal-500)!important;box-shadow:none!important}
+/* Focus de campos: accion nuevo (form.css mezcla accion viejo y violeta) */
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#9CA3AF!important;box-shadow:0 0 0 3px rgba(31,41,55,.05)!important;background:#fff!important}
+.form-group select:hover,.form-group input:hover,.form-group textarea:hover{border-color:#9CA3AF!important;box-shadow:none!important}
 
 /* Plan-limit-info y detalles con colores viejos */
-.plan-limit-info{background:var(--teal-50)!important;border-left:4px solid var(--teal-500)!important;color:var(--ink-700)!important}
+.plan-limit-info{background:#F9FAFB!important;border-left:4px solid #E5E7EB!important;color:var(--ink-700)!important}
 /* ============ PATCH v3: GANA LA GUERRA DE ESPECIFICIDAD ============ */
 
 /* Inputs: mata el padding 16px 1px (texto aplastado) y unifica */
@@ -180,8 +180,8 @@ input[type="text"],input[type="email"],input[type="tel"],input[type="number"],te
   background:#fff!important;
 }
 input[type="text"]:focus,input[type="email"]:focus,input[type="tel"]:focus,input[type="number"]:focus,textarea:focus,select:focus{
-  border-color:var(--teal-500)!important;
-  box-shadow:0 0 0 3px var(--teal-50)!important;
+  border-color:#9CA3AF!important;
+  box-shadow:0 0 0 3px rgba(31,41,55,.05)!important;
   background:#fff!important;
 }
 
@@ -197,22 +197,22 @@ label{color:var(--ink-900)!important;font-size:13.5px!important;font-weight:600!
 
 /* Drop zones: igualar especificidad del ID y recolorar */
 #gallery-drop-area.upload-zone{border:2px dashed var(--line)!important;background-color:var(--bg)!important;background-image:none!important;border-radius:14px!important}
-#gallery-drop-area.upload-zone:hover{border-color:var(--teal-500)!important;background-color:var(--teal-50)!important;box-shadow:none!important;transform:none!important}
+#gallery-drop-area.upload-zone:hover{border-color:#9CA3AF!important;background-color:#F9FAFB!important;box-shadow:none!important;transform:none!important}
 .file-input-wrapper{border:1.5px solid var(--line)!important;background:#fff!important;background-image:none!important;border-radius:14px!important}
-.file-input-wrapper:hover{border-color:var(--teal-500)!important;background:var(--teal-50)!important}
-.upload-placeholder-icon{color:var(--teal-500)!important}
-#cover-image-preview{border:2px dashed var(--teal-500)!important;background:var(--teal-50)!important;border-radius:12px!important}
+.file-input-wrapper:hover{border-color:#9CA3AF!important;background:#F9FAFB!important}
+.upload-placeholder-icon{color:#9CA3AF!important}
+#cover-image-preview{border:2px dashed #D1D5DB!important;background:#F9FAFB!important;border-radius:12px!important}
 
 /* Contadores y detalles con color nuevo */
 .char-count{color:var(--ink-300)!important}
-.terms-agreement input[type="checkbox"]{accent-color:var(--teal-500)!important}
-.terms-agreement a{color:var(--teal-600)!important;border-bottom-color:var(--teal-600)!important}
+.terms-agreement input[type="checkbox"]{accent-color:var(--accion-500)!important}
+.terms-agreement a{color:#374151!important;border-bottom-color:#9CA3AF!important}
 .benefits-list-h li{color:var(--ink-700)!important;font-size:13.5px!important;border-bottom:1px solid var(--bg)!important}
 
 /* Botón seleccionar plan: estados limpios */
 .plan-button-h{background:#fff!important;color:var(--ink-700)!important;border:1.5px solid var(--line)!important;border-radius:11px!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;height:44px;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
-.plan-card-h.selected .plan-button-h{background:var(--teal-500)!important;color:#fff!important;border-color:var(--teal-500)!important}
-.plan-card-h.selected{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important}
+.plan-card-h.selected .plan-button-h{background:var(--accion-500)!important;color:#fff!important;border-color:var(--accion-500)!important}
+.plan-card-h.selected{border-color:var(--accion-500)!important;box-shadow:0 0 0 3px var(--accion-50)!important}
 
 /* Títulos de planes a tinta */
 .plan-title-h{color:var(--ink-900)!important;font-size:19px!important;letter-spacing:.02em!important}
@@ -258,10 +258,10 @@ label{color:var(--ink-900)!important;font-size:13.5px!important;font-weight:600!
   color:#fff!important;
 }
 .destacado-plan .plan-price-h{color:var(--orange-500)!important}
-/* Al seleccionar el destacado, gana el teal (estado de elección) */
+/* Al seleccionar el destacado, gana el accion (estado de elección) */
 .destacado-plan.selected{
-  border-color:var(--teal-500)!important;
-  box-shadow:0 0 0 3px var(--teal-50)!important;
+  border-color:var(--accion-500)!important;
+  box-shadow:0 0 0 3px var(--accion-50)!important;
   transform:translateY(-10px)!important;
 }
 
@@ -315,7 +315,7 @@ main.container.publish-wizard{width:100%!important}
   overflow:hidden!important;
   background:#fff!important;
 }
-.price-input-wrapper:focus-within{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important}
+.price-input-wrapper:focus-within{border-color:#9CA3AF!important;box-shadow:0 0 0 3px rgba(31,41,55,.05)!important}
 
 /* El $ : compacto, altura completa, tipografía sobria */
 .price-input-wrapper .currency-symbol{
@@ -372,7 +372,7 @@ main.container.publish-wizard{width:100%!important}
 .navbar-moderno .nav-search .btn-search-hero{
   border:none!important;
   border-radius:0 19px 19px 0!important;
-  background:var(--teal-500)!important;
+  background:var(--accion-500)!important;
   height:38px!important;
   width:44px!important;
   padding:0!important;

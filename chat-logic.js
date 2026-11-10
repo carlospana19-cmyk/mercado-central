@@ -82,8 +82,8 @@ export function initDetailChatForm(ad) {
         if (!texto) return;
 
         const btn = form.querySelector('.btn-send-msg');
-        const original = btn?.textContent || 'Enviar mensaje';
-        if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+        const original = btn?.innerHTML;
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-paper-plane fa-spin"></i> Enviando…'; }
 
         try {
             const convId = await getOrCreateConversation(ad.id, ad.user_id);
@@ -95,11 +95,11 @@ export function initDetailChatForm(ad) {
                 window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
             } else if (err.message === 'SELF_CHAT') {
                 alert('Este es tu propio anuncio 🙂');
-                if (btn) { btn.disabled = false; btn.textContent = original; }
+                if (btn) { btn.disabled = false; btn.innerHTML = original; }
             } else {
                 console.error('Error enviando mensaje:', err);
                 alert('No se pudo enviar el mensaje. Intenta de nuevo.');
-                if (btn) { btn.disabled = false; btn.textContent = original; }
+                if (btn) { btn.disabled = false; btn.innerHTML = original; }
             }
         }
     });

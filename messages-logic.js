@@ -221,7 +221,7 @@ function mcDialogoConfirmar(
         <p style="margin:0 0 18px;font-size:14px;color:#555">${texto}</p>
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button type="button" data-action="cancel" style="padding:8px 16px;border-radius:20px;border:1px solid #ccc;background:#fff;font-size:14px;cursor:pointer">Cancelar</button>
-          <button type="button" data-action="confirm" style="padding:8px 16px;border-radius:20px;border:none;background:#0B9E8F;color:#fff;font-size:14px;cursor:pointer">${boton}</button>
+          <button type="button" data-action="confirm" style="padding:8px 16px;border-radius:20px;border:none;background:#1F2937;color:#fff;font-size:14px;cursor:pointer">${boton}</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);

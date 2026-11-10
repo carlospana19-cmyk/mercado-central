@@ -3,6 +3,7 @@
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML, UIComponents, cleanLocationString } from './UIComponents.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
+import { urlDetalle, precioTexto, badgeDe, inicialDe } from './utilidades-ui.js';
 import { getSellerReviewStats } from './reviews-logic.js';
 import { HERO_ADS } from './hero-ads.js';
 
@@ -52,9 +53,14 @@ export function initializeHomePage() {
                         ${cta}
                     </div>`;
             }).join('');
-            document.getElementById('hero-slides').innerHTML = slidesHTML;
-            document.querySelector('.hero-text-content')?.remove();
-            document.querySelector('.hero-search')?.classList.add('has-paid-ad');
+            const heroSlidesEl = document.getElementById('hero-slides');
+            if (heroSlidesEl) {
+                // Con el hero estático (FASE 1-D) este contenedor ya no existe:
+                // la publicidad del hero queda sin lugar hasta que se reincorpore.
+                heroSlidesEl.innerHTML = slidesHTML;
+                document.querySelector('.hero-text-content')?.remove();
+                document.querySelector('.hero-search')?.classList.add('has-paid-ad');
+            }
 
             if (window.heroSwiper) window.heroSwiper.destroy();
             window.heroSwiper = new Swiper('.hero-swiper', {
@@ -294,7 +300,7 @@ const getVideoEmbedUrl = (videoUrl) => {
             };
 
             const generateCardHTML = (ad) => {
-                // Fallback unificado de imagen
+                // Fallback unificado de imagen (mismos campos reales de Supabase)
                 let allImages = [];
                 if (ad.imagen_portada) {
                     allImages = [ad.imagen_portada];
@@ -305,128 +311,48 @@ const getVideoEmbedUrl = (videoUrl) => {
                 } else if (Array.isArray(ad.url_galeria)) {
                     allImages = ad.url_galeria;
                 }
-                allImages = allImages.filter(Boolean);
-                const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio);
+                allImages = [...new Set(allImages.filter(Boolean))];
                 const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
-                
-                const cardClass = 'property-card';
-                
-                // ✅ BADGES ELIMINADOS - Ahora usamos section-header como separador elegante
-                let badgeHTML = '';
-                let cardExtraClass = '';
 
-                // === LÓGICA DE BADGES CON CORONAS SEGÚN EL PLAN ===
-                const plan = ad.featured_plan ? ad.featured_plan.toLowerCase() : 'free';
-                let crownBadgeHTML = '';
-                
-                if (plan === 'basico') {
-                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-bronze"></i></div>`;
-                } else if (plan === 'premium') {
-                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-silver"></i></div>`;
-                } else if (plan === 'top' || plan === 'destacado') {
-                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-crown crown-gold"></i></div>`;
-                } else if (plan === 'elite') {
-                    crownBadgeHTML = `<div class="card-crown-badge"><i class="fas fa-gem crown-diamond"></i></div>`;
-                }
-
-                let urgentBadge = '';
-                if (ad.enhancements && ad.enhancements.is_urgent) {
-                    urgentBadge = '<span class="badge-urgent" title="Urgente"><i class="fas fa-clock"></i></span>';
-                }
-
-                // Foto de perfil del usuario (si existe)
-                let profilePhotoHTML = '';
-                if (ad.url_foto_perfil) {
-                    profilePhotoHTML = `
-                        <div class="card-seller-info">
-                            <img src="${ad.url_foto_perfil}" alt="Foto de vendedor" class="seller-photo">
-                            <div class="seller-details">
-                                <p class="seller-name">${ad.nombre_negocio || 'Vendedor'}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // ✅ BADGE VENDIDO EN TARJETAS DEL HOME
-                const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
                 const soldClass = ad.is_sold ? 'card-sold' : '';
-                // ✅ Guardar el id del anuncio en un atributo data
                 const dataAdId = `data-ad-id="${ad.id}" data-is-sold="${ad.is_sold ? 'true' : 'false'}"`;
-                
-                // Avatar del vendedor - SIEMPRE mostrar (con foto o placeholder)
-                const vendorProfile = ad.profiles ? (Array.isArray(ad.profiles) ? ad.profiles[0] : ad.profiles) : null;
-                const vendorPhoto = vendorProfile?.url_foto_perfil;
-                const vendorName = vendorProfile?.nombre_negocio || 'Usuario';
-                const vendorFullName = vendorProfile?.nombre_completo || '';
-                const vendorId = vendorProfile?.id;
-                
-                // ✅ Obtener estadísticas de reseñas del vendedor
-                const vendorStats = vendorId ? (sellerStatsMap[vendorId] || { total_reviews: 0, average_rating: 0 }) : { total_reviews: 0, average_rating: 0 };
-                const starsDisplay = vendorStats.total_reviews > 0 
-                    ? `<span class="vendor-rating"><i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})</span>`
-                    : '';
-                
-                // ✅ Avatar: invisible por defecto (visibility: hidden), solo visible si hay foto (clase .has-image)
-                const vendorAvatar = vendorPhoto 
-                    ? `<div class="vendor-avatar has-image" title="${vendorName}">
-                        <img src="${vendorPhoto}" alt="${vendorName}" class="vendor-avatar-img">
-                        <span class="vendor-name-tooltip">${vendorName}${starsDisplay ? '<br>' + starsDisplay : ''}</span>
-                    </div>` 
-                    : `<div class="vendor-avatar" title="${vendorName}"></div>`;
-
-                // ✅ Agregar data-category para filtrado en tiempo real
                 const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
 
+                // FASE 1: píldoras sobre la foto, SOLO si aplican (utilidades-ui.js)
+                const pildoras = [];
+                if (ad.enhancements && ad.enhancements.is_urgent) {
+                    pildoras.push('<span class="mc-badge mc-badge-urgente"><i class="fas fa-clock"></i> Urgente</span>');
+                }
+                badgeDe(ad).forEach(b => pildoras.push(`<span class="${b.clase}">${b.texto}</span>`));
+                const badgesHTML = pildoras.length ? `<div class="mc-badges">${pildoras.join('')}</div>` : '';
+
+                // Estado "Vendido" (overlay informativo, no botón)
+                const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
+
+                // FASE 1-B: foto ESTÁTICA (siempre la primera); el carrusel vive solo en la página de detalle
+                const totalFotos = allImages.length;
+                const conteoFotosHTML = totalFotos >= 2 ? `<span class="mc-foto-conteo"><i class="fas fa-camera" aria-hidden="true"></i> ${totalFotos}</span>` : '';
+                const fotoHTML = totalFotos > 0
+                    ? `<img src="${allImages[0]}" alt="${ad.titulo}" loading="lazy">`
+                    : `<div class="mc-card-foto-vacia" aria-hidden="true">${inicialDe(ad.titulo)}</div>`;
+
+                // Precio en B/. (o "A consultar") y ubicación en una línea
+                const precio = precioTexto(ad);
+                const ubicacion = cleanLocationString(ad.direccion_exacta || (ad.corregimiento ? ad.corregimiento + ', ' : '') + (ad.distrito || ad.ubicacion || '') + ', ' + (ad.provincia || 'Panamá'));
+
+                // FASE 1: tarjeta completa clicable → detalle-producto.html?id=... (sin botones encima de la foto)
                 return `
-                    <div class="${cardClass} card ${cardExtraClass} ${soldClass}" ${dataAdId} ${dataCategory}>
-                       ${crownBadgeHTML}
-                         ${urgentBadge}
-                         ${soldBadgeHome}
-                         <div class="card-actions">
-                            ${generateLikeButtonHTML(ad.id, 0, false)}
-                         </div>
-                         <div class="property-image ${ad.is_sold ? 'image-sold' : ''}">
-                            <div class="swiper product-swiper" id="swiper-${ad.id}">
-                                <div class="swiper-wrapper">
-                                    ${videoEmbedUrl ? `<div class="swiper-slide video-slide"><iframe src="${videoEmbedUrl}" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe><div class="swiper-edge-left"></div><div class="swiper-edge-right"></div></div>` : ''}
-                                    ${allImages.length > 0 ? allImages.map(img => `<div class="swiper-slide"><img src="${img}" alt="${ad.titulo}" loading="lazy"></div>`).join('') : ''}
-                                </div>
-                                <div class="swiper-button-prev"></div>
-                                <div class="swiper-button-next"></div>
-                                <div class="swiper-pagination"></div>
+                    <div class="mc-card card ${soldClass}" ${dataAdId} ${dataCategory} data-url="${urlDetalle(ad.id)}" role="link" tabindex="0" aria-label="${ad.titulo}">
+                        ${badgesHTML}
+                        ${soldBadgeHome}
+                        <div class="mc-card-foto ${ad.is_sold ? 'image-sold' : ''}">${conteoFotosHTML}${fotoHTML}</div>
+                        <div class="mc-card-cuerpo">
+                            <div class="mc-card-precio">
+                                <span class="${precio ? 'mc-precio-valor' : 'mc-precio-vacio'}">${precio || 'A consultar'}</span>
+                                ${generateLikeButtonHTML(ad.id, 0, false)}
                             </div>
-                        </div>
-                        <div class="property-details ${ad.is_sold ? 'content-sold' : ''}">
-                            <div class="property-seller-name">${ad.contact_name || vendorFullName || vendorName || 'Usuario Verificado'}</div>
-                            <div class="property-price-and-tag">
-                                <span class="property-price">${priceFormatted}</span>
-                                ${vendorAvatar}
-                            </div>
-                            <h3 class="property-title">${ad.titulo}</h3>
-                            <p class="property-location"><i class="fas fa-map-marker-alt"></i> ${cleanLocationString(ad.direccion_exacta || (ad.corregimiento ? ad.corregimiento + ', ' : '') + (ad.distrito || ad.ubicacion || '') + ', ' + (ad.provincia || 'N/A'))}</p>
-${(() => {
-                                try {
-                                    // 1. Asegurar que los atributos sean un objeto válido
-                                    let attrs = ad.atributos_clave;
-                                    if (typeof attrs === 'string') {
-                                        attrs = JSON.parse(attrs);
-                                    }
-                                    
-                                    // 2. Generar el HTML
-                                    const attrHTML = generateAttributesHTML(attrs, ad.categoria, attrs?.subcategoria);
-                                    
-                                    // 3. Forzar visibilidad en caso de que el CSS de la página principal lo oculte
-                                    if (attrHTML && attrHTML.trim() !== '' && attrHTML !== '<span></span>') {
-                                        return `<div class="property-specs card-attributes" style="display: flex !important; flex-wrap: wrap; gap: 8px; margin-top: 8px; font-size: 0.9em; color: #555;">${attrHTML}</div>`;
-                                    }
-                                    return '';
-                                } catch (error) {
-                                    console.error("Error renderizando atributos para ID " + ad.id, error);
-                                    return '';
-                                }
-                            })()}
-                            ${profilePhotoHTML}
-                            <a href="detalle-producto.html?id=${ad.id}&chat=true" class="btn-contact" data-ad-id="${ad.id}">Contactar</a>
+                            <h3 class="mc-card-titulo">${ad.titulo}</h3>
+                            <p class="mc-card-meta"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${ubicacion}</span></p>
                         </div>
                     </div>`;
             };
@@ -643,41 +569,53 @@ ${(() => {
                 }, 250);
             });
 
-            // ✅ Agregar listeners para clicks en tarjetas (delegación de eventos)
-            // Limpiar eventos anteriores completamente
+            // ✅ FASE 1: la tarjeta completa es clicable (delegación de eventos)
+            if (container._cardPointerDownListener) {
+                container.removeEventListener('pointerdown', container._cardPointerDownListener);
+                container._cardPointerDownListener = null;
+            }
             if (container._cardClickListener) {
                 container.removeEventListener('click', container._cardClickListener);
                 container._cardClickListener = null;
             }
-            
-            // El botón Contactar ahora es un enlace directo con href.
-            // No necesitamos JavaScript para redirigir - el navegador lo hace automáticamente.
-            // Solo prevenimos el comportamiento por defecto si es necesario
+            if (container._cardKeydownListener) {
+                container.removeEventListener('keydown', container._cardKeydownListener);
+                container._cardKeydownListener = null;
+            }
+
+            // Si el usuario arrastró el carrusel de la foto, el "click" que sigue no navega
+            container._cardPointerDownListener = (e) => { container._puntoInicio = { x: e.clientX, y: e.clientY }; };
+            container.addEventListener('pointerdown', container._cardPointerDownListener, true);
+
             container._cardClickListener = (e) => {
-                // Si hace click en el botón de contactar, dejar que el href funcione normalmente
-                const btnContact = e.target.closest('.btn-contact');
-                if (btnContact) {
-                    console.log('Click en Contactar - ID:', btnContact.getAttribute('data-ad-id'));
-                    return; // No prevenimos el comportamiento
+                const inicio = container._puntoInicio;
+                if (inicio && Math.abs(e.clientX - inicio.x) + Math.abs(e.clientY - inicio.y) > 12) return;
+
+                // El botón de me gusta funciona solo (no navega)
+                const btnLike = e.target.closest('.like-btn, .like-button, .btn-like');
+                if (btnLike) return;
+
+                // Las flechas y la paginación del carrusel de la foto funcionan solas
+                const carouselNav = e.target.closest('.swiper-button-next, .swiper-button-prev, .swiper-pagination');
+                if (carouselNav) return;
+
+                const tarjeta = e.target.closest('.mc-card');
+                if (tarjeta && !tarjeta.classList.contains('card-sold')) {
+                    window.location.href = tarjeta.dataset.url || urlDetalle(tarjeta.dataset.adId);
                 }
-                
-                // Si hace click en el botón de like, permitir que funcione
-                const btnLike = e.target.closest('.like-button, .btn-like');
-                if (btnLike) {
-                    return; // No prevenimos el comportamiento
-                }
-                
-                // Si hace click en las flechas del carrusel, permitir que funcionen
-                const carouselNav = e.target.closest('.swiper-button-next, .swiper-button-prev');
-                if (carouselNav) {
-                    return;
-                }
-                
-                // Para cualquier otro elemento de la tarjeta, NO redirigir - solo el botón Contactar debe hacerlo
-                // La tarjeta en sí ya no es clickeable
             };
-            
             container.addEventListener('click', container._cardClickListener, false);
+
+            // Accesibilidad: Enter o Espacio sobre la tarjeta enfocada abre el detalle
+            container._cardKeydownListener = (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const tarjeta = e.target.closest('.mc-card');
+                if (tarjeta && !tarjeta.classList.contains('card-sold')) {
+                    e.preventDefault();
+                    window.location.href = tarjeta.dataset.url || urlDetalle(tarjeta.dataset.adId);
+                }
+            };
+            container.addEventListener('keydown', container._cardKeydownListener);
 
             // Inicializar likes en todas las tarjetas
             console.log('Inicializando likes en tarjetas del home...');

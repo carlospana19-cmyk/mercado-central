@@ -1,6 +1,8 @@
 import { supabase } from './supabase-client.js';
 import { ReviewModal, hasUserReviewedSeller, getSellerReviews, getSellerReviewStats, generateReviewStatsHTML, generateReviewHTML } from './reviews-logic.js';
 import { initDetailChatForm } from './chat-logic.js';
+import { tarjetaAnuncioHTML } from './tarjeta-anuncio.js';
+import { initializeAllCardLikes } from './likes-logic.js';
 // Tu API Key de Google Maps
 const MAPS_API_KEY_DETALLE = 'AIzaSyBijfhc6uDfEfzAreBjH_tJpYpc1yDvFas';
 
@@ -137,8 +139,31 @@ function loadGoogleMapsScriptDetalle() {
 }
 
 // ============================================
-// FUNCIÓN UNIFICADA: Burbujas Uniformes para TODOS los Atributos
+// FASE 1-C: Ficha técnica sobria — tabla de dos columnas
+// (etiqueta en gris → valor en oscuro semibold), SIN iconos, SIN burbujas.
+// Solo datos reales del anuncio: si el vendedor escribió "121", se muestra
+// "121" tal cual (sin inventar unidades). Si un atributo no aplica, no hay fila.
 // ============================================
+const SPEC_LABELS = {
+    condicion: 'Condición', estado: 'Estado', procesador: 'Procesador', memoria_ram: 'Memoria RAM',
+    almacenamiento: 'Almacenamiento', marca: 'Marca', modelo: 'Modelo', color: 'Color',
+    anio: 'Año', kilometraje: 'Kilometraje', combustible: 'Combustible', transmision: 'Transmisión',
+    puertas: 'Puertas', vidrios: 'Vidrios', direccion: 'Dirección', frenos: 'Frenos', airbags: 'Airbags',
+    rines: 'Rines', tapiz: 'Tapicería', m2: 'Superficie (m²)', habitaciones: 'Habitaciones',
+    banos: 'Baños', piso: 'Piso', estacionamiento: 'Estacionamientos', amueblado: 'Amueblado',
+    ascensor: 'Ascensor', jardin: 'Jardín', piscina: 'Piscina', tipo_propiedad: 'Tipo de propiedad',
+    anio_construccion: 'Año de construcción', raza: 'Raza', genero: 'Género', edad_mascota: 'Edad',
+    talla: 'Talla', material: 'Material', garantia: 'Garantía', bateria: 'Batería'
+};
+
+const AMP = String.fromCharCode(38); // "&" sin escribir la entidad literal
+const escaparHtml = (texto) => String(texto)
+    .replace(/&/g, AMP + 'amp;')
+    .replace(/</g, AMP + 'lt;')
+    .replace(/>/g, AMP + 'gt;')
+    .replace(/"/g, AMP + 'quot;')
+    .replace(/'/g, AMP + '#39;');
+
 function displayAllAttributesComprehensive(ad) {
     const container = document.getElementById('lista-detalles-completa');
     if (!container) return;
@@ -146,37 +171,16 @@ function displayAllAttributesComprehensive(ad) {
     let atributos = {};
     try {
         atributos = typeof ad.atributos_clave === 'string' ? JSON.parse(ad.atributos_clave) : ad.atributos_clave;
-    } catch (e) { 
-        console.error("Error al leer atributos", e); 
-        return; 
+    } catch (e) {
+        console.error("Error al leer atributos", e);
+        return;
     }
 
-    const categoria = ad.categoria?.toLowerCase() || '';
-    const iconMap = { 
-        // Inmuebles
-        'superficie': 'fa-ruler-combined', 'm2': 'fa-ruler-combined', 'habitaciones': 'fa-bed', 
-        'banos': 'fa-bath', 'piso': 'fa-building', 'estacionamiento': 'fa-parking', 
-        'amueblado': 'fa-couch', 'ascensor': 'fa-elevator', 'jardin': 'fa-leaf', 
-        'piscina': 'fa-swimmer', 'tipo_propiedad': 'fa-home',
-        // Vehículos
-        'kilometraje': 'fa-tachometer-alt', 'anio': 'fa-calendar-alt', 'combustible': 'fa-gas-pump',
-        'marca': 'fa-car', 'modelo': 'fa-car-side', 'color': 'fa-palette', 
-        'rines': 'fa-circle-notch', 'tapiz': 'fa-couch', 'transmision': 'fa-cogs', 
-        'puertas': 'fa-door-open', 'vidrios': 'fa-window-restore', 'direccion': 'fa-steering-wheel', 
-        'frenos': 'fa-stop-circle', 'airbags': 'fa-shield-alt', 'estado': 'fa-star',
-        // Electrónica
-        'memoria_ram': 'fa-microchip', 'almacenamiento': 'fa-hdd', 'procesador': 'fa-microchip', 'condicion': 'fa-check-circle',
-        // Mascotas
-        'raza': 'fa-dog', 'genero': 'fa-venus-mars', 'edad_mascota': 'fa-birthday-cake',
-        // Genéricos
-        'talla': 'fa-ruler', 'material': 'fa-cube'
-    };
-
-    // Excluir keys de control interno
+    // Excluir keys de control interno y valores vacíos (si no aplica, no se muestra la fila)
     const excludePatterns = ['step', 'categoria', 'subcategoria', 'provincia', 'distrito', 'attr-'];
-    const validEntries = Object.entries(atributos).filter(([key, val]) => {
+    const validEntries = Object.entries(atributos || {}).filter(([key, val]) => {
         const isValidKey = !excludePatterns.some(pattern => key.includes(pattern) || key.startsWith(pattern));
-        const isValidValue = val && val !== '' && val !== 'N/A' && val !== '{}' && val !== null;
+        const isValidValue = val !== undefined && val !== null && String(val).trim() !== '' && String(val) !== 'N/A' && String(val) !== '{}';
         return isValidKey && isValidValue;
     });
 
@@ -185,52 +189,36 @@ function displayAllAttributesComprehensive(ad) {
         return;
     }
 
-    // Configuración dinámico TOP 3 BURBUJAS por categoría
-    let topKeys = ['anio', 'kilometraje', 'combustible']; // Default vehículos
-    if (categoria.includes('inmuebl')) topKeys = ['m2', 'habitaciones', 'banos'];
-    else if (['electronica', 'celular', 'computadora'].some(c => categoria.includes(c))) topKeys = ['condicion', 'almacenamiento', 'memoria_ram'];
-    else if (['mascota', 'perro', 'gato'].some(c => categoria.includes(c))) topKeys = ['raza', 'genero', 'edad_mascota'];
-    else topKeys = validEntries.slice(0,3).map(([k]) => k); // Fallback: primeros 3
+    // ✅ FASE 1-F: características colapsables — primeras 5 filas por defecto;
+    // si hay más, enlace "Ver más detalles ▾" que muestra TODAS y pasa a "Ver menos ▴".
+    const MOSTRAR = 5;
+    const filaHTML = ([key, val]) => {
+        const etiqueta = SPEC_LABELS[key] || String(key).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const valor = (val && typeof val === 'object') ? JSON.stringify(val) : val;
+        return `<div class="spec-row"><dt>${escaparHtml(etiqueta)}</dt><dd>${escaparHtml(valor)}</dd></div>`;
+    };
 
-    const topBurbujas = validEntries.filter(([key]) => topKeys.includes(key));
-    
-        let htmlTop = '';
-    if (topBurbujas.length > 0) {
-        htmlTop = '<div class="attr-bubbles-top">';
-        topBurbujas.forEach(([key, val]) => {
-            const icon = iconMap[key] || 'fa-tag';
-            const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            let value = val;
-            if (key === 'kilometraje') value += ' km';
-            else if (key === 'm2') value += ' m²';
-            htmlTop += `
-                <div class="attr-bubble">
-                    <i class="fas ${icon}"></i>
-                    <span class="attr-bubble-value">${value}</span>
-                    <span class="attr-bubble-label">${label}</span>
-                </div>`;
+    if (validEntries.length > MOSTRAR) {
+        const visibles = validEntries.slice(0, MOSTRAR).map(filaHTML).join('');
+        const ocultas = validEntries.slice(MOSTRAR).map(filaHTML).join('');
+        container.style.display = 'block';
+        container.innerHTML = `<dl class="spec-table">${visibles}</dl>
+            <dl class="spec-table spec-extra" style="display:none">${ocultas}</dl>
+            <button type="button" class="ver-mas-detalles" id="ver-mas-detalles">Ver más detalles <i class="fas fa-chevron-down"></i></button>`;
+
+        const btnMas = document.getElementById('ver-mas-detalles');
+        const extra = container.querySelector('.spec-extra');
+        btnMas.addEventListener('click', () => {
+            const abierto = extra.style.display !== 'none';
+            extra.style.display = abierto ? 'none' : 'block';
+            btnMas.innerHTML = abierto
+                ? 'Ver más detalles <i class="fas fa-chevron-down"></i>'
+                : 'Ver menos <i class="fas fa-chevron-up"></i>';
         });
-        htmlTop += '</div>';
+    } else {
+        container.style.display = 'block';
+        container.innerHTML = `<dl class="spec-table">${validEntries.map(filaHTML).join('')}</dl>`;
     }
-
-    // GRUPO 2: LISTA 2 COL (resto attrs)
-    const bottomEntries = validEntries.filter(([key]) => !topKeys.includes(key));
-    let htmlBottom = '<div class="attr-list-bottom">';
-    
-    bottomEntries.forEach(([key, val]) => {
-        const icon = iconMap[key] || 'fa-info-circle';
-        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        htmlBottom += `
-            <div class="attr-row">
-                <i class="fas ${icon}"></i>
-                <span class="attr-row-label">${label}:</span>
-                <span class="attr-row-value">${val}</span>
-            </div>`;
-    });
-    htmlBottom += '</div>';
-
-    container.style.display = 'block'; 
-    container.innerHTML = htmlTop + htmlBottom;
 }
 
 
@@ -329,7 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         // ULTIMO RESORT: placeholder
         if (galleryImages.length === 0) {
-            galleryImages = ['https://via.placeholder.com/500x400?text=Sin+Imagen'];
+            galleryImages = ['img/placeholder.jpg'];
             console.log('🟢 [Detail] Sin imágenes, usando placeholder');
         }
 
@@ -389,11 +377,14 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         }
     } catch(e) { console.warn('Error con message-input:', e); }
     
-    // Formatear precio con moneda panameña (B/. ) y dos decimales
+    // Formatear precio con moneda panameña (B/. 25.00 — espacio después de B/.) y dos decimales
     const priceFormatted = new Intl.NumberFormat('es-PA', { style: 'currency', currency: 'PAB' }).format(ad.precio || 0);
     productPriceEl.textContent = priceFormatted;
+    productPriceEl.textContent = priceFormatted;
     productDescriptionEl.textContent = ad.descripcion || 'Sin descripción';
-
+    productPriceEl.textContent = priceFormatted;
+    productPriceEl.textContent = priceFormatted;
+    productDescriptionEl.textContent = ad.descripcion || 'Sin descripción';
     // Mostrar visitas
     try {
         const productVisitsEl = document.getElementById('product-visits');
@@ -406,7 +397,17 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     try {
         if (typeof loadSellerContactInfo === 'function') loadSellerContactInfo(ad);
     } catch(e) { console.warn('Error con loadSellerContactInfo:', e); }
-        // ✅ FASE 4: conectar el formulario de mensaje directo al chat interno
+    // ✅ FASE 2: sección "Más anuncios de [Nombre]" al final del detalle
+    try {
+        if (ad.user_id) loadSellerMoreAds(ad);
+    } catch(e) { console.warn('Error con más anuncios del vendedor:', e); }
+
+    // ✅ FASE 2: sección "Más anuncios de [Nombre]" al final del detalle
+    try {
+        if (ad.user_id) loadSellerMoreAds(ad);
+    } catch(e) { console.warn('Error con más anuncios del vendedor:', e); }
+
+    // ✅ FASE 4: conectar el formulario de mensaje directo al chat interno
     try {
         initDetailChatForm(ad);
     } catch(e) { console.warn('Error iniciando chat:', e); }
@@ -452,49 +453,55 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     // ⭐️ VISIBILIDAD UNIFICADA: SOLO LA FUNCIÓN PRINCIPAL (sin duplicidad)
     displayAllAttributesComprehensive(ad);
     
-    // ✅ Construir la galería con imagen principal y miniaturas
-    // Las imágenes ya vienen procesadas del parámetro galleryImages
+    // ✅ FASE 1-E: Galería moderna — foto principal GRANDE (4:3, cover), miniaturas
+    // de 80px con estado activo (borde naranja), botón de ampliar y VISOR propio
+    // (lightbox, JS puro sin librerías). Fallback local: nunca una imagen rota.
     console.log('Imágenes válidas para mostrar:', galleryImages);
+
+    const FOTO_RESPALDO = 'img/placeholder.jpg';
 
     if (galleryImages.length > 0) {
         const galleryWrapper = document.getElementById('gallery-wrapper');
-        
-        // ✅ Estructura: Imagen principal + miniaturas
-        const mainImage = galleryImages[0];
-        const thumbnails = galleryImages.slice(1);
-        
-        // Construir HTML de la galería con miniaturas
+        const tieneVarias = galleryImages.length >= 2;
+        const badgeConteo = tieneVarias
+            ? `<span class="mc-foto-conteo"><i class="fas fa-camera" aria-hidden="true"></i> ${galleryImages.length}</span>`
+            : '';
+        const btnAmpliar = `<button type="button" class="btn-ampliar" title="Ver en grande"><i class="fas fa-expand" aria-hidden="true"></i></button>`;
+
         let galleryHTML = `
             <div class="gallery-main">
-                <img id="main-product-image" src="${mainImage}" alt="${ad.titulo}" style="width: 100%; height: 500px; min-height: 400px; max-height: 600px; object-fit: cover; object-position: center;" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
+                ${badgeConteo}
+                <img id="main-product-image" src="${galleryImages[0]}" alt="${ad.titulo}" loading="eager" onerror="this.src='${FOTO_RESPALDO}'">
+                ${btnAmpliar}
             </div>
         `;
-        
-        if (thumbnails.length > 0) {
+
+        if (tieneVarias) {
             galleryHTML += `
                 <div class="gallery-thumbnails">
                     ${galleryImages.map((img, index) => `
-                        <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
-                            <img src="${img}" alt="Minitura ${index + 1}" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
-                        </div>
+                        <button type="button" class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                            <img src="${img}" alt="Miniatura ${index + 1}" loading="lazy" onerror="this.src='${FOTO_RESPALDO}'">
+                        </button>
                     `).join('')}
                 </div>
             `;
         }
-        
+
         galleryWrapper.innerHTML = galleryHTML;
-        
-        // ✅ Agregar event listeners a las miniaturas
-        const thumbnailElements = galleryWrapper.querySelectorAll('.thumbnail');
+
         const mainImageElement = document.getElementById('main-product-image');
-        
+        mainImageElement.style.transition = 'opacity 0.2s ease';
+        let indiceActivo = 0;
+
+        // ✅ Cambio de foto al hacer clic en las miniaturas
+        const thumbnailElements = galleryWrapper.querySelectorAll('.thumbnail');
         thumbnailElements.forEach((thumb, index) => {
-            thumb.addEventListener('click', () => {
-                // Quitar clase active de todas las miniaturas
+            thumb.addEventListener('click', (e) => {
+                e.stopPropagation(); // elegir miniatura no debe abrir el visor
                 thumbnailElements.forEach(t => t.classList.remove('active'));
-                // Agregar clase active a la miniatura seleccionada
                 thumb.classList.add('active');
-                // Cambiar la imagen principal con transición
+                indiceActivo = index;
                 mainImageElement.style.opacity = '0';
                 setTimeout(() => {
                     mainImageElement.src = galleryImages[index];
@@ -502,16 +509,84 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
                 }, 200);
             });
         });
-        
-        // ✅ Transición suave para la imagen principal
-        mainImageElement.style.transition = 'opacity 0.2s ease';
-        
+
+        // ✅ Clic en la foto principal (o en la lupa) abre el visor en grande
+        const abrirDesdeGaleria = () => abrirVisor(galleryImages, indiceActivo);
+        mainImageElement.addEventListener('click', abrirDesdeGaleria);
+        const btnAmpliarEl = galleryWrapper.querySelector('.btn-ampliar');
+        if (btnAmpliarEl) btnAmpliarEl.addEventListener('click', (e) => { e.stopPropagation(); abrirDesdeGaleria(); });
+
         console.log('Galería con miniaturas inicializada');
+        // ✅ FASE 1-E: VISOR "SOLO PARA VER EN GRANDE" (lightbox, JS puro, sin librerías)
+        function abrirVisor(fotos, indice) {
+            cerrarVisor();
+            const overlay = document.createElement('div');
+            overlay.className = 'visor-overlay' + (fotos.length < 2 ? ' visor-una-foto' : '');
+            overlay.innerHTML = `
+                <button type="button" class="visor-cerrar" aria-label="Cerrar">✕</button>
+                <button type="button" class="visor-flecha visor-prev" aria-label="Foto anterior"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                <img class="visor-foto" src="${fotos[indice]}" alt="${ad.titulo}">
+                <button type="button" class="visor-flecha visor-next" aria-label="Foto siguiente"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                <div class="visor-contador">${indice + 1} / ${fotos.length}</div>
+            `;
+            overlay.dataset.indice = String(indice);
+            overlay.dataset.total = String(fotos.length);
+            overlay.dataset.fotos = JSON.stringify(fotos);
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden'; // bloquea el scroll del fondo
+
+            const alTecla = (e) => {
+                if (e.key === 'Escape') { cerrarVisor(); return; }
+                if (e.key === 'ArrowLeft') cambiarFotoVisor(overlay, -1);
+                if (e.key === 'ArrowRight') cambiarFotoVisor(overlay, 1);
+            };
+            document.addEventListener('keydown', alTecla);
+            overlay._alTecla = alTecla;
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay || e.target.closest('.visor-cerrar')) { cerrarVisor(); return; }
+                if (e.target.closest('.visor-prev')) cambiarFotoVisor(overlay, -1);
+                if (e.target.closest('.visor-next')) cambiarFotoVisor(overlay, 1);
+            });
+
+            let toqueX = null;
+            overlay.addEventListener('touchstart', (e) => { toqueX = e.changedTouches[0].clientX; }, { passive: true });
+            overlay.addEventListener('touchend', (e) => {
+                if (toqueX === null) return;
+                const delta = e.changedTouches[0].clientX - toqueX;
+                if (Math.abs(delta) > 40) cambiarFotoVisor(overlay, delta < 0 ? 1 : -1);
+                toqueX = null;
+            }, { passive: true });
+        }
+
+        function pintarVisor(overlay) {
+            const fotos = JSON.parse(overlay.dataset.fotos);
+            const indice = Number(overlay.dataset.indice);
+            overlay.querySelector('.visor-foto').src = fotos[indice];
+            overlay.querySelector('.visor-contador').textContent = `${indice + 1} / ${fotos.length}`;
+            overlay.querySelector('.visor-prev').disabled = indice === 0;
+            overlay.querySelector('.visor-next').disabled = indice === fotos.length - 1;
+        }
+
+        function cambiarFotoVisor(overlay, delta) {
+            const nuevo = Math.min(Math.max(Number(overlay.dataset.indice) + delta, 0), Number(overlay.dataset.total) - 1);
+            if (nuevo === Number(overlay.dataset.indice)) return;
+            overlay.dataset.indice = String(nuevo);
+            pintarVisor(overlay);
+        }
+
+        function cerrarVisor() {
+            const overlay = document.querySelector('.visor-overlay');
+            if (!overlay) return;
+            if (overlay._alTecla) document.removeEventListener('keydown', overlay._alTecla);
+            overlay.remove();
+            document.body.style.overflow = '';
+        }
     } else {
-        console.log('No hay imágenes disponibles, usando placeholder');
+        console.log('No hay imágenes disponibles, usando placeholder local');
         galleryWrapperEl.innerHTML = `
-            <div class="gallery-main">
-                <img src="https://via.placeholder.com/500x400?text=Sin+Imagen" alt="Sin imagen disponible" onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
+            <div class="gallery-main sin-foto">
+                <img src="${FOTO_RESPALDO}" alt="Sin imagen disponible">
             </div>
         `;
     }
@@ -529,7 +604,8 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         // Comprobamos si hay un usuario logueado Y si su ID coincide con el del dueño del anuncio
         if (user && ad.user_id === user.id && editButton) {
             editButton.href = `editar-anuncio.html?id=${ad.id}`;
-            editButton.style.display = 'block'; // Lo hacemos visible
+            // ✅ FASE 1-F: enlace discreto (JAMÁS display:block — esa era la burbuja gigante)
+            editButton.style.display = 'inline-flex';
         }
     } catch (error) {
         console.error('Error en lógica de edición:', error);
@@ -570,15 +646,25 @@ async function loadSellerContactInfo(ad) {
         // Obtener información del usuario vendedor desde la tabla profiles
         const { data: sellerProfile, error } = await supabase
             .from('profiles')
-            .select('telefono, email, nombre_negocio, nombre_completo')
+            .select('telefono, email, nombre_negocio, nombre_completo, url_foto_perfil')
             .eq('id', ad.user_id)
             .single();
-
-        // Nombre del vendedor (estructura Fase 3)
+        // Nombre del vendedor (estructura Fase 3) + enlace a su perfil (FASE 2)
         const sellerLineEl = document.getElementById('seller-line');
         if (sellerLineEl && sellerProfile) {
             const sellerName = sellerProfile?.nombre_negocio || sellerProfile?.nombre_completo || 'Usuario Verificado';
-            sellerLineEl.innerHTML = `<i class="fas fa-user"></i> ${sellerName}`;
+            // ✅ FASE 1-F: foto real del vendedor (url_foto_perfil) o inicial — sin ícono genérico de persona
+            const fotoUrl = sellerProfile?.url_foto_perfil;
+            const avatarHTML = fotoUrl
+                ? `<img class="seller-avatar" src="${escaparHtml(fotoUrl)}" alt="">`
+                : `<span class="seller-avatar seller-avatar-inicial" aria-hidden="true">${escaparHtml(sellerName.trim().charAt(0).toUpperCase())}</span>`;
+            sellerLineEl.innerHTML = `${avatarHTML}<a class="seller-link" href="perfil-vendedor.html?id=${encodeURIComponent(ad.user_id)}">${sellerName}</a>`;
+            // Enlace pequeño gris debajo del nombre: "Ver todos sus anuncios →"
+            const verTodosEl = document.getElementById('seller-ver-todos');
+            if (verTodosEl) {
+                verTodosEl.href = `perfil-vendedor.html?id=${encodeURIComponent(ad.user_id)}`;
+                verTodosEl.style.display = 'inline-flex';
+            }
         }
 
         if (error) {
@@ -639,10 +725,89 @@ async function loadSellerContactInfo(ad) {
     }
 }
 
-async function setupReviewButton(ad) {
-    const reviewBtn = document.getElementById('leave-review-btn');
+// ✅ FASE 2: sección "Más anuncios de [Nombre]" — hasta 8 tarjetas del mismo
+// vendedor, excluyendo el anuncio actual. Si no hay más anuncios, la sección
+// NO se muestra (nada de huecos vacíos). Solo lectura, mismo cliente de Supabase.
+async function loadSellerMoreAds(ad) {
+    const sectionEl = document.getElementById('mas-anuncios-section');
+    if (!sectionEl || !ad.user_id) return;
 
-    if (!reviewBtn) return;
+    try {
+        const { data: ads, error } = await supabase
+            .from('anuncios')
+            .select('*, imagenes(url_imagen), profiles(nombre_negocio, nombre_completo, url_foto_perfil)')
+            .eq('user_id', ad.user_id)
+            .order('fecha_publicacion', { ascending: false })
+            .limit(200);
+
+        if (error) {
+            console.warn('Error al obtener más anuncios del vendedor:', error);
+            return; // la sección permanece oculta
+        }
+
+        const otros = (ads || []).filter(Boolean).filter(a => String(a.id) !== String(ad.id));
+        if (otros.length === 0) return; // no hay más anuncios: la sección NO se muestra
+
+        // Nombre del vendedor: la MISMA fuente que la tarjeta de contacto
+        let nombreVendedor = ad.profiles?.nombre_negocio || ad.profiles?.nombre_completo;
+        if (!nombreVendedor) {
+            try {
+                const { data: sellerProfile } = await supabase
+                    .from('profiles')
+                    .select('nombre_negocio, nombre_completo')
+                    .eq('id', ad.user_id)
+                    .single();
+                nombreVendedor = sellerProfile?.nombre_negocio || sellerProfile?.nombre_completo || 'este vendedor';
+            } catch (e) {
+                nombreVendedor = 'este vendedor';
+            }
+        }
+
+        const tituloEl = document.getElementById('mas-anuncios-titulo');
+        if (tituloEl) tituloEl.textContent = `Más anuncios de ${nombreVendedor}`;
+
+        const gridEl = document.getElementById('mas-anuncios-grid');
+        if (gridEl) {
+            gridEl.innerHTML = otros.slice(0, 8).map(tarjetaAnuncioHTML).join('');
+            try {
+                initializeAllCardLikes();
+            } catch (e) { console.warn('Error inicializando likes (más anuncios):', e); }
+
+            // Navegación de las tarjetas (misma delegación que resultados.html)
+            let puntoInicio = null;
+            gridEl.addEventListener('pointerdown', (e) => {
+                puntoInicio = { x: e.clientX, y: e.clientY };
+            }, true);
+            gridEl.addEventListener('click', (e) => {
+                if (puntoInicio && Math.abs(e.clientX - puntoInicio.x) + Math.abs(e.clientY - puntoInicio.y) > 12) return;
+                const btnLike = e.target.closest('.like-btn, .like-button, .btn-like');
+                if (btnLike) return;
+                const tarjeta = e.target.closest('.mc-card');
+                if (tarjeta && !tarjeta.classList.contains('card-sold')) {
+                    window.location.href = tarjeta.dataset.url || `detalle-producto.html?id=${encodeURIComponent(tarjeta.dataset.adId)}`;
+                }
+            });
+            gridEl.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const tarjeta = e.target.closest('.mc-card');
+                if (tarjeta && !tarjeta.classList.contains('card-sold')) {
+                    e.preventDefault();
+                    window.location.href = tarjeta.dataset.url || `detalle-producto.html?id=${encodeURIComponent(tarjeta.dataset.adId)}`;
+                }
+            });
+        }
+
+        const linkEl = document.getElementById('mas-anuncios-link');
+        if (linkEl) linkEl.href = `perfil-vendedor.html?id=${encodeURIComponent(ad.user_id)}`;
+
+        sectionEl.style.display = 'block';
+    } catch (error) {
+        console.error('Error inesperado en más anuncios del vendedor:', error);
+    }
+}
+
+async function setupReviewButton(ad) {
+    const reviewBtn = document.getElementById('leave-review-btn');    if (!reviewBtn) return;
 
     try {
         // Verificar si el usuario está autenticado

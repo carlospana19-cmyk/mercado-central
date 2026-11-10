@@ -21,46 +21,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="mc-categorias.css?v=5">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     <!-- CSS NUEVO (Fase 1) — los viejos style/cards/home.css NO se tocan todavía -->
-    <link rel="stylesheet" href="mc-base.css?v=24">
-    <link rel="stylesheet" href="mc-home.css?v=27">
+    <link rel="stylesheet" href="mc-base.css?v=26">
+    <link rel="stylesheet" href="mc-home.css?v=29">
+    <link rel="stylesheet" href="mc-tarjeta-2026.css?v=3">
 </head>
 <body id="index-page">
 
     <!-- NAVBAR (componente dinámico — sin cambios) -->
     <div id="navbar-container"></div>
 
-    <!-- HERO -->
-    <section class="hero-search">
-        <div class="hero-carousel">
-            <div class="swiper hero-swiper">
-                <div class="swiper-wrapper" id="hero-slides"></div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
-        </div>
-
+    <!-- HERO (FASE 1-D: imagen única a pantalla completa, sin carrusel ni puntos) -->
+    <section class="hero-search hero-full">
+        <img class="hero-fondo" src="img/categorias/bienes-raices.jpg" alt="" aria-hidden="true">
         <div class="hero-content">
             <div class="hero-text-content">
                 <h1 class="hero-title-animated">Tu comunidad, <span class="highlight-text">tu mercado</span></h1>
                 <p class="hero-subtitle">El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.</p>
+                <div class="hero-acciones">
+                    <a href="#products" class="btn-hero-explorar">Explorar anuncios</a>
+                    <a href="publicar.html" class="btn-hero-publicar">Publicar gratis</a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- CATEGORÍAS -->
+    <!-- CATEGORÍAS (FASE 2: grid de iconos con categorías reales, las llena categorias-home.js) -->
     <section class="categories-section">
-        <div class="categories-horizontal-bar">
-            <a href="resultados.html?category=Bienes%20Raíces" class="category-item"><div class="category-icon"><g class="fas fa-home"></i></div><h3>Bienes Raíces</h3></a>
-            <a href="resultados.html?category=Vehículos" class="category-item"><div class="category-icon"><i class="fas fa-car"></i></div><h3>Vehículos</h3></a>
-            <a href="resultados.html?category=Electrónica" class="category-item"><div class="category-icon"><i class="fas fa-laptop"></i></div><h3>Electrónica</h3></a>
-            <a href="resultados.html?category=Hogar%20y%20Muebles" class="category-item"><div class="category-icon"><i class="fas fa-couch"></i></div><h3>Hogar</h3></a>
-            <a href="resultados.html?category=Moda%20y%20Belleza" class="category-item"><div class="category-icon"><i class="fas fa-tshirt"></i></div><h3>Moda</h3></a>
-            <a href="resultados.html?category=Servicios" class="category-item"><div class="category-icon"><i class="fas fa-briefcase"></i></div><h3>Servicios</h3></a>
-        </div>
+        <div id="categorias-grid" class="categorias-grid" aria-label="Categorías del sitio"></div>
     </section>
 
 
@@ -125,6 +116,7 @@
     </svg>
 
     <script type="module" src="search-global.js"></script>
+    <script type="module" src="categorias-home.js"></script>
     <script src="busqueda-visual.js" defer></script>
 </body>
 </html>

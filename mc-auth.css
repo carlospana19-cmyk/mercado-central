@@ -40,17 +40,17 @@
   transition:border-color .2s,box-shadow .2s;
 }
 .form-box input::placeholder{color:var(--ink-300)}
-.form-box input:focus{border-color:var(--teal-500);box-shadow:0 0 0 3px var(--teal-50)}
+.form-box input:focus{border-color:#9CA3AF;box-shadow:0 0 0 3px rgba(31,41,55,.05)}
 
 /* Botón principal */
 .form-box button[type="submit"]{
   width:100%;height:48px;margin:4px 0 0;
   border:none;border-radius:11px;
-  background:var(--teal-500);color:#fff;
+  background:var(--ink-900);color:#fff;
   font-weight:700;font-size:15.5px;font-family:var(--font-ui);
   cursor:pointer;transition:all .2s;
 }
-.form-box button[type="submit"]:hover{background:var(--teal-600);transform:translateY(-1px)}
+.form-box button[type="submit"]:hover{background:#2A3B45;transform:translateY(-1px)}
 
 /* Divisor "o" */
 .form-box div[style*="text-align"]{margin:14px 0!important}
@@ -69,22 +69,24 @@
 
 /* Enlaces */
 .form-box p{text-align:center;font-size:14px;color:var(--ink-500);margin:12px 0 0}
-.form-box a{color:var(--teal-600);font-weight:600;transition:color .2s}
-.form-box a:hover{color:var(--teal-700)}
+.form-box a{color:#374151;font-weight:600;transition:color .2s}
+.form-box a:hover{color:#1F2937}
 .form-box a[href="forgot-password.html"]{font-size:13.5px}
 
 /* Toggle de contraseña: recoloreado */
 .password-container .toggle-password{color:var(--ink-300)}
-.password-container .toggle-password:hover{color:var(--teal-500)!important}
+.password-container .toggle-password:hover{color:#374151!important}
 
 @media(max-width:480px){
   .form-box{padding:26px 20px}
   .login-center-container{padding:24px 14px}
 }
 
-/* Login: botón y enlaces en naranja de marca */
-#pagina-login .form-box button[type="submit"]{background:var(--orange-500);box-shadow:0 4px 14px rgba(255,138,61,.3)}
-#pagina-login .form-box button[type="submit"]:hover{background:var(--orange-600)}
+/* Login y Registro: botón en naranja de marca */
+#pagina-login .form-box button[type="submit"],
+#pagina-registro .form-box button[type="submit"]{background:var(--orange-500);box-shadow:0 4px 14px rgba(255,138,61,.3)}
+#pagina-login .form-box button[type="submit"]:hover,
+#pagina-registro .form-box button[type="submit"]:hover{background:var(--orange-600)}
 #pagina-login .form-box a,
 #pagina-login .form-box a[href="forgot-password.html"]{color:var(--orange-500)!important}
 #pagina-login .form-box a:hover,

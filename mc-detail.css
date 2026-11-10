@@ -2,20 +2,23 @@
    MERCADOS CENTRAL — mc-detail.css (Fase 3: detalle)
    ===================================================== */
 .detail-page{max-width:1280px;margin:0 auto;padding:20px clamp(16px,4vw,40px) 64px}
-.back-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-500);margin-bottom:14px;transition:color .2s}
-.back-link:hover{color:var(--teal-600)}
+.back-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#374151;margin-bottom:8px;transition:color .2s;text-decoration:none}
+.back-link:hover{color:#FA6406;text-decoration:underline}
 .back-link i{font-size:12px}
 
-/* Encabezado */
-.detail-head{margin-bottom:20px}
-#product-name{font-family:var(--font-display);font-size:clamp(1.5rem,3.4vw,2.3rem);font-weight:700;color:var(--ink-900);letter-spacing:-.02em;line-height:1.2}
-.detail-meta{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;color:var(--ink-500)}
+/* Encabezado compacto (título destacado + metadatos en una sola línea) */
+.detail-head{margin-bottom:14px}
+#product-name{font-family:var(--font-display);font-size:clamp(1.25rem,3vw,1.625rem);font-weight:600;color:#1F2937;letter-spacing:-.01em;line-height:1.25}
+.detail-meta{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin-top:4px;font-size:14px;color:var(--ink-500);white-space:nowrap;min-width:0}
 .detail-meta i{color:var(--ink-300)}
+.detail-meta-sep{color:var(--ink-300);flex-shrink:0}
+/* El separador "·" solo tiene sentido junto al enlace de edición visible */
+.detail-meta:has(> .editar-link[style*="display:none"]) .detail-meta-sep{display:none}
 
-/* Layout maestro */
-.detail-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
-.detail-main{min-width:0;display:flex;flex-direction:column;gap:20px}
-.detail-side{position:sticky;top:84px;display:flex;flex-direction:column;gap:16px}
+/* Layout maestro (FASE 1-E: galería ~62% / sticky ~38%, espaciado uniforme 24px) */
+.detail-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:24px;align-items:start}
+.detail-main{min-width:0;display:flex;flex-direction:column;gap:24px}
+.detail-side{position:sticky;top:90px;display:flex;flex-direction:column;gap:16px}
 @media(max-width:960px){
   .detail-layout{grid-template-columns:1fr}
   .detail-side{position:static}
@@ -23,40 +26,48 @@
 
 /* Tarjeta base */
 .detail-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:clamp(18px,2.5vw,28px);box-shadow:var(--shadow-sm)}
-.detail-card h2{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--ink-900);display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.detail-card h2 i{color:var(--teal-500);font-size:15px}
+.detail-card h2{font-family:var(--font-display);font-size:17px;font-weight:600;color:#1F2937;display:flex;align-items:center;gap:10px;margin-bottom:16px}
 
 /* Galería */
+/* Galería (FASE 1-E): foto principal GRANDE (4:3, cover) + botón de ampliar + conteo */
 .gallery-card{padding:0!important;overflow:hidden}
 #gallery-wrapper{width:100%}
-#gallery-wrapper img,#main-product-image,.gallery-main img{width:100%;height:auto;max-height:520px;object-fit:contain;background:#EEF1F3;display:block}
-/* Swiper de galería generado por JS */
-.product-gallery-swiper{width:100%;height:auto;background:#EEF1F3;border-radius:0}
-.product-gallery-swiper .swiper-slide{display:flex;align-items:center;justify-content:center}
-.product-gallery-swiper .swiper-slide img{width:100%!important;height:auto!important;max-height:520px;object-fit:contain!important}
-.product-gallery-swiper .swiper-button-next,.product-gallery-swiper .swiper-button-prev{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92)!important;color:var(--ink-900)!important;box-shadow:var(--shadow-md);z-index:10}
-.product-gallery-swiper .swiper-button-next:hover,.product-gallery-swiper .swiper-button-prev:hover{background:var(--teal-500)!important;color:#fff!important}
-.product-gallery-swiper .swiper-pagination-bullet{background:rgba(255,255,255,.85)}
-.product-gallery-swiper .swiper-pagination-bullet-active{background:var(--orange-500)}
-/* Miniaturas si el JS las genera */
-.gallery-thumbs,.thumbs-container{display:flex;gap:8px;padding:10px;overflow-x:auto}
-.gallery-thumbs img,.thumbs-container img{width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid transparent;cursor:pointer;flex-shrink:0;max-height:72px!important}
-.gallery-thumbs img.active,.thumbs-container img.active{border-color:var(--teal-500)}
+.gallery-main{position:relative;width:100%;aspect-ratio:4/3;background:#F3F4F6;overflow:hidden;border-radius:14px;cursor:zoom-in}
+.gallery-main img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-main.sin-foto{cursor:default}
+.mc-foto-conteo{position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
+.mc-foto-conteo i{font-size:10px}
+.btn-ampliar{position:absolute;right:12px;bottom:12px;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .2s;border:none;cursor:pointer}
+.btn-ampliar:hover{background:rgba(0,0,0,.75)}
+/* Miniaturas grandes con estado (FASE 1-E) */
+.gallery-thumbnails{display:flex;gap:10px;padding:12px 0 2px;overflow-x:auto;scrollbar-width:none}
+.gallery-thumbnails::-webkit-scrollbar{display:none}
+.thumbnail{width:80px;height:80px;flex-shrink:0;border-radius:10px;overflow:hidden;border:2px solid #E5E7EB;padding:0;background:#F3F4F6;cursor:pointer;transition:border-color .2s,opacity .2s}
+.thumbnail img{width:100%!important;height:100%!important;object-fit:cover!important}
+.thumbnail:hover{opacity:.8}
+.thumbnail.active{border-color:#FA6406;opacity:1}
 
 /* Descripción */
 #product-description{font-size:15px;line-height:1.7;color:var(--ink-700);white-space:pre-line}
 
-/* Ficha técnica (catch-all de las clases que genera el JS) */
-.specs-grid-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.specs-grid-detail .universal-attr-item,.spec-item,.attr-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:4px}
-.specs-grid-detail i{font-size:18px;color:var(--teal-500)!important;margin-bottom:4px}
-.specs-grid-detail .attr-label,.spec-label{font-size:12px;color:var(--ink-500)!important;font-weight:500}
-.specs-grid-detail .attr-value,.spec-value{font-size:14.5px;font-weight:700;color:var(--ink-900)!important}
+/* Ficha técnica (FASE 1-C): tabla sobria de dos columnas, separadas por línea fina */
+.spec-table{margin:0;border-top:1px solid #E5E7EB}
+.spec-row{display:grid;grid-template-columns:minmax(120px,42%) 1fr;gap:12px;padding:10px 0;border-bottom:1px solid #E5E7EB}
+.spec-row dt{margin:0;font-size:13.5px;font-weight:500;color:#6B7280}
+.spec-row dd{margin:0;font-size:14px;font-weight:600;color:#1F2937;overflow-wrap:anywhere}
+/* FASE 1-F: características colapsables ("Ver más detalles") */
+.ver-mas-detalles{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:0;border:none;background:none;font-size:14px;font-weight:500;color:#374151;cursor:pointer;transition:color .2s}
+.ver-mas-detalles:hover{color:#FA6406}
+.ver-mas-detalles i{font-size:11px}
+/* FASE 1-F: características colapsables ("Ver más detalles") */
+.ver-mas-detalles{display:inline-flex;align-items:center;gap:8px;margin-top:12px;background:none;border:none;padding:0;font-size:14px;font-weight:500;color:#374151;cursor:pointer;transition:color .2s}
+.ver-mas-detalles:hover{color:#FA6406}
+.ver-mas-detalles i{font-size:11px}
 
 /* Panel de precio */
 .price-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm)}
 .price-label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin-bottom:4px}
-.price-card .price{font-family:var(--font-display);font-size:clamp(1.8rem,3vw,2.3rem);font-weight:800;color:var(--ink-900);letter-spacing:-.02em;margin-bottom:18px}
+.price-card .price{font-size:clamp(1.375rem,2.5vw,1.75rem);font-weight:700;color:#1F2937;margin-bottom:18px}
 .visits-section{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-500)}
 
 /* WhatsApp protagonista */
@@ -64,33 +75,30 @@
 .btn-contact-wa:hover{background:#1EBE5A;transform:translateY(-1px)}
 .btn-contact-wa i{font-size:19px}
 .contact-secondary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.btn-secondary-contact{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink-700);font-weight:600;font-size:13.5px;transition:all .2s}
-.btn-secondary-contact:hover{border-color:var(--teal-500);color:var(--teal-600);background:var(--teal-50)}
+.btn-secondary-contact{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:12px;border:1.5px solid #E5E7EB;background:#fff;color:var(--ink-900);font-weight:600;font-size:13.5px;transition:all .2s}
+.btn-secondary-contact:hover{border-color:#D1D5DB;color:var(--ink-900);background:#F9FAFB}
 
-.safety-note{display:flex;gap:9px;align-items:flex-start;margin-top:16px;font-size:12.5px;line-height:1.5;color:var(--ink-500);background:var(--bg);border-radius:10px;padding:10px 12px}
-.safety-note i{color:var(--teal-500);margin-top:2px;flex-shrink:0}
+.safety-note{display:block;margin-top:16px;font-size:12.5px;line-height:1.5;color:#6B7280;background:#F3F4F6;border-radius:10px;padding:10px 12px}
 
-/* Mensaje directo (acordeón nativo) */
+/* Mensaje directo (FASE 1-F: SIEMPRE a la vista — caja + botón de enviar, sin acordeón) */
 .msg-direct{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
-.msg-direct summary{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-700);cursor:pointer;list-style:none}
-.msg-direct summary::-webkit-details-marker{display:none}
-.msg-direct summary i{color:var(--teal-500)}
-.msg-direct[open] summary{margin-bottom:12px}
-#contact-form textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:16px;font-family:var(--font-ui);color:var(--ink-900);resize:vertical;min-height:90px;outline:none;transition:border-color .2s}
-#contact-form textarea:focus{border-color:var(--teal-500)}
-.btn-send-msg{width:100%;height:46px;margin-top:10px;border-radius:10px;background:var(--ink-900);color:#fff;font-weight:600;font-size:14.5px;transition:background .2s}
-.btn-send-msg:hover{background:#000}
+#contact-form{display:flex;gap:10px;align-items:flex-end}
+#contact-form textarea{flex:1;width:100%;min-height:52px;border:1.5px solid #E5E7EB;border-radius:12px;padding:12px 14px;font-size:16px;font-family:var(--font-ui);color:var(--ink-900);resize:vertical;outline:none;transition:border-color .2s}
+#contact-form textarea:focus{border-color:#9CA3AF}
+.btn-send-msg{flex-shrink:0;height:46px;padding:0 18px;border-radius:12px;border:none;background:#FA6406;color:#fff;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .2s}
+.btn-send-msg:hover{background:#E05A00}
+.btn-send-msg:disabled{opacity:.6;cursor:default}
 
 /* Tarjeta de reseña */
-.review-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px}
-.review-card p{font-size:13.5px;color:var(--ink-500);line-height:1.5;margin-bottom:12px}
-.btn-review{width:100%;height:44px;border-radius:10px;background:var(--gold);color:#fff;font-weight:700;font-size:14px;transition:filter .2s}
-.btn-review:hover{filter:brightness(1.08)}
+.review-card{background:transparent;border:none;padding:0}
+.review-card p{font-size:13.5px;color:#6B7280;line-height:1.5;margin-bottom:12px}
+.btn-review{width:100%;height:52px;border-radius:12px;background:#fff;border:1.5px solid #E5E7EB;color:var(--ink-900);font-weight:600;font-size:14.5px;transition:all .2s}
+.btn-review:hover{background:#F9FAFB;border-color:#D1D5DB}
 
 /* Mapa */
 .map-card .detail-map{width:100%;height:300px;border-radius:12px;border:1px solid var(--line);overflow:hidden;margin-bottom:14px}
-.btn-route{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 22px;border-radius:10px;background:var(--teal-500);color:#fff;font-weight:600;font-size:14.5px;transition:background .2s}
-.btn-route:hover{background:var(--teal-600)}
+.btn-route{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 22px;border-radius:10px;background:#fff;color:var(--ink-900);border:1.5px solid #E5E7EB;font-weight:600;font-size:14.5px;transition:background .2s}
+.btn-route:hover{background:#F9FAFB}
 
 /* Reseñas (contenedores llenados por JS) */
 .reviews-stats{margin-bottom:16px;font-size:14.5px;color:var(--ink-700)}
@@ -101,44 +109,45 @@
 /* Móvil */
 @media(max-width:640px){
   .detail-page{padding:16px 14px 56px}
-  #gallery-wrapper img,#main-product-image,.gallery-main img,.product-gallery-swiper .swiper-slide img{max-height:320px}
+  #product-name{font-size:1.25rem}
   .price-card{padding:18px}
+  .price-card .price{font-size:1.375rem}
 }
 /* ============ PATCH v2 DETALLE: GALERÍA + ATRIBUTOS ============ */
 /* Imagen principal (vence los estilos inline del JS) */
-#main-product-image{width:100%!important;height:auto!important;min-height:0!important;max-height:520px!important;object-fit:contain!important;background:#EEF1F3;border-radius:0}
-@media(max-width:640px){#main-product-image{max-height:320px!important}}
+#main-product-image{width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;object-fit:cover!important;background:#F3F4F6;border-radius:14px}
+@media(max-width:640px){.gallery-main{border-radius:12px}}
 
-/* Miniaturas (clases REALES que genera el JS) */
-.gallery-main{position:relative}
-.gallery-thumbnails{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#fff}
-.thumbnail{width:72px;height:72px;flex-shrink:0;border-radius:8px;overflow:hidden;border:2px solid var(--line);cursor:pointer;transition:border-color .2s}
-.thumbnail:hover{border-color:var(--ink-300)}
-.thumbnail.active{border-color:var(--teal-500)}
-.thumbnail img{width:100%!important;height:100%!important;object-fit:cover!important;max-height:72px!important}
+/* (FASE 1-E: estilos de galería y miniaturas definidos arriba, en la sección de galería) */
 
-/* Burbujas y lista de atributos (nuevas clases del JS) */
-.attr-bubbles-top{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:22px}
-.attr-bubble{display:flex;flex-direction:column;align-items:center;padding:16px 22px;background:var(--bg);border:1px solid var(--line);border-radius:14px;min-width:120px}
-.attr-bubble i{font-size:22px;color:var(--teal-500);margin-bottom:6px}
-.attr-bubble-value{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--ink-900);line-height:1.2}
-.attr-bubble-label{font-size:11px;color:var(--ink-500);text-transform:uppercase;font-weight:600;letter-spacing:.05em;margin-top:2px}
-.attr-list-bottom{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;border-top:1px solid var(--line);padding-top:16px}
-@media(max-width:640px){.attr-list-bottom{grid-template-columns:1fr}}
-.attr-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bg);font-size:14px}
-.attr-row i{color:var(--teal-500);width:18px;flex-shrink:0;font-size:13px}
-.attr-row-label{color:var(--ink-500);font-weight:500;min-width:45%}
-.attr-row-value{font-weight:700;color:var(--ink-900)}
+/* (FASE 1-C: burbujas de atributos y filas con icono eliminadas — la ficha usa .spec-table) */
 
-/* Botón editar anuncio */
-.btn-edit-ad{display:inline-flex;align-items:center;gap:8px;margin-top:10px;height:38px;padding:0 16px;border-radius:9px;border:1.5px solid var(--line);background:#fff;color:var(--ink-700);font-size:13.5px;font-weight:600;transition:all .2s}
-.btn-edit-ad:hover{border-color:var(--teal-500);color:var(--teal-600);background:var(--teal-50)}
+/* Enlace discreto de edición (FASE 1-F: solo lo ve el dueño; nada de cajas gigantes) */
+.editar-link{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:500;color:var(--ink-500);cursor:pointer;text-decoration:none;transition:color .2s;flex-shrink:0;min-width:0}
+.editar-link i{font-size:11px;color:var(--ink-300);transition:color .2s}
+.editar-link:hover{color:#FA6406;text-decoration:underline}
+.editar-link:hover i{color:#FA6406}
 /* ============ PATCH v3: ANCHO REAL DE PÁGINA ============ */
 /* Hijo de body (flex column) con margin auto → se encoge. width:100% lo fuerza a ocupar hasta el max-width */
 .detail-page{width:100%}
 /* ============ PATCH v4: VENDEDOR + BOTONES FLEX ============ */
-.seller-line{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink-700);background:var(--teal-50);border-radius:10px;padding:10px 14px;margin-bottom:14px}
-.seller-line i{color:var(--teal-600);font-size:13px}
+.seller-line{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--ink-700);background:#F9FAFB;border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.seller-line i{color:#374151;font-size:13px}
+/* FASE 1-F: foto real del vendedor (48px redonda) o inicial en círculo */
+.seller-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#F3F4F6}
+.seller-avatar-inicial{display:flex;align-items:center;justify-content:center;background:#FEF3E8;color:#1F2937;font-weight:700;font-size:20px}
+/* FASE 2: nombre del vendedor como enlace a su perfil + "Ver todos sus anuncios" */
+.seller-line a.seller-link{color:#1F2937;font-weight:600;text-decoration:none}
+.seller-line a.seller-link:hover{text-decoration:underline;color:#FA6406}
+.seller-ver-todos{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#6B7280;margin:-6px 0 14px;transition:color .2s}
+.seller-ver-todos:hover{color:#FA6406}
+/* FASE 2: sección "Más anuncios de [Nombre]" al final del detalle */
+.mas-anuncios-card{margin-top:24px}
+/* FASE 1-F: tarjetas de "Más anuncios" al MISMO tamaño que resultados.html (mismo grid) */
+#mas-anuncios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:20px}
+@media(max-width:640px){#mas-anuncios-grid{grid-template-columns:minmax(0,1fr);gap:12px}}
+.mas-anuncios-link{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:#6B7280;margin-top:14px;transition:color .2s}
+.mas-anuncios-link:hover{color:#FA6406}
 /* ============ PATCH v5: AVATARES DE RESEÑAS ============ */
 .reviews-list img,
 .reviews-stats img{
@@ -282,7 +291,7 @@
   transition:border-color .2s,box-shadow .2s!important;
   box-sizing:border-box!important;
 }
-#review-comment:focus{border-color:var(--teal-500)!important;box-shadow:0 0 0 3px var(--teal-50)!important}
+#review-comment:focus{border-color:#9CA3AF!important;box-shadow:0 0 0 3px rgba(31,41,55,.05)!important}
 .review-modal .char-counter{
   text-align:right!important;
   font-size:12px!important;
@@ -308,10 +317,40 @@
 #review-submit{
   height:44px!important;padding:0 22px!important;
   border-radius:11px!important;border:none!important;
-  background:var(--teal-500)!important;color:#fff!important;
+  background:var(--ink-900)!important;color:#fff!important;
   font-weight:700!important;font-size:14px!important;cursor:pointer!important;
   display:inline-flex!important;align-items:center!important;gap:8px!important;
   transition:background .2s!important;
 }
-#review-submit:hover:not(:disabled){background:var(--teal-600)!important}
+#review-submit:hover:not(:disabled){background:#2A3B45!important}
 #review-submit:disabled{opacity:.5!important;cursor:not-allowed!important}
+
+/* ============ FASE 1-C: barra de contacto fija en móvil ============ */
+/* El bloque de acciones (WhatsApp + Email/Llamar) se fija abajo en pantallas
+   pequeñas; el resto del contenido queda navegable y los botones siempre a mano */
+@media(max-width:960px){
+  .contact-actions{position:fixed;bottom:0;left:0;right:0;z-index:900;display:flex;gap:10px;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 14px rgba(18,33,41,.10);border-top:1px solid var(--line)}
+  .contact-actions .btn-contact-wa{flex:1.5;height:50px}
+  .contact-actions .btn-secondary-contact{height:50px}
+  .detail-page{padding-bottom:96px}
+}
+
+/* ============ FASE 1-E: VISOR (lightbox) — solo blanco sobre negro ============ */
+.visor-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center}
+.visor-foto{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:14px;display:block}
+.visor-cerrar{position:absolute;top:16px;right:16px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;transition:background .2s}
+.visor-cerrar:hover{background:rgba(255,255,255,.28)}
+.visor-flecha{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.14);color:#1F2937;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .2s,opacity .2s}
+.visor-flecha:hover{background:rgba(255,255,255,.30)}
+.visor-flecha:disabled{opacity:.25;cursor:default}
+.visor-prev{left:22px}
+.visor-next{right:22px}
+.visor-contador{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-weight:600;letter-spacing:.05em}
+.visor-una-foto .visor-flecha{display:none}
+@media(max-width:640px){
+  .visor-flecha{top:auto;bottom:64px;transform:none;width:42px;height:42px;font-size:15px}
+  .visor-prev{left:14px}
+  .visor-next{right:14px}
+  .visor-cerrar{top:12px;right:12px}
+  .visor-foto{max-width:96vw;max-height:82vh;border-radius:10px}
+}

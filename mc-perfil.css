@@ -1,0 +1,53 @@
+/* =====================================================
+   MERCADOS CENTRAL — mc-perfil.css (FASE 2)
+   Perfil / tienda del vendedor (estilo "Cool Houses" de E24).
+   Sobreriedad: tarjeta del vendedor blanca sticky a la izquierda,
+   grid de tarjetas 1-B a la derecha. Solo color: WhatsApp verde.
+   ===================================================== */
+
+.perfil-page{max-width:1280px;margin:0 auto;padding:20px clamp(16px,4vw,40px) 64px}
+
+/* ---------- Layout: vendedor a la izquierda / anuncios a la derecha ---------- */
+.perfil-layout{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);gap:24px;align-items:start}
+.perfil-side{position:sticky;top:90px;display:flex;flex-direction:column}
+.perfil-main{min-width:0}
+
+/* ---------- Tarjeta del vendedor ---------- */
+.perfil-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.perfil-avatar{width:96px;height:96px;border-radius:50%;background:#FEF3E8;color:#1F2937;font-family:var(--font-display);font-size:40px;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;user-select:none;margin-bottom:8px}
+.perfil-avatar img{width:100%;height:100%;object-fit:cover}
+.perfil-nombre{font-family:var(--font-display);font-size:22px;font-weight:700;color:#1F2937;letter-spacing:-.02em;line-height:1.2;margin:0}
+.perfil-sub{font-size:13.5px;color:#6B7280}
+.perfil-desde{font-size:13.5px;color:#6B7280}
+.perfil-count{font-size:14px;font-weight:600;color:#1F2937;margin:2px 0 14px}
+
+/* ---------- Botones de contacto (iguales a los del detalle) ---------- */
+.perfil-contacto{display:flex;flex-direction:column;gap:10px;width:100%}
+.perfil-contacto .btn-contact-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border-radius:12px;background:#25D366;color:#fff;font-weight:700;font-size:15.5px;transition:all .2s;box-shadow:0 4px 14px rgba(37,211,102,.35)}
+.perfil-contacto .btn-contact-wa:hover{background:#1EBE5A;transform:translateY(-1px)}
+.perfil-contacto .btn-contact-wa i{font-size:19px}
+.perfil-contacto .btn-secondary-contact{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:12px;border:1.5px solid #E5E7EB;background:#fff;color:var(--ink-900);font-weight:600;font-size:13.5px;transition:all .2s}
+.perfil-contacto .btn-secondary-contact:hover{border-color:#D1D5DB;color:var(--ink-900);background:#F9FAFB}
+
+/* ---------- Sus anuncios ---------- */
+.perfil-seccion-titulo{font-family:var(--font-display);font-size:20px;font-weight:700;color:#1F2937;letter-spacing:-.02em;margin:0 0 14px}
+.perfil-vacio{display:flex;flex-direction:column;align-items:flex-start;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm)}
+.perfil-vacio p{font-size:14.5px;color:#6B7280;margin:0}
+.perfil-vacio .btn-explorar{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 22px;border-radius:12px;background:var(--accion-500);color:#fff;font-weight:700;font-size:14.5px;transition:all .2s}
+.perfil-vacio .btn-explorar:hover{background:var(--accion-600)}
+
+/* ---------- Cargar más ---------- */
+.btn-cargar-mas{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 26px;margin-top:16px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:#1F2937;font-weight:600;font-size:14.5px;transition:all .2s}
+.btn-cargar-mas:hover{border-color:#D1D5DB;background:#F9FAFB}
+
+/* ---------- Móvil: tarjeta del vendedor arriba, grid de 2 columnas ---------- */
+@media(max-width:900px){
+    .perfil-layout{grid-template-columns:1fr}
+    .perfil-side{position:static}
+    .perfil-card{padding:18px}
+    .perfil-avatar{width:80px;height:80px;font-size:32px}
+    .perfil-nombre{font-size:19px}
+}
+@media(max-width:760px){
+    .perfil-page{padding:16px 14px 56px}
+}

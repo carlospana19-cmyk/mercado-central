@@ -18,7 +18,7 @@
 .legal-section h2{
   font-family:var(--font-display);
   font-size:18px;font-weight:700;color:var(--ink-900);
-  margin-bottom:12px;padding-left:12px;border-left:3px solid var(--teal-500);
+  margin-bottom:12px;padding-left:12px;border-left:3px solid #E5E7EB;
 }
 .legal-section p{font-size:15px;line-height:1.75;color:var(--ink-700);margin-bottom:10px}
 .legal-section ul{padding-left:22px;margin-bottom:10px}

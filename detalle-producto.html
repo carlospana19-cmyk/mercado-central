@@ -19,8 +19,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- CSS NUEVO (Fase 3) -->
-    <link rel="stylesheet" href="mc-base.css?v=17">
-    <link rel="stylesheet" href="mc-detail.css?v=7">
+    <link rel="stylesheet" href="mc-base.css?v=26">
+    <link rel="stylesheet" href="mc-detail.css?v=12">
+    <link rel="stylesheet" href="mc-results.css?v=7">
+    <link rel="stylesheet" href="mc-tarjeta-2026.css?v=3">
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -29,18 +31,17 @@
 
         <a href="resultados.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver a resultados</a>
 
-        <!-- Título y fecha -->
-        <div class="detail-head">
-    <h1 id="product-name">Cargando título…</h1>
-    <div class="detail-meta">
-        <i class="fas fa-calendar-alt"></i>
-        <span id="product-date">Cargando…</span>
-    </div>
-
-    <a id="edit-ad-button" href="#" class="btn-edit-ad" style="display:none">
-        <i class="fas fa-edit"></i> Editar mi anuncio
-    </a>
-</div>
+        <!-- Encabezado compacto del anuncio -->
+        <header class="detail-head">
+            <h1 id="product-name">Cargando título…</h1>
+            <div class="detail-meta">
+                <span id="product-date">Cargando…</span>
+                <span class="detail-meta-sep" aria-hidden="true">·</span>
+                <a id="edit-ad-button" href="#" class="editar-link" style="display:none">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i> Editar mi anuncio
+                </a>
+            </div>
+        </header>
              
         <div class="detail-layout">
 
@@ -56,7 +57,7 @@
                 </div>
 
                 <div class="detail-card specs-card">
-                    <h2><i class="fas fa-list-ul"></i> Características y detalles</h2>
+                    <h2>Características y detalles</h2>
                     <div id="lista-detalles-completa" class="specs-grid-detail"></div>
                 </div>
             </div>
@@ -65,6 +66,7 @@
             <aside class="detail-side">
                 <div class="price-card">                   
                      <div class="seller-line" id="seller-line"></div>
+                    <a id="seller-ver-todos" class="seller-ver-todos" href="#" style="display:none">Ver todos sus anuncios →</a>
                     <span class="price-label">Precio</span>
                     <div class="price" id="product-price">—</div>
 
@@ -77,30 +79,31 @@
                         <span class="visits" id="product-visits">0</span>
                     </div>
 
-                    <a class="btn-contact-wa" id="whatsapp-link" style="display:none">
-                        <i class="fab fa-whatsapp"></i> Chat por WhatsApp
-                    </a>
+                    <div class="contact-actions">
+                        <a class="btn-contact-wa" id="whatsapp-link" style="display:none">
+                            <i class="fab fa-whatsapp"></i> Chat por WhatsApp
+                        </a>
 
-                    <div class="contact-secondary">
-                        <a id="email-link" class="btn-secondary-contact" style="display:none"><i class="fas fa-envelope"></i> Email</a>
-                        <a id="phone-link" class="btn-secondary-contact" style="display:none"><i class="fas fa-phone-alt"></i> Llamar</a>
+                        <div class="contact-secondary">
+                            <a id="email-link" class="btn-secondary-contact" style="display:none"><i class="fas fa-envelope"></i> Email</a>
+                            <a id="phone-link" class="btn-secondary-contact" style="display:none"><i class="fas fa-phone"></i> Llamar</a>
+                        </div>
                     </div>
 
-                    <p class="safety-note"><i class="fas fa-shield-alt"></i> Consejo: cita en lugares públicos y paga solo al recibir el producto.</p>
+                    <p class="safety-note">Consejo: cita en lugares públicos y paga solo al recibir el producto.</p>
 
-                    <details class="msg-direct">
-                        <summary><i class="fas fa-comment-dots"></i> Enviar mensaje directo</summary>
+                    <div class="msg-direct">
                         <form id="contact-form">
-                            <textarea id="message-input" name="message" placeholder="Hola, ¿sigue disponible?" rows="4"></textarea>
-                            <button type="submit" class="btn-send-msg">Enviar mensaje</button>
+                            <textarea id="message-input" name="message" placeholder="Escribe un mensaje al vendedor…" rows="2"></textarea>
+                            <button type="submit" class="btn-send-msg" aria-label="Enviar mensaje"><i class="fas fa-paper-plane"></i> Enviar</button>
                         </form>
-                    </details>
+                    </div>
                 </div>
 
                 <div class="review-card">
                     <p>¿Hiciste una compra? Ayuda a otros calificando al vendedor.</p>
                     <button id="leave-review-btn" class="btn-review" style="display:none">
-                        <i class="fas fa-star"></i> Calificar al vendedor
+                        Calificar al vendedor
                     </button>
                 </div>
             </aside>
@@ -108,16 +111,23 @@
 
         <!-- Mapa -->
         <section class="detail-card map-card" id="product-location-section" style="display:none">
-            <h2><i class="fas fa-map-marker-alt"></i> Ubicación del anuncio</h2>
+            <h2>Ubicación del anuncio</h2>
             <div id="mapa-detalles" class="detail-map"></div>
             <a id="btn-navegar-maps" href="#" target="_blank" class="btn-route">
                 <i class="fas fa-directions"></i> Ver ruta / Cómo llegar
             </a>
         </section>
 
+        <!-- FASE 2: Más anuncios del mismo vendedor (se oculta si no hay más) -->
+        <section class="detail-card mas-anuncios-card" id="mas-anuncios-section" style="display:none">
+            <h2 id="mas-anuncios-titulo">Más anuncios del vendedor</h2>
+            <div id="mas-anuncios-grid" class="results-grid"></div>
+            <a id="mas-anuncios-link" class="mas-anuncios-link" href="#" style="display:none">Ver perfil completo →</a>
+        </section>
+
         <!-- Reseñas del vendedor -->
         <section class="detail-card reviews-card" id="seller-reviews-section" style="display:none">
-            <h2><i class="fas fa-star"></i> Opiniones sobre el vendedor</h2>
+            <h2>Opiniones sobre el vendedor</h2>
             <div id="seller-reviews-stats" class="reviews-stats"></div>
             <div id="seller-reviews-list" class="reviews-list"></div>
         </section>

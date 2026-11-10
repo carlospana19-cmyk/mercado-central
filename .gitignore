@@ -1,3 +1,7 @@
 .env
+.env.*
 __pycache__/
 *.pyc
+kit-busqueda-visual/
+kit-ajustes-ui/
+kit-ajustes-ui\ /
