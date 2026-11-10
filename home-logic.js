@@ -318,13 +318,29 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const dataAdId = `data-ad-id="${ad.id}" data-is-sold="${ad.is_sold ? 'true' : 'false'}"`;
                 const dataCategory = ad.categoria ? `data-category="${ad.categoria}"` : '';
 
-                // FASE 1: píldoras sobre la foto, SOLO si aplican (utilidades-ui.js)
-                const pildoras = [];
-                if (ad.enhancements && ad.enhancements.is_urgent) {
-                    pildoras.push('<span class="mc-badge mc-badge-urgente"><i class="fas fa-clock"></i> Urgente</span>');
+                // Corona por plan sobre la foto (restaurada del historial, igual que tarjeta-anuncio.js)
+                let coronaHTML = '';
+                const planCorona = ad.featured_plan ? ad.featured_plan.toLowerCase() : 'free';
+                if (planCorona === 'basico') {
+                    coronaHTML = '<div class="card-crown-badge" aria-hidden="true"><i class="fas fa-crown crown-bronze"></i></div>';
+                } else if (planCorona === 'premium') {
+                    coronaHTML = '<div class="card-crown-badge" aria-hidden="true"><i class="fas fa-crown crown-silver"></i></div>';
+                } else if (planCorona === 'top' || planCorona === 'destacado') {
+                    coronaHTML = '<div class="card-crown-badge" aria-hidden="true"><i class="fas fa-crown crown-gold"></i></div>';
+                } else if (planCorona === 'elite') {
+                    coronaHTML = '<div class="card-crown-badge" aria-hidden="true"><i class="fas fa-gem crown-diamond"></i></div>';
                 }
-                badgeDe(ad).forEach(b => pildoras.push(`<span class="${b.clase}">${b.texto}</span>`));
-                const badgesHTML = pildoras.length ? `<div class="mc-badges">${pildoras.join('')}</div>` : '';
+                const coronaClase = coronaHTML ? 'con-corona' : '';
+
+                // Sobre la foto queda SOLO la píldora "Urgente" (además de la corona por plan).
+                // "Destacado" y "Nuevo" pasan al cuerpo blanco, pegados al título — nunca sobre la imagen.
+                const pildorasFoto = [];
+                if (ad.enhancements && ad.enhancements.is_urgent) {
+                    pildorasFoto.push('<span class="mc-badge mc-badge-urgente"><i class="fas fa-clock"></i> Urgente</span>');
+                }
+                const badgesHTML = pildorasFoto.length ? `<div class="mc-badges">${pildorasFoto.join('')}</div>` : '';
+                const estados = badgeDe(ad);
+                const estadosHTML = estados.length ? `<div class="mc-card-estados">${estados.map(b => `<span class="${b.clase}">${b.texto}</span>`).join('')}</div>` : '';
 
                 // Estado "Vendido" (overlay informativo, no botón)
                 const soldBadgeHome = ad.is_sold ? '<span class="badge-sold-home" title="Vendido"><i class="fas fa-check-circle"></i> VENDIDO</span>' : '';
@@ -342,9 +358,10 @@ const getVideoEmbedUrl = (videoUrl) => {
 
                 // FASE 1: tarjeta completa clicable → detalle-producto.html?id=... (sin botones encima de la foto)
                 return `
-                    <div class="mc-card card ${soldClass}" ${dataAdId} ${dataCategory} data-url="${urlDetalle(ad.id)}" role="link" tabindex="0" aria-label="${ad.titulo}">
+                    <div class="mc-card card ${soldClass} ${coronaClase}" ${dataAdId} ${dataCategory} data-url="${urlDetalle(ad.id)}" role="link" tabindex="0" aria-label="${ad.titulo}">
                         ${badgesHTML}
                         ${soldBadgeHome}
+                        ${coronaHTML}
                         <div class="mc-card-foto ${ad.is_sold ? 'image-sold' : ''}">${conteoFotosHTML}${fotoHTML}</div>
                         <div class="mc-card-cuerpo">
                             <div class="mc-card-precio">
@@ -352,6 +369,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                                 ${generateLikeButtonHTML(ad.id, 0, false)}
                             </div>
                             <h3 class="mc-card-titulo">${ad.titulo}</h3>
+                            ${estadosHTML}
                             <p class="mc-card-meta"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${ubicacion}</span></p>
                         </div>
                     </div>`;

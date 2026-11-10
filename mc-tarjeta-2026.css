@@ -26,13 +26,22 @@
 .mc-foto-conteo{position:absolute;top:8px;right:8px;z-index:6;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
 .mc-foto-conteo i{font-size:10px}
 
-/* ---------- Badges flotantes sobre la foto, SOLO si aplican ---------- */
+/* ---------- Sobre la foto: corona por plan (restaurada del historial) + píldora "Urgente" ---------- */
 .mc-badges{position:absolute;top:8px;left:8px;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
+/* Con corona presente, la píldora urgente baja para no pisarla (la corona mide 32px y arranca en top:10px) */
+.mc-card.con-corona .mc-badges{top:50px}
 .mc-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;line-height:1.2;letter-spacing:.02em}
 .mc-badge i{font-size:10px}
-.mc-badge-destacado{background:#FA6406;color:#fff;box-shadow:0 2px 6px rgba(250,100,6,.35)}
-.mc-badge-nuevo{background:#E8F7EE;color:#1F8B4C;border:1px solid #C4E8D0}
 .mc-badge-urgente{background:#FFF3E0;color:#B25E00;border:1px solid #F5D9A8}
+
+/* ---------- Estado del anuncio en el CUERPO blanco: "Destacado" / "Nuevo" (nunca sobre la foto) ---------- */
+/* Misma píldora para ambos; solo cambia el texto y el tinte. Colocada junto al título
+   (debajo de él) para no desalinear los títulos entre tarjetas vecinas del grid. */
+.mc-card-estados{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;min-width:0}
+.mc-card-estados .mc-badge{padding:2px 8px;font-size:10.5px}
+/* Destacado: tinte suave del naranja de marca; Nuevo: superficie neutra del sistema */
+.mc-badge-destacado{background:var(--accion-50);color:var(--accion-600);border:1px solid rgba(250,100,6,.16)}
+.mc-badge-nuevo{background:var(--bg);color:var(--ink-500);border:1px solid var(--line)}
 
 /* ---------- Cuerpo blanco: precio → título → ubicación (FASE 1-B: un solo tono de texto) ---------- */
 .mc-card-cuerpo{display:flex;flex-direction:column;gap:4px;background:#fff;padding:10px 12px 12px;flex:1;min-width:0}
