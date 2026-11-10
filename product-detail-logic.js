@@ -322,11 +322,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Incrementar contador de visitas
+        // (RPC security-definer: con RLS activado, un visitante anónimo ya
+        //  no puede hacer UPDATE directo sobre anuncios; el incremento lo
+        //  hace la función mc_incrementar_visitas del lado del servidor).
         try {
             const { error: updateError } = await supabase
-                .from('anuncios')
-                .update({ visitas: (ad.visitas || 0) + 1 })
-                .eq('id', adId);
+                .rpc('mc_incrementar_visitas', { p_anuncio_id: adId });
 
             if (updateError) {
                 console.warn('Error al actualizar visitas:', updateError);
