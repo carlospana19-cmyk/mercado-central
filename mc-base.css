@@ -73,8 +73,16 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
 .footer-col ul li{margin-bottom:10px}
 .footer-col a{color:#B7C4C0;font-size:14.5px;transition:color .2s}
 .footer-col a:hover{color:#2EC4B6}
-.social-links a{display:inline-flex;align-items:center;gap:10px;margin-bottom:10px}
-.social-links i{width:20px;text-align:center;font-size:16px}
+/* Redes sociales del footer (PARTE 1): íconos de marca 20px, neutro sobre fondo
+   oscuro (#B7C4C0 = neutral real del footer, 9:1 de contraste), hover naranja de
+   marca (--orange-500, 7:1), transición 180ms y focus visible. */
+.social-links{display:flex!important;flex-wrap:wrap;align-items:center;gap:6px 14px!important}
+.social-links a{display:inline-flex!important;align-items:center!important;justify-content:center;width:40px;height:40px;border-radius:10px;color:#B7C4C0!important;transition:color .18s ease}
+.social-links a i{width:20px!important;text-align:center;font-size:20px!important;line-height:1}
+/* Mayor especificidad que .footer-col a:hover del PATCH v6 (#2EC4B6): aquí el
+   hover de los íconos sociales es el naranja de marca (7:1 sobre fondo oscuro) */
+.footer .social-links a:hover{color:var(--orange-500)!important}
+.social-links a:focus-visible{outline:2px solid var(--orange-500)!important;outline-offset:2px;border-radius:10px}
 .footer-bottom{max-width:1240px;margin:40px auto 0;padding:20px 0;border-top:1px solid rgba(255,255,255,.08);text-align:center;font-size:13.5px;color:#8FA39E}
 
 /* ============ FASE 4D: BOTÓN MENSAJES + BADGE ============ */
@@ -97,7 +105,7 @@ main{width:100%}
 .footer-title::after,.footer-col h4::after{display:none!important}
 .footer-col p,.footer-col a,.footer-subtitle{color:#B7C4C0!important;font-size:14.5px!important}
 .footer-col a:hover{color:#2EC4B6!important;padding-left:0!important}
-.social-links a{display:inline-flex;align-items:center;gap:10px}
+.social-links a{display:inline-flex;align-items:center;justify-content:center;gap:0}
 .social-links a img{width:22px!important;height:22px!important;object-fit:contain}
 .payment-icons i{color:#8FA39E!important}
 .payment-icons i:hover{color:#2EC4B6!important}

@@ -1,4 +1,13 @@
 // AppConfig.js - LA ÚNICA FUENTE DE VERDAD
+
+// ⭐ REDES SOCIALES OFICIALES (PARTE 0) — ÚNICA FUENTE DE VERDAD para todo el proyecto.
+// El footer y cualquier referencia a perfiles sociales de Mercados Central leen de esta constante.
+// No duplicar ni inventar otras URLs.
+export const REDES_SOCIALES = {
+    instagram: 'https://www.instagram.com/mercadoscentral',
+    facebook: 'https://www.facebook.com/mercadoscentral'
+};
+
 export const APP_CONFIG = {
     PLAN_LIMITS: {
         'free': { 
@@ -30,6 +39,9 @@ export const APP_CONFIG = {
             priority: 3 
         }
     },
+
+    // ⭐ REDES SOCIALES OFICIALES (referencia a la constante exportada arriba)
+    REDES_SOCIALES,
     
     // ⭐ TOP 3 ATRIBUTOS PRIORITARIOS POR CATEGORÍA (para tarjetas index/results)
     // Usado por UIComponents.renderAttributes() - exactamente 3 por categoría
@@ -72,6 +84,7 @@ export const APP_CONFIG = {
 // Exponer al objeto window para compatibilidad
 if (typeof window !== 'undefined') {
     window.APP_CONFIG = APP_CONFIG;
+    window.REDES_SOCIALES = REDES_SOCIALES;
     console.log('✅ AppConfig cargado con TOP 3 por categoría:', APP_CONFIG.CATEGORY_ATTRIBUTES);
 }
 

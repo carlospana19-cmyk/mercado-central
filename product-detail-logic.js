@@ -398,6 +398,12 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     try {
         if (typeof loadSellerContactInfo === 'function') loadSellerContactInfo(ad);
     } catch(e) { console.warn('Error con loadSellerContactInfo:', e); }
+
+    // ✅ COMPARTIR ANUNCIO (PARTE 2): fila "Compartir" junto a las acciones de contacto
+    // (WhatsApp / Facebook / Instagram / Copiar enlace) con URL canónica del anuncio.
+    try {
+        if (typeof initShareActions === 'function') initShareActions(ad);
+    } catch(e) { console.warn('Error con initShareActions:', e); }
     // ✅ FASE 2: sección "Más anuncios de [Nombre]" al final del detalle
     try {
         if (ad.user_id) loadSellerMoreAds(ad);
@@ -640,6 +646,117 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
             }
         }
     }
+}
+
+// ============================================
+// ✅ COMPARTIR ANUNCIO (PARTE 2)
+// URL canónica del anuncio + botones WhatsApp / Facebook / Instagram / Copiar
+// enlace. Todo con encodeURIComponent y degradación con gracia donde
+// navigator.share / navigator.clipboard no existan.
+// ============================================
+
+// URL pública canónica del anuncio: base del <link rel="canonical" id="mc-canonical">
+// (URL pública del detalle) + ?id=<id codificado>. Fallback: la URL actual.
+function buildShareUrl(ad) {
+    let base = '';
+    const canonicalEl = document.getElementById('mc-canonical');
+    if (canonicalEl && canonicalEl.href) {
+        base = canonicalEl.href.split('?')[0].split('#')[0];
+    }
+    if (!base || !/^https?:\/\//i.test(base)) {
+        base = window.location.origin + window.location.pathname;
+    }
+    return `${base}?id=${encodeURIComponent(ad.id)}`;
+}
+
+// Copiar al portapapeles con degradación: Clipboard API → document.execCommand('copy')
+async function copiarAlPortapapeles(texto) {
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(texto);
+            return true;
+        } catch (e) { /* continúa al fallback */ }
+    }
+    // Fallback: textarea temporal fuera de pantalla + execCommand
+    try {
+        const ta = document.createElement('textarea');
+        ta.value = texto;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, texto.length);
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+    } catch (e) {
+        return false;
+    }
+}
+
+// Toast del sistema (reutiliza tokens de mc-detail.css: .mc-toast-compartir)
+function mcToastCompartir(mensaje) {
+    const toast = document.createElement('div');
+    toast.className = 'mc-toast-compartir';
+    toast.setAttribute('role', 'status');
+    toast.textContent = mensaje;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2600);
+}
+
+// Conecta la fila "Compartir" del detalle con el anuncio actual
+function initShareActions(ad) {
+    const shareRow = document.getElementById('share-row');
+    if (!shareRow || !ad) return;
+
+    const titulo = ad.titulo || 'Anuncio en Mercados Central';
+    const url = buildShareUrl(ad);
+
+    // Canonical SEO del anuncio (regla 4: la URL compartida es la canónica)
+    const canonicalEl = document.getElementById('mc-canonical');
+    if (canonicalEl) canonicalEl.setAttribute('href', url);
+
+    // WhatsApp: texto = título + URL, TODO codificado con encodeURIComponent
+    const waEl = document.getElementById('share-whatsapp');
+    if (waEl) {
+        waEl.href = `https://wa.me/?text=${encodeURIComponent(`${titulo} ${url}`)}`;
+    }
+
+    // Facebook: sharer oficial con la URL codificada
+    const fbEl = document.getElementById('share-facebook');
+    if (fbEl) {
+        fbEl.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    }
+
+    // Instagram: no tiene URL de compartir en web → navigator.share (menú del
+    // sistema en móvil, incluido Instagram); sin soporte → copiar enlace + toast.
+    const igEl = document.getElementById('share-instagram');
+    if (igEl) {
+        igEl.addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: titulo, text: titulo, url: url });
+                    return; // usuario completó (o canceló) el menú del sistema
+                } catch (err) {
+                    if (err && err.name === 'AbortError') return; // cancelado por el usuario
+                    // Error real del navegador → degradar a copiar enlace
+                }
+            }
+            const ok = await copiarAlPortapapeles(url);
+            mcToastCompartir(ok ? 'Enlace copiado: pégalo en tu historia o bio' : 'No se pudo copiar el enlace');
+        });
+    }
+
+    // Copiar enlace: clipboard + fallback, con toast de confirmación
+    const copyEl = document.getElementById('share-copiar');
+    if (copyEl) {
+        copyEl.addEventListener('click', async () => {
+            const ok = await copiarAlPortapapeles(url);
+            mcToastCompartir(ok ? 'Enlace copiado' : 'No se pudo copiar el enlace');
+        });
+    }
+
+    shareRow.style.display = 'block';
 }
 
 async function loadSellerContactInfo(ad) {
