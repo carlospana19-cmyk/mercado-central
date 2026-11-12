@@ -348,6 +348,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// ============================================
+// ✅ SEO/RED: personalización dinámica de OG/Twitter Cards del detalle.
+// Los crawlers de Facebook/WhatsApp no ejecutan JS (por eso el <head> trae
+// valores por defecto con el logo de marca), pero el DOM queda consistente
+// para clientes que sí lo ejecutan. Solo toca metas que YA existen en el
+// <head> de detalle-producto.html; si falta un dato, no la toca.
+// ============================================
+function setSocialMeta(propiedad, contenido, espejoTwitter) {
+    if (!contenido) return; // sin dato → dejar la meta tal cual
+    const metaOg = document.querySelector(`meta[property="${propiedad}"]`);
+    if (metaOg) metaOg.setAttribute('content', contenido);
+    if (espejoTwitter) {
+        const metaTw = document.querySelector(`meta[name="${espejoTwitter}"]`);
+        if (metaTw) metaTw.setAttribute('content', contenido);
+    }
+}
+
 async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     console.log('Mostrando detalles del producto:', ad);
     console.log('¿Abrir chat automáticamente?:', openChat);
@@ -366,6 +383,34 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     }
 
     document.title = `${ad.titulo} - Mercados Central`;
+
+    // ✅ SEO/RED: OG/Twitter dinámicos con los datos del anuncio.
+    // - og:title: la MISMA cadena que document.title (espejo twitter:title).
+    // - og:description: descripción recortada a 160 caracteres (solo si hay;
+    //   si no hay descripción, no se toca).
+    // - og:image: primera foto de la galería SOLO si es URL pública absoluta
+    //   (getPublicUrl o https completo guardado en la BD). Las firmadas/
+    //   expirables (/object/sign/) y el placeholder relativo NO se tocan:
+    //   queda el logo de marca del <head>.
+    try {
+        setSocialMeta('og:title', `${ad.titulo} - Mercados Central`, 'twitter:title');
+
+        const descripcionSocial = (ad.descripcion || '').trim();
+        if (descripcionSocial) {
+            const descRecortada = descripcionSocial.length > 160
+                ? descripcionSocial.slice(0, 157).trimEnd() + '…'
+                : descripcionSocial;
+            setSocialMeta('og:description', descRecortada, 'twitter:description');
+        }
+
+        const primeraFoto = Array.isArray(galleryImages) && galleryImages.length > 0 ? galleryImages[0] : '';
+        const esFotoPublicaAbsoluta = typeof primeraFoto === 'string'
+            && /^https:\/\//i.test(primeraFoto)            // absoluta https
+            && !primeraFoto.includes('/object/sign/');     // firma/expirable → no
+        if (esFotoPublicaAbsoluta) {
+            setSocialMeta('og:image', primeraFoto, 'twitter:image');
+        }
+    } catch (e) { console.warn('Error personalizando OG/Twitter:', e); }
 
     // Rellenar datos de texto
     productNameEl.textContent = ad.titulo || 'Sin título';
