@@ -40,7 +40,7 @@ async function loadUserProfile() {
     try {
         const { data: profile, error } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, nombre_completo, nombre_negocio, url_foto_perfil, telefono, whatsapp, provincia, distrito, descripcion, tipo_negocio, created_at, updated_at')
             .eq('id', currentUserId)
             .single();
 
@@ -72,7 +72,11 @@ async function loadUserProfile() {
                 provinceSelect.add(new Option(profile.provincia, profile.provincia));
             }
             provinceSelect.value = profile.provincia || '';
-            document.getElementById('location-address').value = profile.direccion || '';
+            // direccion no es legible por la API (kit: lista blanca por columna);
+            // solo se precarga si el propio SELECT la devuelve, para no borrar al guardar.
+            if (profile.direccion) {
+                document.getElementById('location-address').value = profile.direccion;
+            }
 
             if (profile.url_foto_perfil) {
                 document.getElementById('profile-photo-header').src = profile.url_foto_perfil;

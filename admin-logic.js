@@ -24,13 +24,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) { window.location.href = '/index.html'; return; }
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_admin, email')
-        .eq('id', user.id)
-        .single();
+    const { data: esAdmin, error: adminError } = await supabase.rpc('fn_es_admin');
 
-    if (!profile || !profile.is_admin) {
+    if (adminError || !esAdmin) {
         alert('Acceso no autorizado');
         window.location.href = '/index.html';
         return;
@@ -108,7 +104,7 @@ function inicializarNavegacion() {
 async function cargarDashboard() {
     try {
         const { count: totalAds } = await supabase.from('anuncios').select('*', { count: 'exact', head: true });
-        const { count: totalUsr } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+        const { count: totalUsr } = await supabase.from('profiles').select('id', { count: 'exact', head: true });
         
         // Dinero Real (Facturación)
         const { data: pagos } = await supabase.from('user_plans').select('amount_paid').gt('amount_paid', 0);
@@ -200,8 +196,10 @@ async function cargarInventario(categoriaSeleccionada = '') {
 
         const { data } = await query;
         const uIds = [...new Set((data || []).map(a => a.user_id).filter(Boolean))];
-        const { data: profs } = await supabase.from('profiles').select('id, email, nombre_negocio').in('id', uIds);
-        const uMap = {}; profs?.forEach(p => uMap[p.id] = p);
+        const { data: profs, error: profsErr } = await supabase.rpc('fn_admin_usuarios');
+        if (profsErr) throw profsErr;
+        const uMap = {};
+        (profs || []).filter(p => uIds.includes(p.id)).forEach(p => { uMap[p.id] = p; });
         
         inventarioData = (data || []).map(a => ({ ...a, usuario: uMap[a.user_id] }));
         
@@ -339,10 +337,12 @@ async function cargarUsuarios() {
     if (table) table.style.display = 'none';
 
     try {
-        const { data: usrs } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-        
+        const { data: usrs, error: usrsErr } = await supabase.rpc('fn_admin_usuarios');
+        if (usrsErr) throw usrsErr;
+        const usrsOrdenados = (usrs || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
         if (tbody) {
-            tbody.innerHTML = (usrs || []).map(u => {
+            tbody.innerHTML = usrsOrdenados.map(u => {
                 try {
                     const nombre = u.nombre_negocio || u.nombre_completo || u.email.split('@')[0];
                     const rol = u.is_admin ? '<span class="badge-admin">Admin</span>' : '<span class="badge-user">Usuario</span>';
