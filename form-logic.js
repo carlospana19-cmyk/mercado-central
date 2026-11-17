@@ -206,6 +206,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Plan logic (CORREGIDO: jerarquía planes - 60d pagos / 30d free)
             adData.selected_plan = selectedPlan;
             adData.featured_plan = selectedPlan;
+
+            // 🎬 Video de YouTube/Vimeo: solo plan destacado (regresión: se perdió al migrar de publish-logic.js)
+            const videoUrlValue = document.getElementById('video-url')?.value?.trim();
+            if (selectedPlan === 'destacado' && videoUrlValue) {
+                adData.url_video = videoUrlValue;
+            }
             
             // ✅ LÓGICA EXACTA: Pagos (destacado/premium/basico)=60d, Free=30d
             const isPaid = ['destacado', 'premium', 'basico'].includes(selectedPlan);
