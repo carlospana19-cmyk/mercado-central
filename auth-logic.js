@@ -188,7 +188,7 @@ async function handleRegister(e) {
 
         if (!authData.session) {
             // ✅ CASO NORMAL (confirmación de email activada): mostrar el paso
-            // de verificación con el código de 6 dígitos
+            // de verificación con el código de verificación
             console.log('✉️ Sin sesión: mostrando paso de verificación de email...');
             showVerificationStep({
                 email,
@@ -213,7 +213,7 @@ async function handleRegister(e) {
 }
 
 // ==========================================
-// VERIFICACIÓN DE EMAIL CON CÓDIGO (6 dígitos)
+// VERIFICACIÓN DE EMAIL CON CÓDIGO (hasta 8 dígitos)
 // ==========================================
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -250,7 +250,7 @@ function buildVerificationPanel(email, onVerified) {
     panel.noValidate = true;
 
     const msg = document.createElement('p');
-    msg.textContent = 'Te enviamos un código de 6 dígitos a tu correo';
+    msg.textContent = 'Te enviamos un código de verificación a tu correo';
     msg.style.fontWeight = '600';
 
     const emailHint = document.createElement('p');
@@ -261,10 +261,10 @@ function buildVerificationPanel(email, onVerified) {
     codeInput.type = 'text';
     codeInput.id = 'code-verify';
     codeInput.name = 'code';
-    codeInput.placeholder = 'Código de 6 dígitos';
+    codeInput.placeholder = 'Código de verificación';
     codeInput.autocomplete = 'one-time-code';
     codeInput.inputMode = 'numeric';
-    codeInput.maxLength = 6;
+    codeInput.maxLength = 8;
     codeInput.style.cssText = 'text-align:center;letter-spacing:8px;font-size:18px;';
 
     const status = document.createElement('p');
@@ -285,9 +285,9 @@ function buildVerificationPanel(email, onVerified) {
 
     panel.append(msg, emailHint, codeInput, status, verifyBtn, resendBtn);
 
-    // El código es numérico de 6 dígitos
+    // El código es numérico (hasta 8 dígitos)
     codeInput.addEventListener('input', () => {
-        codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+        codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 8);
     });
 
     attachVerifySubmitHandler(panel, { email, codeInput, status, verifyBtn, onVerified });
@@ -303,8 +303,8 @@ function attachVerifySubmitHandler(panel, { email, codeInput, status, verifyBtn,
         event.preventDefault();
 
         const code = codeInput.value.trim();
-        if (!/^\d{6}$/.test(code)) {
-            setVerifyStatus(status, 'Ingresa el código de 6 dígitos.', 'error');
+        if (!code) {
+            setVerifyStatus(status, 'Ingresa el código de verificación.', 'error');
             return;
         }
 
