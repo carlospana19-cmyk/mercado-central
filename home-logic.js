@@ -3,7 +3,7 @@
 import { supabase } from './supabase-client.js';
 import { generateAttributesHTML, UIComponents, cleanLocationString } from './UIComponents.js';
 import { generateLikeButtonHTML, initializeAllCardLikes } from './likes-logic.js';
-import { urlDetalle, precioTexto, badgeDe, inicialDe } from './utilidades-ui.js';
+import { urlDetalle, precioTexto, badgeDe, inicialDe, videoBotonHTML } from './utilidades-ui.js';
 import { getSellerReviewStats } from './reviews-logic.js';
 import { HERO_ADS } from './hero-ads.js';
 
@@ -362,7 +362,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                         ${badgesHTML}
                         ${soldBadgeHome}
                         ${coronaHTML}
-                        <div class="mc-card-foto ${ad.is_sold ? 'image-sold' : ''}">${conteoFotosHTML}${fotoHTML}</div>
+                        <div class="mc-card-foto ${ad.is_sold ? 'image-sold' : ''}">${conteoFotosHTML}${fotoHTML}${videoBotonHTML(ad)}</div>
                         <div class="mc-card-cuerpo">
                             <div class="mc-card-precio">
                                 <span class="${precio ? 'mc-precio-valor' : 'mc-precio-vacio'}">${precio || 'A consultar'}</span>

@@ -3,7 +3,7 @@
 // perfil del vendedor y en la sección "Más anuncios" del detalle.
 // Función pura, sin dependencias de Supabase. Toma el anuncio crudo (como viene
 // de la tabla `anuncios` con sus joins) y normaliza la imagen de portada.
-import { urlDetalle, precioTexto, badgeDe, inicialDe } from './utilidades-ui.js';
+import { urlDetalle, precioTexto, badgeDe, inicialDe, videoBotonHTML } from './utilidades-ui.js';
 import { cleanLocationString } from './UIComponents.js';
 
 export function tarjetaAnuncioHTML(product) {
@@ -102,7 +102,7 @@ export function tarjetaAnuncioHTML(product) {
                 ${badgesHTML}
                 ${soldBadgeResults}
                 ${coronaHTML}
-                <div class="mc-card-foto ${ad.is_sold ? 'image-sold' : ''}">${conteoFotosHTML}${fotoHTML}</div>
+                <div class="mc-card-foto ${ad.is_sold ? 'image-sold' : ''}">${conteoFotosHTML}${fotoHTML}${videoBotonHTML(ad)}</div>
                 <div class="mc-card-cuerpo">
                         <div class="mc-card-precio">
                                 <span class="${precio ? 'mc-precio-valor' : 'mc-precio-vacio'}">${precio || 'A consultar'}</span>

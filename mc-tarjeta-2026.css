@@ -26,6 +26,12 @@
 .mc-foto-conteo{position:absolute;top:8px;right:8px;z-index:6;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
 .mc-foto-conteo i{font-size:10px}
 
+/* Botón "▶ Video" (plan destacado) y reproductor embebido dentro de la foto */
+.mc-video-play{position:absolute;left:8px;bottom:8px;z-index:7;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:0;border-radius:999px;background:rgba(18,33,41,.85);color:#fff;font-size:12px;font-weight:700;font-family:var(--font-ui);line-height:1;cursor:pointer;transition:background .2s,transform .2s}
+.mc-video-play:hover,.mc-video-play:focus-visible{background:var(--orange-500);transform:translateY(-1px)}
+.mc-video-play i{font-size:10px}
+.mc-card-foto iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:8;background:#000}
+
 /* ---------- Sobre la foto: corona por plan (restaurada del historial) + píldora "Urgente" ---------- */
 .mc-badges{position:absolute;top:8px;left:8px;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
 /* Con corona presente, la píldora urgente baja para no pisarla (la corona mide 32px y arranca en top:10px) */

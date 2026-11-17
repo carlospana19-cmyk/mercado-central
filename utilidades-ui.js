@@ -41,6 +41,69 @@ export function badgeDe(anuncio) {
     return badges;
 }
 
+// ============================================
+// VIDEO EN LA TARJETA (plan destacado): botón "▶ Video" sobre la foto.
+// Al pulsarlo, la foto se reemplaza por el reproductor embebido (YouTube/Vimeo)
+// SIN navegar al detalle. Click-to-play: no se carga ningún iframe hasta pulsar.
+// ============================================
+
+// Convierte una URL de YouTube/Vimeo a su URL de embed (null si no es válida).
+// El id se extrae con regex estricta, así que el resultado es seguro para un src.
+export function getVideoEmbedUrl(videoUrl) {
+    if (!videoUrl || typeof videoUrl !== 'string') return null;
+    const url = videoUrl.trim();
+
+    const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (youtubeMatch) {
+        return `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`;
+    }
+
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vimeoMatch) {
+        return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    }
+
+    return null;
+}
+
+// HTML del botón "▶ Video" ('' si el anuncio no tiene un video válido).
+export function videoBotonHTML(anuncio) {
+    const embed = getVideoEmbedUrl(anuncio && anuncio.url_video);
+    if (!embed) return '';
+    return `<button type="button" class="mc-video-play" data-embed="${embed.replace(/&/g, '&amp;')}" aria-label="Reproducir video del anuncio"><i class="fas fa-play" aria-hidden="true"></i> Video</button>`;
+}
+
+// Un solo listener delegado en captura (se instala una vez por página): corre ANTES
+// que los listeners de cada grilla, así que el clic en el botón nunca abre el detalle.
+if (typeof document !== 'undefined' && !window.__mcVideoPlayInit) {
+    window.__mcVideoPlayInit = true;
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest && e.target.closest('.mc-video-play');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const foto = btn.closest('.mc-card-foto');
+        const src = btn.dataset.embed;
+        if (!foto || !src) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.src = src + (src.includes('?') ? '&' : '?') + 'autoplay=1';
+        iframe.title = 'Video del anuncio';
+        iframe.allow = 'autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        foto.replaceChildren(iframe);
+    }, true);
+
+    // Enter/Espacio sobre el botón no debe disparar la navegación de la tarjeta
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target.closest && e.target.closest('.mc-video-play')) e.stopPropagation();
+    }, true);
+}
+
 // Inicial del título para el fondo gris cuando el anuncio no tiene foto.
 export function inicialDe(texto) {
     const t = (texto || '').trim();
