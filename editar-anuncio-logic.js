@@ -25,6 +25,7 @@ export function initializeEditPage() {
 let currentImages = []; 
 let newFiles = [];  
 let currentCoverUrl = '';
+let currentAdPlan = ''; // plan del anuncio cargado (el video solo aplica a 'destacado')
 
 
 
@@ -1435,6 +1436,15 @@ function showBusinessFields() {
         // Guardar URL de portada actual como respaldo
         currentCoverUrl = ad.url_portada || '';
 
+        // 🎬 Video (solo plan destacado): mostrar el campo y rellenarlo con el video actual
+        currentAdPlan = String(ad.featured_plan || ad.selected_plan || '').toLowerCase().trim();
+        const videoBlockEl = document.getElementById('video-block');
+        const videoInputEl = document.getElementById('video-url');
+        if (videoBlockEl && videoInputEl && currentAdPlan === 'destacado') {
+            videoBlockEl.style.display = 'block';
+            videoInputEl.value = ad.url_video || '';
+        }
+
 
         // Guardar temporalmente la categoría y subcategoría en sessionStorage
         window.sessionStorage.setItem('editAdCategory', ad.categoria || '');
@@ -1836,6 +1846,21 @@ if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0
         }
 
         updateData.url_portada = finalCoverUrl;
+
+        // 🎬 Video (solo plan destacado): cambiar la URL o quitarla (campo vacío → null)
+        if (currentAdPlan === 'destacado') {
+            const videoValue = (document.getElementById('video-url')?.value || '').trim();
+            const esVideoValido = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)[a-zA-Z0-9_-]{11}|vimeo\.com\/(?:video\/)?\d+/.test(videoValue);
+            if (videoValue && !esVideoValido) {
+                alert('La URL del video no es válida. Usa un enlace de YouTube o Vimeo.');
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Guardar cambios';
+                }
+                return;
+            }
+            updateData.url_video = videoValue || null;
+        }
 
         // Debug log
         console.log('DATOS A ENVIAR:', updateData);
