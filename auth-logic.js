@@ -1,5 +1,11 @@
 // auth-logic.js - VERSIÓN MEJORADA
 
+// ⏸️ PAUSA TEMPORAL de la verificación de email: el remitente por defecto
+// de Supabase tiene un límite de correos que bloquea las pruebas.
+// El código de verificación NO se borra: queda dormido tras este flag.
+// ✅ Para reactivarlo antes del lanzamiento: poner en true (1 línea).
+const EMAIL_VERIFICACION_ACTIVA = false;
+
 import { supabase } from './supabase-client.js';
 
 export function initializeAuthPages() {
@@ -79,11 +85,13 @@ async function handleLogin(e) {
             console.error('❌ Error de Supabase:', error.message);
 
             // ✉️ Correo sin confirmar: mostrar el paso de verificación
-            // (input de código + verificar + reenviar) en lugar del error crudo
+            // (input de código + verificar + reenviar) en lugar del error crudo.
+            // PAUSADO tras el flag EMAIL_VERIFICACION_ACTIVA: con el flag en
+            // false, el error se muestra como antes de este ciclo.
             const isEmailNotConfirmed = error?.code === 'email_not_confirmed'
                 || /email not confirmed/i.test(error?.message || '');
 
-            if (isEmailNotConfirmed) {
+            if (EMAIL_VERIFICACION_ACTIVA && isEmailNotConfirmed) {
                 console.log('✉️ Correo sin confirmar, mostrando paso de verificación...');
                 showVerificationStep({
                     email,
@@ -187,24 +195,32 @@ async function handleRegister(e) {
         console.log('✅ Registro exitoso');
 
         if (!authData.session) {
-            // ✅ CASO NORMAL (confirmación de email activada): mostrar el paso
-            // de verificación con el código de verificación
-            console.log('✉️ Sin sesión: mostrando paso de verificación de email...');
-            showVerificationStep({
-                email,
-                formToHide: document.getElementById('register-form'),
-                onVerified: () => {
-                    // ✅ Redirección directa a panel-unificado.html (flujo actual)
-                    console.log('🔄 Email verificado, redirigiendo a panel-unificado.html...');
-                    window.location.href = 'panel-unificado.html';
-                }
-            });
-            return;
+            // ✅ PAUSADO tras EMAIL_VERIFICACION_ACTIVA: con el flag en false
+            // NUNCA se muestra el paso del código (Confirm email está
+            // desactivado en el Dashboard, así que el signUp trae sesión).
+            if (EMAIL_VERIFICACION_ACTIVA) {
+                console.log('✉️ Sin sesión: mostrando paso de verificación de email...');
+                showVerificationStep({
+                    email,
+                    formToHide: document.getElementById('register-form'),
+                    onVerified: () => {
+                        // ✅ Redirección directa a panel-unificado.html (flujo actual)
+                        console.log('🔄 Email verificado, redirigiendo a panel-unificado.html...');
+                        window.location.href = 'panel-unificado.html';
+                    }
+                });
+                return;
+            }
+
+            // Flag en false: continuar el flujo de siempre (redirigir directo)
+            console.log('⚠️ Sin sesión y verificación pausada: continuando flujo directo...');
         }
 
-        // Sesión inmediata (confirmación de email desactivada): redirigir como hoy
+        // ✅ Redirección directa a panel-unificado.html (flujo de siempre)
         console.log('🔄 Redirigiendo a panel-unificado.html...');
-        alert('¡Registro exitoso! Redirigiendo al panel...');
+        if (!EMAIL_VERIFICACION_ACTIVA) {
+            alert('¡Registro exitoso! Redirigiendo al panel...');
+        }
         window.location.href = 'panel-unificado.html';
     } catch (err) {
         console.error('❌ Error:', err);
