@@ -365,6 +365,25 @@ function setSocialMeta(propiedad, contenido, espejoTwitter) {
     }
 }
 
+// Convierte una URL de YouTube/Vimeo a su URL de embed (null si no es válida).
+// El id se extrae con una regex estricta, así que el resultado es seguro para un src.
+function getVideoEmbedUrl(videoUrl) {
+    if (!videoUrl || typeof videoUrl !== 'string') return null;
+    const url = videoUrl.trim();
+
+    const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (youtubeMatch) {
+        return `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`;
+    }
+
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vimeoMatch) {
+        return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    }
+
+    return null;
+}
+
 async function displayProductDetails(ad, openChat = false, galleryImages = []) {
     console.log('Mostrando detalles del producto:', ad);
     console.log('¿Abrir chat automáticamente?:', openChat);
@@ -641,6 +660,22 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
                 <img src="${FOTO_RESPALDO}" alt="Sin imagen disponible">
             </div>
         `;
+    }
+
+    // 🎬 Video del anuncio (plan destacado): YouTube/Vimeo embebido bajo la galería
+    const videoEmbedUrl = getVideoEmbedUrl(ad.url_video);
+    if (videoEmbedUrl && galleryWrapperEl) {
+        galleryWrapperEl.insertAdjacentHTML('beforeend', `
+            <div class="detail-video" style="padding:16px 0 0;">
+                <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;">
+                    <iframe src="${videoEmbedUrl}" title="Video de ${String(ad.titulo || 'anuncio').replace(/"/g, '&quot;')}"
+                        style="position:absolute;inset:0;width:100%;height:100%;border:0;"
+                        loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+            </div>
+        `);
     }
 
     // --- LÓGICA DEL BOTÓN DE EDICIÓN ---
