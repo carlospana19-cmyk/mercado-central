@@ -7,6 +7,15 @@ import { urlDetalle, precioTexto, badgeDe, inicialDe, videoBotonHTML } from './u
 import { getSellerReviewStats } from './reviews-logic.js';
 import { HERO_ADS } from './hero-ads.js';
 
+// Escape HTML para contenido de usuario (mismo patrón que escaparHtml en product-detail-logic.js)
+const AMP_HOME = String.fromCharCode(38); // "&" sin escribir la entidad literal
+const escaparHtmlHome = (texto) => String(texto)
+    .replace(/&/g, AMP_HOME + 'amp;')
+    .replace(/</g, AMP_HOME + 'lt;')
+    .replace(/>/g, AMP_HOME + 'gt;')
+    .replace(/"/g, AMP_HOME + 'quot;')
+    .replace(/'/g, AMP_HOME + '#39;');
+
 export function initializeHomePage() {
 
     console.log("SENSOR 1: initializeHomePage() se ha ejecutado.");
@@ -206,9 +215,41 @@ const getVideoEmbedUrl = (videoUrl) => {
                 
                 const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
                 const attributeMatches = attributesHTML.match(/<span[^>]*>.*?<\/span>/g) || [];
-                const eliteAttributes = attributeMatches.slice(0, 4).map(attr => {
+                let eliteAttributes = attributeMatches.slice(0, 4).map(attr => {
                     return attr.replace(/class="[^"]*"/, 'class="elite-attribute"');
                 }).join('');
+
+                // Respaldo: si no hay atributos específicos, chips desde datos que siempre existen
+                if (attributeMatches.length === 0) {
+                    const fallbackChips = [];
+                    const categoriaTxt = String(ad.categoria ?? '').trim();
+                    if (categoriaTxt) {
+                        fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-tag"></i>${escaparHtmlHome(categoriaTxt)}</span>`);
+                    }
+                    const numFotos = Array.isArray(ad.url_galeria) ? ad.url_galeria.length : 0;
+                    if (numFotos > 0) {
+                        fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-camera"></i>${numFotos} fotos</span>`);
+                    }
+                    const estadoTxt = String(ad.estado ?? '').trim();
+                    if (estadoTxt) {
+                        fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-circle-check"></i>${escaparHtmlHome(estadoTxt)}</span>`);
+                    }
+                    if (ad.fecha_publicacion) {
+                        const fechaPub = new Date(ad.fecha_publicacion);
+                        if (!isNaN(fechaPub.getTime())) {
+                            const dias = Math.max(0, Math.floor((Date.now() - fechaPub.getTime()) / 86400000));
+                            const relativo = dias === 0 ? 'Hoy' : dias === 1 ? 'Ayer' : `Hace ${dias} días`;
+                            fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-clock"></i>${relativo}</span>`);
+                        }
+                    }
+                    eliteAttributes = fallbackChips.slice(0, 4).join('');
+                }
+
+                // Descripción: sin etiquetas HTML y escapada
+                const descripcionLimpia = String(ad.descripcion ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                const descripcionHTML = descripcionLimpia
+                    ? `<div class="elite-banner-desc">${escaparHtmlHome(descripcionLimpia)}</div>`
+                    : '';
                 
                 const urgentBadge = ad.enhancements?.is_urgent 
                     ? '<span class="elite-badge-urgent"><i class="fas fa-bolt"></i> URGENTE</span>' 
@@ -268,6 +309,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                                 <i class="fas fa-map-marker-alt"></i>
                                 ${cleanLocationString(ad.corregimiento ? ad.corregimiento + ', ' : '' + (ad.distrito || ad.ubicacion || '') + ', ' + (ad.provincia || 'N/A'))}
                             </div>
+                            ${descripcionHTML}
                             <div class="elite-banner-attributes">
                                 ${eliteAttributes}
                             </div>
