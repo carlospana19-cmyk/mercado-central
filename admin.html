@@ -80,12 +80,18 @@
             letter-spacing: -0.3px;
         }
 
-        .sidebar-header span {
+        .sidebar-header > span {
             font-size: 11px;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* Wordmark "Mercado·ˢ Central" */
+        .mc-wordmark { font-weight: 700; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; }
+        .mc-wordmark .logo-mark { position: relative; display: inline-block; width: .3em; height: .95em; margin-left: -1.5px; vertical-align: baseline; }
+        .mc-wordmark .logo-sup { position: absolute; top: 0; left: 0; right: 0; margin: 0; font-size: .6em; font-weight: 700; line-height: 1; text-align: center; vertical-align: baseline; }
+        .mc-wordmark .logo-dot { position: absolute; left: 50%; top: .62em; width: 3px; height: 3px; margin-left: -1.5px; border-radius: 50%; background-color: #FA6406; }
 
         .sidebar-nav {
             flex: 1;
@@ -680,7 +686,7 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <span>Mercados Central</span>
+                <span class="mc-wordmark" role="img" aria-label="Mercado Central">Mercado<span class="logo-mark"><sup class="logo-sup">s</sup><span class="logo-dot"></span></span> Central</span>
                 <h1>Admin</h1>
             </div>
             <nav class="sidebar-nav">
