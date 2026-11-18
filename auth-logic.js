@@ -4,7 +4,7 @@
 // de Supabase tiene un límite de correos que bloquea las pruebas.
 // El código de verificación NO se borra: queda dormido tras este flag.
 // ✅ Para reactivarlo antes del lanzamiento: poner en true (1 línea).
-const EMAIL_VERIFICACION_ACTIVA = false;
+const EMAIL_VERIFICACION_ACTIVA = true;
 
 import { supabase } from './supabase-client.js';
 
