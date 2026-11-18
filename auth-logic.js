@@ -8,6 +8,18 @@ const EMAIL_VERIFICACION_ACTIVA = true;
 
 import { supabase } from './supabase-client.js';
 
+// Página de arranque (home) a la que se vuelve tras verificar el email
+const HOME_PAGE = 'index.html';
+
+// URL a la que Supabase devuelve al usuario en cualquier flujo por enlace.
+// Producción: https://mercadoscentral.com/ — desarrollo: la URL local actual.
+// Ambas deben estar en Dashboard → Authentication → URL Configuration → Redirect URLs.
+function getEmailRedirectUrl() {
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1';
+    return isLocal ? window.location.origin + '/' : 'https://mercadoscentral.com/';
+}
+
 export function initializeAuthPages() {
     console.log("🔐 initializeAuthPages() iniciando...");
     
@@ -168,7 +180,10 @@ async function handleRegister(e) {
 
         // Metadatos para el trigger on_auth_user_created: la fila de profiles
         // la crea el trigger, NO se inserta aquí
-        const options = { data: { nombre_negocio: nombreNegocio } };
+        const options = {
+            data: { nombre_negocio: nombreNegocio },
+            emailRedirectTo: getEmailRedirectUrl()
+        };
 
         // nombre_completo solo si el formulario lo pide
         const nombreCompleto = document.getElementById('nombre-completo')?.value?.trim();
@@ -203,11 +218,7 @@ async function handleRegister(e) {
                 showVerificationStep({
                     email,
                     formToHide: document.getElementById('register-form'),
-                    onVerified: () => {
-                        // ✅ Redirección directa a panel-unificado.html (flujo actual)
-                        console.log('🔄 Email verificado, redirigiendo a panel-unificado.html...');
-                        window.location.href = 'panel-unificado.html';
-                    }
+                    onVerified: (verifyData) => goHomeAfterVerification(verifyData, { email, password })
                 });
                 return;
             }
@@ -329,7 +340,7 @@ function attachVerifySubmitHandler(panel, { email, codeInput, status, verifyBtn,
         setVerifyStatus(status, 'Verificando código...', 'info');
 
         try {
-            const { data, error } = await supabase.auth.verifyOTP({
+            const { data, error } = await supabase.auth.verifyOtp({
                 email,
                 token: code,
                 type: 'signup'
@@ -361,7 +372,11 @@ async function handleResendCode(email, resendBtn, status) {
 
     try {
         console.log('📨 Reenviando código de confirmación a:', email);
-        const { error } = await supabase.auth.resend({ type: 'signup', email });
+        const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email,
+            options: { emailRedirectTo: getEmailRedirectUrl() }
+        });
 
         if (error) {
             console.error('❌ Error reenviando código:', error.message);
@@ -401,6 +416,44 @@ function startResendCooldown(resendBtn) {
             resendBtn.textContent = label;
         }
     }, 1000);
+}
+
+// Tras verificar el código del registro: asegura que haya sesión guardada y
+// navega SIEMPRE a la home. verifyOtp ya persiste la sesión (localStorage) y
+// dispara onAuthStateChange; aquí solo se espera a que esté leíble antes de
+// navegar, para que la página destino no la lea antes de tiempo.
+async function goHomeAfterVerification(verifyData, { email, password }) {
+    try {
+        let session = verifyData?.session || null;
+
+        if (!session) {
+            const { data: current } = await supabase.auth.getSession();
+            session = current?.session || null;
+        }
+
+        // Respuesta correcta pero sin sesión: iniciarla con las credenciales
+        // del registro (el correo ya está confirmado)
+        if (!session && email && password) {
+            console.warn('⚠️ verifyOtp sin sesión, iniciando sesión con credenciales...');
+            const { data: signInData, error: signInError } =
+                await supabase.auth.signInWithPassword({ email, password });
+            if (signInError) {
+                console.error('❌ No se pudo iniciar sesión tras verificar:', signInError.message);
+            } else {
+                session = signInData?.session || null;
+            }
+        }
+
+        if (session) {
+            // Confirmar que la sesión quedó persistida antes de navegar
+            await supabase.auth.getSession();
+        }
+        console.log(session ? '✅ Sesión lista, yendo a la home' : '⚠️ Sin sesión, yendo a la home de todos modos');
+    } catch (err) {
+        console.error('❌ Error preparando la sesión tras verificar:', err);
+    }
+
+    window.location.href = HOME_PAGE;
 }
 
 function setVerifyStatus(el, message, type) {
