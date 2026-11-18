@@ -72,11 +72,6 @@ async function loadUserProfile() {
                 provinceSelect.add(new Option(profile.provincia, profile.provincia));
             }
             provinceSelect.value = profile.provincia || '';
-            // direccion no es legible por la API (kit: lista blanca por columna);
-            // solo se precarga si el propio SELECT la devuelve, para no borrar al guardar.
-            if (profile.direccion) {
-                document.getElementById('location-address').value = profile.direccion;
-            }
 
             if (profile.url_foto_perfil) {
                 document.getElementById('profile-photo-header').src = profile.url_foto_perfil;
@@ -351,10 +346,11 @@ async function saveProfile(e) {
             tipo_negocio: document.getElementById('business-type').value,
             descripcion: document.getElementById('description').value,
             provincia: document.getElementById('location-province').value,
-            distrito: document.getElementById('location-district').value,
-            direccion: document.getElementById('location-address').value
+            distrito: document.getElementById('location-district').value
         };
 
+        // Nota: 'direccion' no se guarda desde la API (column-grants, migración 0002).
+        // Incluirla provoca 42501 y rechaza todo el upsert.
         const { error } = await supabase
             .from('profiles')
             .upsert(profileData);
@@ -378,8 +374,7 @@ function updateCharCounts() {
         { id: 'phone', max: 20 },
         { id: 'whatsapp', max: 20 },
         { id: 'business-name', max: 100 },
-        { id: 'description', max: 500 },
-        { id: 'location-address', max: 150 }
+        { id: 'description', max: 500 }
     ];
 
     fields.forEach(field => {
@@ -495,7 +490,7 @@ function initializeEventListeners() {
     document.getElementById('profile-photo-input').addEventListener('change', handlePhotoUpload);
 
     // Contador de caracteres
-    const fields = ['full-name', 'phone', 'whatsapp', 'business-name', 'description', 'location-address'];
+    const fields = ['full-name', 'phone', 'whatsapp', 'business-name', 'description'];
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
