@@ -176,6 +176,11 @@ async function handleRegister(e) {
             return;
         }
 
+        if (password.length < 8) {
+            alert('La contraseña debe tener al menos 8 caracteres');
+            return;
+        }
+
         console.log("📧 Intentando registro con:", email);
 
         // Metadatos para el trigger on_auth_user_created: la fila de profiles
@@ -549,8 +554,8 @@ async function handleResetPassword(e) {
             return;
         }
 
-        if (password.length < 6) {
-            alert('La contraseña debe tener al menos 6 caracteres');
+        if (password.length < 8) {
+            alert('La contraseña debe tener al menos 8 caracteres');
             return;
         }
 
