@@ -330,10 +330,22 @@
 /* Los slides son position:absolute (no dan altura al padre):
    en móvil la altura fija es imprescindible */
 @media(max-width:820px){
+  /* Slides apilados en la misma celda de grid y en flujo normal:
+     el contenedor toma la altura del slide más alto (sin recortar el botón) */
   .elite-slider-wrapper{
     height:auto!important;
-    min-height:560px!important;
+    min-height:0!important;
+    display:grid!important;
   }
+  .elite-banner-slide{
+    position:relative!important;
+    inset:auto!important;
+    grid-area:1/1;
+    min-width:0;
+  }
+  /* Espacio inferior para los indicadores de progreso (absolute, bottom:16px) */
+  .elite-banner-content{padding-bottom:40px!important}
+  .elite-progress-indicators{bottom:14px!important}
 }
 /* ============ PUBLICIDAD DEL HERO ============ */
 .hero-ad-badge{
