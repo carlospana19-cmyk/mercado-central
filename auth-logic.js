@@ -177,7 +177,7 @@ async function handleRegister(e) {
         }
 
         if (password.length < 8) {
-            alert('La contraseña debe tener al menos 8 caracteres');
+            showFormError(document.getElementById('register-form'), 'password-register', 'La contraseña debe tener al menos 8 caracteres');
             return;
         }
 
@@ -466,6 +466,33 @@ function setVerifyStatus(el, message, type) {
     el.style.color = type === 'error' ? '#dc2626' : (type === 'ok' ? '#059669' : '');
 }
 
+// Mensaje de error inline para formularios (mismo estilo y mecanismo que
+// #verify-status: <p role="alert"> + setVerifyStatus, sin alert() nativo).
+// El <p> se crea una sola vez, justo antes del botón de envío, y se limpia
+// en cuanto el usuario vuelve a escribir en el campo.
+function showFormError(form, inputId, message) {
+    if (!form) return;
+
+    let status = form.querySelector('.form-inline-error');
+    if (!status) {
+        status = document.createElement('p');
+        status.className = 'form-inline-error';
+        status.setAttribute('role', 'alert');
+        status.style.cssText = 'margin-top:2px;font-size:13.5px;min-height:18px;';
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        form.insertBefore(status, submitBtn || null);
+    }
+
+    setVerifyStatus(status, message, 'error');
+
+    const input = inputId ? document.getElementById(inputId) : null;
+    if (input) {
+        input.focus();
+        input.addEventListener('input', () => setVerifyStatus(status, '', ''), { once: true });
+    }
+}
+
 export async function checkUserLoggedIn() {
     try {
         const currentPath = window.location.pathname;
@@ -555,7 +582,7 @@ async function handleResetPassword(e) {
         }
 
         if (password.length < 8) {
-            alert('La contraseña debe tener al menos 8 caracteres');
+            showFormError(document.getElementById('reset-password-form'), 'password-reset', 'La contraseña debe tener al menos 8 caracteres');
             return;
         }
 
