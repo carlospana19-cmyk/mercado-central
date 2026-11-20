@@ -58,7 +58,7 @@ def optimizar():
         ]
         
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=mensajes,
             temperature=0.1
         )
@@ -92,7 +92,7 @@ def optimizar():
             })
             
     except Exception as e:
-        print(f"❌ ERROR FATAL: {str(e)}")
+        print(f"ERROR FATAL: {str(e)}")
         return jsonify({"error": "Error servidor"}), 500
 
 if __name__ == '__main__':
