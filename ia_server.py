@@ -20,6 +20,14 @@ CORS(app, origins=[
     'https://www.mercadoscentral.com'
 ])
 
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({
+        "ok": True,
+        "modelo": "gpt-4o-mini",
+        "key_set": bool(os.getenv("OPENAI_API_KEY"))
+    })
+
 # Límites por plan
 LIMITS = {
     'free': 0,
@@ -93,7 +101,7 @@ def optimizar():
             
     except Exception as e:
         print(f"ERROR FATAL: {str(e)}")
-        return jsonify({"error": "Error servidor"}), 500
+        return jsonify({"error": "Error servidor", "detalle": str(e)[:300]}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
