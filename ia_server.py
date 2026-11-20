@@ -47,6 +47,18 @@ PROMPTS = {
     'free': "{\"titulo\": \"\", \"descripcion\": \"\"}"
 }
 
+# DEFENSA PARSEO: recupera el JSON aunque venga envuelto en fences ```json ``` o en texto
+def extraer_json(texto):
+    m = re.search(r'\{.*\}', texto, re.DOTALL)
+    return json.loads(m.group(0) if m else texto)
+
+# DEFENSA LIMPIEZA: filtra etiquetas tipo "json:", "titulo:", "descripcion:" al inicio
+def limpiar(texto):
+    if not texto: return ""
+    t = str(texto)
+    t = re.sub(r'(?i)^\s*(json\b|titulo|título|descripcion|descripción)\s*[:\-]?\s*', '', t)
+    return re.sub(r'[^a-zA-Z0-9\s.,!?;:\-áéíóúñÁÉÍÓÚÑ]', '', t).strip()
+
 @app.route('/optimizar', methods=['POST'])
 def optimizar():
     try:  # Capa 1: Seguridad Total
@@ -58,7 +70,7 @@ def optimizar():
         system_prompt = PROMPTS.get(plan, PROMPTS['free'])
         
         # NUEVO MENSAJE CLARO - SIN 'SOLO TEXTO PLANO'
-        user_prompt = f"Optimiza estos campos por separado. Título original: {titulo}. Descripción original: {descripcion}. Devuelve un JSON con las llaves 'titulo' (máx 60 chars) y 'descripcion' (máx 900 chars)."
+        user_prompt = f"Optimiza estos campos por separado. Título original: {titulo}. Descripción original: {descripcion}. Devuelve un JSON con las llaves 'titulo' (máx 60 chars) y 'descripcion' (máx 900 chars). Responde ÚNICAMENTE con el objeto JSON, sin texto antes ni después, sin markdown y sin bloques de código."
         
         mensajes = [
             {"role": "system", "content": system_prompt},
@@ -68,36 +80,37 @@ def optimizar():
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=mensajes,
-            temperature=0.1
+            temperature=0.1,
+            response_format={"type": "json_object"}
         )
         
         respuesta_ia_cruda = response.choices[0].message.content
         
         try:  # Capa 2: Parse JSON
-            resultado = json.loads(respuesta_ia_cruda)
-            
-            def limpiar(texto):
-                if not texto: return ""
-                # Filtro completo tildes + Ñ mayúsc/minúsc
-                return re.sub(r'[^a-zA-Z0-9\s.,!?;:\-áéíóúñÁÉÍÓÚÑ]', '', str(texto))
-            
+            resultado = extraer_json(respuesta_ia_cruda)
+
             titulo_final = limpiar(resultado.get('titulo', ''))[:60]
             desc_final = limpiar(resultado.get('descripcion', ''))[:900]
-            
+
             return jsonify({
                 "titulo": titulo_final.strip(),
                 "descripcion": desc_final.strip(),
                 "usados": 1,
                 "limite": LIMITS.get(plan, 0)
             })
-            
-        except:
-            # Fallback limpio
-            clean_raw = re.sub(r'[^a-zA-Z0-9\s.,!?;:\-áéíóúñÁÉÍÓÚÑ]', '', respuesta_ia_cruda)
-            return jsonify({
-                "titulo": clean_raw[:60].strip(),
-                "descripcion": clean_raw[60:960].strip()
-            })
+
+        except Exception:
+            # DEFENSA FALLBACK: nunca volcar prosa cruda al formulario
+            m_t = re.search(r'(?i)titulo\s*[:\-]\s*(.+?)(?=\s*descripcion|descripción\s*[:\-]|$)', respuesta_ia_cruda, re.DOTALL)
+            m_d = re.search(r'(?i)(?:descripcion|descripción)\s*[:\-]\s*(.+)$', respuesta_ia_cruda, re.DOTALL)
+            if m_t and m_d:
+                return jsonify({
+                    "titulo": limpiar(m_t.group(1))[:60],
+                    "descripcion": limpiar(m_d.group(1))[:900],
+                    "usados": 1,
+                    "limite": LIMITS.get(plan, 0)
+                })
+            return jsonify({"error": "IA no pudo formatear la respuesta, intenta de nuevo"}), 502
             
     except Exception as e:
         print(f"ERROR FATAL: {str(e)}")
