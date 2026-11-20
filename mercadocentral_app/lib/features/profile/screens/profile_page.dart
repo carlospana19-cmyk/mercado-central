@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/services/profile_photo_service.dart';
 import '../../../core/utils/session_guard.dart';
 import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
@@ -20,6 +21,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final _client = Supabase.instance.client;
   late Future<_ProfileOverview> _overview;
+  bool _subiendoFoto = false;
 
   @override
   void initState() {
@@ -27,12 +29,14 @@ class _ProfilePageState extends State<ProfilePage> {
     _overview = _loadOverview();
   }
 
-  // Columnas explícitas: select('*') lanza 42501 "permission denied" cuando la
-  // sesión está muerta (el rol anon solo tiene concedidas algunas columnas).
+  // Columnas explícitas (las MISMAS que consulta la web en
+  // panel-unificado-logic.js): la tabla profiles tiene column-grants
+  // (migración 0002) y select('*') — o pedir una columna sin grant como
+  // email — lanza 42501 aunque la sesión sea válida. El email se muestra
+  // desde auth (user.email), igual que hace la web.
   static const String _profileColumns =
       'id, nombre_completo, nombre_negocio, url_foto_perfil, telefono, '
-      'whatsapp, email, tipo_negocio, descripcion, provincia, distrito, '
-      'created_at';
+      'whatsapp, tipo_negocio, descripcion, provincia, distrito, created_at';
 
   Future<_ProfileOverview> _loadOverview() async {
     // Blindaje: con sesión muerta (token no renovable) el guard la limpia y
@@ -296,9 +300,12 @@ class _ProfilePageState extends State<ProfilePage> {
             user?.userMetadata?['name'] ??
             'Usuario')
         .toString();
+    // La web muestra 'Cuenta Personal' cuando no hay nombre de negocio
+    // (panel-unificado-logic.js: nombre_negocio || 'Cuenta Personal').
     final business = (profile['nombre_negocio'] ?? '').toString().trim();
     final phone = (profile['telefono'] ?? '').toString().trim();
-    final email = (profile['email'] ?? user?.email ?? '').toString().trim();
+    final whatsapp = (profile['whatsapp'] ?? '').toString().trim();
+    final email = (user?.email ?? '').toString().trim();
     final photo = profile['url_foto_perfil']?.toString();
 
     return Container(
@@ -310,15 +317,53 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 34,
-            backgroundColor: const Color(0xFFF1F3F5),
-            backgroundImage:
-                photo == null || photo.isEmpty ? null : NetworkImage(photo),
-            child: photo == null || photo.isEmpty
-                ? const Icon(Icons.person_outline,
-                    size: 34, color: Mc.grisSuave)
-                : null,
+          // Foto con botón de cámara (paridad con el header de la web: la
+          // foto se cambia directo desde el panel, sin abrir el formulario).
+          GestureDetector(
+            onTap: _subiendoFoto ? null : _cambiarFoto,
+            child: SizedBox(
+              width: 68,
+              height: 68,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 34,
+                    backgroundColor: const Color(0xFFF1F3F5),
+                    backgroundImage: photo == null || photo.isEmpty
+                        ? null
+                        : NetworkImage(photo),
+                    child: photo == null || photo.isEmpty
+                        ? const Icon(Icons.person_outline,
+                            size: 34, color: Mc.grisSuave)
+                        : null,
+                  ),
+                  Positioned(
+                    right: -2,
+                    bottom: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Mc.naranja,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: _subiendoFoto
+                          ? const SizedBox(
+                              width: 11,
+                              height: 11,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.photo_camera,
+                              size: 12, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -335,13 +380,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (business.isNotEmpty)
-                  Text(
-                    business,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Mc.grisSuave),
-                  ),
+                Text(
+                  business.isNotEmpty ? business : 'Cuenta Personal',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Mc.grisSuave),
+                ),
                 if (email.isNotEmpty)
                   Text(
                     email,
@@ -360,6 +404,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontSize: 12,
                     ),
                   ),
+                if (whatsapp.isNotEmpty)
+                  Text(
+                    'WhatsApp: $whatsapp',
+                    style: const TextStyle(
+                      color: Mc.grisSuave,
+                      fontSize: 12,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -369,6 +421,39 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: const Icon(Icons.edit_outlined, color: Mc.naranja),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Cambia la foto directo desde el panel (paridad con el botón de cámara
+  /// del header de la web): hoja Cámara/Galería → subida al mismo bucket y
+  /// ruta que la web → refresh del panel.
+  Future<void> _cambiarFoto() async {
+    final source = await ProfilePhotoService.seleccionarOrigen(context);
+    if (source == null || !mounted) return;
+
+    setState(() => _subiendoFoto = true);
+    try {
+      final url =
+          await ProfilePhotoService.cambiarFoto(_client, source: source);
+      if (!mounted) return;
+      if (url != null) {
+        _aviso('Foto de perfil actualizada.');
+        await _refresh();
+      }
+    } on ProfilePhotoException catch (error) {
+      if (mounted) _aviso(error.mensaje, isError: true);
+    } finally {
+      if (mounted) setState(() => _subiendoFoto = false);
+    }
+  }
+
+  void _aviso(String mensaje, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: isError ? Colors.red : null,
       ),
     );
   }

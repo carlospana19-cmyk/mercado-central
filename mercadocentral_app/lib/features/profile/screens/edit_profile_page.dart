@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/services/profile_photo_service.dart';
 import '../../../core/utils/location_helper.dart';
 import '../../../theme/mc_colores.dart';
 
@@ -14,7 +14,6 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _client = Supabase.instance.client;
-  final _picker = ImagePicker();
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -30,13 +29,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool _saving = false;
   bool _uploadingPhoto = false;
 
-  static const _businessTypes = [
-    'Persona Natural',
-    'Tienda',
-    'Negocio',
-    'Empresa',
-    'Otro',
-  ];
+  // Columnas EXPLÍCITAS (paridad con loadUserProfile de la web): la tabla
+  // profiles tiene column-grants (migración 0002) y select('*') lanza 42501
+  // aunque la sesión sea válida — por eso el formulario cargaba vacío.
+  static const String _profileColumns = 'id, nombre_completo, nombre_negocio, '
+      'url_foto_perfil, telefono, whatsapp, tipo_negocio, descripcion, '
+      'provincia, distrito';
+
+  // Valores CANÓNICOS de la web (select business-type de
+  // panel-unificado.html): mismos 5, mismo formato, para que app y web
+  // concuerden en la columna tipo_negocio de la BD.
+  static const Map<String, String> _businessTypes = {
+    'persona-natural': 'Persona Natural',
+    'tienda': 'Tienda',
+    'negocio': 'Negocio',
+    'empresa': 'Empresa',
+    'otro': 'Otro',
+  };
+
+  /// Normaliza el valor guardado al canónico de la web: minúsculas y guion
+  /// (legacy de la app: 'Persona Natural' → 'persona-natural').
+  static String _normalizarTipoNegocio(String? raw) {
+    final value = (raw ?? '').trim().toLowerCase().replaceAll(' ', '-');
+    return _businessTypes.containsKey(value) ? value : '';
+  }
 
   @override
   void initState() {
@@ -65,19 +81,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       final profile = await _client
           .from('profiles')
-          .select('*')
+          .select(_profileColumns)
           .eq('id', user.id)
           .maybeSingle();
       if (!mounted) return;
 
-      _emailController.text =
-          (profile?['email'] ?? user.email ?? '').toString();
+      // Email de AUTENTICACIÓN: la web lo muestra disabled con la nota
+      // "No se puede cambiar desde aquí" y jamás lo consulta en profiles.
+      _emailController.text = (user.email ?? '').toString();
       if (profile != null) {
         _nameController.text = (profile['nombre_completo'] ?? '').toString();
         _phoneController.text = (profile['telefono'] ?? '').toString();
         _whatsappController.text = (profile['whatsapp'] ?? '').toString();
         _businessController.text = (profile['nombre_negocio'] ?? '').toString();
-        _businessType = (profile['tipo_negocio'] ?? '').toString();
+        _businessType =
+            _normalizarTipoNegocio(profile['tipo_negocio']?.toString());
         _descriptionController.text = (profile['descripcion'] ?? '').toString();
         _photoUrl = profile['url_foto_perfil']?.toString();
         final province = profile['provincia']?.toString();
@@ -100,34 +118,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final user = _client.auth.currentUser;
     if (user == null) return;
 
-    final image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (image == null || !mounted) return;
+    // Cámara o galería (misma elección que ofrece la web en el móvil).
+    final source = await ProfilePhotoService.seleccionarOrigen(context);
+    if (source == null || !mounted) return;
 
     setState(() => _uploadingPhoto = true);
     try {
-      final extension = image.name.contains('.')
-          ? image.name.split('.').last.toLowerCase()
-          : 'jpg';
-      final path =
-          '${user.id}/profile-${DateTime.now().millisecondsSinceEpoch}.$extension';
-      await _client.storage
-          .from('imagenes_anuncios')
-          .uploadBinary(path, await image.readAsBytes());
       final photoUrl =
-          _client.storage.from('imagenes_anuncios').getPublicUrl(path);
-      await _client.from('profiles').upsert({
-        'id': user.id,
-        'url_foto_perfil': photoUrl,
-      });
-      if (mounted) {
+          await ProfilePhotoService.cambiarFoto(_client, source: source);
+      if (!mounted) return;
+      if (photoUrl != null) {
         setState(() => _photoUrl = photoUrl);
         _showMessage('Foto de perfil actualizada.');
       }
-    } catch (error) {
-      _showMessage('No se pudo subir la foto: $error', isError: true);
+    } on ProfilePhotoException catch (error) {
+      _showMessage(error.mensaje, isError: true);
     } finally {
       if (mounted) setState(() => _uploadingPhoto = false);
     }
@@ -143,17 +148,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     setState(() => _saving = true);
     try {
+      // MISMO upsert que saveProfile de la web (panel-unificado-logic.js):
+      // SIN email (lo maneja auth; incluirlo lanza 42501 por column-grants
+      // y rechaza el guardado completo) y SIN direccion. Provincia y
+      // distrito van como texto ('' si no se eligió), igual que el select
+      // de la web.
       await _client.from('profiles').upsert({
         'id': user.id,
-        'email': _emailController.text.trim(),
         'nombre_completo': _nameController.text.trim(),
         'telefono': _phoneController.text.trim(),
         'whatsapp': _whatsappController.text.trim(),
         'nombre_negocio': _businessController.text.trim(),
         'tipo_negocio': _businessType,
         'descripcion': _descriptionController.text.trim(),
-        'provincia': _province,
-        'distrito': _district,
+        'provincia': _province ?? '',
+        'distrito': _district ?? '',
         if (_photoUrl != null) 'url_foto_perfil': _photoUrl,
       });
       if (!mounted) return;
@@ -277,19 +286,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _emailController,
+                    readOnly: true,
                     keyboardType: TextInputType.emailAddress,
                     textCapitalization: TextCapitalization.none,
-                    autofillHints: const [AutofillHints.email],
-                    decoration: _decoration('Correo electrónico de contacto'),
-                    validator: (value) {
-                      final email = value?.trim() ?? '';
-                      if (email.isNotEmpty &&
-                          !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-                              .hasMatch(email)) {
-                        return 'Ingresa un correo electrónico válido.';
-                      }
-                      return null;
-                    },
+                    decoration: _decoration(
+                      'Correo electrónico',
+                      hint: 'Tu email',
+                    ).copyWith(helperText: 'No se puede cambiar desde aquí'),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -313,14 +316,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _businessTypes.contains(_businessType)
-                        ? _businessType
-                        : null,
+                    initialValue: _businessType.isEmpty
+                        ? null
+                        : _businessType,
                     decoration: _decoration('Tipo de negocio'),
-                    items: _businessTypes
-                        .map((type) => DropdownMenuItem(
-                              value: type,
-                              child: Text(type),
+                    items: _businessTypes.entries
+                        .map((entry) => DropdownMenuItem(
+                              value: entry.key,
+                              child: Text(entry.value),
                             ))
                         .toList(),
                     onChanged: (value) =>
