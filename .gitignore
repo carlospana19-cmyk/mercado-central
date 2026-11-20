@@ -13,6 +13,13 @@ kit-ajustes-ui\ /
 # ===== Carpetas temporales accidentales =====
 15
 4
+# ===== Carpetas temporales accidentales =====
+15
+4
+
+# ===== Logs del servidor IA local =====
+ia_server.log
+ia_server.err.log
 
 # ===== Archivos generados por Flutter (se regeneran con flutter pub get) =====
 **/GeneratedPluginRegistrant.*

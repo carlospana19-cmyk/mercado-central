@@ -1972,7 +1972,11 @@ if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0
 
             // Fetch Python IA
             try {
-const response = await fetch('http://127.0.0.1:5001/optimizar', {
+                const IA_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://127.0.0.1:5001'
+                    : 'https://mercado-central-9yqf.onrender.com';
+
+                const response = await fetch(`${IA_URL}/optimizar`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
