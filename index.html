@@ -10,7 +10,7 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <meta name="description" content="Compra, vende y publica gratis en Panamá: bienes raíces, vehículos, tecnología, hogar y más. Tu comunidad, tu mercado.">
+    <meta name="description" content="Compra, vende y publica gratis en Panamá: bienes raíces, vehículos, tecnología, hogar y más. La plataforma que reúne muchos mercados.">
     <meta property="og:title" content="Mercados Central — Anuncios clasificados en Panamá">
     <meta property="og:description" content="Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.">
     <meta property="og:image" content="https://www.mercadoscentral.com/logo-mercado-central.png">
@@ -31,7 +31,7 @@
 
     <!-- CSS NUEVO (Fase 1) — los viejos style/cards/home.css NO se tocan todavía -->
     <link rel="stylesheet" href="mc-base.css?v=26">
-    <link rel="stylesheet" href="mc-home.css?v=31">
+    <link rel="stylesheet" href="mc-home.css?v=32">
     <link rel="stylesheet" href="mc-tarjeta-2026.css?v=4">
 </head>
 <body id="index-page">
@@ -39,12 +39,24 @@
     <!-- NAVBAR (componente dinámico — sin cambios) -->
     <div id="navbar-container"></div>
 
-    <!-- HERO (FASE 1-D: imagen única a pantalla completa, sin carrusel ni puntos) -->
+    <!-- HERO (FASE 1-E: carrusel de 2 láminas con crossfade, paridad con la APK.
+         El carrusel aplica SOLO en el estado "sin avisos activos": si hero-ads.js
+         trae publicidad, los avisos reemplazan ambas láminas vía #hero-slides) -->
     <section class="hero-search hero-full">
-        <img class="hero-fondo" src="mercadocentral_app/assets/images/hero-portada.jpg" alt="Casa moderna en venta, portada de Mercados Central">
+        <div class="hero-fondo-carrusel">
+            <img class="hero-fondo is-activa" src="mercadocentral_app/assets/images/hero-portada.jpg" alt="Casa moderna en venta, portada de Mercados Central">
+            <img class="hero-fondo" src="mercadocentral_app/assets/images/hero-tarjetas.jpg" alt="Anuncios clasificados cerca de ti, Mercados Central">
+        </div>
+        <!-- PUBLICIDAD DEL HERO (hero-ads.js): oculto hasta que haya avisos activos -->
+        <div class="hero-carousel">
+            <div class="hero-swiper swiper">
+                <div class="swiper-wrapper" id="hero-slides"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
         <div class="hero-content">
             <div class="hero-text-content">
-                <h1 class="hero-title-animated">Tu comunidad, <span class="highlight-text">tu mercado</span></h1>
+                <h1 class="hero-title-animated" id="hero-titulo">La plataforma que reúne <span class="highlight-text">muchos mercados</span></h1>
                 <p class="hero-subtitle">El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.</p>
                 <div class="hero-acciones">
                     <a href="#products" class="btn-hero-explorar">Explorar anuncios</a>

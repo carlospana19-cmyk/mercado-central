@@ -44,6 +44,9 @@ h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.15}
 .logo-text .logo-dot,.mc-wordmark .logo-dot{position:absolute;left:50%;top:.62em;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background-color:var(--accion-500,#FA6406)}
 /* Wordmark reutilizable "Mercado·ˢ Central" (footer, copyright, etc.): hereda tamaño y color del contexto */
 .mc-wordmark{font-weight:700;text-transform:none!important;letter-spacing:normal!important;white-space:nowrap}
+/* Marca como texto: "Mercados" naranja (misma que botones/highlight) + "Central" tinta.
+   La "s" es letra normal, sin superíndice. Tamaño 20px y peso 700 los define .logo-text (sin cambio). */
+.logo-brand{color:var(--orange-500)}
 .buttons-nav{display:flex;align-items:center;gap:10px}
 .buttons-nav button{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;border-radius:10px;font-weight:600;font-size:14.5px;white-space:nowrap;transition:all .2s}
 .buttons-nav button i{font-size:15px}

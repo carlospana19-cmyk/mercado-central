@@ -50,7 +50,9 @@ class _HeroBannerState extends State<HeroBanner> {
   static const List<Map<String, String>> _laminasLocales = [
     {
       'imagen': 'assets/images/hero-portada.jpg',
-      'titulo': 'Tu comunidad, tu mercado',
+      'titulo': 'La plataforma que reúne muchos mercados',
+      // Frase resaltada en naranja (paridad con la web: .highlight-text).
+      'resaltar': 'muchos mercados',
       'subtitulo': 'Anuncios reales de vecinos y negocios cerca de ti.',
     },
     {
@@ -247,16 +249,7 @@ class _HeroBannerState extends State<HeroBanner> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                lamina['titulo']!,
-                maxLines: 2,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  height: 1.15,
-                ),
-              ),
+              _tituloLamina(lamina),
               const SizedBox(height: 3),
               Text(
                 lamina['subtitulo']!,
@@ -273,6 +266,38 @@ class _HeroBannerState extends State<HeroBanner> {
           ),
         ),
       ],
+    );
+  }
+
+  /// Título de la lámina: resalta en naranja la frase marcada
+  /// ('muchos mercados' en la lámina 1, igual que .highlight-text en la web).
+  Widget _tituloLamina(Map<String, String> lamina) {
+    final titulo = lamina['titulo']!;
+    final resaltar = lamina['resaltar'];
+    const base = TextStyle(
+      color: Colors.white,
+      fontSize: 17,
+      fontWeight: FontWeight.bold,
+      height: 1.15,
+    );
+    if (resaltar == null || !titulo.contains(resaltar)) {
+      return Text(titulo, maxLines: 2, style: base);
+    }
+    final i = titulo.indexOf(resaltar);
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: titulo.substring(0, i)),
+          TextSpan(
+            text: resaltar,
+            style: const TextStyle(color: Mc.naranja),
+          ),
+          if (i + resaltar.length < titulo.length)
+            TextSpan(text: titulo.substring(i + resaltar.length)),
+        ],
+      ),
+      maxLines: 2,
+      style: base,
     );
   }
 

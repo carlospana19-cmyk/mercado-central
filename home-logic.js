@@ -763,8 +763,61 @@ const getVideoEmbedUrl = (videoUrl) => {
 
 // ✅ generateAttributesHTML importada desde utils-attributes.js
 
-// Función para inicializar el carrusel del hero
+// =====================================================
+// HERO CARRUSEL WEB (2 láminas, paridad con la APK)
+// Crossfade CSS + timer de ~6s por lámina, loop infinito,
+// título sincronizado con la foto (swap de innerHTML).
+// SOLO aplica en el estado "sin avisos activos": cuando
+// hero-ads.js trae publicidad, loadFeaturedAds() agrega la
+// clase 'has-paid-ad' al hero y el carrusel se detiene
+// (los avisos reemplazan ambas láminas).
+// =====================================================
 function initializeHeroCarousel() {
+    const hero = document.querySelector('.hero-search.hero-full');
+    if (!hero) return;
+
+    const fondos = hero.querySelectorAll('.hero-fondo-carrusel .hero-fondo');
+    const titulo = document.getElementById('hero-titulo');
+    if (fondos.length < 2) return;
+
+    const titulos = [
+        'La plataforma que reúne <span class="highlight-text">muchos mercados</span>',
+        'Esto ya se vende cerca de ti'
+    ];
+
+    let lamina = 0;
+    let timerId = null;
+
+    const detener = () => {
+        if (timerId) { clearInterval(timerId); timerId = null; }
+    };
+    const mostrarLamina = (i) => {
+        fondos.forEach((img, idx) => img.classList.toggle('is-activa', idx === i));
+        if (titulo) titulo.innerHTML = titulos[i % titulos.length];
+    };
+    const tick = () => {
+        // Con publicidad del hero activa, los avisos mandan: detener el carrusel.
+        if (hero.classList.contains('has-paid-ad')) { detener(); return; }
+        lamina = (lamina + 1) % fondos.length;
+        mostrarLamina(lamina);
+    };
+
+    // Si la publicidad ya tomó el hero, no iniciar nunca.
+    if (!hero.classList.contains('has-paid-ad')) {
+        timerId = setInterval(tick, 6000);
+    }
+
+    // El estado puede cambiar al cargar (hero-ads.js con avisos activos):
+    // observar la clase del hero para cancelar el timer en cuanto ocurra.
+    new MutationObserver(() => {
+        if (hero.classList.contains('has-paid-ad')) detener();
+    }).observe(hero, { attributes: true, attributeFilter: ['class'] });
+}
+
+// CARRUSEL LEGACY por categoría (imagen única, FASE 1-D): desactivado.
+// Ya no se llama desde initializeHomePage(); el código queda como función
+// no referenciada para no alterar el historial del archivo.
+function initializeHeroCarouselLegacy() {
     const heroSlidesContainer = document.getElementById('hero-slides');
     if (!heroSlidesContainer) {
         console.warn('Contenedor de slides del hero no encontrado');
