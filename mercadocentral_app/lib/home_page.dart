@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mercadocentral_app/core/services/busqueda_visual_service.dart';
 import 'package:mercadocentral_app/theme/mc_colores.dart';
 import 'package:mercadocentral_app/features/home/widgets/featured_ads.dart';
 import 'package:mercadocentral_app/features/home/widgets/hero_banner.dart';
@@ -264,9 +267,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     colors: [Mc.naranja, Mc.naranja.withValues(alpha: 0.05)],
                   ),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: HeroBanner(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: HeroBanner(
+                    onExplorarAnuncios: _explorarAnuncios,
+                    onPublicarGratis: () => setState(() => _selectedIndex = 2),
+                  ),
                 ),
               ),
 
@@ -366,7 +372,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   // 🚀 BUSCADOR CONEXIÓN REAL
-  // 🚀 BUSCADOR CONEXIÓN REAL
   Widget _buildSearchBubble() {
     return GestureDetector(
       onTap: _openSearch,
@@ -377,22 +382,156 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            SizedBox(width: 20),
-            Expanded(
+            const SizedBox(width: 20),
+            const Expanded(
               child: Text(
                 'Buscar en Mercados Central',
                 style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
             ),
-            Padding(
+            // 📷 Búsqueda visual IA (busqueda-visual.js de la web): el botón
+            // de cámara vive DENTRO del campo, a la derecha, siempre visible.
+            GestureDetector(
+              onTap: _buscarConFoto,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                child: Icon(
+                  Icons.photo_camera_outlined,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            const Padding(
               padding: EdgeInsets.only(right: 16),
               child: Icon(Icons.search, color: Colors.grey),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// CTA "Explorar anuncios" del hero: el listado con filtros (el
+  /// equivalente a resultados.html sin query en la web).
+  void _explorarAnuncios() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ResultadosBusquedaPage()),
+    );
+  }
+
+  /// Búsqueda visual IA (busqueda-visual.js de la web): cámara → foto
+  /// comprimida (máx 1024 px, JPEG 0.8, máx 5 MB) → Edge Function en
+  /// producción `busqueda-visual` (la MISMA de la web, sin endpoints
+  /// nuevos) → el texto y la categoría devueltos rellenan el buscador y
+  /// disparan la búsqueda automáticamente.
+  Future<void> _buscarConFoto() async {
+    // Límite diario ANTES de abrir la cámara: bloquea en el uso 16.
+    if (await BusquedaVisualService.limiteAlcanzado()) {
+      _mostrarMensaje(
+          'Llegaste al límite diario de búsquedas por foto. Intenta mañana.');
+      return;
+    }
+
+    XFile? foto;
+    try {
+      // Paridad con la web: máx 1024 px de lado y JPEG calidad 0.8.
+      foto = await ImagePicker().pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+    } catch (_) {
+      _mostrarMensaje(
+          'No pudimos abrir la cámara. Revisa los permisos de la app.');
+      return;
+    }
+    if (foto == null || !mounted) return; // el usuario cerró la cámara
+
+    final bytes = await foto.readAsBytes();
+    if (!mounted) return;
+    if (bytes.length > BusquedaVisualService.maxBytesFoto) {
+      _mostrarMensaje(
+          'La foto es demasiado grande. Intenta con otra más ligera.');
+      return;
+    }
+    // dataURL JPEG que espera la Edge Function (data:image/jpeg;base64,...).
+    final dataUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+
+    // Spinner durante el proceso (overlay "Analizando tu foto…" de la web);
+    // la llamada a la IA tiene timeout de 20 s.
+    _mostrarOverlayAnalizando();
+
+    final ResultadoVisual resultado;
+    try {
+      resultado = await BusquedaVisualService.analizarFoto(dataUrl);
+    } on BusquedaVisualException catch (e) {
+      if (mounted) _cerrarOverlay(e.mensaje);
+      return;
+    } catch (_) {
+      if (mounted) {
+        _cerrarOverlay('No se pudo analizar la foto. Intenta con otra.');
+      }
+      return;
+    }
+    if (!mounted) return;
+    _cerrarOverlay();
+
+    // Uso contado solo cuando la IA respondió bien (igual que la web).
+    await BusquedaVisualService.contarBusqueda();
+    if (!mounted) return;
+
+    // Rellenar el texto + preseleccionar la categoría devuelta + ejecutar
+    // la búsqueda automáticamente: la pantalla de resultados recibe
+    // queryInicial (campo de texto relleno) y categoriaInicial (filtro
+    // preseleccionado) y carga los resultados al abrir — el mismo flujo
+    // que la web al navegar a resultados.html?q=<texto>&category=<cat>.
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ResultadosBusquedaPage(
+          queryInicial: resultado.textoBusqueda,
+          categoriaInicial: resultado.categoria,
+        ),
+      ),
+    );
+  }
+
+  /// Overlay con spinner mientras la IA analiza (igual que la web).
+  void _mostrarOverlayAnalizando() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Dialog(
+        backgroundColor: Colors.transparent,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: Colors.white),
+              SizedBox(height: 14),
+              Text(
+                'Analizando tu foto…',
+                style: TextStyle(color: Colors.white, fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Cierra el overlay del análisis y, si trae mensaje, lo muestra.
+  void _cerrarOverlay([String? mensaje]) {
+    Navigator.of(context, rootNavigator: true).pop();
+    if (mensaje != null && mensaje.isNotEmpty) _mostrarMensaje(mensaje);
+  }
+
+  void _mostrarMensaje(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensaje)),
     );
   }
 

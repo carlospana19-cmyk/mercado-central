@@ -1,39 +1,67 @@
 import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../../core/services/hero_ads_service.dart';
+import '../../../theme/mc_colores.dart';
 
 class HeroBanner extends StatefulWidget {
-  const HeroBanner({super.key});
+  const HeroBanner({
+    super.key,
+    required this.onExplorarAnuncios,
+    required this.onPublicarGratis,
+  });
+
+  /// CTA "Explorar anuncios" de la lámina 1: abre el listado de anuncios.
+  final VoidCallback onExplorarAnuncios;
+
+  /// CTA "Publicar gratis" (ambas láminas): lleva a la pestaña Publicar.
+  final VoidCallback onPublicarGratis;
 
   @override
   State<HeroBanner> createState() => _HeroBannerState();
 }
 
 class _HeroBannerState extends State<HeroBanner> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+  // Punto de partida virtual DEBE ser múltiplo de las láminas locales (2):
+  // así el loop infinito arranca en la lámina 0 aunque el total cambie
+  // cuando carguen los avisos patrocinados.
+  static const int _inicioVirtual = 4000;
+
+  // Autoplay ~6 s (la web usa 4-5 s con disableOnInteraction: false).
+  static const Duration _intervalo = Duration(seconds: 6);
+
+  final PageController _pageController =
+      PageController(initialPage: _inicioVirtual);
   Timer? _timer;
   List<HeroAd> _ads = [];
 
-  // Se muestran cuando no hay publicidad activa en hero-ads.js (igual que la web).
-  final List<Map<String, String>> _defaultBanners = [
+  // Índice VIRTUAL actual dentro del PageView infinito (loop).
+  int _paginaVirtual = _inicioVirtual;
+
+  // Índice real (0..total-1) para el indicador de puntos.
+  int _pagina = 0;
+
+  // Láminas locales: el estado "sin avisos" (igual que la web cuando
+  // hero-ads.js no trae publicidad activa). Cada lámina lleva su propio
+  // título, subtítulo y CTA.
+  static const List<Map<String, String>> _laminasLocales = [
     {
-      'image':
-          'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800',
-      'title': '¡Destaca tu Auto Aquí!',
-      'subtitle': 'Llega a más de 50,000 personas hoy.',
+      'imagen': 'assets/images/hero-portada.jpg',
+      'titulo': 'Tu comunidad, tu mercado',
+      'subtitulo': 'Anuncios reales de vecinos y negocios cerca de ti.',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800',
-      'title': 'Bienes Raíces en Panamá',
-      'subtitle': 'Las mejores propiedades en un solo lugar.',
+      'imagen': 'assets/images/hero-tarjetas.jpg',
+      'titulo': 'Esto ya se vende cerca de ti',
+      'subtitulo': 'Publica lo que ya no usas en minutos.',
     },
   ];
 
-  int get _count => _ads.isNotEmpty ? _ads.length : _defaultBanners.length;
+  int get _totalLaminas =>
+      _ads.isNotEmpty ? _ads.length : _laminasLocales.length;
 
   @override
   void initState() {
@@ -47,17 +75,18 @@ class _HeroBannerState extends State<HeroBanner> {
     if (!mounted || ads.isEmpty) return;
     setState(() {
       _ads = ads;
-      _currentPage = 0;
+      _paginaVirtual = _inicioVirtual;
+      _pagina = 0;
     });
-    if (_pageController.hasClients) _pageController.jumpToPage(0);
+    if (_pageController.hasClients) _pageController.jumpToPage(_inicioVirtual);
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (!_pageController.hasClients || _count < 2) return;
-      _currentPage = (_currentPage + 1) % _count;
+    _timer = Timer.periodic(_intervalo, (_) {
+      if (!_pageController.hasClients || _totalLaminas < 2) return;
+      _paginaVirtual += 1;
       _pageController.animateToPage(
-        _currentPage,
+        _paginaVirtual,
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeInOutQuart,
       );
@@ -79,26 +108,65 @@ class _HeroBannerState extends State<HeroBanner> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 180,
+      // itemCount null = carrusel con loop infinito (swipe manual incluido).
       child: PageView.builder(
         controller: _pageController,
-        itemCount: _count,
-        onPageChanged: (index) => _currentPage = index,
-        itemBuilder: (context, index) => Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
+        onPageChanged: (index) => setState(() {
+          _paginaVirtual = index;
+          _pagina = index % _totalLaminas;
+        }),
+        itemBuilder: (context, index) {
+          final real = index % _totalLaminas;
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                _ads.isNotEmpty
+                    ? _sponsoredSlide(_ads[real])
+                    : _laminaLocal(_laminasLocales[real], real),
+                _puntos(),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Indicador de puntos del carrusel (activo = pastilla alargada).
+  Widget _puntos() {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 8,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(
+          _totalLaminas,
+          (i) => AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: i == _pagina ? 16 : 6,
+            height: 6,
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            decoration: BoxDecoration(
+              color: i == _pagina
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(3),
+            ),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: _ads.isNotEmpty
-              ? _sponsoredSlide(_ads[index])
-              : _defaultSlide(_defaultBanners[index]),
         ),
       ),
     );
@@ -137,7 +205,7 @@ class _HeroBannerState extends State<HeroBanner> {
             child: ElevatedButton(
               onPressed: () => _open(ad.link!),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF8A3D),
+                backgroundColor: Mc.naranja,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
               ),
@@ -148,41 +216,110 @@ class _HeroBannerState extends State<HeroBanner> {
     );
   }
 
-  Widget _defaultSlide(Map<String, String> banner) {
+  /// Lámina local con foto propia, scrim bajo el texto y sus CTA.
+  Widget _laminaLocal(Map<String, String> lamina, int index) {
     return Stack(
+      fit: StackFit.expand,
       children: [
-        CachedNetworkImage(
-          imageUrl: banner['image']!,
+        Image.asset(
+          lamina['imagen']!,
           fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          color: Colors.black.withValues(alpha: 0.3),
-          colorBlendMode: BlendMode.darken,
-          placeholder: (_, __) => Container(color: Colors.black12),
-          errorWidget: (_, __, ___) => Container(color: Colors.black12),
+          errorBuilder: (_, __, ___) => Container(color: Colors.black12),
+        ),
+        // Scrim (gradiente suave) bajo el texto en AMBAS láminas: la lámina
+        // 2 es clara y el texto blanco no se leería sin él.
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.55),
+              ],
+              stops: const [0.45, 1.0],
+            ),
+          ),
         ),
         Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                banner['title']!,
+                lamina['titulo']!,
+                maxLines: 2,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
+                  height: 1.15,
                 ),
               ),
+              const SizedBox(height: 3),
               Text(
-                banner['subtitle']!,
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                lamina['subtitulo']!,
+                maxLines: 2,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
+              const SizedBox(height: 10),
+              Wrap(spacing: 8, runSpacing: 6, children: _ctasDeLamina(index)),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  /// CTAs propios de cada lámina local: la 1 lleva dos, la 2 solo uno.
+  List<Widget> _ctasDeLamina(int index) => switch (index) {
+        0 => [
+            _ctaSecundario('Explorar anuncios', widget.onExplorarAnuncios),
+            _ctaPrimario('Publicar gratis', widget.onPublicarGratis),
+          ],
+        _ => [_ctaPrimario('Publicar gratis', widget.onPublicarGratis)],
+      };
+
+  Widget _ctaPrimario(String texto, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Mc.naranja,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(0, 34),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+      ),
+      child: Text(
+        texto,
+        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  Widget _ctaSecundario(String texto, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Mc.textoListas,
+        minimumSize: const Size(0, 34),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+      ),
+      child: Text(
+        texto,
+        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+      ),
     );
   }
 }

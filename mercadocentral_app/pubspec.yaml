@@ -36,6 +36,8 @@ flutter:
 
   assets:
     - assets/images/logo-mercado-central.jpeg
+    - assets/images/hero-portada.jpg
+    - assets/images/hero-tarjetas.jpg
     - assets/images/google_g.svg
     - assets/images/categorias/
 
