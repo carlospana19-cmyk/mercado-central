@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../core/utils/session_guard.dart';
+import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
 import '../../chat/screens/chat_page.dart';
 import '../../favorites/screens/favorites_page.dart';
@@ -24,30 +27,93 @@ class _ProfilePageState extends State<ProfilePage> {
     _overview = _loadOverview();
   }
 
+  // Columnas explícitas: select('*') lanza 42501 "permission denied" cuando la
+  // sesión está muerta (el rol anon solo tiene concedidas algunas columnas).
+  static const String _profileColumns =
+      'id, nombre_completo, nombre_negocio, url_foto_perfil, telefono, '
+      'whatsapp, email, tipo_negocio, descripcion, provincia, distrito, '
+      'created_at';
+
   Future<_ProfileOverview> _loadOverview() async {
+    // Blindaje: con sesión muerta (token no renovable) el guard la limpia y
+    // la app muestra el panel de "Iniciar sesión" en lugar de consultar como
+    // anon (que produce 42501 y pantallas vacías).
+    final sessionOk = await SessionGuard.ensureFresh(_client);
     final user = _client.auth.currentUser;
-    if (user == null) {
+    if (!sessionOk || user == null) {
       return const _ProfileOverview(profile: {}, total: 0, active: 0, sold: 0);
     }
 
-    final profileResult = await _client
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-    final adsResult =
-        await _client.from('anuncios').select('is_sold').eq('user_id', user.id);
-    final profile = profileResult == null
-        ? <String, dynamic>{}
-        : Map<String, dynamic>.from(profileResult);
-    final ads = List<Map<String, dynamic>>.from(adsResult);
-    final sold = ads.where((ad) => ad['is_sold'] == true).length;
+    // Perfil y stats se cargan INDEPENDIENTES: si una consulta falla, la otra
+    // igual se muestra (jamás una pantalla en blanco por un solo error).
+    Map<String, dynamic> profile = {};
+    var profileFailed = false;
+    var total = 0;
+    var sold = 0;
+    var statsFailed = false;
+    var plan = 'free';
+
+    try {
+      final profileResult = await _client
+          .from('profiles')
+          .select(_profileColumns)
+          .eq('id', user.id)
+          .maybeSingle();
+      profile = profileResult == null
+          ? <String, dynamic>{}
+          : Map<String, dynamic>.from(profileResult);
+    } catch (_) {
+      // Ej. código 42501 con sesión degradada → panel de sesión expirada.
+      profileFailed = true;
+    }
+
+    try {
+      final adsResult = await _client
+          .from('anuncios')
+          .select('is_sold, selected_plan')
+          .eq('user_id', user.id);
+      final ads = List<Map<String, dynamic>>.from(adsResult);
+      sold = ads.where((ad) => ad['is_sold'] == true).length;
+      total = ads.length;
+      // Plan del usuario SIEMPRE desde `suscripciones` (la misma fuente del
+      // saldo IA) — NO desde el último anuncio: si el usuario tiene
+      // suscripción pero 0 anuncios, el último anuncio daría plan equivocado.
+      try {
+        final sub = await _client
+            .from('suscripciones')
+            .select('plan_tipo, limite_ia, optimizations_ia_usadas')
+            .eq('user_id', user.id)
+            .maybeSingle();
+        if (sub != null) {
+          final planTipo = (sub['plan_tipo'] ?? '').toString().trim();
+          if (planTipo.isNotEmpty) {
+            plan = PlanLimits.normalize(planTipo);
+          } else {
+            // Sin columna de plan: derivar desde limite_ia (mapeo en PlanLimits).
+            final limite = (sub['limite_ia'] as num?)?.toInt() ?? 0;
+            plan = PlanLimits.planFromLimiteIA(limite);
+          }
+        }
+      } catch (_) {
+        // Tabla sin columna plan_tipo o acceso denegado: fallback al último
+        // anuncio (comportamiento anterior).
+        final planRaw = ads.isEmpty
+            ? 'free'
+            : (ads.first['selected_plan'] ?? 'free').toString();
+        plan = PlanLimits.normalize(planRaw);
+      }
+    } catch (_) {
+      statsFailed = true;
+    }
 
     return _ProfileOverview(
       profile: profile,
-      total: ads.length,
-      active: ads.length - sold,
+      total: total,
+      active: total - sold,
       sold: sold,
+      plan: plan,
+      profileFailed: profileFailed,
+      statsFailed: statsFailed,
     );
   }
 
@@ -131,10 +197,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
           final overview = snapshot.data ??
               const _ProfileOverview(profile: {}, total: 0, active: 0, sold: 0);
-          if (_client.auth.currentUser == null) {
+          final user = _client.auth.currentUser;
+          if (user == null) {
             return _ErrorPanel(
               message: 'Inicia sesión para ver tu perfil.',
-              onRetry: () => Navigator.of(context)
+              actionLabel: 'Iniciar sesión',
+              onAction: () => Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (route) => false),
+            );
+          }
+          if (overview.profileFailed) {
+            // La consulta del perfil falló (ej. código 42501 con sesión
+            // muerta): mensaje claro + botón para re-autenticar.
+            // Jamás una pantalla en blanco.
+            return _ErrorPanel(
+              message: 'Tu sesión expiró. Iniciá sesión de nuevo.',
+              actionLabel: 'Iniciar sesión',
+              onAction: () => Navigator.of(context)
                   .pushNamedAndRemoveUntil('/', (route) => false),
             );
           }
@@ -148,7 +227,18 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 _profileHeader(overview.profile),
                 const SizedBox(height: 14),
+                const SizedBox(height: 12),
+                _planCard(overview.plan),
                 _statsCard(overview),
+                if (overview.statsFailed)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 6),
+                    child: Text(
+                      'No se pudieron cargar los conteos. Desliza hacia abajo para reintentar.',
+                      style: TextStyle(color: Mc.grisSuave, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 const SizedBox(height: 22),
                 _sectionLabel('MI ACTIVIDAD'),
                 _menuItem(
@@ -301,6 +391,71 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  /// Tarjeta del plan del usuario: nombre y límites del plan (única fuente:
+  /// PlanLimits). Si el plan no incluye video o IA, CTA "Mejorar plan" → web.
+  Widget _planCard(String plan) {
+    final limites = PlanLimits.planes[plan] ?? PlanLimits.planes['free']!;
+    final tieneVideo = limites['hasVideo'] == true;
+    final tieneIA = (limites['limiteIA'] as int? ?? 0) > 0;
+    final puedeMejorar = !tieneVideo || !tieneIA;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE8ECEF)),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.workspace_premium, color: Mc.naranja, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Tu plan: ${limites['label']}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: Mc.texto,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              Text(
+                '\$${limites['price']}',
+                style: const TextStyle(color: Mc.naranjaOscuro, fontSize: 13),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${limites['maxFotos']} fotos · ${limites['vigenciaDias']} días de vigencia'
+            '${tieneVideo ? ' · 1 video HD' : ''}'
+            '${tieneIA ? ' · ${limites['limiteIA']} optimizaciones IA' : ''}',
+            style: const TextStyle(color: Mc.grisSuave, fontSize: 12.5),
+          ),
+          if (puedeMejorar) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => launchUrl(
+                  Uri.parse(PlanLimits.webUrl),
+                  mode: LaunchMode.externalApplication,
+                ),
+                style: FilledButton.styleFrom(backgroundColor: Mc.naranja),
+                icon: const Icon(Icons.upgrade, size: 16),
+                label: const Text('Mejorar plan',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _statItem(int value, String label) => Expanded(
         child: Column(
           children: [
@@ -372,20 +527,34 @@ class _ProfileOverview {
   final int total;
   final int active;
   final int sold;
+  // Plan del usuario (derivado del último anuncio; fallback free).
+  final String plan;
+  final bool profileFailed;
+  final bool statsFailed;
 
   const _ProfileOverview({
     required this.profile,
     required this.total,
     required this.active,
     required this.sold,
+    this.plan = 'free',
+    this.profileFailed = false,
+    this.statsFailed = false,
   });
 }
 
 class _ErrorPanel extends StatelessWidget {
   final String message;
-  final VoidCallback onRetry;
+  final VoidCallback? onRetry;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
-  const _ErrorPanel({required this.message, required this.onRetry});
+  const _ErrorPanel({
+    required this.message,
+    this.onRetry,
+    this.actionLabel,
+    this.onAction,
+  });
 
   @override
   Widget build(BuildContext context) => Center(
@@ -395,9 +564,19 @@ class _ErrorPanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(message, textAlign: TextAlign.center),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                  onPressed: onRetry, child: const Text('Reintentar')),
+              if (actionLabel != null && onAction != null) ...[
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: onAction,
+                  style: FilledButton.styleFrom(backgroundColor: Mc.naranja),
+                  child: Text(actionLabel!),
+                ),
+              ],
+              if (onRetry != null) ...[
+                const SizedBox(height: 12),
+                OutlinedButton(
+                    onPressed: onRetry, child: const Text('Reintentar')),
+              ],
             ],
           ),
         ),

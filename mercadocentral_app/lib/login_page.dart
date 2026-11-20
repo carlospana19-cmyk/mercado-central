@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'features/auth/paso_verificacion_otp.dart';
 import 'theme/mc_colores.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,15 +17,29 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  @override
-  void initState() {
-    super.initState();
-    // Navegar a home cuando el login Google regrese por deep link
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.signedIn && mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    });
+  /// Muestra el paso de verificación con código OTP de 8 dígitos
+  /// (showVerificationStep en auth-logic.js de la web). Tras verificar,
+  /// la sesión normal de Supabase activa el listener global de main.dart,
+  /// que lleva a /home sin cambios.
+  Future<void> _abrirVerificacion() async {
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PasoVerificacionOtp(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ),
+      ),
+    );
+  }
+
+  /// El error de correo sin confirmar (login con cuenta nueva): code
+  /// 'email_not_confirmed' o el mensaje HTTP 'Email not confirmed' — mismo
+  /// criterio que isEmailNotConfirmed en auth-logic.js de la web.
+  bool _esCorreoSinConfirmar(Object error) {
+    final mensaje = error.toString().toLowerCase();
+    return mensaje.contains('email_not_confirmed') ||
+        mensaje.contains('email not confirmed');
   }
 
   Future<void> _signIn() async {
@@ -35,9 +50,17 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (mounted) Navigator.pushReplacementNamed(context, '/home');
+      // La navegación a /home la hace el listener global del widget raíz
+      // (AuthChangeEvent.signedIn). No navegar aquí para no duplicar rutas.
     } catch (e) {
       if (mounted) {
+        // Correo sin confirmar: mostrar el paso de verificación (igual que
+        // la web) en lugar del error crudo.
+        if (_esCorreoSinConfirmar(e)) {
+          setState(() => _isLoading = false);
+          await _abrirVerificacion();
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
@@ -51,11 +74,11 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.length < 6) {
+    if (email.isEmpty || password.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text(
-                'Completa el correo y una contraseña de al menos 6 caracteres'),
+                'Completa el correo y una contraseña de al menos 8 caracteres'),
             backgroundColor: Colors.red),
       );
       return;
@@ -64,17 +87,25 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await Supabase.instance.client.auth.signUp(
+      // Igual que handleRegister en auth-logic.js de la web: la fila de
+      // profiles la crea el trigger on_auth_user_created con los metadatos
+      // (nombre_negocio por defecto = prefijo del correo).
+      final response = await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
+        data: {'nombre_negocio': email.split('@')[0]},
       );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('¡Cuenta creada! Revisa tu correo para confirmar.'),
-              backgroundColor: Colors.green),
-        );
+
+      if (!mounted) return;
+      if (response.session == null) {
+        // Registro con confirmación de correo: la web muestra el paso de
+        // verificación con el código enviado al correo.
+        setState(() => _isLoading = false);
+        await _abrirVerificacion();
+        return;
       }
+      // Con sesión inmediata (confirmación desactivada) el listener global
+      // reacciona al evento signedIn y abre /home.
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -236,17 +267,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Row(
+                  const Row(
                     children: [
-                      const Expanded(child: Divider()),
+                      Expanded(child: Divider()),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
                           'o',
                           style: TextStyle(color: Mc.grisSuave),
                         ),
                       ),
-                      const Expanded(child: Divider()),
+                      Expanded(child: Divider()),
                     ],
                   ),
                   const SizedBox(height: 24),

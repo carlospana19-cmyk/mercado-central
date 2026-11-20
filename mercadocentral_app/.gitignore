@@ -1,9 +1,34 @@
+# ===== Secretos =====
+.env
+.env.*
+
+# Archivos de salida de sesiones de build/run (logs de terminal)
+*_out.txt
+*_err.txt
+run_output.txt
+fbuild_out.txt
+run_err.txt
+flutter_run_out.txt
+flutter_run_err.txt
+gradle_out.txt
+logcat_out.txt
+
+# Capturas de referencia (no son código fuente)
+pantalla_movil.png
+
 # Miscellaneous
 *.class
 *.log
 *.pyc
 *.swp
 .DS_Store
+
+# Herramientas de agente/IA
+.kilo/
+
+# Android artifacts
+*.apk
+
 .atom/
 .build/
 .buildlog/
@@ -27,6 +52,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+build/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/

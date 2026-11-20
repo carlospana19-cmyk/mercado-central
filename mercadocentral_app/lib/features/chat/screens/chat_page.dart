@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -340,10 +341,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   height: 48,
                   child: imageUrl == null || imageUrl.isEmpty
                       ? const _ChatAdPlaceholder()
-                      : Image.network(
-                          imageUrl,
+                      // Miniatura del anuncio con caché (FASE 1 · BLOQUE A):
+                      // placeholder gris y estado de error igual que el resto.
+                      : CachedNetworkImage(
+                          imageUrl: imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
+                          placeholder: (_, __) => const _ChatAdPlaceholder(),
+                          errorWidget: (_, __, ___) =>
                               const _ChatAdPlaceholder(),
                         ),
                 ),
@@ -448,8 +452,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _inboxRefreshTimer?.cancel();
     final channel = _inboxChannel;
-    if (channel != null)
+    if (channel != null) {
       unawaited(Supabase.instance.client.removeChannel(channel));
+    }
     super.dispose();
   }
 
@@ -905,7 +910,7 @@ class _ChatConversationPageState extends State<ChatConversationPage>
                                       ),
                                       decoration: BoxDecoration(
                                         color: mine
-                                            ? const Color(0xFF0B9E8F)
+                                            ? Mc.naranja
                                             : Colors.white,
                                         borderRadius: BorderRadius.only(
                                           topLeft: const Radius.circular(16),

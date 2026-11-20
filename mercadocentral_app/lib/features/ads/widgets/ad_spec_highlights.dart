@@ -1,7 +1,38 @@
-import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
+import 'dart:convert';
 
-class AdSpecHighlights extends StatelessWidget {
+import 'package:flutter/material.dart';
+
+import '../../../features/categorias/esquema_categorias.dart';
+import '../../../theme/mc_colores.dart';
+
+/// Un valor de atributo es mostrable solo si es texto plano legible.
+/// Los contenedores (Map/List) o strings con JSON crudo se EXCLUYEN:
+/// jamás se imprime una llave { } o corchete [ ] en pantalla.
+bool _esValorMostrable(dynamic value) {
+  if (value == null) return false;
+  if (value is Map || value is List) return false;
+  final text = value.toString().trim();
+  if (text.isEmpty || text == '0' || text == 'N/A' || text == '{}') {
+    return false;
+  }
+  if (text.startsWith('{') || text.startsWith('[')) {
+    try {
+      final decoded = jsonDecode(text);
+      if (decoded is Map || decoded is List) return false;
+    } catch (_) {
+      // No es JSON válido: se muestra como texto normal.
+    }
+  }
+  return true;
+}
+
+/// Atributos del DETALLE agrupados igual que la web
+/// (product-detail-logic.js · displayAllAttributesComprehensive, FASE 1-F):
+/// una tabla de especificaciones con las etiquetas de SPEC_LABELS
+/// (espejo en EsquemaCategorias.etiquetaDetalle), excluyendo las claves de
+/// control y los valores vacíos; las primeras 5 filas visibles por defecto y
+/// un enlace "Ver más detalles ▾" que muestra TODAS y pasa a "Ver menos ▴".
+class AdSpecHighlights extends StatefulWidget {
   final String categoria;
   final Map<String, dynamic> attributes;
 
@@ -12,151 +43,104 @@ class AdSpecHighlights extends StatelessWidget {
   });
 
   @override
+  State<AdSpecHighlights> createState() => _AdSpecHighlightsState();
+}
+
+class _AdSpecHighlightsState extends State<AdSpecHighlights> {
+  /// MOSTRAR = 5 en displayAllAttributesComprehensive de la web.
+  static const int _filasVisibles = 5;
+  bool _expandido = false;
+
+  @override
   Widget build(BuildContext context) {
-    final visibleAttributes = Map<String, dynamic>.fromEntries(
-      attributes.entries.where((entry) {
-        final key = entry.key.toLowerCase();
-        final value = entry.value?.toString().trim() ?? '';
-        const excludedKeys = [
-          'step',
-          'categoria',
-          'subcategoria',
-          'provincia',
-          'distrito',
-          'attr-',
-        ];
-        return !excludedKeys.any((part) => key.contains(part)) &&
-            value.isNotEmpty &&
-            value != '0' &&
-            value != 'N/A' &&
-            value != '{}';
-      }),
-    );
-    if (visibleAttributes.isEmpty) return const SizedBox.shrink();
+    final validEntries = widget.attributes.entries.where((entry) {
+      final key = entry.key.toLowerCase();
+      const excludePatterns = [
+        'step',
+        'categoria',
+        'subcategoria',
+        'provincia',
+        'distrito',
+        'attr-',
+      ];
+      final isValidKey =
+          !excludePatterns.any((pattern) => key.contains(pattern));
+      return isValidKey && _esValorMostrable(entry.value);
+    }).toList();
 
-    final cat = categoria
-        .toLowerCase()
-        .replaceAll('á', 'a')
-        .replaceAll('é', 'e')
-        .replaceAll('í', 'i')
-        .replaceAll('ó', 'o')
-        .replaceAll('ú', 'u');
+    if (validEntries.isEmpty) return const SizedBox.shrink();
 
-    final List<String> topKeys;
-    if (cat.contains('inmuebl') ||
-        cat.contains('casa') ||
-        cat.contains('apart')) {
-      topKeys = ['m2', 'habitaciones', 'banos'];
-    } else if (['electronica', 'celular', 'computadora'].any(cat.contains)) {
-      topKeys = ['condicion', 'almacenamiento', 'memoria_ram'];
-    } else if (['mascota', 'perro', 'gato'].any(cat.contains)) {
-      topKeys = ['raza', 'genero', 'edad_mascota'];
-    } else if (cat.contains('veh') ||
-        cat.contains('auto') ||
-        cat.contains('moto')) {
-      topKeys = ['anio', 'kilometraje', 'combustible'];
-    } else {
-      topKeys = visibleAttributes.keys.take(3).toList();
+    final filas = <Widget>[];
+    for (var i = 0; i < validEntries.length; i++) {
+      final entry = validEntries[i];
+      final visible = _expandido || i < _filasVisibles;
+      if (!visible) continue;
+      filas.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 150,
+                child: Text(
+                  EsquemaCategorias.etiquetaDetalle(entry.key),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Mc.grisSuave,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  entry.value.toString(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Mc.textoListas,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
-    final highlights = topKeys
-        .where(visibleAttributes.containsKey)
-        .map((key) => MapEntry(key, visibleAttributes[key]))
-        .toList();
-    final remaining = visibleAttributes.entries
-        .where((entry) => !topKeys.contains(entry.key))
-        .toList();
+    final tieneOcultas = validEntries.length > _filasVisibles;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (highlights.isNotEmpty) ...[
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: highlights
-                  .map((entry) =>
-                      _buildBubble(entry.key, entry.value.toString()))
-                  .toList(),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFFE8ECEF)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          child: Column(children: filas),
+        ),
+        if (tieneOcultas)
+          TextButton.icon(
+            onPressed: () => setState(() => _expandido = !_expandido),
+            icon: Icon(
+              _expandido
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down,
+              size: 18,
+            ),
+            label: Text(_expandido ? 'Ver menos ▴' : 'Ver más detalles ▾'),
+            style: TextButton.styleFrom(
+              foregroundColor: Mc.naranjaOscuro,
+              textStyle: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          if (remaining.isNotEmpty) const SizedBox(height: 20),
-        ],
-        if (remaining.isNotEmpty) ...[
-          const Divider(),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            childAspectRatio: 3,
-            children: remaining
-                .map((entry) =>
-                    _buildSecondaryAttr(entry.key, entry.value.toString()))
-                .toList(),
-          ),
-        ],
       ],
-    );
-  }
-
-  Widget _buildBubble(String key, String value) {
-    var displayValue = value;
-    if (key == 'kilometraje') displayValue += ' km';
-    if (key == 'm2') displayValue += ' m²';
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.grey.shade50, Colors.grey.shade200],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            displayValue,
-            style: const TextStyle(
-              fontWeight: FontWeight.w900,
-              fontSize: 16,
-              color: AppColors.textDark,
-            ),
-          ),
-          Text(
-            key.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 9,
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSecondaryAttr(String key, String value) {
-    return ListTile(
-      dense: true,
-      title: Text(
-        key.replaceAll('_', ' ').toUpperCase(),
-        style: const TextStyle(fontSize: 10, color: Colors.grey),
-      ),
-      subtitle: Text(
-        value,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
     );
   }
 }

@@ -1,6 +1,6 @@
 // Archivo: lib/features/search/screens/all_categories_page.dart
 import 'package:flutter/material.dart';
-import 'package:mercadocentral_app/core/theme/app_colors.dart';
+import 'package:mercadocentral_app/theme/mc_colores.dart';
 import '../models/category_catalog.dart'; // Importa el catálogo del paso 1
 
 class AllCategoriesPage extends StatelessWidget {
@@ -28,7 +28,7 @@ class AllCategoriesPage extends StatelessWidget {
             backgroundColor: Colors.white,
             collapsedBackgroundColor: Colors.white,
             // 1. Título de la categoría principal (con icono grande)
-            leading: Icon(category.icon, color: AppColors.primary, size: 28),
+            leading: Icon(category.icon, color: Mc.naranja, size: 28),
             title: Text(category.name,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,

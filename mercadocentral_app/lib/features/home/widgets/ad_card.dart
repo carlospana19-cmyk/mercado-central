@@ -1,98 +1,110 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mercadocentral_app/core/utils/formatos.dart';
 import 'package:mercadocentral_app/features/ads/screens/ad_details_page.dart';
 import '../../../theme/mc_colores.dart';
 
-// Valores tomados de mc-base.css / mc-home.css de la web.
+// Valores tomados de mc-base.css / mc-tarjeta-2026.css de la web.
 const _ink900 = Color(0xFF122129);
-const _ink700 = Color(0xFF31413D);
 const _ink500 = Color(0xFF5C6B66);
 const _ink300 = Color(0xFF9AA7A2);
 const _line = Color(0xFFE8ECEF);
 const _bg = Color(0xFFF6F8FA);
-const _teal600 = Color(0xFF087F73);
 
-/// Atributos que la web muestra en la tarjeta, por categoría (AppConfig.js).
-const _categoryAttributes = <String, List<String>>{
-  'vehiculos': ['marca', 'anio', 'kilometraje'],
-  'inmuebles': ['m2', 'habitaciones', 'banos'],
-  'electronica': ['marca', 'modelo', 'almacenamiento'],
-  'hogar': ['tipo_electrodomestico', 'tipo_mueble', 'marca'],
-  'moda': ['talla', 'marca', 'color'],
-  'deportes': ['tipo_bicicleta', 'tipo_instrumento', 'marca'],
-  'mascotas': ['raza', 'edad_mascota', 'genero'],
-  'servicios': ['tipo_servicio', 'modalidad', 'experiencia'],
-  'negocios': ['tipo_negocio', 'razon_venta', 'condicion'],
-  'comunidad': ['tipo_evento', 'tipo_clase', 'modalidad'],
-};
+// Único tono de texto de la tarjeta (#1F2937): título, estados neutros y
+// ubicación. PROHIBIDO reintroducir verde-azulado (turquesa/cian): regla 90/10.
+const _textoTarjeta = Color(0xFF1F2937);
 
-const _defaultAttributes = ['marca', 'condicion'];
+// Píldora "Urgente" sobre la foto (mc-badge-urgente).
+const _urgenteFondo = Color(0xFFFFF3E0);
+const _urgenteTexto = Color(0xFFB25E00);
+const _urgenteBorde = Color(0xFFF5D9A8);
 
-const _attributeSynonyms = <String, List<String>>{
-  'habitaciones': ['habitaciones', 'recamaras', 'rooms'],
-  'banos': ['banos', 'baños', 'toilettes'],
-  'm2': ['m2', 'superficie', 'area'],
-  'kilometraje': ['kilometraje', 'km'],
-};
+// Píldora "Destacado" en el cuerpo (mc-badge-destacado: --accion-50/600).
+const _destacadoFondo = Color(0xFFFFF1E8);
+const _destacadoTexto = Color(0xFFE05A00);
+const _destacadoBorde = Color(0x29FA6406); // rgba(250,100,6,.16)
 
-FaIconData _attributeIcon(String field) {
-  switch (field) {
-    case 'habitaciones':
-      return FontAwesomeIcons.bed;
-    case 'banos':
-      return FontAwesomeIcons.bath;
-    case 'm2':
-      return FontAwesomeIcons.rulerCombined;
-    case 'kilometraje':
-      return FontAwesomeIcons.gaugeHigh;
-    case 'transmision':
-      return FontAwesomeIcons.gear;
-    case 'combustible':
-      return FontAwesomeIcons.gasPump;
-    case 'condicion':
-      return FontAwesomeIcons.circleInfo;
-    default:
-      return FontAwesomeIcons.check;
-  }
+// ============================================================
+// Normalizadores (paridad con utilidades-ui.js de la web).
+// ============================================================
+
+/// Inicial del título para el fondo gris cuando el anuncio no tiene foto
+/// (inicialDe de utilidades-ui.js).
+String _inicialDe(String? texto) {
+  final t = (texto ?? '').trim();
+  return t.isEmpty ? 'M' : t.substring(0, 1).toUpperCase();
 }
 
-String _categoryKey(String? categoria) {
-  final c = (categoria ?? '').toLowerCase();
-  if (c.contains('veh') ||
-      c.contains('auto') ||
-      c.contains('moto') ||
-      c.contains('carro')) {
-    return 'vehiculos';
+/// Decodifica un valor que puede llegar como Map o como string JSON
+/// (incluso doble-codificado). Devuelve {} si no se puede leer.
+Map<String, dynamic> _decodeMap(dynamic raw) {
+  var value = raw;
+  for (var i = 0; i < 3 && value is String; i++) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return {};
+    try {
+      value = jsonDecode(trimmed);
+    } catch (_) {
+      return {};
+    }
   }
-  if (c.contains('inmueble') ||
-      c.contains('bienes') ||
-      c.contains('casa') ||
-      c.contains('apart')) {
-    return 'inmuebles';
-  }
-  if (c.contains('electr') || c.contains('tecno')) return 'electronica';
-  if (c.contains('hogar') || c.contains('mueble')) return 'hogar';
-  if (c.contains('moda') || c.contains('belleza')) return 'moda';
-  if (c.contains('deporte') || c.contains('hobb')) return 'deportes';
-  if (c.contains('mascota')) return 'mascotas';
-  if (c.contains('servicio')) return 'servicios';
-  if (c.contains('negocio')) return 'negocios';
-  if (c.contains('comunidad')) return 'comunidad';
-  return '';
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return {};
 }
 
-String _formatPrice(dynamic value) {
-  final number = num.tryParse(value?.toString() ?? '');
-  if (number == null) return 'Consultar';
-  final parts = number.toStringAsFixed(2).split('.');
-  final integer = parts[0].replaceAllMapped(
-    RegExp(r'\B(?=(\d{3})+(?!\d))'),
-    (_) => ',',
-  );
-  return 'B/. $integer.${parts[1]}';
+/// Galería de fotos: array de Supabase o string JSON (doble-codificado
+/// incluido). Nunca devuelve JSON crudo: un texto plano se trata como URL.
+List<String> _decodeGaleria(dynamic raw) {
+  var value = raw;
+  for (var i = 0; i < 3 && value is String; i++) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return const [];
+    try {
+      value = jsonDecode(trimmed);
+    } catch (_) {
+      return [trimmed];
+    }
+  }
+  if (value is List) {
+    return [
+      for (final item in value)
+        if (item != null && item.toString().trim().isNotEmpty)
+          item.toString().trim(),
+    ];
+  }
+  if (value is String && value.trim().isNotEmpty) return [value.trim()];
+  return const [];
+}
+
+/// Imagen de portada con la prioridad EXACTA de tarjeta-anuncio.js:
+/// imagen_portada > imagenes[0].url_imagen > url_portada > url_galeria[0].
+String _portadaUrl(Map<String, dynamic> ad) {
+  final portada = ad['imagen_portada']?.toString().trim() ?? '';
+  if (portada.isNotEmpty) return portada;
+  final imagenes = ad['imagenes'];
+  if (imagenes is List && imagenes.isNotEmpty && imagenes.first is Map) {
+    final primera =
+        (imagenes.first as Map)['url_imagen']?.toString().trim() ?? '';
+    if (primera.isNotEmpty) return primera;
+  }
+  final urlPortada = ad['url_portada']?.toString().trim() ?? '';
+  if (urlPortada.isNotEmpty) return urlPortada;
+  final galeria = _decodeGaleria(ad['url_galeria']);
+  return galeria.isNotEmpty ? galeria.first : '';
+}
+
+/// "Nuevo": publicado hace menos de 24 horas (esNuevo de utilidades-ui.js).
+bool _esNuevo(Map<String, dynamic> ad) {
+  final fecha = ad['created_at'] ?? ad['fecha_publicacion'];
+  final date = DateTime.tryParse(fecha?.toString() ?? '');
+  if (date == null) return false;
+  return DateTime.now().difference(date).inMinutes < 24 * 60;
 }
 
 class AdCard extends StatelessWidget {
@@ -110,44 +122,37 @@ class AdCard extends StatelessWidget {
     return null;
   }
 
-  Map<String, dynamic> get _attributes {
-    final raw = anuncio['atributos_clave'];
-    try {
-      if (raw is String && raw.trim().isNotEmpty) {
-        final decoded = jsonDecode(raw);
-        if (decoded is Map) return Map<String, dynamic>.from(decoded);
-      } else if (raw is Map) {
-        return Map<String, dynamic>.from(raw);
-      }
-    } catch (_) {}
-    return {};
+  /// Mejoras del plan (enhancements): puede llegar como Map o string JSON.
+  Map<String, dynamic> get _enhancements => _decodeMap(anuncio['enhancements']);
+
+  /// Píldora "Urgente" sobre la foto: solo si enhancements.is_urgent = true.
+  bool get _esUrgente => _enhancements['is_urgent'] == true;
+
+  /// "Destacado": plan dorado/diamante (destacado/top/elite), igual que la web.
+  bool get _esDestacado {
+    final plan = (anuncio['featured_plan'] ??
+            anuncio['selected_plan'] ??
+            anuncio['plan'] ??
+            '')
+        .toString()
+        .toLowerCase()
+        .trim();
+    return plan == 'destacado' || plan == 'top' || plan == 'elite';
   }
 
-  /// Hasta 3 atributos con valor, en el orden de la web.
-  List<MapEntry<String, String>> _attributeChips() {
-    final attrs = _attributes;
-    if (attrs.isEmpty) return [];
+  /// Portada con la prioridad de la web.
+  String get _coverUrl => _portadaUrl(anuncio);
 
-    final fields =
-        _categoryAttributes[_categoryKey(anuncio['categoria']?.toString())] ??
-            _defaultAttributes;
-    final chips = <MapEntry<String, String>>[];
-
-    for (final field in fields) {
-      for (final key in _attributeSynonyms[field] ?? [field]) {
-        final value = attrs[key];
-        if (value == null) continue;
-        final text = value.toString().trim();
-        if (text.isEmpty || text == '0' || text == 'N/A') continue;
-        chips.add(MapEntry(
-          field,
-          text.length > 15 ? '${text.substring(0, 12)}...' : text,
-        ));
-        break;
-      }
-      if (chips.length == 3) break;
+  /// Galería real (portada + galería, sin duplicados): alimenta la foto
+  /// y el conteo 📷, igual que tarjeta-anuncio.js.
+  List<String> get _galeria {
+    final galeria = <String>[];
+    final portada = _coverUrl;
+    if (portada.isNotEmpty) galeria.add(portada);
+    for (final url in _decodeGaleria(anuncio['url_galeria'])) {
+      if (!galeria.contains(url)) galeria.add(url);
     }
-    return chips;
+    return galeria;
   }
 
   String _location() {
@@ -207,6 +212,57 @@ class AdCard extends StatelessWidget {
     );
   }
 
+  /// Fondo gris con la inicial del título cuando no hay foto real
+  /// (mc-card-foto-vacia de la web: nunca una imagen rota).
+  Widget _fotoVacia() => Container(
+        color: const Color(0xFFEEF1F3),
+        alignment: Alignment.center,
+        child: Text(
+          _inicialDe(anuncio['titulo']?.toString()),
+          style: const TextStyle(
+            fontSize: 42,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFFAEBBB8),
+          ),
+        ),
+      );
+
+  /// Abre el video del anuncio fuera de la app (la web lo reproduce embebido;
+  /// sin webview disponible aquí, se lanza con el visor del sistema).
+  Future<void> _openVideo(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // Sin visor disponible: el botón no abre nada, no rompe la tarjeta.
+    }
+  }
+
+  /// Píldora de estado del cuerpo (mc-card-estados): 2px 8px, 10.5px w600.
+  Widget _estadoPildora(
+    String label, {
+    required Color fondo,
+    required Color color,
+    required Color borde,
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: fondo,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: borde),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 10.5,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final adId = anuncio['id']?.toString() ?? '';
@@ -227,17 +283,22 @@ class AdCard extends StatelessWidget {
         .map((v) => v?.toString().trim() ?? '')
         .firstWhere((v) => v.isNotEmpty, orElse: () => 'Usuario Verificado');
     final vendorPhoto = profile?['url_foto_perfil']?.toString();
-    final cover = anuncio['url_portada']?.toString() ?? '';
+    final cover = _coverUrl;
+    final galeria = _galeria;
+    final urlVideo = (anuncio['url_video'] ?? '').toString().trim();
+    final esUrgente = _esUrgente;
+    final esDestacado = _esDestacado;
+    final esNuevo = _esNuevo(anuncio);
     final crown = _crownBadge(plan);
-    final chips = _attributeChips();
 
     Widget image = cover.isEmpty
-        ? Container(color: const Color(0xFFEEF1F3))
-        : Image.network(
-            cover,
+        ? _fotoVacia()
+        : CachedNetworkImage(
+            imageUrl: cover,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                Container(color: const Color(0xFFEEF1F3)),
+            // Placeholder gris mientras carga (mc-card-foto de la web).
+            placeholder: (_, __) => Container(color: _bg),
+            errorWidget: (_, __, ___) => _fotoVacia(),
           );
     if (isSold) {
       image = ColorFiltered(
@@ -247,7 +308,8 @@ class AdCard extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () => _openDetails(context),
+      // La tarjeta completa abre el detalle; si está vendida, no navega.
+      onTap: isSold ? null : () => _openDetails(context),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         clipBehavior: Clip.antiAlias,
@@ -274,6 +336,43 @@ class AdCard extends StatelessWidget {
                   image,
                   if (crown != null)
                     Positioned(top: 10, left: 10, child: crown),
+                  // Píldora "Urgente" sobre la foto; con corona presente se
+                  // desplaza hacia abajo para no pisarla (mc-badges.con-corona).
+                  if (esUrgente)
+                    Positioned(
+                      top: crown != null ? 50 : 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _urgenteFondo,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: _urgenteBorde),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.clock,
+                              size: 9,
+                              color: _urgenteTexto,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              'Urgente',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: _urgenteTexto,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   if (isSold)
                     Positioned(
                       top: 10,
@@ -310,6 +409,80 @@ class AdCard extends StatelessWidget {
                         onToggle: onFavoriteToggle,
                       ),
                     ),
+                  // Botón "▶ Video" sobre la foto, solo si el anuncio tiene
+                  // video (url_video no nulo). El tap no navega al detalle.
+                  if (urlVideo.isNotEmpty)
+                    Positioned(
+                      left: 8,
+                      bottom: 8,
+                      child: GestureDetector(
+                        onTap: () => _openVideo(urlVideo),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xD9122129),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              FaIcon(
+                                FontAwesomeIcons.play,
+                                size: 10,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Video',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  // Conteo de fotos (📷 + número) solo cuando hay 2 o más.
+                  if (galeria.length >= 2)
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.55),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const FaIcon(
+                              FontAwesomeIcons.camera,
+                              size: 10,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              '${galeria.length}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -333,7 +506,9 @@ class AdCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          _formatPrice(anuncio['precio']),
+                          // USD "$1,250.00" (FASE 1) con el criterio
+                          // "A consultar" de precioTexto (utilidades-ui.js).
+                          Formatos.precioUsd(anuncio['precio']),
                           style: const TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
@@ -350,7 +525,7 @@ class AdCard extends StatelessWidget {
                             shape: BoxShape.circle,
                             border: Border.all(color: _line, width: 2),
                             image: DecorationImage(
-                              image: NetworkImage(vendorPhoto),
+                              image: CachedNetworkImageProvider(vendorPhoto),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -366,10 +541,36 @@ class AdCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: _ink900,
+                      color: _textoTarjeta,
                       height: 1.35,
                     ),
                   ),
+                  // Estados pegados al título, SIEMPRE en el cuerpo blanco
+                  // (nunca sobre la imagen): "Destacado" según el plan y
+                  // "Nuevo" si el anuncio tiene menos de 24 horas.
+                  if (esDestacado || esNuevo) ...[
+                    const SizedBox(height: 5),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        if (esDestacado)
+                          _estadoPildora(
+                            'Destacado',
+                            fondo: _destacadoFondo,
+                            color: _destacadoTexto,
+                            borde: _destacadoBorde,
+                          ),
+                        if (esNuevo)
+                          _estadoPildora(
+                            'Nuevo',
+                            fondo: _bg,
+                            color: _ink500,
+                            borde: _line,
+                          ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -384,73 +585,11 @@ class AdCard extends StatelessWidget {
                           _location(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 13, color: _ink500),
+                          style: const TextStyle(
+                              fontSize: 13, color: _textoTarjeta),
                         ),
                       ),
                     ],
-                  ),
-                  if (chips.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final chip in chips)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 9,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _bg,
-                              border: Border.all(color: _line),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                FaIcon(
-                                  _attributeIcon(chip.key),
-                                  size: 11,
-                                  color: _teal600,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  chip.value,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: _ink700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 42,
-                    child: ElevatedButton(
-                      onPressed: () => _openDetails(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Mc.naranja,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Contactar',
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),

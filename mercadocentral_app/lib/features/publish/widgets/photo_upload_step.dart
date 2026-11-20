@@ -127,7 +127,7 @@ class _PhotoUploadStepState extends State<PhotoUploadStep> {
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
-                color: Colors.grey.shade300!,
+                color: Colors.grey.shade300,
                 style: BorderStyle.solid,
               ),
             ),

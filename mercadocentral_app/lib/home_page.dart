@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mercadocentral_app/core/theme/app_colors.dart';
 import 'package:mercadocentral_app/theme/mc_colores.dart';
 import 'package:mercadocentral_app/features/home/widgets/featured_ads.dart';
 import 'package:mercadocentral_app/features/home/widgets/hero_banner.dart';
 import 'package:mercadocentral_app/features/search/delegates/mercado_search_delegate.dart';
 import 'package:mercadocentral_app/features/search/screens/all_categories_page.dart';
+import 'package:mercadocentral_app/features/search/screens/resultados_busqueda_page.dart';
 
 // Importaciones necesarias para las otras pestañas
 import 'package:mercadocentral_app/features/publish/screens/upload_page.dart';
@@ -31,16 +31,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   RealtimeChannel? _messageChannel;
   Timer? _unreadRefreshTimer;
 
-  // 1. Lista de burbujas en el home (reducida a 6 populares + "Ver más")
-  final List<Map<String, dynamic>> _categories = [
-    {'name': 'Todos', 'icon': Icons.grid_view_rounded},
-    {'name': 'Vehículos', 'icon': Icons.directions_car_filled_rounded},
-    {'name': 'Inmuebles', 'icon': Icons.home_work_rounded},
-    {'name': 'Electrónica', 'icon': Icons.devices_rounded},
-    {'name': 'Comunidad', 'icon': Icons.people_alt_rounded},
-    {'name': 'Hogar', 'icon': Icons.chair_rounded},
-    // 👇 ESTA ES LA FLECHA TÁCTICA DE VER MÁS
-    {'name': 'Ver más', 'icon': Icons.arrow_forward_ios_rounded},
+  // Categorías con FOTO en la home (paridad con categorias-home.js: las
+  // mismas 6 que muestra la web). El nombre es el valor EXACTO de la tabla
+  // `categorias` porque alimenta el filtro de anuncios; la foto es el asset
+  // local gemelo de img/categorias/. El resto de las categorías vive solo
+  // en "Ver más" → AllCategoriesPage, igual que en la web.
+  static const List<Map<String, String>> _homeCategories = [
+    {'name': 'Inmuebles', 'foto': 'assets/images/categorias/bienes-raices.jpg'},
+    {'name': 'Vehículos', 'foto': 'assets/images/categorias/vehiculos.jpg'},
+    {
+      'name': 'Electrónica',
+      'foto': 'assets/images/categorias/electronica.jpg',
+    },
+    {
+      'name': 'Hogar y Muebles',
+      'foto': 'assets/images/categorias/hogar.jpg',
+    },
+    {'name': 'Moda y Belleza', 'foto': 'assets/images/categorias/moda.jpg'},
+    {'name': 'Servicios', 'foto': 'assets/images/categorias/servicios.jpg'},
   ];
 
   @override
@@ -102,15 +110,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _unreadRefreshTimer?.cancel();
     final channel = _messageChannel;
-    if (channel != null)
+    if (channel != null) {
       unawaited(Supabase.instance.client.removeChannel(channel));
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // 🚨 REEMPLAZA TU LISTA _PAGES EXACTAMENTE POR ESTA:
-    final List<Widget> _pages = [
+    // Lista de páginas de las 5 pestañas (IndexedStack).
+    final List<Widget> pages = [
       _buildHomeContent(), // Index 0: Inicio
       FavoritesPage(key: _favoritesPageKey), // Index 1: Favoritos
       const UploadPage(), // Index 2: Publicar
@@ -122,10 +131,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       backgroundColor: Colors.white,
       body: IndexedStack(
         index: _selectedIndex,
-        children: _pages,
+        children: pages,
       ),
 
-      // 🚀 BOTÓN DE VENDER CON TU COLOR TURQUESA
+      // 🚀 BOTÓN DE VENDER (naranja de marca Mc)
       floatingActionButton: SizedBox(
         width: 65,
         height: 65,
@@ -173,7 +182,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       int index, IconData icon, IconData activeIcon, String label) {
     bool isSelected = _selectedIndex == index;
     final navIcon = Icon(isSelected ? activeIcon : icon,
-        color: isSelected ? AppColors.primary : Colors.grey);
+        color: isSelected ? Mc.naranja : Colors.grey);
     final iconWithBadge = index == 3 && _unreadMessages > 0
         ? Stack(
             clipBehavior: Clip.none,
@@ -213,7 +222,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
         setState(() => _selectedIndex = index);
       },
-      child: Container(
+      child: SizedBox(
         width: 70,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -221,7 +230,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             iconWithBadge,
             Text(label,
                 style: TextStyle(
-                    color: isSelected ? AppColors.primary : Colors.grey,
+                    color: isSelected ? Mc.naranja : Colors.grey,
                     fontSize: 11)),
           ],
         ),
@@ -252,7 +261,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Mc.naranja, Mc.naranja.withOpacity(0.05)],
+                    colors: [Mc.naranja, Mc.naranja.withValues(alpha: 0.05)],
                   ),
                 ),
                 child: const Padding(
@@ -261,70 +270,68 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ),
 
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 20, 16, 10),
-                child: Text('Categorías',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-
-              // 🚀 LÓGICA DE CATEGORÍAS CONECTADA
-              SizedBox(
-                height: 100,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  children: _categories.map((cat) {
-                    bool isSelected = _selectedCategory == cat['name'];
-                    return GestureDetector(
-                      // 🚀 LÓGICA DE NAVEGACIÓN TÁCTICA
-                      onTap: () async {
-                        if (cat['name'] == 'Ver más') {
-                          // 1. Si tocan "Ver más", abre la nueva pantalla
-                          final selectionBack = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const AllCategoriesPage()),
-                          );
-
-                          // 2. Si el usuario eligió algo (no cerró la pantalla sin tocar nada)
-                          if (selectionBack != null) {
-                            setState(() {
-                              _selectedCategory =
-                                  selectionBack.toString(); // Cambia el filtro
-                            });
-                          }
-                        } else {
-                          // 3. Lógica normal: tocar cualquier otra burbuja
-                          setState(() => _selectedCategory = cat['name']);
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Categorías',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    // Volver a "Todos" cuando hay una categoría filtrada.
+                    if (_selectedCategory != 'Todos')
+                      GestureDetector(
+                        onTap: () =>
+                            setState(() => _selectedCategory = 'Todos'),
+                        child: const Row(
                           children: [
-                            CircleAvatar(
-                              radius: 28,
-                              backgroundColor:
-                                  isSelected ? AppColors.primary : Colors.white,
-                              child: Icon(cat['icon'],
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey[600]),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(cat['name'],
+                            Icon(Icons.close, size: 14, color: Mc.grisSuave),
+                            SizedBox(width: 4),
+                            Text('Quitar filtro',
                                 style: TextStyle(
-                                    fontSize: 12,
-                                    color: isSelected
-                                        ? AppColors.primary
-                                        : Colors.black87)),
+                                    fontSize: 12, color: Mc.grisSuave)),
                           ],
                         ),
                       ),
-                    );
-                  }).toList(),
+                  ],
+                ),
+              ),
+
+              // 🚀 TARJETAS DE CATEGORÍA CON FOTO (paridad con categorias-home.js)
+              SizedBox(
+                height: 142,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  children: [
+                    for (final cat in _homeCategories)
+                      _CategoryCard(
+                        name: cat['name']!,
+                        foto: cat['foto']!,
+                        selected: _selectedCategory == cat['name'],
+                        onTap: () =>
+                            setState(() => _selectedCategory = cat['name']!),
+                      ),
+                    // 👇 ESTA ES LA FLECHA TÁCTICA DE VER MÁS: Deportes y
+                    // Hobbies, Mascotas, Negocios y Comunidad viven solo en
+                    // AllCategoriesPage, igual que en la web.
+                    _CategoryCard(
+                      name: 'Ver más',
+                      selected: false,
+                      onTap: () async {
+                        final selectionBack = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AllCategoriesPage()),
+                        );
+                        // Si el usuario eligió algo (no cerró sin tocar nada)
+                        if (selectionBack != null) {
+                          setState(() =>
+                              _selectedCategory = selectionBack.toString());
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
 
@@ -339,8 +346,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             : 'En $_selectedCategory',
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
-                    const Text('Ver todos',
-                        style: TextStyle(color: AppColors.primary)),
+                    GestureDetector(
+                      onTap: () => setState(() => _selectedCategory = 'Todos'),
+                      child: const Text('Ver todos',
+                          style: TextStyle(color: Mc.naranja)),
+                    ),
                   ],
                 ),
               ),
@@ -386,10 +396,113 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  void _openSearch() {
-    showSearch(
+  Future<void> _openSearch() async {
+    // Igual que la web: sugerencias/recientes al escribir (delegate) y, al
+    // ENVIAR, la pantalla de resultados con filtros (resultados.html).
+    final query = await showSearch(
       context: context,
       delegate: MercadoSearchDelegate(),
+    );
+    final texto = query?.trim() ?? '';
+    if (texto.isEmpty || !mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ResultadosBusquedaPage(queryInicial: texto),
+      ),
+    );
+  }
+}
+
+/// Tarjeta de categoría con FOTO (paridad con mc-categorias.css):
+/// tarjeta blanca de 110px, foto cuadrada con esquinas de 12px sobre fondo
+/// #F3F4F6 y el nombre debajo en #1F2937. Si la foto no carga (onerror de la
+/// web), se muestra la inicial sobre el fondo gris: nunca una imagen rota.
+/// Con foto == null se dibuja el tile "Ver más" (ícono sobre el mismo gris).
+class _CategoryCard extends StatelessWidget {
+  final String name;
+  final String? foto;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _CategoryCard({
+    required this.name,
+    required this.selected,
+    required this.onTap,
+    this.foto,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: Container(
+          width: 110,
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: selected ? Mc.naranja : const Color(0xFFE5E7EB),
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0D122129),
+                blurRadius: 3,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                height: 90,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: foto == null
+                    ? const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 26,
+                        color: Mc.grisSuave,
+                      )
+                    : Image.asset(
+                        foto!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Text(
+                            name.isEmpty
+                                ? '?'
+                                : name.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF374151),
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

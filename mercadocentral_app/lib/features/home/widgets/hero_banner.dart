@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/services/hero_ads_service.dart';
@@ -107,10 +108,11 @@ class _HeroBannerState extends State<HeroBanner> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.network(
-          ad.imagen,
+        CachedNetworkImage(
+          imageUrl: ad.imagen,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stack) =>
+          placeholder: (_, __) => Container(color: Colors.black12),
+          errorWidget: (context, error, stack) =>
               Container(color: Colors.black12),
         ),
         Positioned(
@@ -149,13 +151,15 @@ class _HeroBannerState extends State<HeroBanner> {
   Widget _defaultSlide(Map<String, String> banner) {
     return Stack(
       children: [
-        Image.network(
-          banner['image']!,
+        CachedNetworkImage(
+          imageUrl: banner['image']!,
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
           color: Colors.black.withValues(alpha: 0.3),
           colorBlendMode: BlendMode.darken,
+          placeholder: (_, __) => Container(color: Colors.black12),
+          errorWidget: (_, __, ___) => Container(color: Colors.black12),
         ),
         Padding(
           padding: const EdgeInsets.all(20),

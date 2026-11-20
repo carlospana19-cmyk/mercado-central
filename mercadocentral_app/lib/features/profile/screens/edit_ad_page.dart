@@ -1,13 +1,15 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/location_helper.dart';
+import '../../../features/categorias/esquema_categorias.dart';
+
+import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
 import '../../ads/widgets/location_map_picker.dart';
-import '../../publish/widgets/details_form_step.dart'
-    show AttrField, propertyAttrFields, vehicleAttrFields;
 import '../../search/models/category_catalog.dart';
 
 class EditAdPage extends StatefulWidget {
@@ -20,21 +22,6 @@ class EditAdPage extends StatefulWidget {
 }
 
 class _EditAdPageState extends State<EditAdPage> {
-  static const _maxPhotosByPlan = {
-    'free': 5,
-    'basico': 10,
-    'premium': 15,
-    'destacado': 20,
-    'top': 20,
-  };
-  static const _numericAttrs = {
-    'kilometraje',
-    'm2',
-    'anio',
-    'habitaciones',
-    'banos',
-  };
-
   final _formKey = GlobalKey<FormState>();
   final _supabase = Supabase.instance.client;
   final _picker = ImagePicker();
@@ -142,20 +129,20 @@ class _EditAdPageState extends State<EditAdPage> {
     }
   }
 
-  List<AttrField> _fieldsForCategory(String? category) {
-    if (category == 'Vehículos') return vehicleAttrFields;
-    if (category == 'Inmuebles') return propertyAttrFields;
-    return const [];
+  List<CampoAtributo> _fieldsForCategory(String? category) {
+    // Única fuente (FASE 1 · BLOQUE D): campos EXACTOS de la web según
+    // categoría + subcategoría del anuncio en edición.
+    return EsquemaCategorias.camposPara(category ?? '', _subcategory ?? '');
   }
 
   void _loadAttributes(Map<String, dynamic> attrs) {
-    final knownKeys = _fieldsForCategory(_category).map((f) => f.key).toSet();
-    for (final field in _fieldsForCategory(_category)) {
-      final value = attrs[field.key]?.toString() ?? '';
-      if (field.options != null) {
-        if (field.options!.contains(value)) _selectAttrs[field.key] = value;
+    final knownKeys = _fieldsForCategory(_category).map((c) => c.key).toSet();
+    for (final campo in _fieldsForCategory(_category)) {
+      final value = attrs[campo.key]?.toString() ?? '';
+      if (campo.opciones != null) {
+        if (campo.opciones!.contains(value)) _selectAttrs[campo.key] = value;
       } else {
-        _textAttrControllers[field.key] = TextEditingController(text: value);
+        _textAttrControllers[campo.key] = TextEditingController(text: value);
       }
     }
     // Los atributos de otras categorías se conservan tal cual al guardar.
@@ -181,14 +168,15 @@ class _EditAdPageState extends State<EditAdPage> {
         (widget.ad['featured_plan'] ?? widget.ad['selected_plan'] ?? 'free')
             .toString()
             .toLowerCase();
-    return _maxPhotosByPlan[plan] ?? 5;
+    // Tope SIEMPRE desde PlanLimits (única fuente, espejo de la web).
+    return PlanLimits.maxFotosFor(plan);
   }
 
   int get _photoCount => _currentImages.length + _newImages.length;
 
   Future<void> _pickPhotos() async {
     if (_photoCount >= _maxPhotos) {
-      _showMessage('Solo puedes subir un máximo de $_maxPhotos imágenes.');
+      _showMessage('Tu plan permite $_maxPhotos fotos.');
       return;
     }
     final picked = await _picker.pickMultiImage(imageQuality: 80);
@@ -196,7 +184,7 @@ class _EditAdPageState extends State<EditAdPage> {
     final room = _maxPhotos - _photoCount;
     setState(() => _newImages.addAll(picked.take(room)));
     if (picked.length > room) {
-      _showMessage('Solo puedes subir un máximo de $_maxPhotos imágenes.');
+      _showMessage('Tu plan permite $_maxPhotos fotos.');
     }
   }
 
@@ -214,12 +202,12 @@ class _EditAdPageState extends State<EditAdPage> {
 
   Map<String, dynamic> _collectAttributes() {
     final attrs = <String, dynamic>{};
-    for (final field in _fieldsForCategory(_category)) {
-      final raw = field.options != null
-          ? _selectAttrs[field.key] ?? ''
-          : _textAttrControllers[field.key]?.text.trim() ?? '';
+    for (final campo in _fieldsForCategory(_category)) {
+      final raw = campo.opciones != null
+          ? _selectAttrs[campo.key] ?? ''
+          : _textAttrControllers[campo.key]?.text.trim() ?? '';
       if (raw.isEmpty) continue;
-      attrs[field.key] = _numericAttrs.contains(field.key)
+      attrs[campo.key] = EsquemaCategorias.clavesNumericas.contains(campo.key)
           ? (double.tryParse(raw.replaceAll(',', '')) ?? 0)
           : raw;
     }
@@ -323,29 +311,55 @@ class _EditAdPageState extends State<EditAdPage> {
         ),
       );
 
-  Widget _attributeInput(AttrField field) {
-    if (field.options != null) {
+  Widget _attributeInput(CampoAtributo campo) {
+    final current = _selectAttrs[campo.key] ??
+        _textAttrControllers[campo.key]?.text ??
+        '';
+    if (campo.opciones != null) {
       return DropdownButtonFormField<String>(
-        initialValue: _selectAttrs[field.key],
+        initialValue: campo.opciones!.contains(current) ? current : null,
         isExpanded: true,
-        decoration: _decoration(field.label),
-        items: field.options!
+        decoration: _decoration(campo.etiqueta),
+        items: campo.opciones!
             .map((option) =>
                 DropdownMenuItem(value: option, child: Text(option)))
             .toList(),
         onChanged: (value) => setState(() {
           if (value == null) {
-            _selectAttrs.remove(field.key);
+            _selectAttrs.remove(campo.key);
           } else {
-            _selectAttrs[field.key] = value;
+            _selectAttrs[campo.key] = value;
           }
         }),
       );
     }
+    if (campo.esFecha) {
+      // Campo date de la web (communitySubcategories: fecha_evento).
+      return TextFormField(
+        controller: _textAttrControllers[campo.key] ??=
+            TextEditingController(text: current),
+        readOnly: true,
+        decoration: _decoration(campo.etiqueta),
+        onTap: () async {
+          final elegida = await showDatePicker(
+            context: context,
+            initialDate: DateTime.tryParse(current) ?? DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+          if (elegida != null) {
+            _textAttrControllers[campo.key]!.text =
+                elegida.toIso8601String().substring(0, 10);
+          }
+        },
+      );
+    }
     return TextFormField(
-      controller: _textAttrControllers[field.key],
-      keyboardType: field.numeric ? TextInputType.number : TextInputType.text,
-      decoration: _decoration(field.label, hint: field.hint),
+      controller: _textAttrControllers[campo.key] ??=
+          TextEditingController(text: current),
+      keyboardType:
+          campo.esNumerico ? TextInputType.number : TextInputType.text,
+      decoration: _decoration(campo.etiqueta, hint: campo.placeholder),
     );
   }
 
@@ -353,10 +367,12 @@ class _EditAdPageState extends State<EditAdPage> {
     final tiles = <Widget>[
       for (var i = 0; i < _currentImages.length; i++)
         _photoTile(
-          Image.network(
-            _currentImages[i],
+          CachedNetworkImage(
+            imageUrl: _currentImages[i],
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+            placeholder: (_, __) =>
+                const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            errorWidget: (_, __, ___) => const Icon(Icons.broken_image),
           ),
           isCover: i == 0,
           onRemove: () => setState(() => _currentImages.removeAt(i)),
@@ -452,20 +468,20 @@ class _EditAdPageState extends State<EditAdPage> {
         ],
       );
 
-  Widget _attributeGrid(String title, List<AttrField> fields) {
+  Widget _attributeGrid(String title, List<CampoAtributo> campos) {
     final rows = <Widget>[];
-    for (var i = 0; i < fields.length; i += 2) {
+    for (var i = 0; i < campos.length; i += 2) {
       rows.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _attributeInput(fields[i])),
+              Expanded(child: _attributeInput(campos[i])),
               const SizedBox(width: 10),
               Expanded(
-                child: i + 1 < fields.length
-                    ? _attributeInput(fields[i + 1])
+                child: i + 1 < campos.length
+                    ? _attributeInput(campos[i + 1])
                     : const SizedBox.shrink(),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
 
 class _PlanInfo {
@@ -20,59 +21,58 @@ class _PlanInfo {
   });
 }
 
-const _plans = [
-  _PlanInfo(
-    id: 'free',
-    title: 'GRATIS',
-    price: '\$0.00',
-    color: Color(0xFF9CA3AF),
-    benefits: [
-      'Hasta 5 fotos',
-      'Chat directo con compradores',
-      'Publica en minutos',
-    ],
-  ),
-  _PlanInfo(
-    id: 'basico',
-    title: 'BÁSICO',
-    price: '\$10.00',
-    badge: 'RECOMENDADO',
-    color: Color(0xFFCD7F32),
-    benefits: [
-      'Hasta 10 fotos',
-      'Insignia bronce en tu anuncio',
-      'Prioridad sobre anuncios gratis',
-      '1 optimización con IA',
-    ],
-  ),
-  _PlanInfo(
-    id: 'premium',
-    title: 'PREMIUM',
-    price: '\$20.00',
-    badge: 'POPULAR',
-    color: Color(0xFF6B7280),
-    benefits: [
-      'Hasta 15 fotos + carrusel',
-      'Insignia plateada en tu anuncio',
-      'Prioridad alta en resultados',
-      '3 optimizaciones con IA',
-    ],
-  ),
-  _PlanInfo(
-    id: 'destacado',
-    title: 'DESTACADO',
-    price: '\$30.00',
-    badge: 'MÁS VENDIDO',
-    color: Color(0xFFF5B301),
-    benefits: [
-      'Tu anuncio en la portada principal',
-      'Hasta 20 fotos + carrusel',
-      'Insignia dorada verificada',
-      'Máxima prioridad en búsquedas',
-      '5 optimizaciones con IA',
-      '1 video HD',
-    ],
-  ),
+/// Copys de marketing (badges, insignias, portada) son UI propia de la app;
+/// los límites (fotos, IA, video, vigencia, precio) vienen SIEMPRE de
+/// PlanLimits (espejo de AppConfig.js de la web). Nada hardcodeado aquí.
+const _planBadges = {
+  'basico': 'RECOMENDADO',
+  'premium': 'POPULAR',
+  'destacado': 'MÁS VENDIDO',
+};
+const _planColors = {
+  'free': Color(0xFF9CA3AF),
+  'basico': Color(0xFFCD7F32),
+  'premium': Color(0xFF6B7280),
+  'destacado': Color(0xFFF5B301),
+};
+const _planStaticBenefits = {
+  'free': ['Chat directo con compradores', 'Publica en minutos'],
+  'basico': ['Insignia bronce en tu anuncio', 'Prioridad sobre anuncios gratis'],
+  'premium': [
+    'Insignia plateada en tu anuncio',
+    'Prioridad alta en resultados',
+  ],
+  'destacado': [
+    'Tu anuncio en la portada principal',
+    'Insignia dorada verificada',
+    'Máxima prioridad en búsquedas',
+  ],
+};
+
+/// Lista de planes ordenada por prioridad (free → destacado), generada
+/// desde PlanLimits: precios, fotos, IA, video y vigencia de la web.
+final List<_PlanInfo> _plans = [
+  for (final entry in PlanLimits.planes.entries)
+    _PlanInfo(
+      id: entry.key,
+      title: (entry.value['label'] as String? ?? entry.key).toUpperCase(),
+      price: '\$${(entry.value['price'] as int? ?? 0).toStringAsFixed(2)}',
+      badge: _planBadges[entry.key],
+      color: _planColors[entry.key] ?? Mc.grisSuave,
+      benefits: [
+        // Vigencia: la del plan (form-logic.js: pagos 60d / free 30d).
+        'Vigencia de ${entry.value['vigenciaDias']} días',
+        // Fotos: tope del plan (AppConfig.js maxFotos).
+        'Hasta ${entry.value['maxFotos']} fotos'
+            '${entry.key == 'free' ? '' : ' + carrusel'}',
+        // IA: créditos de optimización por anuncio (publish-logic.js).
+        if ((entry.value['limiteIA'] as int? ?? 0) > 0)
+          '${entry.value['limiteIA']} optimización${entry.value['limiteIA'] == 1 ? '' : 'es'} con IA',
+        // Video: solo donde la web lo permite (publicar.html video-block).
+        if (entry.value['hasVideo'] == true) '1 video HD',
+        ..._planStaticBenefits[entry.key] ?? const <String>[],
+      ],
+    ),
 ];
 
 class PlanSelectionStep extends StatefulWidget {
@@ -270,11 +270,11 @@ class _PlanSelectionStepState extends State<PlanSelectionStep> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 4),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
-                          '30 días',
-                          style: TextStyle(color: Mc.grisSuave),
+                          '${PlanLimits.vigenciaDiasFor(plan.id)} días',
+                          style: const TextStyle(color: Mc.grisSuave),
                         ),
                       ),
                     ],

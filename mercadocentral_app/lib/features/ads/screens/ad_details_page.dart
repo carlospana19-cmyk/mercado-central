@@ -1,13 +1,42 @@
 import 'dart:convert'; // NUEVO: Para decodificar los atributos clave
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:mercadocentral_app/core/config/app_config.dart';
+import 'package:mercadocentral_app/core/utils/formatos.dart';
 import 'package:mercadocentral_app/features/chat/screens/chat_page.dart';
 import 'package:mercadocentral_app/features/profile/screens/edit_ad_page.dart';
 import '../../../core/services/review_service.dart';
 import '../../../theme/mc_colores.dart';
 import '../widgets/ad_spec_highlights.dart';
 import '../widgets/seller_reviews_widget.dart';
+
+/// Decodifica url_galeria sin importar cómo llegue: array de Supabase, string
+/// JSON o string JSON doble-codificado (["..."]). Nunca devuelve JSON crudo:
+/// si no se puede decodificar y es un texto plano, se trata como URL única.
+List<String> _decodeListaUrl(dynamic raw) {
+  var value = raw;
+  for (var i = 0; i < 3 && value is String; i++) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return const [];
+    try {
+      value = jsonDecode(trimmed);
+    } catch (_) {
+      return [trimmed]; // URL simple guardada como texto
+    }
+  }
+  if (value is List) {
+    return [
+      for (final item in value)
+        if (item != null && item.toString().trim().isNotEmpty)
+          item.toString().trim(),
+    ];
+  }
+  if (value is String && value.trim().isNotEmpty) return [value.trim()];
+  return const [];
+}
 
 class _SellerMessageDialog extends StatefulWidget {
   const _SellerMessageDialog();
@@ -172,27 +201,56 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
     }
   }
 
-  String _formatPrice(dynamic rawPrice) {
-    final price = num.tryParse(rawPrice?.toString() ?? '');
-    if (price == null) return 'Consultar';
-    final fixed = price.toStringAsFixed(2).split('.');
-    final grouped = fixed.first.replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+(?!\d))'),
-      (_) => ',',
-    );
-    return 'B/. $grouped.${fixed.last}';
-  }
+  String _formatPrice(dynamic rawPrice) => Formatos.precioUsd(rawPrice);
 
   String _publishedDate() {
     final value = widget.ad['fecha_publicacion'] ?? widget.ad['created_at'];
-    final date = DateTime.tryParse(value?.toString() ?? '');
+    final date = DateTime.tryParse(value?.toString() ?? '')?.toLocal();
     if (date == null) return 'Fecha no disponible';
-    final days = DateTime.now().difference(date.toLocal()).inDays;
-    if (days <= 0) return 'Publicado hoy';
-    if (days == 1) return 'Publicado hace 1 día';
-    if (days < 30) return 'Publicado hace $days días';
-    if (days < 60) return 'Publicado hace 1 mes';
-    return 'Publicado hace ${days ~/ 30} meses';
+    final days = DateTime.now().difference(date).inDays;
+    final relativo = days <= 0
+        ? 'Publicado hoy'
+        : days == 1
+            ? 'Publicado hace 1 día'
+            : days < 30
+                ? 'Publicado hace $days días'
+                : days < 60
+                    ? 'Publicado hace 1 mes'
+                    : 'Publicado hace ${days ~/ 30} meses';
+    // Fecha absoluta con intl (FASE 1): "20 nov 2026".
+    final absoluta = Formatos.fechaCorta(date);
+    return absoluta.isEmpty ? relativo : '$relativo · $absoluta';
+  }
+
+  /// Comparte el anuncio con el MISMO formato que initShareActions() en
+  /// product-detail-logic.js de la web: navigator.share
+  /// ({ title: titulo, text: titulo, url: url }) con la URL canónica
+  /// detalle-producto.html?id=<id codificado> (buildShareUrl).
+  Future<void> _compartirAnuncio() async {
+    final tituloCrudo = widget.ad['titulo']?.toString().trim() ?? '';
+    final titulo = tituloCrudo.isNotEmpty
+        ? tituloCrudo
+        : 'Anuncio en Mercados Central';
+    final url = AppConfig.urlDetalleAnuncio(
+      widget.ad['id']?.toString() ?? '',
+    );
+    try {
+      // share_plus 11 NO acepta `text` y `uri` a la vez (AssertionError:
+      // "uri and text cannot be provided at the same time"). Se envía el
+      // título + enlace combinados en `text`, igual que initShareActions()
+      // de la web (title + url juntos en el mismo mensaje).
+      await SharePlus.instance.share(
+        ShareParams(title: titulo, text: '$titulo\n$url'),
+      );
+    } catch (error) {
+      debugPrint('No se pudo compartir el anuncio: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No se pudo abrir el selector para compartir')),
+        );
+      }
+    }
   }
 
   bool get _isOwner =>
@@ -273,11 +331,12 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
       _allImages.add(ad['url_portada'].toString());
     }
 
-    // 2. Añadimos las fotos de la galería (dependiendo de cómo vengan de Supabase)
-    if (ad['url_galeria'] != null && ad['url_galeria'] is List) {
-      for (var img in ad['url_galeria']) {
-        if (img.toString().isNotEmpty) _allImages.add(img.toString());
-      }
+    // 2. Añadimos las fotos de la galería. url_galeria puede venir como array
+    //    de Supabase o como string JSON (incluso doble-codificado): se decodifica
+    //    siempre para NUNCA imprimir JSON crudo ni corchetes en pantalla.
+    final galeria = _decodeListaUrl(ad['url_galeria']);
+    if (galeria.isNotEmpty) {
+      _allImages.addAll(galeria);
     } else if (ad['imagenes'] != null && ad['imagenes'] is List) {
       for (var img in ad['imagenes']) {
         if (img['url_imagen'] != null) {
@@ -562,10 +621,15 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                             });
                           },
                           itemBuilder: (context, index) {
-                            return Image.network(
-                              _allImages[index],
+                            return CachedNetworkImage(
+                              imageUrl: _allImages[index],
                               fit: BoxFit.contain,
-                              errorBuilder: (c, e, s) => Container(
+                              // Fondo gris mientras carga (mc-detail.css:
+                              // #main-product-image background #EEF1F3).
+                              placeholder: (_, __) => Container(
+                                color: const Color(0xFFEEF1F3),
+                              ),
+                              errorWidget: (c, e, s) => Container(
                                 color: Colors.grey[200],
                                 child: const Icon(
                                   Icons.broken_image,
@@ -633,10 +697,12 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                         ),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: Image.network(
-                        _allImages[index],
+                      child: CachedNetworkImage(
+                        imageUrl: _allImages[index],
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        placeholder: (_, __) =>
+                            Container(color: const Color(0xFFEEF1F3)),
+                        errorWidget: (_, __, ___) => const Icon(
                           Icons.broken_image_outlined,
                           color: Mc.grisSuave,
                         ),
@@ -681,6 +747,19 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                         ),
                       ),
                     ],
+                  ),
+
+                  // Compartir anuncio: fila siempre visible, igual que la
+                  // share-row de detalle-producto.html de la web.
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    onPressed: _compartirAnuncio,
+                    icon: const Icon(Icons.share_outlined, size: 18),
+                    label: const Text('Compartir'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Mc.naranjaOscuro,
+                      side: const BorderSide(color: Mc.naranja),
+                    ),
                   ),
 
                   const Divider(
@@ -755,7 +834,7 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                                               ?.toString()
                                               .isNotEmpty ??
                                           false)
-                                      ? NetworkImage(
+                                      ? CachedNetworkImageProvider(
                                           _sellerProfile['url_foto_perfil']
                                               .toString(),
                                         )

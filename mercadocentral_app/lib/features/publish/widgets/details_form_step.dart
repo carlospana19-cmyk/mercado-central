@@ -1,121 +1,29 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/config/app_config.dart';
+import '../../../features/categorias/esquema_categorias.dart';
+import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
 import '../../ads/widgets/location_picker.dart';
 import '../../ads/widgets/location_map_picker.dart';
 import '../../search/models/category_catalog.dart';
 
-class AttrField {
-  final String key;
-  final String label;
-  final String? hint;
-  final bool numeric;
-  final List<String>? options;
-
-  const AttrField(
-    this.key,
-    this.label, {
-    this.hint,
-    this.numeric = false,
-    this.options,
-  });
-}
-
-const _yesNo = ['Sí', 'No'];
-const _conditions = [
-  'Excelente',
-  'Bueno',
-  'Regular',
-  'Necesita reparaciones',
-];
-
-const vehicleAttrFields = [
-  AttrField('marca', 'Marca', hint: 'Ej: Toyota'),
-  AttrField('modelo', 'Modelo', hint: 'Ej: Hilux 2.4 CD 4x4'),
-  AttrField('anio', 'Año', hint: 'Ej: 2020', numeric: true),
-  AttrField('kilometraje', 'Kilometraje', hint: 'Ej: 50000', numeric: true),
-  AttrField('transmision', 'Transmisión', options: ['Automática', 'Manual']),
-  AttrField(
-    'combustible',
-    'Combustible',
-    options: ['Gasolina', 'Diesel', 'Híbrido', 'Eléctrico'],
-  ),
-  AttrField('color', 'Color', hint: 'Ej: Blanco'),
-  AttrField('puertas', 'Puertas', options: ['2', '3', '4', '5']),
-  AttrField('vidrios', 'Vidrios', options: ['Eléctricos', 'Manuales']),
-  AttrField('rines', 'Rines', hint: 'Ej: 16 pulgadas'),
-  AttrField('tapiz', 'Tapiz', options: ['Tela', 'Cuero', 'Vinilo']),
-  AttrField(
-    'direccion',
-    'Dirección',
-    options: ['Asistida', 'Hidráulica', 'Eléctrica'],
-  ),
-  AttrField('frenos', 'Frenos', options: ['ABS', 'Discos', 'Tambores']),
-  AttrField('airbags', 'Airbags', options: _yesNo),
-  AttrField('estado', 'Estado', options: _conditions),
-];
-
-const propertyAttrFields = [
-  AttrField('m2', 'Metros cuadrados (m²)', hint: 'Ej: 120', numeric: true),
-  AttrField('habitaciones', 'Habitaciones', hint: 'Ej: 3', numeric: true),
-  AttrField('banos', 'Baños', hint: 'Ej: 2', numeric: true),
-  AttrField('piso', 'Piso', hint: 'Ej: 5', numeric: true),
-  AttrField(
-    'estacionamiento',
-    'Estacionamientos',
-    hint: 'Ej: 1',
-    numeric: true,
-  ),
-  AttrField('amueblado', 'Amueblado', options: ['Sí', 'No', 'Parcialmente']),
-  AttrField('ascensor', 'Ascensor', options: _yesNo),
-  AttrField('jardin', 'Jardín', options: _yesNo),
-  AttrField('piscina', 'Piscina', options: _yesNo),
-  AttrField(
-    'tipo_propiedad',
-    'Tipo de propiedad',
-    options: ['Casa', 'Apartamento', 'Local', 'Oficina', 'Terreno'],
-  ),
-  AttrField(
-    'anio_construccion',
-    'Año de construcción',
-    hint: 'Ej: 2020',
-    numeric: true,
-  ),
-  AttrField(
-    'estado_conservacion',
-    'Estado de conservación',
-    options: _conditions,
-  ),
-  AttrField('calefaccion', 'Calefacción',
-      options: ['Sí', 'No', 'Eléctrica', 'Gas']),
-  AttrField(
-    'aire_acondicionado',
-    'Aire acondicionado',
-    options: ['Sí', 'No', 'Central', 'Split'],
-  ),
-  AttrField(
-    'seguridad',
-    'Seguridad',
-    options: ['Portero', 'Cámaras', 'Alarmas', 'Conserje', 'Básica'],
-  ),
-  AttrField(
-    'orientacion',
-    'Orientación',
-    options: ['Norte', 'Sur', 'Este', 'Oeste'],
-  ),
-  AttrField('mascotas', 'Mascotas permitidas',
-      options: ['Sí', 'No', 'Pequeñas']),
-  AttrField('gimnasio', 'Gimnasio', options: _yesNo),
-];
-
 class DetailsFormStep extends StatefulWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onDataChanged;
+
+  /// Plan seleccionado en el paso anterior: define si el plan permite video
+  /// (PlanLimits.hasVideoFor) y el tope de IA (PlanLimits.limiteIAFor).
+  final String selectedPlan;
 
   const DetailsFormStep({
     super.key,
     required this.formData,
     required this.onDataChanged,
+    required this.selectedPlan,
   });
 
   @override
@@ -126,6 +34,14 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
   late final String _email;
   String? _mapProvince;
   String? _mapDistrict;
+
+  // Créditos IA (espejo de editar-anuncio-logic.js: suscripciones.limite_ia
+  // menos optimizations_ia_usadas). -1 = aún sin cargar.
+  int _iaRestantes = -1;
+  bool _iaOptimizando = false;
+  String? _iaStatus;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
 
   Map<String, dynamic> get _attrs =>
       widget.formData['atributos_clave'] as Map<String, dynamic>;
@@ -138,6 +54,128 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
     widget.formData['contact_name'] ??=
         (user?.userMetadata?['full_name'] ?? user?.userMetadata?['name'] ?? '')
             .toString();
+    if (user != null) _loadIaCredits(user.id);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descController.dispose();
+    super.dispose();
+  }
+
+  /// Créditos IA: suscripciones.limite_ia - optimizations_ia_usadas,
+  /// exactamente como la web (editar-anuncio-logic.js líneas 1904-1915).
+  Future<void> _loadIaCredits(String userId) async {
+    try {
+      final sub = await Supabase.instance.client
+          .from('suscripciones')
+          .select('optimizations_ia_usadas, limite_ia')
+          .eq('user_id', userId)
+          .single();
+      final limite = (sub['limite_ia'] as num?)?.toInt() ?? 0;
+      final usadas = (sub['optimizations_ia_usadas'] as num?)?.toInt() ?? 0;
+      if (mounted) setState(() => _iaRestantes = limite - usadas);
+    } catch (_) {
+      // Sin suscripción registrada: el tope del plan aplica igual.
+      if (mounted) {
+        setState(() =>
+            _iaRestantes = PlanLimits.limiteIAFor(widget.selectedPlan));
+      }
+    }
+  }
+
+  /// Relee el saldo IA desde `suscripciones` (limite_ia -
+  /// optimizations_ia_usadas), igual que ia-button.js en la web: la BD es la
+  /// única fuente de verdad y nunca se asume el valor en memoria.
+  Future<void> _releerSaldoIa() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+      final sub = await Supabase.instance.client
+          .from('suscripciones')
+          .select('limite_ia, optimizations_ia_usadas')
+          .eq('user_id', user.id)
+          .maybeSingle();
+      if (sub == null) return;
+      final limite = (sub['limite_ia'] as num?)?.toInt() ?? 0;
+      final usadas = (sub['optimizations_ia_usadas'] as num?)?.toInt() ?? 0;
+      if (mounted) setState(() => _iaRestantes = limite - usadas);
+    } catch (_) {
+      // Sin acceso a la BD: se conserva el valor en memoria.
+    }
+  }
+
+  /// Botón IA: llama al mismo endpoint que ia-button.js de la web y bloquea
+  /// en 0 créditos. Tras optimizar con éxito, registra el uso en la BD y
+  /// relee el saldo real desde `suscripciones`.
+  Future<void> _optimizeWithAi() async {
+    final titulo = _titleController.text.trim();
+    final descripcion = _descController.text.trim();
+    if (titulo.isEmpty || descripcion.isEmpty) {
+      setState(() => _iaStatus = 'Escribe título y descripción primero');
+      return;
+    }
+    if (_iaRestantes <= 0) {
+      setState(() =>
+          _iaStatus = 'Has agotado tus optimizaciones de IA de tu plan actual.');
+      return;
+    }
+
+    setState(() {
+      _iaOptimizando = true;
+      _iaStatus = 'Optimizando con IA...';
+    });
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConfig.iaServerUrl}/optimizar'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'titulo': titulo, 'descripcion': descripcion}),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Error ${response.statusCode}');
+      }
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (data.containsKey('error')) throw Exception(data['error']);
+
+      final newTitle =
+          (data['titulo'] ?? data['titulo_optimizado'] ?? '').toString();
+      final newDesc =
+          (data['descripcion'] ?? data['descripcion_optimizada'] ?? '')
+              .toString();
+      _titleController.text = newTitle.isNotEmpty ? newTitle : titulo;
+      _descController.text = newDesc.isNotEmpty ? newDesc : descripcion;
+      _updateField('titulo', _titleController.text);
+      _updateField('descripcion', _descController.text);
+
+      // Incremento de uso en suscripciones (editar-anuncio-logic.js L1967).
+      try {
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user != null) {
+          final sub = await Supabase.instance.client
+              .from('suscripciones')
+              .select('optimizations_ia_usadas')
+              .eq('user_id', user.id)
+              .single();
+          final usadas = (sub['optimizations_ia_usadas'] as num?)?.toInt() ?? 0;
+          await Supabase.instance.client
+              .from('suscripciones')
+              .update({'optimizations_ia_usadas': usadas + 1})
+              .eq('user_id', user.id);
+        }
+      } catch (_) {}
+      // Releer el saldo REAL desde `suscripciones` (limite_ia -
+      // optimizations_ia_usadas), igual que ia-button.js en la web: si algo
+      // descontó en la BD, incrementar solo en memoria desfasaría el contador.
+      await _releerSaldoIa();
+      if (mounted) {
+        setState(() => _iaStatus = '✨ ¡Optimizado!');
+      }
+    } catch (_) {
+      if (mounted) setState(() => _iaStatus = 'Error de conexión con IA');
+    } finally {
+      if (mounted) setState(() => _iaOptimizando = false);
+    }
   }
 
   void _updateField(String key, dynamic value) {
@@ -194,41 +232,61 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         ),
       );
 
-  Widget _attrInput(AttrField field) {
-    final current = _attrs[field.key]?.toString();
-    if (field.options != null) {
+  Widget _attrInput(CampoAtributo campo) {
+    final current = _attrs[campo.key]?.toString();
+    if (campo.opciones != null) {
       return DropdownButtonFormField<String>(
-        decoration: _decoration(field.label),
+        decoration: _decoration(campo.etiqueta),
         isExpanded: true,
-        value: field.options!.contains(current) ? current : null,
-        items: field.options!
+        initialValue: campo.opciones!.contains(current) ? current : null,
+        items: campo.opciones!
             .map((o) => DropdownMenuItem(value: o, child: Text(o)))
             .toList(),
-        onChanged: (v) => _updateAttribute(field.key, v),
+        onChanged: (v) => _updateAttribute(campo.key, v),
+      );
+    }
+    if (campo.esFecha) {
+      // Campo date de la web (communitySubcategories: fecha_evento).
+      return TextFormField(
+        decoration: _decoration(campo.etiqueta),
+        controller: TextEditingController(text: current),
+        readOnly: true,
+        onTap: () async {
+          final elegida = await showDatePicker(
+            context: context,
+            initialDate: DateTime.tryParse(current ?? '') ?? DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+          if (elegida != null) {
+            _updateAttribute(campo.key, elegida.toIso8601String().substring(0, 10));
+          }
+        },
       );
     }
     return TextFormField(
-      decoration: _decoration(field.label, hint: field.hint),
-      keyboardType: field.numeric ? TextInputType.number : TextInputType.text,
+      decoration: _decoration(campo.etiqueta, hint: campo.placeholder),
+      keyboardType:
+          campo.esNumerico ? TextInputType.number : TextInputType.text,
       initialValue: current,
-      onChanged: (v) => _updateAttribute(field.key, v),
+      onChanged: (v) => _updateAttribute(campo.key, v),
     );
   }
 
-  Widget _attributeGrid(String title, List<AttrField> fields) {
+  Widget _attributeGrid(String title, List<CampoAtributo> campos) {
     final rows = <Widget>[];
-    for (var i = 0; i < fields.length; i += 2) {
+    for (var i = 0; i < campos.length; i += 2) {
       rows.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _attrInput(fields[i])),
+              Expanded(child: _attrInput(campos[i])),
               const SizedBox(width: 10),
               Expanded(
-                child: i + 1 < fields.length
-                    ? _attrInput(fields[i + 1])
+                child: i + 1 < campos.length
+                    ? _attrInput(campos[i + 1])
                     : const SizedBox.shrink(),
               ),
             ],
@@ -260,6 +318,8 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
     final subcategories = cat == null
         ? <String>[]
         : fullCategoryCatalog.firstWhere((c) => c.name == cat).subcategories;
+    final subcatActual = (sub ?? '').toString();
+    final campos = EsquemaCategorias.camposPara(cat ?? '', subcatActual);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +328,7 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         DropdownButtonFormField<String>(
           decoration: _decoration('Categoría principal *'),
           isExpanded: true,
-          value: cat,
+          initialValue: cat,
           items: fullCategoryCatalog
               .map((c) => DropdownMenuItem(value: c.name, child: Text(c.name)))
               .toList(),
@@ -285,7 +345,7 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         DropdownButtonFormField<String>(
           decoration: _decoration('Subcategoría'),
           isExpanded: true,
-          value: subcategories.contains(sub) ? sub : null,
+          initialValue: subcategories.contains(sub) ? sub : null,
           items: subcategories
               .map((s) => DropdownMenuItem(value: s, child: Text(s)))
               .toList(),
@@ -323,12 +383,12 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         const SizedBox(height: 14),
         _section(Icons.edit_note, 'Información del anuncio'),
         TextFormField(
+          controller: _titleController,
           decoration: _decoration(
             'Título del anuncio *',
             hint: 'Ej. Toyota Hilux 2022 Impecable',
           ),
           maxLength: 60,
-          initialValue: widget.formData['titulo'],
           onChanged: (val) => _updateField('titulo', val),
         ),
         const SizedBox(height: 8),
@@ -341,19 +401,105 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
         ),
         const SizedBox(height: 14),
         TextFormField(
+          controller: _descController,
           decoration: _decoration(
             'Descripción *',
             hint: 'Describe las características, estado, mantenimiento, etc.',
           ),
           maxLines: 6,
           maxLength: 1000,
-          initialValue: widget.formData['descripcion'],
           onChanged: (val) => _updateField('descripcion', val),
         ),
-        if (cat == 'Vehículos')
-          _attributeGrid('Especificaciones del vehículo', vehicleAttrFields),
-        if (cat == 'Inmuebles')
-          _attributeGrid('Especificaciones del inmueble', propertyAttrFields),
+        // Botón IA: solo visible si el plan lo permite (límite > 0).
+        // Contador de créditos restantes = suscripciones.limite_ia - usadas
+        // (espejo de editar-anuncio-logic.js de la web).
+        if (PlanLimits.limiteIAFor(widget.selectedPlan) > 0) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              ElevatedButton.icon(
+                onPressed: _iaOptimizando || _iaRestantes <= 0
+                    ? null
+                    : _optimizeWithAi,
+                icon: _iaOptimizando
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.auto_awesome, size: 16),
+                label: const Text('Optimizar con IA'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7C3AED),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                _iaRestantes < 0
+                    ? '... créditos IA'
+                    : '$_iaRestantes créditos IA',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _iaRestantes > 0 ? Mc.grisSuave : Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          if (_iaStatus != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                _iaStatus!,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _iaStatus!.startsWith('✨') ? Colors.green : Colors.red,
+                ),
+              ),
+            ),
+        ],
+        // Campo de video: solo visible si el plan lo permite (publicar.html
+        // de la web muestra video-block solo para Destacado).
+        if (PlanLimits.hasVideoFor(widget.selectedPlan)) ...[
+          const SizedBox(height: 14),
+          TextFormField(
+            decoration: _decoration(
+              'URL de Video (Youtube o Vimeo)',
+              hint: 'https://www.youtube.com/watch?v=...',
+            ),
+            initialValue: widget.formData['video_url']?.toString(),
+            onChanged: (val) => _updateField('video_url', val),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Text(
+              'Añade un vídeo de hasta 60 segundos para el carrusel.',
+              style: TextStyle(fontSize: 12, color: Mc.grisSuave),
+            ),
+          ),
+        ],
+        // Sección dinámica de atributos (FASE 1 · BLOQUE D): para TODAS las
+        // categorías, con los campos EXACTOS de la web (EsquemaCategorias,
+        // única fuente espejo de publish-logic.js y publicar.html).
+        if (campos.isNotEmpty)
+          _attributeGrid(
+            EsquemaCategorias.tituloSeccion(
+              cat ?? '',
+              (widget.formData['subcategoria'] ?? '').toString(),
+            ),
+            campos,
+          ),
         const Divider(),
         _section(Icons.account_circle_outlined, 'Información de contacto'),
         TextFormField(

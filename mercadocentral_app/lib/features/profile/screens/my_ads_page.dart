@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formatos.dart';
+import '../../../theme/mc_colores.dart';
 import 'edit_ad_page.dart'; // 🚨 ¡ASEGÚRATE DE TENER ESTA LÍNEA!
 
 class MyAdsPage extends StatefulWidget {
@@ -83,13 +85,14 @@ class _MyAdsPageState extends State<MyAdsPage> {
         _refreshList(); // Recargamos visualmente
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al eliminar: $e'),
             backgroundColor: Colors.red,
           ),
         );
+      }
     }
   }
 
@@ -118,10 +121,11 @@ class _MyAdsPageState extends State<MyAdsPage> {
         _refreshList();
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
+      }
     }
   }
 
@@ -143,7 +147,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(color: Mc.naranja),
             );
           }
 
@@ -232,23 +236,38 @@ class _MyAdsPageState extends State<MyAdsPage> {
                                 ad['imagenes'][0]['url_imagen'].toString();
                           }
 
+                          // Vencimiento: igual que la web, la fecha de
+                          // eliminación define cuándo muere el anuncio.
+                          // Badge "Vence en N días" con ≤ 7 días restantes.
+                          final fechaElim =
+                              DateTime.tryParse(ad['fecha_eliminacion'] ?? '');
+                          final diasRestantes =
+                              fechaElim?.difference(DateTime.now()).inDays;
+                          final bool isExpired = !isSold &&
+                              diasRestantes != null &&
+                              diasRestantes < 0;
+                          final bool expiringSoon = !isSold &&
+                              !isExpired &&
+                              diasRestantes != null &&
+                              diasRestantes <= 7;
+
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 width: 80,
                                 height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                color: Colors.grey[100],
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: imageUrl != null
-                                      ? Image.network(
-                                          imageUrl,
+                                      ? CachedNetworkImage(
+                                          imageUrl: imageUrl,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (c, e, s) => const Icon(
+                                          placeholder: (_, __) => Container(
+                                            color: Colors.grey[100],
+                                          ),
+                                          errorWidget: (c, e, s) => const Icon(
                                             Icons.broken_image,
                                             color: Colors.grey,
                                           ),
@@ -273,13 +292,45 @@ class _MyAdsPageState extends State<MyAdsPage> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      '\$${ad['precio']}',
+                                      // USD "$1,250.00" con intl (FASE 1).
+                                      Formatos.precioUsd(ad['precio']),
                                       style: const TextStyle(
-                                        color: AppColors.primary,
+                                        color: Mc.naranja,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
                                     ),
+                                    // Fechas con intl (FASE 1): publicación y,
+                                    // si aplica, vencimiento ("20 nov 2026").
+                                    if (Formatos.fechaCortaDeIso(
+                                                ad['fecha_publicacion'] ??
+                                                    ad['created_at'])
+                                            .isNotEmpty ||
+                                        Formatos.fechaCortaDeIso(
+                                                ad['fecha_eliminacion'])
+                                            .isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        () {
+                                          final partes = <String>[
+                                            if (Formatos.fechaCortaDeIso(
+                                                        ad['fecha_publicacion'] ??
+                                                            ad['created_at'])
+                                                    .isNotEmpty)
+                                              'Publicado: ${Formatos.fechaCortaDeIso(ad['fecha_publicacion'] ?? ad['created_at'])}',
+                                            if (Formatos.fechaCortaDeIso(
+                                                    ad['fecha_eliminacion'])
+                                                .isNotEmpty)
+                                              'Vence: ${Formatos.fechaCortaDeIso(ad['fecha_eliminacion'])}',
+                                          ];
+                                          return partes.join(' · ');
+                                        }(),
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                     const SizedBox(height: 5),
 
                                     // 🚨 LA ETIQUETA VISUAL
@@ -291,16 +342,30 @@ class _MyAdsPageState extends State<MyAdsPage> {
                                       decoration: BoxDecoration(
                                         color: (isSold
                                                 ? Colors.grey
-                                                : Colors.green)
-                                            .withOpacity(0.1),
+                                                : isExpired
+                                                    ? Colors.red
+                                                    : expiringSoon
+                                                        ? Colors.orange
+                                                        : Colors.green)
+                                            .withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: Text(
-                                        isSold ? 'VENDIDO' : 'ACTIVO',
+                                        isSold
+                                            ? 'VENDIDO'
+                                            : isExpired
+                                                ? 'VENCIDO'
+                                                : expiringSoon
+                                                    ? 'Vence en $diasRestantes días'
+                                                    : 'ACTIVO',
                                         style: TextStyle(
                                           color: isSold
                                               ? Colors.grey
-                                              : Colors.green,
+                                              : isExpired
+                                                  ? Colors.red
+                                                  : expiringSoon
+                                                      ? Colors.orange
+                                                      : Colors.green,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -357,7 +422,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
                                                 ? Colors.green
                                                 : Colors.orange,
                                           ),
-                                          SizedBox(width: 10),
+                                          const SizedBox(width: 10),
                                           Text(isSold
                                               ? 'Reactivar'
                                               : 'Marcar Vendido'),

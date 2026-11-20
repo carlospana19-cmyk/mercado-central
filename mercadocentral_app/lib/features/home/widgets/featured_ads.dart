@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../ads/screens/ad_details_page.dart';
+import '../../../theme/mc_colores.dart';
 import 'ad_card.dart';
 
 class FeaturedAds extends StatefulWidget {
@@ -98,7 +97,7 @@ class _FeaturedAdsState extends State<FeaturedAds> {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(40.0),
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(color: Mc.naranja),
             ),
           );
         }

@@ -21,7 +21,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _whatsappController = TextEditingController();
   final _businessController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _addressController = TextEditingController();
 
   String _businessType = '';
   String? _province;
@@ -53,7 +52,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _whatsappController.dispose();
     _businessController.dispose();
     _descriptionController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -81,7 +79,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _businessController.text = (profile['nombre_negocio'] ?? '').toString();
         _businessType = (profile['tipo_negocio'] ?? '').toString();
         _descriptionController.text = (profile['descripcion'] ?? '').toString();
-        _addressController.text = (profile['direccion'] ?? '').toString();
         _photoUrl = profile['url_foto_perfil']?.toString();
         final province = profile['provincia']?.toString();
         _province =
@@ -157,7 +154,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'descripcion': _descriptionController.text.trim(),
         'provincia': _province,
         'distrito': _district,
-        'direccion': _addressController.text.trim(),
         if (_photoUrl != null) 'url_foto_perfil': _photoUrl,
       });
       if (!mounted) return;
@@ -371,12 +367,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     onChanged: districts.isEmpty
                         ? null
                         : (value) => setState(() => _district = value),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _addressController,
-                    maxLength: 150,
-                    decoration: _decoration('Dirección'),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(

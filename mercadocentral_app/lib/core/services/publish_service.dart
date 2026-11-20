@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../features/categorias/esquema_categorias.dart';
+import '../../features/planes/plan_limits.dart';
+import '../utils/session_guard.dart';
 
 class PublishService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -14,6 +17,16 @@ class PublishService {
     Map<String, dynamic>? token,
   }) async {
     try {
+      // 0. Sesión vigente: renueva el token si está por vencer; si la sesión
+      //    está muerta (típico tras restaurar datos de otra instalación) la
+      //    limpia y corta aquí, porque el insert saldría como anon y la BD
+      //    responde 42501 "permission denied for table anuncios".
+      final sessionOk = await SessionGuard.ensureFresh(_supabase);
+      if (!sessionOk) {
+        debugPrint('Sesión ausente o no renovable: no se puede publicar.');
+        return false;
+      }
+
       // 1. Verificar usuario activo
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) {
@@ -56,21 +69,15 @@ class PublishService {
         imageUrls.add(publicUrl);
       }
 
-      // 3. Asignar el peso numérico del plan (para que queden arriba en el Home)
-      int planPriority = 1; // Free
-      if (selectedPlan == 'basico') planPriority = 2;
-      if (selectedPlan == 'premium') planPriority = 3;
-      if (selectedPlan == 'destacado' || selectedPlan == 'top')
-        planPriority = 4;
+      // 3. Asignar el peso numérico del plan (para que queden arriba en el Home).
+      //    Prioridad SIEMPRE desde PlanLimits (espejo de la web). Nada hardcodeado.
+      final planPriority = PlanLimits.priorityFor(selectedPlan) + 1;
 
-      // 4. Preparar el paquete de datos EXACTO como lo usa tu web
-      const numericAttrs = {
-        'kilometraje',
-        'm2',
-        'anio',
-        'habitaciones',
-        'banos'
-      };
+      // 4. Preparar el paquete de datos EXACTO como lo usa tu web.
+      // Claves numéricas derivadas del esquema de categorías
+      // (FASE 1 · BLOQUE D): cualquier campo number de la web se guarda
+      // como número real en atributos_clave.
+      final numericAttrs = EsquemaCategorias.clavesNumericas;
       final attrs = <String, dynamic>{};
       (adData['atributos_clave'] as Map? ?? {}).forEach((key, value) {
         final text = value.toString();
@@ -83,7 +90,9 @@ class PublishService {
       final now = DateTime.now().toUtc();
       final tokenDays = int.tryParse(token?['duracion_dias']?.toString() ?? '');
       final planDays = tokenDays != null && tokenDays > 0 ? tokenDays : 30;
-      final expirationDays = isPaid ? 60 : 30;
+      // Vigencia SIEMPRE desde PlanLimits (espejo de form-logic.js de la web:
+      // pagos 60 días, free 30 días). Nada hardcodeado.
+      final expirationDays = PlanLimits.vigenciaDiasFor(selectedPlan);
       final phone = (adData['contact_phone'] ?? '').toString().trim();
 
       final insertData = {
@@ -115,6 +124,11 @@ class PublishService {
         // La primera foto es la portada, el resto va a la galería
         'url_portada': imageUrls.isNotEmpty ? imageUrls.first : null,
         'url_galeria': imageUrls.length > 1 ? imageUrls.sublist(1) : [],
+        // Video: solo llega aquí si el plan lo permite (el campo se oculta
+        // en el formulario según PlanLimits.hasVideoFor).
+        'video_url': (adData['video_url'] ?? '').toString().trim().isEmpty
+            ? null
+            : adData['video_url'].toString().trim(),
       };
 
       // 5. Registrar la vigencia del plan pago, como lo hace la web.

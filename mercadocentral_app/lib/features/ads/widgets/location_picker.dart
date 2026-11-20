@@ -24,7 +24,7 @@ class _LocationPickerState extends State<LocationPicker> {
       children: [
         DropdownButtonFormField<String>(
           decoration: const InputDecoration(labelText: 'Provincia'),
-          value: _selectedProvince,
+          initialValue: _selectedProvince,
           items: LocationHelper.getProvinces()
               .map((p) => DropdownMenuItem(value: p, child: Text(p)))
               .toList(),
@@ -39,7 +39,7 @@ class _LocationPickerState extends State<LocationPicker> {
         const SizedBox(height: 15),
         DropdownButtonFormField<String>(
           decoration: const InputDecoration(labelText: 'Distrito'),
-          value: _selectedDistrict,
+          initialValue: _selectedDistrict,
           disabledHint: const Text('Selecciona una provincia primero'),
           items: _selectedProvince == null
               ? null

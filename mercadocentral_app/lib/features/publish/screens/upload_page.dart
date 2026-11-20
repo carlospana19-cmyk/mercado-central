@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/publish_service.dart'; // NUEVO SERVICIO
+import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
 import '../widgets/plan_selection_step.dart';
 import '../widgets/details_form_step.dart';
@@ -24,13 +25,8 @@ class _UploadPageState extends State<UploadPage> {
   };
 
   Map<String, dynamic>? _tokenData;
-  static const _maxPhotosByPlan = {
-    'free': 5,
-    'basico': 10,
-    'premium': 15,
-    'destacado': 20,
-  };
-  int get _maxPhotos => _maxPhotosByPlan[_selectedPlan] ?? 5;
+  // Máximo de fotos SIEMPRE desde PlanLimits (espejo de la web). Nada hardcodeado.
+  int get _maxPhotos => PlanLimits.maxFotosFor(_selectedPlan);
 
   final List<XFile> _selectedImages = [];
   final PublishService _publishService =
@@ -54,10 +50,12 @@ class _UploadPageState extends State<UploadPage> {
 
     final title = (_adData['titulo'] ?? '').toString().trim();
     final price = double.tryParse((_adData['precio'] ?? '').toString()) ?? 0;
-    if (_adData['categoria'] == null)
+    if (_adData['categoria'] == null) {
       return _showError('Selecciona una categoría');
-    if (_adData['provincia'] == null)
+    }
+    if (_adData['provincia'] == null) {
       return _showError('Selecciona provincia y distrito');
+    }
     if (title.isEmpty) return _showError('Por favor ingresa un título');
     if (price < 1) return _showError('Ingresa un precio válido');
     if ((_adData['descripcion'] ?? '').toString().trim().isEmpty) {
@@ -96,10 +94,19 @@ class _UploadPageState extends State<UploadPage> {
     } else {
       setState(() => _isPublishing = false);
       if (!mounted) return;
+      // Si la sesión se limpió (vencida y no renovable), dar un mensaje
+      // claro en vez del genérico.
+      final sinSesion =
+          Supabase.instance.client.auth.currentSession == null;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Error al publicar. Intenta de nuevo.'),
-            backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(
+            sinSesion
+                ? 'Tu sesión expiró. Inicia sesión de nuevo para publicar.'
+                : 'Error al publicar. Intenta de nuevo.',
+          ),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -212,6 +219,7 @@ class _UploadPageState extends State<UploadPage> {
                     content: DetailsFormStep(
                       formData: _adData,
                       onDataChanged: () {},
+                      selectedPlan: _selectedPlan,
                     ),
                     isActive: _currentStep >= 1,
                     state: _currentStep > 1

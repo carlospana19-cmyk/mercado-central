@@ -6,7 +6,7 @@ import 'package:mercadocentral_app/main.dart';
 void main() {
   testWidgets('App loads smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MercadoCentralApp());
+    await tester.pumpWidget(const MercadoCentralApp(startAtHome: false));
 
     // Verify that app loads (checking for login title)
     expect(find.byType(MaterialApp), findsOneWidget);
