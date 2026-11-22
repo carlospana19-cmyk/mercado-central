@@ -632,7 +632,10 @@ class _EditAdPageState extends State<EditAdPage> {
                     maxLength: 100,
                     decoration: _decoration(
                       'Título del anuncio *',
-                      hint: 'Ej: Toyota Corolla 2020, Excelente Estado',
+                      // Placeholder dinámico según categoría/subcategoría
+                      // (espejo de editar-anuncio-logic.js de la web).
+                      hint: EsquemaCategorias.tituloPlaceholder(
+                          _category ?? '', _subcategory ?? ''),
                     ),
                     validator: (value) {
                       final text = value?.trim() ?? '';

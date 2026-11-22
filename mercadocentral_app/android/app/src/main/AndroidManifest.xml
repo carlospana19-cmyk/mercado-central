@@ -44,6 +44,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Render con Skia en vez de Impeller: en dispositivos Xiaomi con
+             OpenGLES, Impeller produce artefactos al hacer scroll (la imagen
+             se desplaza/pinta desfasada dentro de la tarjeta). Forzar Skia
+             elimina ese glitch de composición. -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
     </application>
     <queries>
         <intent>

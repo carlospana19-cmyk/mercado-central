@@ -264,6 +264,10 @@ class _MyAdsPageState extends State<MyAdsPage> {
                                       ? CachedNetworkImage(
                                           imageUrl: imageUrl,
                                           fit: BoxFit.cover,
+                                          // Sin fade: evita el desfase
+                                          // imagen/tarjeta al scrollear.
+                                          fadeInDuration: Duration.zero,
+                                          fadeOutDuration: Duration.zero,
                                           placeholder: (_, __) => Container(
                                             color: Colors.grey[100],
                                           ),

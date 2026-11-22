@@ -819,6 +819,31 @@ const Map<String, String> etiquetasDetalle = {
   'bateria': 'Batería',
 };
 
+/// MAPEO CATEGORÍA → PLACEHOLDER DEL TÍTULO (publish-logic.js L1585-L1597).
+///
+/// Espejo exacto del `placeholderMap` de la web: el hint del título del
+/// anuncio cambia según la categoría principal y la subcategoría elegida.
+/// Si la categoría no está registrada (o aún no se elige) se usa el
+/// placeholder por defecto de la web: "Ej: Descripción breve y atractiva
+/// de tu artículo".
+final Map<String, String Function(String)> _placeholdersTitulo = {
+  'Vehículos': (sub) => 'Ej: Vendo ${sub.isEmpty ? 'Vehículo' : sub}, Como Nuevo',
+  'Inmuebles': (sub) => 'Ej: Se Vende ${sub.isEmpty ? 'Propiedad' : sub} en [Ubicación]',
+  'Empleos y Servicios': (sub) =>
+      'Ej: Ofrezco Servicios de ${sub.isEmpty ? 'Profesional' : sub}',
+  'Servicios': (sub) => 'Ej: ${sub.isEmpty ? 'Servicio' : sub} a Domicilio',
+  'Comunidad': (sub) => 'Ej: ${sub.isEmpty ? 'Anuncio de Comunidad' : sub}',
+  'Mascotas': (sub) => 'Ej: Adopción Responsable de ${sub.isEmpty ? 'Mascota' : sub}',
+  'Electrónica': (sub) =>
+      'Ej: ${sub.isEmpty ? 'Artículo Electrónico' : sub} en Buen Estado',
+  'Hogar y Muebles': (sub) => 'Ej: Vendo ${sub.isEmpty ? 'Mueble' : sub} para Sala',
+  'Moda y Belleza': (sub) =>
+      'Ej: Vendo ${sub.isEmpty ? 'Artículo de Moda' : sub}, Talla M',
+  'Deportes y Hobbies': (sub) =>
+      'Ej: Vendo ${sub.isEmpty ? 'Artículo Deportivo' : sub}, Poco Uso',
+  'Negocios': (sub) => 'Ej: Oportunidad de Inversión en ${sub.isEmpty ? 'Negocio' : sub}',
+};
+
 /// API única para publicar / editar / detalle.
 class EsquemaCategorias {
   EsquemaCategorias._();
@@ -846,6 +871,20 @@ class EsquemaCategorias {
         ? subcategoria.trim()
         : categoria;
     return 'Especificaciones para $objetivo';
+  }
+
+  /// Hint del título del anuncio según categoría/subcategoría (espejo del
+  /// placeholderMap de publish-logic.js L1585-L1597: "Vehículos" muestra
+  /// "Ej: Vendo Vehículo, Como Nuevo", "Inmuebles" muestra "Ej: Se Vende
+  /// Propiedad en [Ubicación]", etc.). Con subcategoría elegida se interpola
+  /// en el ejemplo; sin categoría registrada se muestra el placeholder
+  /// estático de publicar.html (input #title), igual que la web al cargar.
+  static String tituloPlaceholder(String categoria, String subcategoria) {
+    final generador = _placeholdersTitulo[categoria];
+    if (generador == null) {
+      return 'Título corto y directo (máx. 60 caracteres). Ej: Toyota Hilux 2022 Impecable';
+    }
+    return generador(subcategoria.trim());
   }
 
   /// Etiqueta humana de una clave de atributo para el DETALLE:

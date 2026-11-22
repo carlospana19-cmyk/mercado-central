@@ -10,7 +10,10 @@ import '../utils/session_guard.dart';
 class PublishService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<bool> publishAd({
+  /// Publica el anuncio. Devuelve `null` si tuvo éxito, o un String con la
+  /// CAUSA del fallo (session, Storage, PostgREST/RLS, etc.) para mostrarla
+  /// tal cual en la UI — nunca un genérico "Error al publicar".
+  Future<String?> publishAd({
     required Map<String, dynamic> adData,
     required List<XFile> images,
     required String selectedPlan,
@@ -24,19 +27,19 @@ class PublishService {
       final sessionOk = await SessionGuard.ensureFresh(_supabase);
       if (!sessionOk) {
         debugPrint('Sesión ausente o no renovable: no se puede publicar.');
-        return false;
+        return 'Tu sesión expiró. Inicia sesión de nuevo e inténtalo otra vez.';
       }
 
       // 1. Verificar usuario activo
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) {
         debugPrint('Error: No hay usuario autenticado');
-        return false;
+        return 'No hay usuario autenticado. Inicia sesión e inténtalo otra vez.';
       }
       if (['basico', 'premium', 'destacado'].contains(selectedPlan) &&
           token?['id'] == null) {
         debugPrint('Error: No hay token validado para el plan de pago');
-        return false;
+        return 'Falta un token válido para el plan seleccionado.';
       }
 
       // 2. Subir imágenes al Storage de Supabase
@@ -49,18 +52,23 @@ class PublishService {
         final filePath =
             '$userId/$fileName'; // Guardamos en una carpeta con el ID del usuario
 
-        if (kIsWeb) {
-          // Lógica de subida para Web
-          await _supabase.storage.from('imagenes_anuncios').uploadBinary(
-                filePath,
-                await image.readAsBytes(),
-              );
-        } else {
-          // Lógica de subida para Celulares (Android/iOS)
-          await _supabase.storage.from('imagenes_anuncios').upload(
-                filePath,
-                File(image.path),
-              );
+        try {
+          if (kIsWeb) {
+            // Lógica de subida para Web
+            await _supabase.storage.from('imagenes_anuncios').uploadBinary(
+                  filePath,
+                  await image.readAsBytes(),
+                );
+          } else {
+            // Lógica de subida para Celulares (Android/iOS)
+            await _supabase.storage.from('imagenes_anuncios').upload(
+                  filePath,
+                  File(image.path),
+                );
+          }
+        } catch (e) {
+          debugPrint('🚨 Error subiendo imagen ${i + 1} a Storage: $e');
+          return 'Error subiendo la imagen ${i + 1}: ${_describe(e)}';
         }
 
         // Obtener la URL pública de la imagen recién subida
@@ -125,10 +133,11 @@ class PublishService {
         'url_portada': imageUrls.isNotEmpty ? imageUrls.first : null,
         'url_galeria': imageUrls.length > 1 ? imageUrls.sublist(1) : [],
         // Video: solo llega aquí si el plan lo permite (el campo se oculta
-        // en el formulario según PlanLimits.hasVideoFor).
-        'video_url': (adData['video_url'] ?? '').toString().trim().isEmpty
-            ? null
-            : adData['video_url'].toString().trim(),
+        // en el formulario según PlanLimits.hasVideoFor). La columna real de
+        // la BD es url_video (espejo de form-logic.js de la web, que solo la
+        // envía cuando el usuario escribió una URL).
+        if ((adData['url_video'] ?? '').toString().trim().isNotEmpty)
+          'url_video': adData['url_video'].toString().trim(),
       };
 
       // 5. Registrar la vigencia del plan pago, como lo hace la web.
@@ -175,10 +184,27 @@ class PublishService {
         }
       }
 
-      return true; // ¡Misión Cumplida!
+      return null; // ¡Misión Cumplida!
     } catch (e) {
       debugPrint('🚨 Error crítico en PublishService: $e');
-      return false;
+      return _describe(e);
     }
+  }
+
+  /// Traduce excepciones de Supabase a mensajes legibles: la UI muestra esto
+  /// tal cual, así un fallo de RLS / columna faltante / bucket se ve de raíz.
+  static String _describe(Object e) {
+    if (e is PostgrestException) {
+      final code = (e.code == null || e.code!.isEmpty) ? 'sin código' : e.code!;
+      final msg = e.message.isNotEmpty ? e.message : e.toString();
+      return 'Base de datos ($code): $msg';
+    }
+    if (e is StorageException) {
+      final msg = e.message.isNotEmpty ? e.message : e.toString();
+      final status =
+          (e.statusCode == null || e.statusCode!.isEmpty) ? '' : ' (HTTP ${e.statusCode})';
+      return 'Storage$status: $msg';
+    }
+    return e.toString();
   }
 }

@@ -68,15 +68,16 @@ class _UploadPageState extends State<UploadPage> {
 
     setState(() => _isPublishing = true); // Mostrar cargando
 
-    // Llamamos al servicio que acabamos de crear
-    final success = await _publishService.publishAd(
+    // Llamamos al servicio. Devuelve null si publicó OK, o el texto con la
+    // CAUSA real del fallo (sesión, Storage, RLS, columna faltante, etc.).
+    final error = await _publishService.publishAd(
       adData: _adData,
       images: _selectedImages,
       selectedPlan: _selectedPlan,
       token: _tokenData,
     );
 
-    if (success) {
+    if (error == null) {
       setState(() => _isPublishing = false); // Apaga la bolita
 
       // 1. Mensaje de victoria
@@ -95,17 +96,21 @@ class _UploadPageState extends State<UploadPage> {
       setState(() => _isPublishing = false);
       if (!mounted) return;
       // Si la sesión se limpió (vencida y no renovable), dar un mensaje
-      // claro en vez del genérico.
+      // claro en vez del genérico. Si no, mostrar la CAUSA real devuelta
+      // por el servicio para poder corregir de raíz.
       final sinSesion =
           Supabase.instance.client.auth.currentSession == null;
+      final mensaje = sinSesion
+          ? 'Tu sesión expiró. Inicia sesión de nuevo para publicar.'
+          : (error.trim().isEmpty
+              ? 'Error al publicar. Intenta de nuevo.'
+              : error.trim());
+      debugPrint('🚨 Publicar falló → $mensaje');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            sinSesion
-                ? 'Tu sesión expiró. Inicia sesión de nuevo para publicar.'
-                : 'Error al publicar. Intenta de nuevo.',
-          ),
+          content: Text(mensaje),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 6),
         ),
       );
     }

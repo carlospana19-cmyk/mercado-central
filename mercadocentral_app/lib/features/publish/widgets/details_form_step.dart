@@ -194,10 +194,13 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
     widget.onDataChanged();
   }
 
-  InputDecoration _decoration(String label, {String? hint, String? prefix}) =>
+  InputDecoration _decoration(String label,
+      {String? hint, String? prefix, String? helper}) =>
       InputDecoration(
         labelText: label,
         hintText: hint,
+        helperText: helper,
+        helperMaxLines: 2,
         prefixText: prefix,
         floatingLabelStyle: const TextStyle(color: Mc.naranja),
         border: OutlineInputBorder(
@@ -315,9 +318,21 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
   Widget build(BuildContext context) {
     final cat = widget.formData['categoria'] as String?;
     final sub = widget.formData['subcategoria'] as String?;
-    final subcategories = cat == null
+    // ANTES: firstWhere((c) => c.name == cat) lanzaba StateError si
+    // formData['categoria'] traía un nombre no presente EXACTO en el
+    // catálogo (p. ej. acentos: 'Vehiculos' ≠ 'Vehículos'), crasheando el
+    // paso Detalles. Ahora: sin coincidencia → lista vacía (fallback) y el
+    // usuario vuelve a elegir la categoría.
+    final catMatches = cat == null
+        ? const []
+        : fullCategoryCatalog.where((c) => c.name == cat).toList();
+    if (cat != null && catMatches.isEmpty) {
+      debugPrint(
+          '⚠️ Categoría "$cat" no existe en fullCategoryCatalog (¿acentos?)');
+    }
+    final subcategories = catMatches.isEmpty
         ? <String>[]
-        : fullCategoryCatalog.firstWhere((c) => c.name == cat).subcategories;
+        : catMatches.first.subcategories;
     final subcatActual = (sub ?? '').toString();
     final campos = EsquemaCategorias.camposPara(cat ?? '', subcatActual);
 
@@ -386,7 +401,13 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
           controller: _titleController,
           decoration: _decoration(
             'Título del anuncio *',
-            hint: 'Ej. Toyota Hilux 2022 Impecable',
+            // Placeholder dinámico según categoría/subcategoría
+            // (espejo de publish-logic.js L1585-L1604 de la web). Sin
+            // categoría muestra el placeholder estático de publicar.html.
+            hint: EsquemaCategorias.tituloPlaceholder(
+                cat ?? '', subcatActual),
+            // Texto de ayuda bajo el campo (espejo del .help-text web).
+            helper: 'Mínimo 10 caracteres, máximo 60',
           ),
           maxLength: 60,
           onChanged: (val) => _updateField('titulo', val),
@@ -478,8 +499,8 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
               'URL de Video (Youtube o Vimeo)',
               hint: 'https://www.youtube.com/watch?v=...',
             ),
-            initialValue: widget.formData['video_url']?.toString(),
-            onChanged: (val) => _updateField('video_url', val),
+            initialValue: widget.formData['url_video']?.toString(),
+            onChanged: (val) => _updateField('url_video', val),
           ),
           const Padding(
             padding: EdgeInsets.only(top: 4),

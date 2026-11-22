@@ -145,8 +145,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           backgroundColor: Mc.naranja,
           elevation: 4,
           shape: const CircleBorder(),
-          onPressed: () =>
-              setState(() => _selectedIndex = 2), // Nos lleva a "Publicar"
+          onPressed: _goToPublicar, // Nos lleva a "Publicar" (con guard sesión)
           child: const Icon(Icons.add, color: Colors.white, size: 35),
         ),
       ),
@@ -179,6 +178,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+
+  /// Punto 2e: sin sesión activa NO se entra al flujo de publicar: se manda
+  /// a login ('/'). Tras el login, el listener global de signedIn
+  /// (main.dart) regresa a /home y el usuario puede volver a tocar Publicar.
+  void _goToPublicar() {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Inicia sesión para publicar un anuncio.'),
+        backgroundColor: Colors.red,
+      ));
+      Navigator.of(context).pushNamed('/');
+      return;
+    }
+    setState(() => _selectedIndex = 2);
   }
 
   Widget _buildNavItem(
@@ -271,7 +286,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: HeroBanner(
                     onExplorarAnuncios: _explorarAnuncios,
-                    onPublicarGratis: () => setState(() => _selectedIndex = 2),
+                    onPublicarGratis: _goToPublicar,
                   ),
                 ),
               ),

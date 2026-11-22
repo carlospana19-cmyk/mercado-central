@@ -45,20 +45,24 @@ class _HeroBannerState extends State<HeroBanner> {
   int _pagina = 0;
 
   // Láminas locales: el estado "sin avisos" (igual que la web cuando
-  // hero-ads.js no trae publicidad activa). Cada lámina lleva su propio
-  // título, subtítulo y CTA.
+  // hero-ads.js no trae publicidad activa). Texto espejo del hero actual de
+  // index.html: un solo título + subtítulo constantes sobre el carrusel de
+  // fondos (la web hace crossfade de las 2 imágenes con el texto fijo).
   static const List<Map<String, String>> _laminasLocales = [
     {
       'imagen': 'assets/images/hero-portada.jpg',
       'titulo': 'La plataforma que reúne muchos mercados',
       // Frase resaltada en naranja (paridad con la web: .highlight-text).
       'resaltar': 'muchos mercados',
-      'subtitulo': 'Anuncios reales de vecinos y negocios cerca de ti.',
+      'subtitulo':
+          'El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.',
     },
     {
       'imagen': 'assets/images/hero-tarjetas.jpg',
-      'titulo': 'Esto ya se vende cerca de ti',
-      'subtitulo': 'Publica lo que ya no usas en minutos.',
+      'titulo': 'La plataforma que reúne muchos mercados',
+      'resaltar': 'muchos mercados',
+      'subtitulo':
+          'El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.',
     },
   ];
 

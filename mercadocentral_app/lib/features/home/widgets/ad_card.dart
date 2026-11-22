@@ -291,21 +291,27 @@ class AdCard extends StatelessWidget {
     final esNuevo = _esNuevo(anuncio);
     final crown = _crownBadge(plan);
 
+    // Grayscale de "VENDIDO" aplicado DENTRO del widget de imagen
+    // (color + colorBlendMode). NO usar un widget ColorFiltered aquí:
+    // crea una capa saveLayer que, dentro de la tarjeta con clip, al hacer
+    // scroll se pinta con el offset viejo y la imagen "sube" mientras la
+    // tarjeta se queda (bug de composición). El filtro a nivel Image se
+    // aplica en el paint de la imagen y viaja pegado a la tarjeta.
     Widget image = cover.isEmpty
-        ? _fotoVacia()
+        ? _fotoVacia() // ya es gris; no necesita filtro de saturación
         : CachedNetworkImage(
             imageUrl: cover,
             fit: BoxFit.cover,
+            // Sin fade: la animación de aparición se desfasa del scroll y
+            // la imagen parece "subir" sola dentro de la tarjeta.
+            fadeInDuration: Duration.zero,
+            fadeOutDuration: Duration.zero,
             // Placeholder gris mientras carga (mc-card-foto de la web).
             placeholder: (_, __) => Container(color: _bg),
             errorWidget: (_, __, ___) => _fotoVacia(),
+            color: isSold ? const Color(0xFF808080) : null,
+            colorBlendMode: isSold ? BlendMode.saturation : null,
           );
-    if (isSold) {
-      image = ColorFiltered(
-        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.saturation),
-        child: image,
-      );
-    }
 
     return GestureDetector(
       // La tarjeta completa abre el detalle; si está vendida, no navega.
@@ -333,7 +339,10 @@ class AdCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  image,
+                  // RepaintBoundary: la imagen se compone en su propia capa
+                  // y viaja SIEMPRE pegada a la tarjeta aunque el raster
+                  // cache de Impeller/Skia se desfase durante el scroll.
+                  RepaintBoundary(child: image),
                   if (crown != null)
                     Positioned(top: 10, left: 10, child: crown),
                   // Píldora "Urgente" sobre la foto; con corona presente se
