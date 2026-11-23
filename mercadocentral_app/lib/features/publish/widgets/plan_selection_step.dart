@@ -60,8 +60,12 @@ final List<_PlanInfo> _plans = [
       badge: _planBadges[entry.key],
       color: _planColors[entry.key] ?? Mc.grisSuave,
       benefits: [
-        // Vigencia: la del plan (form-logic.js: pagos 60d / free 30d).
-        'Vigencia de ${entry.value['vigenciaDias']} días',
+        // Vigencia: 30 días para todos. El plan de pago pasa a gratis al
+        // cumplir su mes; el anuncio gratis se elimina al terminar.
+        if (entry.key == 'free')
+          'Vigencia de ${entry.value['vigenciaDias']} días'
+        else
+          '${entry.value['vigenciaDias']} días de plan, luego pasa a gratis',
         // Fotos: tope del plan (AppConfig.js maxFotos).
         'Hasta ${entry.value['maxFotos']} fotos'
             '${entry.key == 'free' ? '' : ' + carrusel'}',

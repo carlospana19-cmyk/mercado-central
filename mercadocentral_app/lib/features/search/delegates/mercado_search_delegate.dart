@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/preferencias_busqueda.dart';
 import '../../../theme/mc_colores.dart';
-import '../../../search_result_card.dart';
+import '../../home/widgets/ads_grid.dart';
 
 class MercadoSearchDelegate extends SearchDelegate {
   // Función para calcular el peso (ponerla fuera del build o como método privado)
@@ -147,10 +147,10 @@ class MercadoSearchDelegate extends SearchDelegate {
                 .compareTo(_getPlanPriority(b['selected_plan']));
           });
           return ListView(
-            padding: const EdgeInsets.all(15.0),
+            padding: const EdgeInsets.all(12.0),
             children: [
               _SeccionRecientes(onSeleccionar: (texto) => query = texto),
-              for (final ad in ads) SearchResultCard(ad: ad),
+              AdsGrid(ads: ads, padding: EdgeInsets.zero),
             ],
           );
         },
@@ -184,10 +184,10 @@ class MercadoSearchDelegate extends SearchDelegate {
         });
 
         return ListView.builder(
-          padding: const EdgeInsets.all(15.0),
-          itemCount: ads.length,
-          itemBuilder: (context, index) {
-            return SearchResultCard(ad: ads[index]);
+          padding: const EdgeInsets.all(12.0),
+          itemCount: adsGridFilas(ads.length),
+          itemBuilder: (context, fila) {
+            return AdsGridRow(ads: ads, fila: fila);
           },
         );
       },

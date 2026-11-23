@@ -59,11 +59,16 @@ class _HeroBannerState extends State<HeroBanner> {
     },
     {
       'imagen': 'assets/images/hero-tarjetas.jpg',
-      'titulo': 'La plataforma que reúne muchos mercados',
-      'resaltar': 'muchos mercados',
-      'subtitulo':
-          'El punto de encuentro para hacer buenos negocios. Publica gratis o explora anuncios en bienes raíces, vehículos, tecnología y más.',
+      'titulo': 'Esto ya se vende cerca de ti',
+      'resaltar': 'cerca de ti',
+      'subtitulo': '',
     },
+  ];
+
+  // Sombra del texto sobre las fotos: el blanco se perdía en fondos claros.
+  static const List<Shadow> _sombraTexto = [
+    Shadow(color: Color(0xCC000000), blurRadius: 6, offset: Offset(0, 1)),
+    Shadow(color: Color(0x99000000), blurRadius: 2, offset: Offset(0, 1)),
   ];
 
   int get _totalLaminas =>
@@ -254,16 +259,19 @@ class _HeroBannerState extends State<HeroBanner> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _tituloLamina(lamina),
-              const SizedBox(height: 3),
-              Text(
-                lamina['subtitulo']!,
-                maxLines: 2,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
+              if (lamina['subtitulo']!.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(
+                  lamina['subtitulo']!,
+                  maxLines: 2,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    shadows: _sombraTexto,
+                  ),
                 ),
-              ),
+              ],
               const SizedBox(height: 10),
               Wrap(spacing: 8, runSpacing: 6, children: _ctasDeLamina(index)),
             ],
@@ -283,6 +291,7 @@ class _HeroBannerState extends State<HeroBanner> {
       fontSize: 17,
       fontWeight: FontWeight.bold,
       height: 1.15,
+      shadows: _sombraTexto,
     );
     if (resaltar == null || !titulo.contains(resaltar)) {
       return Text(titulo, maxLines: 2, style: base);

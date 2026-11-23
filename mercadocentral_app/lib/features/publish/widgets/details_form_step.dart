@@ -19,11 +19,17 @@ class DetailsFormStep extends StatefulWidget {
   /// (PlanLimits.hasVideoFor) y el tope de IA (PlanLimits.limiteIAFor).
   final String selectedPlan;
 
+  /// true cuando este es el paso visible del Stepper. El Stepper monta TODOS
+  /// los pasos desde el inicio (initState corre en el paso Planes), así que
+  /// los créditos IA se recargan al pasar a activo y al cambiar de plan.
+  final bool isActive;
+
   const DetailsFormStep({
     super.key,
     required this.formData,
     required this.onDataChanged,
     required this.selectedPlan,
+    this.isActive = true,
   });
 
   @override
@@ -58,15 +64,33 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
   }
 
   @override
+  void didUpdateWidget(covariant DetailsFormStep oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // El Stepper mantiene este widget montado desde el paso Planes: el saldo
+    // cargado en initState es el del plan/suscripción de ANTES de elegir. Se
+    // refresca al entrar al paso Detalles y si cambia el plan.
+    final entroAlPaso = widget.isActive && !oldWidget.isActive;
+    final cambioPlan = widget.selectedPlan != oldWidget.selectedPlan;
+    if (entroAlPaso || (widget.isActive && cambioPlan)) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) _loadIaCredits(user.id);
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descController.dispose();
     super.dispose();
   }
 
+  // Descarta respuestas viejas si hay varias cargas de saldo en vuelo.
+  int _iaLoadSeq = 0;
+
   /// Créditos IA: suscripciones.limite_ia - optimizations_ia_usadas,
   /// exactamente como la web (editar-anuncio-logic.js líneas 1904-1915).
   Future<void> _loadIaCredits(String userId) async {
+    final seq = ++_iaLoadSeq;
     try {
       final sub = await Supabase.instance.client
           .from('suscripciones')
@@ -75,10 +99,12 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
           .single();
       final limite = (sub['limite_ia'] as num?)?.toInt() ?? 0;
       final usadas = (sub['optimizations_ia_usadas'] as num?)?.toInt() ?? 0;
-      if (mounted) setState(() => _iaRestantes = limite - usadas);
+      if (mounted && seq == _iaLoadSeq) {
+        setState(() => _iaRestantes = limite - usadas);
+      }
     } catch (_) {
       // Sin suscripción registrada: el tope del plan aplica igual.
-      if (mounted) {
+      if (mounted && seq == _iaLoadSeq) {
         setState(() =>
             _iaRestantes = PlanLimits.limiteIAFor(widget.selectedPlan));
       }
@@ -323,7 +349,13 @@ class _DetailsFormStepState extends State<DetailsFormStep> {
     // catálogo (p. ej. acentos: 'Vehiculos' ≠ 'Vehículos'), crasheando el
     // paso Detalles. Ahora: sin coincidencia → lista vacía (fallback) y el
     // usuario vuelve a elegir la categoría.
-    final catMatches = cat == null
+    // TIPADO EXPLÍSITO (fix pantalla gris): sin la anotación, la rama `const []`
+    // se infiere List<dynamic> y la LUB del ternario degrada catMatches a
+    // List<dynamic>. Entonces `.subcategories` es dynamic y el
+    // `.map(...).toList()` del dropdown de subcategoría devolvía List<dynamic>
+    // en runtime → "type 'List<dynamic>' is not a subtype of type
+    // 'List<DropdownMenuItem<String>>?'" (trace logcat 12:57:00.474).
+    final List<CategoryItem> catMatches = cat == null
         ? const []
         : fullCategoryCatalog.where((c) => c.name == cat).toList();
     if (cat != null && catMatches.isEmpty) {

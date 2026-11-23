@@ -190,6 +190,16 @@ class _UploadPageState extends State<UploadPage> {
                   );
                 },
                 onStepContinue: () {
+                  // Plan de pago sin token aplicado: no se avanza. Hay que
+                  // tocar "Aplicar" con un token válido o elegir GRATIS.
+                  if (_currentStep == 0 &&
+                      PlanLimits.isPaid(_selectedPlan) &&
+                      _tokenData?['id'] == null) {
+                    return _showError(
+                      'Escribe un token y toca "Aplicar" para activar el plan '
+                      '${PlanLimits.labelFor(_selectedPlan)}, o elige GRATIS.',
+                    );
+                  }
                   if (_currentStep < 2) {
                     setState(() => _currentStep += 1);
                   } else {
@@ -225,6 +235,7 @@ class _UploadPageState extends State<UploadPage> {
                       formData: _adData,
                       onDataChanged: () {},
                       selectedPlan: _selectedPlan,
+                      isActive: _currentStep == 1,
                     ),
                     isActive: _currentStep >= 1,
                     state: _currentStep > 1

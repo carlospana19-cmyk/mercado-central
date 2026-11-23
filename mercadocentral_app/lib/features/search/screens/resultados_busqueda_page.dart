@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/services/buscador_service.dart';
 import '../../../core/utils/location_helper.dart';
 import '../../../theme/mc_colores.dart';
-import '../../home/widgets/ad_card.dart';
+import '../../home/widgets/ads_grid.dart';
 import '../models/category_catalog.dart';
 
 /// Pantalla de resultados con filtros (FASE 1 · BLOQUE C): espejo de
@@ -527,10 +527,11 @@ class _ResultadosBusquedaPageState extends State<ResultadosBusquedaPage> {
         }
         return false;
       },
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-        itemCount: visibles + 1, // +1: línea de resumen al final
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+      // Cuadrícula de 2 columnas (mc-tarjeta-2026.css): cada item de la lista
+      // es una fila de 2 tarjetas compactas; el item 0 es el resumen.
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
+        itemCount: adsGridFilas(visibles) + 1, // +1: línea de resumen
         itemBuilder: (context, index) {
           if (index == 0) {
             return Padding(
@@ -544,8 +545,10 @@ class _ResultadosBusquedaPageState extends State<ResultadosBusquedaPage> {
               ),
             );
           }
-          final ad = _resultados[index - 1];
-          return AdCard(anuncio: ad);
+          return AdsGridRow(
+            ads: _resultados.take(visibles).toList(),
+            fila: index - 1,
+          );
         },
       ),
     );

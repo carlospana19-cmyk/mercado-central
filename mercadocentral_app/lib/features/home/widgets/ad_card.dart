@@ -111,7 +111,17 @@ class AdCard extends StatelessWidget {
   final Map<String, dynamic> anuncio;
   final Function(bool)? onFavoriteToggle;
 
-  const AdCard({super.key, required this.anuncio, this.onFavoriteToggle});
+  /// Versión compacta para la cuadrícula de 2 columnas (mc-tarjeta-2026.css:
+  /// foto 4:3, precio + like, título 1 línea, estados y ubicación).
+  /// Solo debe usarse con altura acotada (ver AdsGrid / AdsGridRow).
+  final bool compact;
+
+  const AdCard({
+    super.key,
+    required this.anuncio,
+    this.onFavoriteToggle,
+    this.compact = false,
+  });
 
   Map<String, dynamic>? get _profile {
     final profiles = anuncio['profiles'];
@@ -168,7 +178,7 @@ class AdCard extends StatelessWidget {
         : (provincia.isNotEmpty ? provincia : 'Panamá');
   }
 
-  Widget? _crownBadge(String plan) {
+  Widget? _crownBadge(String plan, {bool compact = false}) {
     final Color color;
     FaIconData icon = FontAwesomeIcons.crown;
     switch (plan.toLowerCase()) {
@@ -192,8 +202,8 @@ class AdCard extends StatelessWidget {
     }
 
     return Container(
-      width: 32,
-      height: 32,
+      width: compact ? 26 : 32,
+      height: compact ? 26 : 32,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.94),
         shape: BoxShape.circle,
@@ -201,7 +211,103 @@ class AdCard extends StatelessWidget {
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
-      child: Center(child: FaIcon(icon, color: color, size: 14)),
+      child: Center(child: FaIcon(icon, color: color, size: compact ? 12 : 14)),
+    );
+  }
+
+  /// Cuerpo de la tarjeta compacta (mc-card-cuerpo): precio + like, título
+  /// de 1 línea, estados y ubicación al pie para alinear tarjetas vecinas.
+  Widget _cuerpoCompacto({
+    required String adId,
+    required bool esDestacado,
+    required bool esNuevo,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  Formatos.precioUsd(anuncio['precio']),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: _textoTarjeta,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+              if (adId.isNotEmpty) ...[
+                const SizedBox(width: 6),
+                _FavoriteButton(
+                  anuncioId: adId,
+                  onToggle: onFavoriteToggle,
+                  size: 28,
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            anuncio['titulo']?.toString() ?? 'Sin título',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13.5,
+              color: _textoTarjeta,
+              height: 1.35,
+            ),
+          ),
+          if (esDestacado || esNuevo) ...[
+            const SizedBox(height: 5),
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                if (esDestacado)
+                  _estadoPildora(
+                    'Destacado',
+                    fondo: _destacadoFondo,
+                    color: _destacadoTexto,
+                    borde: _destacadoBorde,
+                  ),
+                if (esNuevo)
+                  _estadoPildora(
+                    'Nuevo',
+                    fondo: _bg,
+                    color: _ink500,
+                    borde: _line,
+                  ),
+              ],
+            ),
+          ],
+          const Spacer(),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const FaIcon(
+                FontAwesomeIcons.locationDot,
+                size: 11,
+                color: _ink300,
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  _location(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12, color: _ink500),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -289,7 +395,7 @@ class AdCard extends StatelessWidget {
     final esUrgente = _esUrgente;
     final esDestacado = _esDestacado;
     final esNuevo = _esNuevo(anuncio);
-    final crown = _crownBadge(plan);
+    final crown = _crownBadge(plan, compact: compact);
 
     // Grayscale de "VENDIDO" aplicado DENTRO del widget de imagen
     // (color + colorBlendMode). NO usar un widget ColorFiltered aquí:
@@ -317,11 +423,11 @@ class AdCard extends StatelessWidget {
       // La tarjeta completa abre el detalle; si está vendida, no navega.
       onTap: isSold ? null : () => _openDetails(context),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: EdgeInsets.only(bottom: compact ? 0 : 16),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(compact ? 12 : 16),
           border: Border.all(color: _line),
           boxShadow: const [
             BoxShadow(
@@ -344,13 +450,17 @@ class AdCard extends StatelessWidget {
                   // cache de Impeller/Skia se desfase durante el scroll.
                   RepaintBoundary(child: image),
                   if (crown != null)
-                    Positioned(top: 10, left: 10, child: crown),
+                    Positioned(
+                      top: compact ? 6 : 10,
+                      left: compact ? 6 : 10,
+                      child: crown,
+                    ),
                   // Píldora "Urgente" sobre la foto; con corona presente se
                   // desplaza hacia abajo para no pisarla (mc-badges.con-corona).
                   if (esUrgente)
                     Positioned(
-                      top: crown != null ? 50 : 8,
-                      left: 8,
+                      top: crown != null ? (compact ? 38 : 50) : (compact ? 6 : 8),
+                      left: compact ? 6 : 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -389,19 +499,19 @@ class AdCard extends StatelessWidget {
                       right: 0,
                       child: Center(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: compact ? 10 : 14,
+                            vertical: compact ? 4 : 6,
                           ),
                           decoration: BoxDecoration(
                             color: _ink900,
                             borderRadius: BorderRadius.circular(99),
                           ),
-                          child: const Text(
+                          child: Text(
                             'VENDIDO',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: compact ? 10 : 12,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1,
                             ),
@@ -409,7 +519,9 @@ class AdCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (adId.isNotEmpty)
+                  // En la tarjeta compacta el corazón va junto al precio
+                  // (como en la web), nunca sobre la foto.
+                  if (adId.isNotEmpty && !compact)
                     Positioned(
                       top: 10,
                       right: 10,
@@ -422,14 +534,14 @@ class AdCard extends StatelessWidget {
                   // video (url_video no nulo). El tap no navega al detalle.
                   if (urlVideo.isNotEmpty)
                     Positioned(
-                      left: 8,
-                      bottom: 8,
+                      left: compact ? 6 : 8,
+                      bottom: compact ? 6 : 8,
                       child: GestureDetector(
                         onTap: () => _openVideo(urlVideo),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: compact ? 8 : 12,
+                            vertical: compact ? 4 : 6,
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xD9122129),
@@ -460,8 +572,8 @@ class AdCard extends StatelessWidget {
                   // Conteo de fotos (📷 + número) solo cuando hay 2 o más.
                   if (galeria.length >= 2)
                     Positioned(
-                      right: 8,
-                      bottom: 8,
+                      right: compact ? 6 : 8,
+                      bottom: compact ? 6 : 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 9,
@@ -495,6 +607,15 @@ class AdCard extends StatelessWidget {
                 ],
               ),
             ),
+            if (compact)
+              Expanded(
+                child: _cuerpoCompacto(
+                  adId: adId,
+                  esDestacado: esDestacado,
+                  esNuevo: esNuevo,
+                ),
+              )
+            else
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Column(
@@ -616,7 +737,12 @@ class AdCard extends StatelessWidget {
 class _FavoriteButton extends StatefulWidget {
   final String anuncioId;
   final Function(bool)? onToggle;
-  const _FavoriteButton({required this.anuncioId, this.onToggle});
+  final double size;
+  const _FavoriteButton({
+    required this.anuncioId,
+    this.onToggle,
+    this.size = 34,
+  });
 
   @override
   State<_FavoriteButton> createState() => _FavoriteButtonState();
@@ -710,24 +836,24 @@ class _FavoriteButtonState extends State<_FavoriteButton> {
     return GestureDetector(
       onTap: isLoading ? null : _toggleLike,
       child: Container(
-        width: 34,
-        height: 34,
+        width: widget.size,
+        height: widget.size,
         decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
           border: Border.all(color: _line),
         ),
         child: isLoading
-            ? const Padding(
-                padding: EdgeInsets.all(9),
-                child: CircularProgressIndicator(
+            ? Padding(
+                padding: EdgeInsets.all(widget.size * 0.27),
+                child: const CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Mc.naranja,
                 ),
               )
             : Icon(
                 isLiked ? Icons.favorite : Icons.favorite_border,
-                size: 18,
+                size: widget.size < 34 ? 16 : 18,
                 color: isLiked ? Mc.naranja : _ink500,
               ),
       ),

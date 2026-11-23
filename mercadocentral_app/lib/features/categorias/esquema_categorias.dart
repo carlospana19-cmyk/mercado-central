@@ -877,12 +877,15 @@ class EsquemaCategorias {
   /// placeholderMap de publish-logic.js L1585-L1597: "Vehículos" muestra
   /// "Ej: Vendo Vehículo, Como Nuevo", "Inmuebles" muestra "Ej: Se Vende
   /// Propiedad en [Ubicación]", etc.). Con subcategoría elegida se interpola
-  /// en el ejemplo; sin categoría registrada se muestra el placeholder
-  /// estático de publicar.html (input #title), igual que la web al cargar.
+  /// en el ejemplo; sin categoría registrada (o con una no registrada) se
+  /// usa el placeholder por defecto de la web (publish-logic.js L1582:
+  /// "Ej: Descripción breve y atractiva de tu artículo"). El texto de Hilux
+  /// es solo el placeholder INICIAL del HTML de publicar.html — la web lo
+  /// sobreescribe al entrar al paso de Detalles, así que nunca se muestra.
   static String tituloPlaceholder(String categoria, String subcategoria) {
     final generador = _placeholdersTitulo[categoria];
     if (generador == null) {
-      return 'Título corto y directo (máx. 60 caracteres). Ej: Toyota Hilux 2022 Impecable';
+      return 'Ej: Descripción breve y atractiva de tu artículo';
     }
     return generador(subcategoria.trim());
   }

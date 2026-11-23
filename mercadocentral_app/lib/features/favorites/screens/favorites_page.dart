@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:mercadocentral_app/search_result_card.dart';
+import 'package:mercadocentral_app/features/home/widgets/ads_grid.dart';
 import '../../../theme/mc_colores.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -90,14 +90,14 @@ class FavoritesPageState extends State<FavoritesPage> {
           : _favoriteAds.isEmpty
               ? _buildEmptyState()
               : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _favoriteAds.length,
-                  itemBuilder: (context, index) {
-                    final ad = _favoriteAds[index];
-                    return SearchResultCard(
-                      ad: ad,
+                  padding: const EdgeInsets.all(12),
+                  itemCount: adsGridFilas(_favoriteAds.length),
+                  itemBuilder: (context, fila) {
+                    return AdsGridRow(
+                      ads: _favoriteAds,
+                      fila: fila,
                       // 🚀 ESCUCHAMOS LA SEÑAL DE LA TARJETA
-                      onFavoriteToggle: (isLiked) {
+                      onFavoriteToggle: (ad, isLiked) {
                         if (!isLiked) {
                           removeFavoriteLocally(ad['id'].toString());
                         }

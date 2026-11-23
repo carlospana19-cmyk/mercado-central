@@ -97,10 +97,16 @@ class PublishService {
       final isPaid = ['basico', 'premium', 'destacado'].contains(selectedPlan);
       final now = DateTime.now().toUtc();
       final tokenDays = int.tryParse(token?['duracion_dias']?.toString() ?? '');
-      final planDays = tokenDays != null && tokenDays > 0 ? tokenDays : 30;
-      // Vigencia SIEMPRE desde PlanLimits (espejo de form-logic.js de la web:
-      // pagos 60 días, free 30 días). Nada hardcodeado.
-      final expirationDays = PlanLimits.vigenciaDiasFor(selectedPlan);
+      final planDays = tokenDays != null && tokenDays > 0
+          ? tokenDays
+          : PlanLimits.vigenciaDiasFor(selectedPlan);
+      // Ciclo SIEMPRE desde PlanLimits (espejo de form-logic.js de la web):
+      // el plan dura 30 días (featured_until), luego pasa a gratis y el mes
+      // gratis termina en la eliminación (fecha_eliminacion = 30 + 30).
+      // Un anuncio gratis vive 30 días y se elimina.
+      final expirationDays = PlanLimits.diasHastaEliminacionFor(selectedPlan);
+      final featuredUntil =
+          now.add(Duration(days: PlanLimits.vigenciaDiasFor(selectedPlan)));
       final phone = (adData['contact_phone'] ?? '').toString().trim();
 
       final insertData = {
@@ -127,6 +133,8 @@ class PublishService {
         'user_id': userId,
         if (phone.isNotEmpty) 'contact_phone': phone,
         'fecha_publicacion': now.toIso8601String(),
+        // Fin del plan de pago: al vencer, el anuncio baja a gratis.
+        if (isPaid) 'featured_until': featuredUntil.toIso8601String(),
         'fecha_eliminacion':
             now.add(Duration(days: expirationDays)).toIso8601String(),
         // La primera foto es la portada, el resto va a la galería

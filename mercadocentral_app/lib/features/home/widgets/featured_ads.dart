@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../theme/mc_colores.dart';
-import 'ad_card.dart';
+import 'ads_grid.dart';
 
 class FeaturedAds extends StatefulWidget {
   final String categoriaFiltro;
@@ -108,13 +108,8 @@ class _FeaturedAdsState extends State<FeaturedAds> {
 
         final ads = snapshot.data!;
 
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: ads.length,
-          itemBuilder: (context, index) => AdCard(anuncio: ads[index]),
-        );
+        // Cuadrícula de 2 columnas con tarjetas compactas.
+        return AdsGrid(ads: ads);
       },
     );
   }

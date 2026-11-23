@@ -3,8 +3,11 @@
 /// Origen (web, en .kilo/worktrees/iris-thing/):
 ///  - AppConfig.js → PLAN_LIMITS: maxFotos (5/10/15/20), price (0/10/20/30),
 ///    label, hasVideo (solo destacado), priority (0/1/2/3).
-///  - form-logic.js (líneas 210-214) → vigencia: pagos (basico/premium/
-///    destacado) = 60 días, free = 30 días. La constante VIGENCIA_PLANES de
+///  - Ciclo de vida del anuncio (form-logic.js): TODOS los planes duran 30
+///    días. Un plan de pago pasa a GRATIS al cumplir su mes (anuncios.
+///    featured_until) y el mes gratis termina en la eliminación
+///    (anuncios.fecha_eliminacion = 30 pagos + 30 gratis). Un anuncio gratis
+///    vive 30 días y se elimina. La constante VIGENCIA_PLANES de
 ///    publish-logic.js es código muerto (no se usa en ningún lugar).
 ///  - publish-logic.js (líneas 1287-1340) → IA por anuncio: free 0, basico 1,
 ///    premium 3, destacado 5 (cobro al publicar vía flag ia_usada_al_publicar;
@@ -37,7 +40,7 @@ class PlanLimits {
       'label': 'Básico',
       'maxFotos': 10,
       'price': 10,
-      'vigenciaDias': 60,
+      'vigenciaDias': 30,
       'hasVideo': false,
       'limiteIA': 1,
       'priority': 1,
@@ -46,7 +49,7 @@ class PlanLimits {
       'label': 'Premium',
       'maxFotos': 15,
       'price': 20,
-      'vigenciaDias': 60,
+      'vigenciaDias': 30,
       'hasVideo': false,
       'limiteIA': 3,
       'priority': 2,
@@ -55,7 +58,7 @@ class PlanLimits {
       'label': 'Destacado',
       'maxFotos': 20,
       'price': 30,
-      'vigenciaDias': 60,
+      'vigenciaDias': 30,
       'hasVideo': true,
       'limiteIA': 5,
       'priority': 3,
@@ -73,8 +76,23 @@ class PlanLimits {
 
   static int maxFotosFor(String plan) => forPlan(plan)?['maxFotos'] as int? ?? 5;
 
+  /// Días que dura el plan elegido (30 para todos).
   static int vigenciaDiasFor(String plan) =>
       forPlan(plan)?['vigenciaDias'] as int? ?? 30;
+
+  /// Días de gracia en plan GRATIS que siguen a un plan de pago antes de que
+  /// el anuncio se elimine (y vigencia total de un anuncio gratis).
+  static const int vigenciaGratisDias = 30;
+
+  /// Plan de pago = cualquiera con precio (basico, premium, destacado/top).
+  static bool isPaid(String plan) => priceFor(plan) > 0;
+
+  /// Días hasta la eliminación del anuncio (anuncios.fecha_eliminacion):
+  /// pago → 30 de plan + 30 gratis; gratis → 30.
+  static int diasHastaEliminacionFor(String plan) =>
+      isPaid(plan)
+          ? vigenciaDiasFor(plan) + vigenciaGratisDias
+          : vigenciaGratisDias;
 
   static bool hasVideoFor(String plan) =>
       forPlan(plan)?['hasVideo'] as bool? ?? false;
