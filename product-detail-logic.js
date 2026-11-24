@@ -565,24 +565,61 @@ async function displayProductDetails(ad, openChat = false, galleryImages = []) {
         mainImageElement.style.transition = 'opacity 0.2s ease';
         let indiceActivo = 0;
 
-        // ✅ Cambio de foto al hacer clic en las miniaturas
+        // ✅ Cambio de foto (miniaturas y deslizamiento con el dedo)
         const thumbnailElements = galleryWrapper.querySelectorAll('.thumbnail');
+        const mostrarFoto = (index) => {
+            if (index < 0 || index >= galleryImages.length || index === indiceActivo) return;
+            thumbnailElements.forEach(t => t.classList.remove('active'));
+            if (thumbnailElements[index]) {
+                thumbnailElements[index].classList.add('active');
+                // mantiene visible la miniatura activa en la tira horizontal
+                thumbnailElements[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+            indiceActivo = index;
+            mainImageElement.style.opacity = '0';
+            setTimeout(() => {
+                mainImageElement.src = galleryImages[index];
+                mainImageElement.style.opacity = '1';
+            }, 200);
+        };
+
         thumbnailElements.forEach((thumb, index) => {
             thumb.addEventListener('click', (e) => {
                 e.stopPropagation(); // elegir miniatura no debe abrir el visor
-                thumbnailElements.forEach(t => t.classList.remove('active'));
-                thumb.classList.add('active');
-                indiceActivo = index;
-                mainImageElement.style.opacity = '0';
-                setTimeout(() => {
-                    mainImageElement.src = galleryImages[index];
-                    mainImageElement.style.opacity = '1';
-                }, 200);
+                mostrarFoto(index);
             });
         });
 
+        // ✅ Deslizar con el dedo sobre la foto principal (izquierda = siguiente, derecha = anterior)
+        let swipeInicioX = null;
+        let swipeInicioY = null;
+        let huboSwipe = false;
+        const galleryMainEl = galleryWrapper.querySelector('.gallery-main');
+        if (galleryMainEl && galleryImages.length > 1) {
+            galleryMainEl.addEventListener('touchstart', (e) => {
+                swipeInicioX = e.changedTouches[0].clientX;
+                swipeInicioY = e.changedTouches[0].clientY;
+                huboSwipe = false;
+            }, { passive: true });
+            galleryMainEl.addEventListener('touchend', (e) => {
+                if (swipeInicioX === null) return;
+                const dx = e.changedTouches[0].clientX - swipeInicioX;
+                const dy = e.changedTouches[0].clientY - swipeInicioY;
+                swipeInicioX = null;
+                swipeInicioY = null;
+                // gesto horizontal claro (no un scroll vertical)
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                    huboSwipe = true; // evita que el "click" posterior abra el visor
+                    mostrarFoto(indiceActivo + (dx < 0 ? 1 : -1));
+                }
+            }, { passive: true });
+        }
+
         // ✅ Clic en la foto principal (o en la lupa) abre el visor en grande
-        const abrirDesdeGaleria = () => abrirVisor(galleryImages, indiceActivo);
+        const abrirDesdeGaleria = () => {
+            if (huboSwipe) { huboSwipe = false; return; }
+            abrirVisor(galleryImages, indiceActivo);
+        };
         mainImageElement.addEventListener('click', abrirDesdeGaleria);
         const btnAmpliarEl = galleryWrapper.querySelector('.btn-ampliar');
         if (btnAmpliarEl) btnAmpliarEl.addEventListener('click', (e) => { e.stopPropagation(); abrirDesdeGaleria(); });

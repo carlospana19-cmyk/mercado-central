@@ -32,7 +32,7 @@
 /* Galería (FASE 1-E): foto principal GRANDE (4:3, cover) + botón de ampliar + conteo */
 .gallery-card{padding:0!important;overflow:hidden}
 #gallery-wrapper{width:100%}
-.gallery-main{position:relative;width:100%;aspect-ratio:4/3;background:#F3F4F6;overflow:hidden;border-radius:14px;cursor:zoom-in}
+.gallery-main{position:relative;width:100%;aspect-ratio:4/3;background:#F3F4F6;overflow:hidden;border-radius:14px;cursor:zoom-in;touch-action:pan-y}
 .gallery-main img{width:100%;height:100%;object-fit:cover;display:block}
 .gallery-main.sin-foto{cursor:default}
 .mc-foto-conteo{position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
@@ -330,9 +330,27 @@
    pequeñas; el resto del contenido queda navegable y los botones siempre a mano */
 @media(max-width:960px){
   .contact-actions{position:fixed;bottom:0;left:0;right:0;z-index:900;display:flex;gap:10px;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 14px rgba(18,33,41,.10);border-top:1px solid var(--line)}
-  .contact-actions .btn-contact-wa{flex:1.5;height:50px}
-  .contact-actions .btn-secondary-contact{height:50px}
+  .contact-actions{align-items:stretch}
+  .contact-actions .btn-contact-wa{flex:1 1 0;min-width:0;width:auto;height:50px;padding:0 10px;white-space:nowrap}
+  .contact-actions .btn-contact-wa i{flex-shrink:0}
+  .contact-actions .contact-secondary{flex:0 0 auto;display:flex;margin-top:0}
+  .contact-actions .btn-secondary-contact{height:50px;padding:0 20px;white-space:nowrap}
+  .contact-actions .btn-secondary-contact i{flex-shrink:0}
+  /* Si no hay WhatsApp (oculto), "Llamar" ocupa todo el ancho */
+  .contact-actions:has(.btn-contact-wa[style*="display:none"]) .contact-secondary,
+  .contact-actions:has(.btn-contact-wa[style*="display: none"]) .contact-secondary{flex:1 1 auto}
   .detail-page{padding-bottom:96px}
+}
+/* Móviles pequeños (≤ 400px): texto/íconos algo menores y más aire entre botones */
+@media(max-width:400px){
+  .contact-actions{gap:12px;padding-left:12px;padding-right:12px}
+  .contact-actions .btn-contact-wa{gap:6px;padding:0 8px;font-size:13px}
+  .contact-actions .btn-contact-wa i{font-size:17px}
+  .contact-actions .btn-secondary-contact{gap:7px;padding:0 18px;font-size:13px}
+}
+@media(max-width:340px){
+  .contact-actions .btn-contact-wa{font-size:12px;padding:0 6px}
+  .contact-actions .btn-secondary-contact{padding:0 14px;font-size:12px}
 }
 
 /* ============ FASE 1-E: VISOR (lightbox) — solo blanco sobre negro ============ */
