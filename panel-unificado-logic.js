@@ -12,6 +12,11 @@ import {
 let currentUserId = null;
 let currentFilter = 'todos';
 
+// Paginación de "Mis Anuncios": 12 por página (filas completas con 1, 2, 3 o 4 columnas)
+const ADS_PER_PAGE = 12;
+let currentPage = 1;
+let allAds = [];
+
 // Al cargar la página
 document.addEventListener('DOMContentLoaded', async () => {
     checkUserLoggedIn();
@@ -119,8 +124,11 @@ async function loadUserAds() {
         document.getElementById('active-ads').textContent = activeAds;
         document.getElementById('sold-ads').textContent = soldAds;
 
+        allAds = ads;
+
         if (ads.length === 0) {
             document.getElementById('my-ads-container').innerHTML = '<p class="no-ads-message">No tienes anuncios aún. <a href="publicar.html">¡Crea uno!</a></p>';
+            renderPagination(0);
             return;
         }
 
@@ -144,10 +152,18 @@ function renderAds(ads) {
 
     if (filteredAds.length === 0) {
         container.innerHTML = '<p class="no-ads-message">No hay anuncios en esta categoría.</p>';
+        renderPagination(0);
         return;
     }
 
-    container.innerHTML = filteredAds.map(ad => {
+    // Paginación: solo se pintan los anuncios de la página actual
+    const totalPages = Math.ceil(filteredAds.length / ADS_PER_PAGE);
+    if (currentPage > totalPages) currentPage = totalPages; // p. ej. se eliminó el último anuncio de la última página
+    if (currentPage < 1) currentPage = 1;
+    const pageAds = filteredAds.slice((currentPage - 1) * ADS_PER_PAGE, currentPage * ADS_PER_PAGE);
+    renderPagination(totalPages);
+
+    container.innerHTML = pageAds.map(ad => {
         const imageUrl = ad.imagenes && ad.imagenes.length > 0 
             ? ad.imagenes[0].url_imagen 
             : ad.url_portada || 'images/placeholder.jpg';
@@ -211,6 +227,45 @@ function renderAds(ads) {
     };
     
     adsContainer.addEventListener('click', adsContainer._adButtonListener);
+}
+
+// ========================================
+// PAGINACIÓN DE MIS ANUNCIOS
+// ========================================
+// Números de página a mostrar: todos si son pocos; si no, primera, última y vecinas de la actual con "…"
+function getPageItems(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const items = [1];
+    const from = Math.max(2, current - 1);
+    const to = Math.min(total - 1, current + 1);
+    if (from > 2) items.push('…');
+    for (let i = from; i <= to; i++) items.push(i);
+    if (to < total - 1) items.push('…');
+    items.push(total);
+    return items;
+}
+
+function renderPagination(totalPages) {
+    const nav = document.getElementById('my-ads-pagination');
+    if (!nav) return;
+
+    // Con una sola página (o sin anuncios) no hace falta paginación
+    if (totalPages <= 1) {
+        nav.innerHTML = '';
+        return;
+    }
+
+    const numeros = getPageItems(currentPage, totalPages).map(item => {
+        if (item === '…') return '<span class="page-ellipsis" aria-hidden="true">…</span>';
+        const activa = item === currentPage;
+        return `<button type="button" class="page-btn${activa ? ' active' : ''}" data-page="${item}" aria-label="Página ${item}"${activa ? ' aria-current="page"' : ''}>${item}</button>`;
+    }).join('');
+
+    nav.innerHTML = `
+        <button type="button" class="page-btn page-prev" data-page="${currentPage - 1}"${currentPage === 1 ? ' disabled' : ''}>Anterior</button>
+        ${numeros}
+        <button type="button" class="page-btn page-next" data-page="${currentPage + 1}"${currentPage === totalPages ? ' disabled' : ''}>Siguiente</button>
+    `;
 }
 
 // ========================================
@@ -478,9 +533,23 @@ function initializeEventListeners() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentFilter = btn.dataset.filter;
+            currentPage = 1; // al cambiar de filtro se vuelve a la primera página
             loadUserAds();
         });
     });
+
+    // Paginación de anuncios (delegación: los botones se vuelven a crear en cada render)
+    const adsPagination = document.getElementById('my-ads-pagination');
+    if (adsPagination) {
+        adsPagination.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-page]');
+            if (!btn || btn.disabled) return;
+            currentPage = Number(btn.dataset.page);
+            renderAds(allAds);
+            const header = document.querySelector('.anuncios-header');
+            if (header) header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
 
     // Upload foto
     document.getElementById('upload-photo-btn').addEventListener('click', () => {
