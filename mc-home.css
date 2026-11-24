@@ -209,9 +209,9 @@
 
 /* Carruseles por fila + flechas estilo marketplace */
 .carousel-row-wrapper{position:relative;max-width:1240px;margin:0 auto 44px;padding:0 20px}
-.row-nav-prev,.row-nav-next{position:absolute;top:30%;width:42px;height:110px;background:rgba(255,255,255,.95);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-900);z-index:20;cursor:pointer;transition:all .2s;box-shadow:var(--shadow-sm)}
-.row-nav-prev{left:0;border-radius:0 12px 12px 0}
-.row-nav-next{right:0;border-radius:12px 0 0 12px}
+.row-nav-prev,.row-nav-next{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.95);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-900);z-index:20;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(18,33,41,.18)}
+.row-nav-prev{left:-8px}
+.row-nav-next{right:-8px}
 .row-nav-prev:hover,.row-nav-next:hover{background:#1F2937;border-color:#1F2937;color:#fff}
 @media(max-width:900px){.row-nav-prev,.row-nav-next{display:none}}
 

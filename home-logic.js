@@ -693,8 +693,8 @@ const getVideoEmbedUrl = (videoUrl) => {
                 const shouldLoop = slideCount >= minSlidesForLoop;
                 
                 return {
-                    slidesPerView: 1.2,
-                    spaceBetween: 15,
+                    slidesPerView: 2.2,
+                    spaceBetween: 12,
                     loop: shouldLoop,
                     loopAdditionalSlides: shouldLoop ? 3 : 0,
                     watchOverflow: !shouldLoop,
