@@ -379,3 +379,46 @@ body{padding-top:76px!important}
   .navbar-moderno.search-open .nav-search .nav-search-close{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0;border-radius:10px;color:var(--ink-500)}
   .navbar-moderno.search-open .nav-search .search-suggest{left:12px;right:12px}
 }
+
+/* ============ NAVBAR ESCRITORIO (>=768px): mismo menú hamburguesa que en móvil ============
+   Laptop: logo | buscador | [Publicar anuncio] [☰]. Perfil, cerrar/iniciar sesión e idioma
+   viven dentro del panel lateral. (El comportamiento JS es el mismo: navbar-logic.js) */
+@media(min-width:768px){
+  /* backdrop-filter crearía un bloque contenedor y rompería el position:fixed del panel */
+  .navbar-moderno{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .buttons-nav{flex-shrink:0}
+  .buttons-nav #btn-publish-logged-in{order:0}
+  .buttons-nav .nav-menu-toggle{order:1;display:inline-flex;width:42px;padding:0;background:transparent;color:var(--ink-700);border:1.5px solid var(--line)}
+  .buttons-nav .nav-menu-toggle:hover{background:#fff;border-color:var(--ink-300)}
+  .navbar-moderno.menu-open .nav-menu-toggle{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+
+  /* Panel lateral */
+  .buttons-nav .nav-menu-panel{display:flex;flex-direction:column;position:fixed;top:0;right:0;bottom:0;
+    width:min(320px,86vw);padding:0 16px 16px;background:#fff;box-shadow:-8px 0 32px rgba(18,33,41,.18);
+    z-index:1002;overflow-y:auto;overscroll-behavior:contain;
+    transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
+  .navbar-moderno.menu-open .nav-menu-panel{transform:none;visibility:visible;transition:transform .25s ease}
+  .buttons-nav .nav-menu-overlay{display:block;position:fixed;top:0;right:0;bottom:0;left:0;z-index:1001;
+    background:rgba(18,33,41,.45);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility 0s linear .25s}
+  .navbar-moderno.menu-open .nav-menu-overlay{opacity:1;visibility:visible;transition:opacity .25s ease}
+  html.nav-menu-open,html.nav-menu-open body{overflow:hidden!important}
+
+  .nav-menu-header{display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0;border-bottom:1px solid var(--line)}
+  .nav-menu-title{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink-900)}
+  .buttons-nav .nav-menu-close{display:inline-flex;width:36px;height:36px;padding:0;color:var(--ink-500);border-radius:10px;background:transparent;border:none}
+  .nav-menu-items{display:flex;flex-direction:column;gap:8px;padding:16px 0}
+
+  /* Items del panel: anulan el estilo de botón de la barra */
+  .buttons-nav .nav-menu-panel .nav-menu-item{width:100%!important;height:46px!important;padding:0 14px!important;
+    justify-content:flex-start;gap:12px;font-size:15px;text-align:left;order:0;position:relative}
+  .buttons-nav .nav-menu-panel .nav-menu-item i{font-size:16px;width:20px;text-align:center}
+  .buttons-nav .nav-menu-panel .nav-menu-item:not([style*="display: none"]){display:flex!important}
+  .buttons-nav .nav-menu-panel .nav-menu-item:hover{transform:none}
+  .nav-menu-label{display:inline}
+  .nav-menu-item .nav-badge{position:static;margin-left:auto}
+
+  /* Selectores (Idioma / País): solo visible si un slot tiene contenido */
+  .nav-menu-selectors{display:none}
+  .nav-menu-selectors:has(.nav-menu-slot:not(:empty)){display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+}
+

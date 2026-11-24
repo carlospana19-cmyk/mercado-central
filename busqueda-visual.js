@@ -130,7 +130,7 @@
     var select = $("categorySelect");
     if (select) {
       for (var i = 0; i < select.options.length; i++) {
-        var t = select.options[i].text.trim();
+        var t = (window.mcI18n ? window.mcI18n.optText(select.options[i]) : select.options[i].text).trim();
         if (t && t.indexOf("Todas") !== 0) categorias.push(t);
       }
     }
@@ -172,7 +172,7 @@
       if (select) {
         var objetivo = normalizar(res.categoria);
         for (var i = 0; i < select.options.length; i++) {
-          if (normalizar(select.options[i].text) === objetivo) {
+          if (normalizar(window.mcI18n ? window.mcI18n.optText(select.options[i]) : select.options[i].text) === objetivo) {
             select.value = select.options[i].value;
             break;
           }
@@ -194,7 +194,7 @@
         if (selBv) {
           var objetivoBv = normalizar(res.categoria);
           for (var j = 0; j < selBv.options.length; j++) {
-            if (normalizar(selBv.options[j].text) === objetivoBv) {
+            if (normalizar(window.mcI18n ? window.mcI18n.optText(selBv.options[j]) : selBv.options[j].text) === objetivoBv) {
               catFinal = selBv.options[j].value || selBv.options[j].text;
               break;
             }

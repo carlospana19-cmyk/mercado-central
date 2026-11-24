@@ -195,7 +195,7 @@ class GoogleMapsIntegration {
             // Cargar el script de Google Maps con loading async
             const script = document.createElement('script');
             script.async = true;
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&loading=async&libraries=places&language=es&v=beta`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&loading=async&libraries=places&language=${window.mcLang || 'es'}&v=beta`;
             script.defer = true;
 
             script.onload = () => {

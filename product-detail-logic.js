@@ -129,7 +129,7 @@ function loadGoogleMapsScriptDetalle() {
         const script = document.createElement('script');
         script.async = true;
         script.defer = true;
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY_DETALLE}&loading=async&language=es`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY_DETALLE}&loading=async&language=${window.mcLang || 'es'}`;
         
         script.onload = () => resolve();
         script.onerror = () => reject(new Error('Error al cargar Google Maps'));

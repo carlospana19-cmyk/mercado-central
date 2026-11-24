@@ -681,7 +681,7 @@ async function loadGivenReviews() {
                                     </div>
                                     <div class="reviewer-details">
                                         <div class="reviewer-name">Tú</div>
-                                        <div class="review-date">${new Date(review.created_at).toLocaleDateString('es-ES', {
+                                        <div class="review-date">${new Date(review.created_at).toLocaleDateString(window.mcLang === 'en' ? 'en-US' : 'es-ES', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric'

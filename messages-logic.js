@@ -175,7 +175,7 @@ function appendMessage(msg){
   const el = document.createElement('div');
   el.className = 'chat-bubble-row ' + (mine ? 'mine' : 'theirs');
   el.dataset.msgId = msg.id;
-  const time = new Date(msg.created_at).toLocaleTimeString('es-PA', { hour:'2-digit', minute:'2-digit' });
+  const time = new Date(msg.created_at).toLocaleTimeString(window.mcLang === 'en' ? 'en-US' : 'es-PA', { hour:'2-digit', minute:'2-digit' });
   const bubble = document.createElement('div');
   bubble.className = 'chat-bubble';
   if(msg.borrado){

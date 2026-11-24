@@ -1701,7 +1701,7 @@ function showCommunityFields() {
             }
 
             const titleInput = document.getElementById('title');
-            const mainCategoryText = categorySelectStep4?.options[categorySelectStep4.selectedIndex]?.text || ''; // Usamos la categoría del paso 2
+            const mainCategoryText = (window.mcI18n ? window.mcI18n.optText(categorySelectStep4?.options[categorySelectStep4.selectedIndex]) : categorySelectStep4?.options[categorySelectStep4.selectedIndex]?.text) || ''; // Usamos la categoría del paso 2
             const subcategoryValue = subcategorySelectStep4?.value || '';
             
             let placeholder = "Ej: Descripción breve y atractiva de tu artículo"; // Nuevo placeholder por defecto

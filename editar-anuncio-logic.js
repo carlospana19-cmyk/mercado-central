@@ -1467,7 +1467,7 @@ function showBusinessFields() {
                 let catFound = false;
                 // Buscar y seleccionar la Categoría Principal
                 for (let i = 0; i < categorySelect.options.length; i++) {
-                    if (categorySelect.options[i].text === ad.categoria || categorySelect.options[i].value === ad.categoria) {
+                    if ((window.mcI18n ? window.mcI18n.optText(categorySelect.options[i]) : categorySelect.options[i].text) === ad.categoria || categorySelect.options[i].value === ad.categoria) {
                         categorySelect.selectedIndex = i;
                         catFound = true;
                         console.log(`✅ Categoría principal anclada: ${ad.categoria}`);
@@ -1490,7 +1490,7 @@ function showBusinessFields() {
                             
                             // Buscar y seleccionar la Subcategoría
                             for (let i = 0; i < subSelect.options.length; i++) {
-                                if (subSelect.options[i].text === ad.subcategoria || subSelect.options[i].value === ad.subcategoria) {
+                                if ((window.mcI18n ? window.mcI18n.optText(subSelect.options[i]) : subSelect.options[i].text) === ad.subcategoria || subSelect.options[i].value === ad.subcategoria) {
                                     subSelect.selectedIndex = i;
                                     console.log(`✅ Subcategoría anclada: ${ad.subcategoria}`);
                                     break;
@@ -1539,7 +1539,7 @@ function showBusinessFields() {
 
                                     // 2. Buscamos y forzamos la nueva opción
                                     for (let i = 0; i < subSelectFinal.options.length; i++) {
-                                        const optText = String(subSelectFinal.options[i].text || '').trim().toLowerCase();
+                                        const optText = String((window.mcI18n ? window.mcI18n.optText(subSelectFinal.options[i]) : subSelectFinal.options[i].text) || '').trim().toLowerCase();
                                         const optVal = String(subSelectFinal.options[i].value || '').trim().toLowerCase();
                                         
                                         if (optText === targetSub || optVal === targetSub) {

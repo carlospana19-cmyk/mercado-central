@@ -285,7 +285,7 @@ export function generateReviewStatsHTML(stats) {
 
 // Generar HTML para una reseña individual
 export function generateReviewHTML(review) {
-    const date = new Date(review.created_at).toLocaleDateString('es-ES', {
+    const date = new Date(review.created_at).toLocaleDateString(window.mcLang === 'en' ? 'en-US' : 'es-ES', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'

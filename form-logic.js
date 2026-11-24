@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ⭐ VISIBILIDAD CAMPOS DINÁMICOS (mejorada)
     if (categorySelect) {
         categorySelect.addEventListener('change', function() {
-            const selectedText = this.options[this.selectedIndex].text; // ⭐ NOMBRE no ID
+            const selectedText = (window.mcI18n ? window.mcI18n.optText(this.options[this.selectedIndex]) : this.options[this.selectedIndex].text); // ⭐ NOMBRE no ID
             const selectedId = this.value; // ID numérico
             
             console.log('🔍 Categoría TEXT:', selectedText, 'ID:', selectedId);
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             // ⭐ CAPTURA ATRIBUTOS MEJORADA - NUNCA VACÍO (VEHÍCULOS + MÁS)
-            const categoriaNombre = categorySelect.options[categorySelect.selectedIndex].text;
+            const categoriaNombre = (window.mcI18n ? window.mcI18n.optText(categorySelect.options[categorySelect.selectedIndex]) : categorySelect.options[categorySelect.selectedIndex].text);
             console.log('📦 Publicando categoría:', categoriaNombre);
             
             let atributos = {};
