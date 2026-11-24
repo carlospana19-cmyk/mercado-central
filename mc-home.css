@@ -208,7 +208,11 @@
 .header-line-golden:last-child{background:linear-gradient(to left,transparent,var(--gold))}
 
 /* Carruseles por fila + flechas estilo marketplace */
-.carousel-row-wrapper{position:relative;max-width:1240px;margin:0 auto 44px;padding:0 20px}
+.carousel-row-wrapper{position:relative;box-sizing:border-box;width:100%;min-width:0;max-width:1240px;margin:0 auto 44px;padding:0 20px}
+/* .box-container es flex-columna: con margin:auto el hijo NO se estira y toma el ancho de su contenido
+   (hasta 1240px), por eso Swiper calculaba las tarjetas sobre ~1200px en móvil. width:100% + min-width:0 lo fija al viewport. */
+.row-carousel{width:100%;min-width:0}
+.section-header-golden{box-sizing:border-box;width:100%}
 .row-nav-prev,.row-nav-next{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.95);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-900);z-index:20;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(18,33,41,.18)}
 .row-nav-prev{left:-8px}
 .row-nav-next{right:-8px}
