@@ -213,37 +213,35 @@ const getVideoEmbedUrl = (videoUrl) => {
                     ? `<i class="fas fa-star"></i> ${vendorStats.average_rating.toFixed(1)} (${vendorStats.total_reviews})`
                     : '<span class="no-reviews">Sin reseñas</span>';
                 
-                const attributesHTML = generateAttributesHTML(ad.atributos_clave, ad.categoria, ad.atributos_clave?.subcategoria);
-                const attributeMatches = attributesHTML.match(/<span[^>]*>.*?<\/span>/g) || [];
-                let eliteAttributes = attributeMatches.slice(0, 4).map(attr => {
-                    return attr.replace(/class="[^"]*"/, 'class="elite-attribute"');
-                }).join('');
-
-                // Respaldo: si no hay atributos específicos, chips desde datos que siempre existen
-                if (attributeMatches.length === 0) {
-                    const fallbackChips = [];
-                    const categoriaTxt = String(ad.categoria ?? '').trim();
-                    if (categoriaTxt) {
-                        fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-tag"></i>${escaparHtmlHome(categoriaTxt)}</span>`);
-                    }
-                    const numFotos = Array.isArray(ad.url_galeria) ? ad.url_galeria.length : 0;
-                    if (numFotos > 0) {
-                        fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-camera"></i>${numFotos} fotos</span>`);
-                    }
-                    const estadoTxt = String(ad.estado ?? '').trim();
-                    if (estadoTxt) {
-                        fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-circle-check"></i>${escaparHtmlHome(estadoTxt)}</span>`);
-                    }
-                    if (ad.fecha_publicacion) {
-                        const fechaPub = new Date(ad.fecha_publicacion);
-                        if (!isNaN(fechaPub.getTime())) {
-                            const dias = Math.max(0, Math.floor((Date.now() - fechaPub.getTime()) / 86400000));
-                            const relativo = dias === 0 ? 'Hoy' : dias === 1 ? 'Ayer' : `Hace ${dias} días`;
-                            fallbackChips.push(`<span class="elite-attribute"><i class="fas fa-clock"></i>${relativo}</span>`);
-                        }
-                    }
-                    eliteAttributes = fallbackChips.slice(0, 4).join('');
+                // Atributos reales del anuncio (año, kilometraje, habitaciones, m², etc.) con sus iconos.
+                // generateAttributesHTML devuelve <span><i class="fas fa-..."></i> valor</span> SIN clase en el span:
+                // la clase del chip se agrega al <span> (no se toca la del <i>, que es el icono).
+                let atributosReales = ad.atributos_clave;
+                if (typeof atributosReales === 'string') {
+                    try { atributosReales = JSON.parse(atributosReales); } catch (e) { atributosReales = null; }
                 }
+                const attributesHTML = atributosReales
+                    ? generateAttributesHTML(atributosReales, ad.categoria, ad.subcategoria || atributosReales.subcategoria)
+                    : '';
+                const attributeMatches = attributesHTML.match(/<span[^>]*>.*?<\/span>/g) || [];
+                const chipsAtributos = attributeMatches.slice(0, 3).map(attr => {
+                    return attr.replace(/^<span[^>]*>/, '<span class="elite-attribute">');
+                });
+
+                // Cantidad de fotos (portada + galería, sin duplicados) con su icono de cámara
+                const fotosAnuncio = [];
+                if (ad.url_portada && String(ad.url_portada).trim() !== '' && !String(ad.url_portada).includes('placeholder')) {
+                    fotosAnuncio.push(ad.url_portada);
+                }
+                if (Array.isArray(ad.url_galeria)) {
+                    ad.url_galeria.forEach(u => { if (u && String(u).trim() !== '' && !fotosAnuncio.includes(u)) fotosAnuncio.push(u); });
+                }
+                const numFotos = fotosAnuncio.length;
+                const chipFotos = numFotos > 0
+                    ? `<span class="elite-attribute"><i class="fas fa-camera"></i> ${numFotos} ${numFotos === 1 ? 'foto' : 'fotos'}</span>`
+                    : '';
+
+                const eliteAttributes = chipsAtributos.concat(chipFotos ? [chipFotos] : []).join('');
 
                 // Descripción: sin etiquetas HTML y escapada
                 const descripcionLimpia = String(ad.descripcion ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -269,9 +267,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                     ? '<span class="sponsored-tag"><i class="fas fa-ad"></i> Patrocinado</span>' 
                     : '';
                 
-                const organicTag = !ad.is_sponsored && ad.featured_plan === 'top'
-                    ? '<span class="organic-tag"><i class="fas fa-check-circle"></i> Verificado</span>'
-                    : '';
+                const organicTag = '';
                 
                 let mediaHTML = '';
                 if (isVideo) {
@@ -300,9 +296,6 @@ const getVideoEmbedUrl = (videoUrl) => {
                         ${soldBadge}
                         ${mediaHTML}
                         <div class="elite-banner-content">
-                            <span class="elite-badge-gold">
-                                <i class="fas fa-check-circle"></i> VERIFICADO
-                            </span>
                             <div class="elite-banner-price">${priceFormatted}</div>
                             <h3 class="elite-banner-title">${ad.titulo}</h3>
                             <div class="elite-banner-location">
@@ -454,7 +447,6 @@ const getVideoEmbedUrl = (videoUrl) => {
                     <div class="elite-banner-container">
                         <div class="elite-banner-label">
                             <span class="elite-label-text"><i class="fas fa-crown"></i> Recién Agregado</span>
-                            <div class="elite-label-line"></div>
                         </div>
                         <div class="elite-slider-wrapper" id="elite-slider">
                             ${bannerAds.map((ad, index) => generateEliteSlideHTML(ad, index)).join('')}

@@ -213,11 +213,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 adData.url_video = videoUrlValue;
             }
             
-            // ✅ LÓGICA EXACTA: Pagos (destacado/premium/basico)=60d, Free=30d
+            // ✅ CICLO: todos los planes duran 30 días. Un plan de pago pasa a gratis
+            // al cumplir su mes (featured_until) y el mes gratis termina en la
+            // eliminación (fecha_eliminacion = 30 pagos + 30 gratis). Gratis = 30 y se elimina.
             const isPaid = ['destacado', 'premium', 'basico'].includes(selectedPlan);
-            const diasVigencia = isPaid ? 60 : 30;
+            const DIAS_PLAN = 30;
+            const DIAS_GRATIS = 30;
+            const MS_DIA = 24 * 60 * 60 * 1000;
+            const diasVigencia = isPaid ? DIAS_PLAN + DIAS_GRATIS : DIAS_GRATIS;
             const hoy = new Date();
-            adData.fecha_eliminacion = new Date(hoy.getTime() + (diasVigencia * 24 * 60 * 60 * 1000)).toISOString();
+            if (isPaid) {
+                adData.featured_until = new Date(hoy.getTime() + (DIAS_PLAN * MS_DIA)).toISOString();
+            }
+            adData.fecha_eliminacion = new Date(hoy.getTime() + (diasVigencia * MS_DIA)).toISOString();
 
             console.log('🚀 Enviando a Supabase (fecha_eliminacion):', {
                 selectedPlan,
