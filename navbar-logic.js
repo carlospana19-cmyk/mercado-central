@@ -169,11 +169,49 @@ function setSearchOpen(open) {
     if (!nav) return;
     nav.classList.toggle('search-open', open);
     document.getElementById('btn-search-toggle')?.setAttribute('aria-expanded', String(open));
-    if (open) document.getElementById('mainSearchInput')?.focus();
+    if (open) {
+        setMenuOpen(false);
+        document.getElementById('mainSearchInput')?.focus();
+    }
 }
+
+// Menú hamburguesa móvil (drawer): perfil, cerrar sesión, iniciar sesión y futuros selectores
+function setMenuOpen(open) {
+    const nav = document.querySelector('.navbar-moderno');
+    if (!nav) return;
+    const isOpen = nav.classList.contains('menu-open');
+    if (isOpen === open) return;
+    nav.classList.toggle('menu-open', open);
+    document.documentElement.classList.toggle('nav-menu-open', open);
+    const toggle = document.getElementById('btn-menu-toggle');
+    if (toggle) {
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        const icon = toggle.querySelector('i');
+        if (icon) icon.className = open ? 'fas fa-times' : 'fas fa-bars';
+    }
+    if (open) setSearchOpen(false);
+}
+
 document.addEventListener('click', e => {
+    if (e.target.closest('#btn-menu-toggle')) {
+        const nav = document.querySelector('.navbar-moderno');
+        setMenuOpen(!nav?.classList.contains('menu-open'));
+        return;
+    }
+    // Cerrar el drawer: botón X, overlay, o al elegir cualquier opción del panel
+    if (e.target.closest('.nav-menu-close') || e.target.closest('.nav-menu-overlay') || e.target.closest('.nav-menu-item')) {
+        setMenuOpen(false);
+    } else if (!e.target.closest('.nav-menu-panel')) {
+        setMenuOpen(false);
+    }
+
     if (e.target.closest('#btn-search-toggle')) setSearchOpen(true);
     else if (e.target.closest('.nav-search-close')) setSearchOpen(false);
     else if (!e.target.closest('.nav-search')) setSearchOpen(false);
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') setSearchOpen(false); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { setSearchOpen(false); setMenuOpen(false); }
+});
+// Al pasar a escritorio, el drawer no debe quedar abierto ni bloquear el scroll
+window.matchMedia('(min-width: 768px)').addEventListener('change', e => { if (e.matches) setMenuOpen(false); });

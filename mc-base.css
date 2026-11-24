@@ -305,13 +305,67 @@ body{padding-top:76px!important}
 
 /* ============ NAVBAR MÓVIL: UNA FILA + LUPA ============ */
 .buttons-nav .nav-search-toggle,.nav-search-close{display:none}
-@media(max-width:560px){
-  .navbar-moderno{flex-wrap:nowrap!important;gap:8px;padding:6px 12px!important}
+
+/* ============ NAVBAR: MENÚ HAMBURGUESA (drawer) ============ */
+/* Escritorio (>=768px): el panel es transparente (display:contents) y sus botones se
+   comportan como hijos directos de .buttons-nav, con el mismo orden visual de siempre. */
+.buttons-nav .nav-menu-toggle,.nav-menu-overlay,.nav-menu-header,.nav-menu-selectors,.nav-menu-label{display:none}
+.nav-menu-panel,.nav-menu-items{display:contents}
+.buttons-nav #btn-dashboard{order:1}
+.buttons-nav #btn-publish-logged-in{order:2}
+.buttons-nav #btn-logout{order:3}
+.buttons-nav #btn-login{order:4}
+
+/* Móvil (<768px): logo | lupa + publicar (+) + hamburguesa. Perfil, cerrar sesión e
+   iniciar sesión viven dentro del drawer. */
+@media(max-width:767px){
+  .navbar-moderno{flex-wrap:nowrap!important;gap:8px;padding:6px 12px!important;
+    /* backdrop-filter crearía un bloque contenedor y rompería el position:fixed del drawer */
+    backdrop-filter:none;-webkit-backdrop-filter:none}
   .logo-link{gap:0}
   .logo-img{height:44px!important}
-  .logo-text{display:none!important}
-  .buttons-nav{gap:6px!important;margin-left:auto}
-  .buttons-nav button{width:36px!important;height:36px!important}
+  .buttons-nav{gap:6px!important;margin-left:auto;flex-shrink:0}
+  .buttons-nav button{width:36px!important;height:36px!important;font-size:0;gap:0;padding:0;justify-content:center}
+  .buttons-nav button i{font-size:16px}
+  .buttons-nav #btn-publish-logged-in{order:0}
+  .buttons-nav .nav-search-toggle{order:-1}
+  .buttons-nav .nav-menu-toggle{order:1;display:inline-flex;background:transparent;color:var(--ink-700);border:1.5px solid var(--line)}
+  .buttons-nav .nav-menu-toggle:hover{background:#fff;border-color:var(--ink-300)}
+  .navbar-moderno.menu-open .nav-menu-toggle{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+
+  /* Drawer lateral */
+  .buttons-nav .nav-menu-panel{display:flex;flex-direction:column;position:fixed;top:0;right:0;bottom:0;
+    width:min(300px,86vw);padding:0 16px 16px;background:#fff;box-shadow:-8px 0 32px rgba(18,33,41,.18);
+    z-index:1002;overflow-y:auto;overscroll-behavior:contain;
+    transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
+  .navbar-moderno.menu-open .nav-menu-panel{transform:none;visibility:visible;transition:transform .25s ease}
+  .buttons-nav .nav-menu-overlay{display:block;position:fixed;top:0;right:0;bottom:0;left:0;z-index:1001;
+    background:rgba(18,33,41,.45);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility 0s linear .25s}
+  .navbar-moderno.menu-open .nav-menu-overlay{opacity:1;visibility:visible;transition:opacity .25s ease}
+  html.nav-menu-open,html.nav-menu-open body{overflow:hidden!important}
+
+  .nav-menu-header{display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0;border-bottom:1px solid var(--line)}
+  .nav-menu-title{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink-900)}
+  .buttons-nav .nav-menu-close{color:var(--ink-500);border-radius:10px}
+  .nav-menu-items{display:flex;flex-direction:column;gap:8px;padding:16px 0}
+
+  /* Items del drawer: anulan el modo "solo icono" de la barra (especificidad + !important) */
+  .buttons-nav .nav-menu-panel .nav-menu-item{width:100%!important;height:46px!important;padding:0 14px!important;
+    justify-content:flex-start;gap:12px;font-size:15px;text-align:left;order:0;position:relative}
+  .buttons-nav .nav-menu-panel .nav-menu-item i{font-size:16px;width:20px;text-align:center}
+  .buttons-nav .nav-menu-panel .nav-menu-item:not([style*="display: none"]){display:flex!important}
+  .buttons-nav .nav-menu-panel .nav-menu-item:hover{transform:none}
+  .nav-menu-label{display:inline}
+  .nav-menu-item .nav-badge{position:static;margin-left:auto}
+
+  /* Espacio reservado para futuros selectores (Idioma / País): solo visible si un slot tiene contenido */
+  .nav-menu-selectors{display:none}
+  .nav-menu-selectors:has(.nav-menu-slot:not(:empty)){display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+}
+/* Pantallas muy pequeñas: solo el isotipo del logo */
+@media(max-width:560px){.logo-text{display:none!important}}
+
+@media(max-width:767px){
   .buttons-nav .nav-search-toggle{display:inline-flex;background:var(--accion-50);color:var(--accion-600)}
   body{padding-top:56px!important}
 

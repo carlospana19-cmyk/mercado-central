@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="css/all.min.css">
-        <link rel="stylesheet" href="mc-base.css?v=26">
+        <link rel="stylesheet" href="mc-base.css?v=27">
     <link rel="stylesheet" href="mc-publish.css?v=15">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -24,18 +24,33 @@
       </a>
     </div>
     <div class="buttons-nav">
-        <button id="btn-dashboard" class="nav-btn-user nav-icon-btn" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
-            <i class="fas fa-user"></i>
-        </button>
-        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'">
+        <div id="nav-menu-panel" class="nav-menu-panel">
+            <div class="nav-menu-header">
+                <span class="nav-menu-title">Menú</span>
+                <button type="button" class="nav-menu-close" aria-label="Cerrar menú"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="nav-menu-items">
+                <button id="btn-dashboard" class="nav-btn-user nav-icon-btn nav-menu-item" style="display: none;" onclick="window.location.href='panel-unificado.html'" title="Mi Panel">
+                    <i class="fas fa-user"></i>
+                    <span class="nav-menu-label">Mi perfil</span>
+                </button>
+                <button id="btn-logout" class="nav-btn-user nav-menu-item" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+                <button id="btn-login" class="nav-btn-guest nav-menu-item" onclick="window.location.href='login.html'">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                </button>
+            </div>
+            <div class="nav-menu-selectors">
+                <div class="nav-menu-slot" id="nav-slot-language" data-slot="language"></div>
+                <div class="nav-menu-slot" id="nav-slot-country" data-slot="country"></div>
+            </div>
+        </div>
+        <button id="btn-publish-logged-in" class="nav-btn-user" style="display: none;" onclick="window.location.href='publicar.html'" aria-label="Publicar anuncio">
             <i class="fas fa-plus"></i> Publicar anuncio
         </button>
-        <button id="btn-logout" class="nav-btn-user" style="display: none;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </button>
-        <button id="btn-login" class="nav-btn-guest" onclick="window.location.href='login.html'">
-            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-        </button>
+        <button type="button" id="btn-menu-toggle" class="nav-menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-menu-panel"><i class="fas fa-bars"></i></button>
+        <div class="nav-menu-overlay"></div>
     </div>
     </nav>
 
