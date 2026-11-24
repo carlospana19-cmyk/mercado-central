@@ -159,6 +159,129 @@ function getPendingTokenData() {
 }
 window.getPendingTokenData = getPendingTokenData;
 
+// =====================================================
+// HELPERS DE VIGENCIA DEL TOKEN (featured_until / plan_priority / cortesía)
+// =====================================================
+const TOKEN_PLAN_PRIORITY = { premium: 4, destacado: 3, basico: 2 };
+const MS_DIA_TOKEN = 86400000;
+
+function normalizeTokenPlan(plan) {
+    const p = String(plan || '').toLowerCase().trim();
+    return p === 'top' ? 'destacado' : p;
+}
+
+/**
+ * featured_until = el MAYOR entre la fecha ya existente del anuncio y ahora,
+ * más los días del token. Nunca acorta un plan vigente.
+ */
+function calcFeaturedUntil(currentFeaturedUntil, diasToken) {
+    const base = currentFeaturedUntil ? new Date(currentFeaturedUntil).getTime() : 0;
+    const hasta = new Date(Math.max(base, Date.now()) + diasToken * MS_DIA_TOKEN);
+    return hasta.toISOString();
+}
+
+/**
+ * Deja la cortesía ligada al anuncio con fecha_fin = featured_until.
+ * Actualiza la cortesía indicada (o la existente del anuncio); si no hay, inserta.
+ */
+async function syncCortesiaConAnuncio({ userId, adId, plan, fechaFin, cortesiaId }) {
+    const payload = { anuncio_id: adId, plan_tipo: plan, fecha_fin: fechaFin, activo: true };
+    try {
+        if (cortesiaId) {
+            const { data, error } = await supabase
+                .from('cortesias_aplicadas').update(payload).eq('id', cortesiaId).select('id');
+            if (!error && data && data.length) return { success: true };
+            if (error) console.warn('No se pudo actualizar la cortesía por id:', error);
+        }
+
+        const { data: existentes } = await supabase
+            .from('cortesias_aplicadas')
+            .select('id')
+            .eq('anuncio_id', adId)
+            .eq('metodo', 'token')
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (existentes && existentes.length) {
+            const { error } = await supabase
+                .from('cortesias_aplicadas').update(payload).eq('id', existentes[0].id);
+            if (error) throw error;
+            return { success: true };
+        }
+
+        const { error } = await supabase
+            .from('cortesias_aplicadas')
+            .insert([{ user_id: userId, metodo: 'token', ...payload }]);
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error sincronizando cortesía con el anuncio:', error);
+        return { success: false, error };
+    }
+}
+
+/**
+ * Aplica un token YA VALIDADO (validar_token) a un anuncio existente.
+ * @param {number|string} adId
+ * @param {{id:string, plan_tipo:string, duracion_dias?:number, dias?:number}} tokenData
+ */
+async function applyTokenToExistingAd(adId, tokenData) {
+    try {
+        if (!adId || !tokenData || !tokenData.id) {
+            return { success: false, message: 'Faltan datos del anuncio o del token.' };
+        }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return { success: false, message: 'Usuario no autenticado.' };
+
+        const plan = normalizeTokenPlan(tokenData.plan_tipo);
+        const priority = TOKEN_PLAN_PRIORITY[plan];
+        const diasToken = Number(tokenData.duracion_dias ?? tokenData.dias);
+        if (!priority || !(diasToken > 0)) {
+            return { success: false, message: 'Token con plan o días inválidos.' };
+        }
+
+        const { data: ad, error: adError } = await supabase
+            .from('anuncios')
+            .select('id, user_id, featured_until')
+            .eq('id', adId)
+            .single();
+        if (adError || !ad) throw adError || new Error('Anuncio no encontrado');
+        if (ad.user_id !== user.id) {
+            return { success: false, message: 'Este anuncio no te pertenece.' };
+        }
+
+        const featuredUntil = calcFeaturedUntil(ad.featured_until, diasToken);
+        const { error: updError } = await supabase
+            .from('anuncios')
+            .update({
+                featured_plan: plan,
+                selected_plan: plan,
+                plan_priority: priority,
+                featured_until: featuredUntil
+            })
+            .eq('id', ad.id);
+        if (updError) throw updError;
+
+        await syncCortesiaConAnuncio({
+            userId: user.id, adId: ad.id, plan, fechaFin: featuredUntil
+        });
+        await markTokenAsUsed(tokenData);
+
+        return { success: true, featured_until: featuredUntil, plan_priority: priority };
+    } catch (error) {
+        console.error('Error aplicando token a anuncio existente:', error);
+        return { success: false, message: 'No se pudo aplicar el token al anuncio.', error };
+    }
+}
+
+window.mcTokens = {
+    PLAN_PRIORITY: TOKEN_PLAN_PRIORITY,
+    calcFeaturedUntil,
+    syncCortesiaConAnuncio,
+    applyTokenToExistingAd
+};
+window.applyTokenToExistingAd = applyTokenToExistingAd;
+
 // Exportar para uso interno (módulo)
 export { markTokenAsUsed, validatedToken };
 
@@ -249,6 +372,8 @@ async function applyValidatedToken(tokenData, userId, selectedPlan) {
         setPendingTokenData({
             id: tokenData.id,
             usuario_id: userId,
+            plan: normalizeTokenPlan(tokenData.plan_tipo || selectedPlan),
+            dias: Number(tokenData.duracion_dias) || durationDays,
             cortesia: data ? data[0] : null
         });
         

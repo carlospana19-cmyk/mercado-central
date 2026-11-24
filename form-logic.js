@@ -222,8 +222,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const MS_DIA = 24 * 60 * 60 * 1000;
             const diasVigencia = isPaid ? DIAS_PLAN + DIAS_GRATIS : DIAS_GRATIS;
             const hoy = new Date();
+            // Con token: el anuncio queda destacado EXACTAMENTE los días del token.
+            // Sin token: DIAS_PLAN fijo (sin cambios).
+            const tokenPendiente = window.pendingTokenData;
+            const diasToken = tokenPendiente && tokenPendiente.id ? Number(tokenPendiente.dias) : 0;
+            const planToken = tokenPendiente && tokenPendiente.plan ? tokenPendiente.plan : selectedPlan;
+            const usaToken = isPaid && diasToken > 0 && planToken === selectedPlan;
             if (isPaid) {
-                adData.featured_until = new Date(hoy.getTime() + (DIAS_PLAN * MS_DIA)).toISOString();
+                const diasDestacado = usaToken ? diasToken : DIAS_PLAN;
+                adData.featured_until = new Date(hoy.getTime() + (diasDestacado * MS_DIA)).toISOString();
+            }
+            if (usaToken) {
+                const PLAN_PRIORITY = { premium: 4, destacado: 3, basico: 2 };
+                adData.plan_priority = PLAN_PRIORITY[selectedPlan];
             }
             adData.fecha_eliminacion = new Date(hoy.getTime() + (diasVigencia * MS_DIA)).toISOString();
 
@@ -242,6 +253,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Tokens (sin cambios)
             const pendingToken = window.pendingTokenData;
             if (pendingToken && pendingToken.id) {
+                // cortesias_aplicadas: ligar al anuncio con fecha_fin = featured_until
+                if (usaToken && window.mcTokens) {
+                    await window.mcTokens.syncCortesiaConAnuncio({
+                        userId: user.id,
+                        adId: newAd.id,
+                        plan: selectedPlan,
+                        fechaFin: adData.featured_until,
+                        cortesiaId: pendingToken.cortesia ? pendingToken.cortesia.id : null
+                    });
+                }
                 await window.markTokenAsUsed(pendingToken);
             }
 

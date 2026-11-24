@@ -306,24 +306,18 @@ async function loadAndFilterResults() {
 
     // === ORDENAMIENTO DE JERARQUÍA ANTIBALAS ===
     products.sort((a, b) => {
-        const planA = a.featured_plan ? a.featured_plan.toString().toLowerCase().trim() : '';
-        const planB = b.featured_plan ? b.featured_plan.toString().toLowerCase().trim() : '';
-        
-        // Función que busca la palabra clave real de la base de datos
-        const getPlanWeight = (planStr) => {
-            if (!planStr) return 1;
-            // 4 Puntos (ORO)
-            if (planStr.includes('top') || planStr.includes('destacado') || planStr.includes('oro')) return 4;
-            // 3 Puntos (PLATA) -> Se agregaron "premium" y "plus" a la lógica para Platinum
-            if (planStr.includes('premium') || planStr.includes('plus') || planStr.includes('plata')) return 3;
-            // 2 Puntos (BRONCE)
-            if (planStr.includes('basico') || planStr.includes('básico') || planStr.includes('bronce')) return 2;
-            
-            return 1; // Gratis
+        // Orden NUMÉRICO por plan_priority (desc). Nunca alfabético por featured_plan.
+        // Respaldo solo para filas sin plan_priority (anuncios antiguos): se deriva del plan.
+        const PRIORIDAD_POR_PLAN = { premium: 4, destacado: 3, top: 3, basico: 2 };
+        const getPlanWeight = (ad) => {
+            const n = Number(ad.plan_priority);
+            if (Number.isFinite(n) && n > 0) return n;
+            const plan = ad.featured_plan ? ad.featured_plan.toString().toLowerCase().trim() : '';
+            return PRIORIDAD_POR_PLAN[plan] || 1; // 1 = gratis
         };
         
-        const weightA = getPlanWeight(planA);
-        const weightB = getPlanWeight(planB);
+        const weightA = getPlanWeight(a);
+        const weightB = getPlanWeight(b);
         
         // 1. Priorizar por peso comercial
         if (weightA !== weightB) {
