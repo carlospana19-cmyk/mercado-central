@@ -11,6 +11,9 @@ import 'package:mercadocentral_app/features/profile/screens/edit_ad_page.dart';
 import '../../../core/services/review_service.dart';
 import '../../../theme/mc_colores.dart';
 import '../widgets/ad_spec_highlights.dart';
+import '../widgets/ad_video_box.dart';
+import '../widgets/report_ad_dialog.dart';
+import '../widgets/seller_more_ads.dart';
 import '../widgets/seller_reviews_widget.dart';
 
 /// Decodifica url_galeria sin importar cómo llegue: array de Supabase, string
@@ -173,6 +176,23 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
     super.initState();
     _extractAllImages();
     _loadSellerProfile();
+    _registrarVisita();
+  }
+
+  /// Contador de visitas: mismo RPC que la web (product-detail-logic.js →
+  /// mc_incrementar_visitas, SECURITY DEFINER). No cuenta al dueño del anuncio.
+  /// Si el RPC falla no se rompe la pantalla; solo se omite el conteo.
+  Future<void> _registrarVisita() async {
+    final adId = int.tryParse(widget.ad['id']?.toString() ?? '');
+    if (adId == null || _isOwner) return;
+    try {
+      await Supabase.instance.client
+          .rpc('mc_incrementar_visitas', params: {'p_anuncio_id': adId});
+      final actuales = int.tryParse(widget.ad['visitas']?.toString() ?? '') ?? 0;
+      if (mounted) setState(() => widget.ad['visitas'] = actuales + 1);
+    } catch (error) {
+      debugPrint('No se pudo registrar la visita: $error');
+    }
   }
 
   @override
@@ -256,6 +276,16 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
   bool get _isOwner =>
       widget.ad['user_id']?.toString() ==
       Supabase.instance.client.auth.currentUser?.id;
+
+  Future<void> _reportarAnuncio() async {
+    final adId = widget.ad['id']?.toString() ?? '';
+    if (adId.isEmpty) return;
+    await ReportAdDialog.mostrar(
+      context,
+      anuncioId: adId,
+      vendedorId: widget.ad['user_id']?.toString(),
+    );
+  }
 
   bool get _hasSellerPhone =>
       (widget.ad['contact_phone'] ?? _sellerProfile['telefono'])
@@ -712,6 +742,17 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                 ),
               ),
 
+            // 🎬 Video del anuncio: justo bajo la galería y sus miniaturas,
+            // igual que `.detail-video` en product-detail-logic.js de la web.
+            if (AdVideoBox.esValido(ad['url_video']))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 16, 14, 0),
+                child: AdVideoBox(
+                  url: ad['url_video']?.toString(),
+                  titulo: ad['titulo']?.toString() ?? 'anuncio',
+                ),
+              ),
+
             // 2. DETALLES DEL PRODUCTO
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -749,6 +790,26 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                     ],
                   ),
 
+                  // Visitas (la web muestra "Visitas N" bajo el precio).
+                  if ((int.tryParse(ad['visitas']?.toString() ?? '') ?? 0) > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.visibility_outlined,
+                              color: Colors.grey, size: 18),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Visitas ${ad['visitas']}',
+                            style: const TextStyle(
+                              color: Mc.grisSuave,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // Compartir anuncio: fila siempre visible, igual que la
                   // share-row de detalle-producto.html de la web.
                   const SizedBox(height: 16),
@@ -761,6 +822,22 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                       side: const BorderSide(color: Mc.naranja),
                     ),
                   ),
+
+                  // Reportar anuncio (requisito de Google Play / App Store
+                  // para contenido de usuarios). No aparece en tu propio anuncio.
+                  if (!_isOwner &&
+                      (ad['id']?.toString().isNotEmpty ?? false))
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: _reportarAnuncio,
+                        icon: const Icon(Icons.flag_outlined, size: 18),
+                        label: const Text('Reportar anuncio'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Mc.grisSuave,
+                        ),
+                      ),
+                    ),
 
                   const Divider(
                     height: 40,
@@ -991,6 +1068,20 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
                               Supabase.instance.client.auth.currentUser != null
                           ? _leaveReview
                           : null,
+                    ),
+                  ],
+                  // 🛍️ Más anuncios del mismo vendedor (oculto si no hay)
+                  if ((ad['user_id']?.toString().isNotEmpty ?? false) &&
+                      (ad['id']?.toString().isNotEmpty ?? false)) ...[
+                    const SizedBox(height: 18),
+                    SellerMoreAds(
+                      key: ValueKey('more_${ad['user_id']}_${ad['id']}'),
+                      sellerId: ad['user_id'].toString(),
+                      currentAdId: ad['id'].toString(),
+                      sellerName: (_sellerProfile['nombre_negocio'] ??
+                              _sellerProfile['nombre_completo'] ??
+                              '')
+                          .toString(),
                     ),
                   ],
                   const SizedBox(height: 20),

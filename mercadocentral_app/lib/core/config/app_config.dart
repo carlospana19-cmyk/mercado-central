@@ -38,5 +38,17 @@ class AppConfig {
 
   static String urlDetalleAnuncio(String idAnuncio) =>
       '$webBaseUrl/detalle-producto.html?id=${Uri.encodeComponent(idAnuncio)}';
+
+  // 7. LEGAL Y CONTACTO (requisitos de Google Play / App Store).
+  //    Las páginas viven en la web: terminos.html, privacidad.html y
+  //    eliminar-cuenta.html (URL pública de eliminación de cuenta).
+  static const String urlTerminos = '$webBaseUrl/terminos.html';
+  static const String urlPrivacidad = '$webBaseUrl/privacidad.html';
+  static const String urlEliminarCuenta = '$webBaseUrl/eliminar-cuenta.html';
+
+  /// Canales oficiales de soporte. WhatsApp con prefijo de Panamá (507).
+  static const String emailSoporte = 'administrador@mercadoscentral.com';
+  static const String whatsappSoporte = '50763770057';
+  static const String whatsappSoporteVisible = '+507 6377-0057';
 }
 

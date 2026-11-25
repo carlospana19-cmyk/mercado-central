@@ -13,6 +13,16 @@ rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use 
     localProps.load(stream)
 }
 
+// Firma de producción: android/key.properties (git lo ignora) apunta al keystore
+// android/app/upload-keystore.jks. Si no existe (otro equipo, CI), el build
+// release cae a la firma debug para que `flutter run --release` siga funcionando,
+// pero ESE APK no sirve para subir a Google Play.
+val keyProps = Properties()
+val keyPropsFile = rootProject.file("key.properties")
+if (keyPropsFile.exists()) {
+    keyPropsFile.inputStream().use { stream -> keyProps.load(stream) }
+}
+
 android {
     namespace = "com.example.mercadocentral_app"
     compileSdk = flutter.compileSdkVersion
@@ -28,10 +38,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.mercadocentral_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // ID definitivo de la app en Google Play (NO se puede cambiar una vez publicada).
+        // El namespace de arriba se queda en com.example.mercadocentral_app: es solo el
+        // paquete del código (MainActivity) y es independiente del applicationId.
+        applicationId = "com.mercadoscentral.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -39,11 +49,24 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = localProps.getProperty("MAPS_API_KEY") ?: ""
     }
 
+    signingConfigs {
+        create("release") {
+            if (keyPropsFile.exists()) {
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+                storePassword = keyProps.getProperty("storePassword")
+                storeFile = keyProps.getProperty("storeFile")?.let { file(it) }
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keyPropsFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

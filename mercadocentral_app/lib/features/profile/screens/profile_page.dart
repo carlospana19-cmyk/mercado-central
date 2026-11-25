@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/config/app_config.dart';
+import '../../../core/services/account_service.dart';
 import '../../../core/services/profile_photo_service.dart';
+import '../../../core/utils/enlaces.dart';
 import '../../../core/utils/session_guard.dart';
 import '../../../features/planes/plan_limits.dart';
 import '../../../theme/mc_colores.dart';
 import '../../chat/screens/chat_page.dart';
 import '../../favorites/screens/favorites_page.dart';
+import '../widgets/delete_account_dialog.dart';
 import 'edit_profile_page.dart';
 import 'my_ads_page.dart';
 import 'my_reviews_page.dart';
@@ -161,6 +165,86 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  /// Hoja con los canales de soporte: correo y WhatsApp.
+  void _mostrarContacto() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.mail_outline, color: Mc.naranja),
+              title: const Text('Escribir por correo'),
+              subtitle: const Text(AppConfig.emailSoporte),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Enlaces.abrir(
+                  context,
+                  Enlaces.correo(asunto: 'Soporte Mercados Central'),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.chat, color: Color(0xFF25D366)),
+              title: const Text('Escribir por WhatsApp'),
+              subtitle: const Text(AppConfig.whatsappSoporteVisible),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Enlaces.abrir(
+                  context,
+                  Enlaces.whatsapp(
+                    mensaje: 'Hola, necesito ayuda con Mercados Central.',
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Eliminar cuenta (requisito de Google Play / App Store): confirmación
+  /// escribiendo ELIMINAR → RPC mc_eliminar_mi_cuenta → vuelta al login.
+  Future<void> _eliminarCuenta() async {
+    final confirmado = await DeleteAccountDialog.mostrar(context);
+    if (!confirmado || !mounted) return;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(child: CircularProgressIndicator(color: Mc.naranja)),
+      ),
+    );
+
+    String? error;
+    try {
+      await AccountService.eliminarMiCuenta(_client);
+    } on AccountException catch (e) {
+      error = e.mensaje;
+    } catch (_) {
+      error = 'No se pudo eliminar tu cuenta. Intenta de nuevo.';
+    }
+
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // cierra el progreso
+
+    if (error != null) {
+      _aviso(error, isError: true);
+      return;
+    }
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tu cuenta fue eliminada.')),
+    );
+  }
+
   void _openPage(Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
@@ -278,11 +362,38 @@ class _ProfilePageState extends State<ProfilePage> {
                   _openEditProfile,
                 ),
                 const SizedBox(height: 22),
+                _sectionLabel('AYUDA Y LEGAL'),
+                _menuItem(
+                  Icons.support_agent_outlined,
+                  'Contacto y soporte',
+                  AppConfig.emailSoporte,
+                  _mostrarContacto,
+                ),
+                _menuItem(
+                  Icons.description_outlined,
+                  'Términos y Condiciones',
+                  'Reglas de uso de la plataforma.',
+                  () => Enlaces.abrirWeb(context, AppConfig.urlTerminos),
+                ),
+                _menuItem(
+                  Icons.privacy_tip_outlined,
+                  'Política de Privacidad',
+                  'Cómo usamos y protegemos tus datos.',
+                  () => Enlaces.abrirWeb(context, AppConfig.urlPrivacidad),
+                ),
+                const SizedBox(height: 22),
                 _menuItem(
                   Icons.logout,
                   'Cerrar sesión',
                   'Salir de tu cuenta de Mercados Central.',
                   _logout,
+                  isDanger: true,
+                ),
+                _menuItem(
+                  Icons.delete_forever_outlined,
+                  'Eliminar mi cuenta',
+                  'Borra tu cuenta y tus datos de forma permanente.',
+                  _eliminarCuenta,
                   isDanger: true,
                 ),
               ],

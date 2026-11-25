@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'core/config/app_config.dart';
+import 'core/utils/enlaces.dart';
 import 'features/auth/paso_verificacion_otp.dart';
 import 'theme/mc_colores.dart';
 
@@ -323,6 +325,32 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Enlaces legales (obligatorios para Google Play / App Store).
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () => Enlaces.abrirWeb(
+                            context, AppConfig.urlTerminos),
+                        child: const Text(
+                          'Términos y Condiciones',
+                          style: TextStyle(color: Mc.grisSuave, fontSize: 12),
+                        ),
+                      ),
+                      const Text('·',
+                          style: TextStyle(color: Mc.grisSuave, fontSize: 12)),
+                      TextButton(
+                        onPressed: () => Enlaces.abrirWeb(
+                            context, AppConfig.urlPrivacidad),
+                        child: const Text(
+                          'Política de Privacidad',
+                          style: TextStyle(color: Mc.grisSuave, fontSize: 12),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
