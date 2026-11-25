@@ -462,22 +462,15 @@ const getVideoEmbedUrl = (videoUrl) => {
             // === RENDER FASE 2: COLUMNAS DE IMPACTO (6 tarjetas) ===
             if (gridAds && gridAds.length > 0) {
                 // Fila 1 de impacto (3 tarjetas)
-                // En móvil (2 columnas): fila 1 = 4 tarjetas (2x2), fila 2 = 2 tarjetas. En escritorio: 3 + 3.
-                const isMobileGrid = window.matchMedia('(max-width: 760px)').matches;
-                const firstRowCount = isMobileGrid ? 4 : 3;
-                const row1Ads = gridAds.slice(0, firstRowCount);
-                if (row1Ads.length > 0) {
-                    adsHTML += `<div class="ads-row row-3-cols">${row1Ads.map(ad => generateCardHTML(ad)).join('')}</div>`;
+                // Una sola cuadrícula con las 6 tarjetas: el CSS decide las columnas
+                // (escritorio: 3 + 3, móvil: 2 + 2 + 2).
+                const impactAds = gridAds.slice(0, 6);
+                if (impactAds.length > 0) {
+                    adsHTML += `<div class="ads-row row-3-cols">${impactAds.map(ad => generateCardHTML(ad)).join('')}</div>`;
                 }
                 // Cerramos el main-content-wrapper si se abrió en el banner
                 if (bannerAds.length > 0) {
                     adsHTML += `</div>`;
-                }
-
-                // Fila 2 de impacto (3 tarjetas)
-                const row2Ads = gridAds.slice(firstRowCount, 6);
-                if (row2Ads.length > 0) {
-                    adsHTML += `<div class="ads-row row-3-cols">${row2Ads.map(ad => generateCardHTML(ad)).join('')}</div>`;
                 }
             } else if (bannerAds.length > 0) {
                 // Si hay banner pero no grid, cerramos el wrapper
