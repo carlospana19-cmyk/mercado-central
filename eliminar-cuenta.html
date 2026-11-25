@@ -53,7 +53,9 @@
             <div id="del-form" class="del-box" style="display:none">
                 <p>Sesión: <strong id="del-email"></strong></p>
                 <label for="del-confirm">Escribe <strong>ELIMINAR</strong> para confirmar:</label>
-                <input id="del-confirm" type="text" autocomplete="off" placeholder="ELIMINAR">
+                <input id="del-confirm" name="confirmacion-borrado" type="text" inputmode="text"
+                       autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"
+                       data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="ELIMINAR">
                 <button id="del-go" class="del-btn" disabled>Eliminar mi cuenta definitivamente</button>
                 <p id="del-msg" class="del-msg" role="status"></p>
             </div>

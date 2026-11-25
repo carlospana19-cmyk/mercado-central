@@ -51,11 +51,24 @@ async function init() {
     form.style.display = 'block';
     document.getElementById('del-email').textContent = session.user.email || '';
 
-    input.addEventListener('input', () => {
-        // En inglés la palabra visible es DELETE (i18n traduce ELIMINAR), así que
-        // se aceptan ambas.
+    // En inglés la palabra visible es DELETE (i18n traduce ELIMINAR), así que
+    // se aceptan ambas.
+    const validar = () => {
         btn.disabled = !['ELIMINAR', 'DELETE'].includes(input.value.trim().toUpperCase());
-    });
+    };
+    input.addEventListener('input', validar);
+    input.addEventListener('change', validar);
+    input.addEventListener('keyup', validar);
+
+    // El navegador a veces autocompleta este campo con el correo de la cuenta y
+    // eso NO dispara 'input'. Se vacía al cargar y de nuevo tras el autocompletado.
+    const vaciar = () => {
+        if (!['ELIMINAR', 'DELETE'].includes(input.value.trim().toUpperCase())) input.value = '';
+        validar();
+    };
+    vaciar();
+    setTimeout(vaciar, 300);
+    setTimeout(vaciar, 1200);
 
     btn.addEventListener('click', async () => {
         btn.disabled = true;
