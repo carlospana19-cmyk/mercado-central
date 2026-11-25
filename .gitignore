@@ -24,3 +24,8 @@ ia_server.err.log
 # ===== Archivos generados por Flutter (se regeneran con flutter pub get) =====
 **/GeneratedPluginRegistrant.*
 
+
+# ===== Firmas Android =====
+*.jks
+*.keystore
+key.properties
