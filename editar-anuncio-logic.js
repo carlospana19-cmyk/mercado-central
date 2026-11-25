@@ -2117,13 +2117,39 @@ if (ad.url_galeria && Array.isArray(ad.url_galeria) && ad.url_galeria.length > 0
 
 
     // Event listener para portada
+    let coverPreviewObjectUrl = null;
+    let originalCoverSrc = null;
     coverImageInput.addEventListener('change', function() {
         const file = this.files[0];
+        const previewWrapper = document.getElementById('current-cover-image');
+        const previewImg = document.getElementById('cover-image-preview');
+        if (previewImg && originalCoverSrc === null) {
+            originalCoverSrc = previewImg.getAttribute('src') || '';
+        }
+        if (coverPreviewObjectUrl) {
+            URL.revokeObjectURL(coverPreviewObjectUrl);
+            coverPreviewObjectUrl = null;
+        }
         if (file) {
             coverImageName.textContent = file.name;
+            // Mostrar de inmediato la nueva portada seleccionada
+            if (previewImg && previewWrapper) {
+                coverPreviewObjectUrl = URL.createObjectURL(file);
+                previewImg.src = coverPreviewObjectUrl;
+                previewWrapper.style.display = 'block';
+            }
         } else {
             coverImageName.textContent = 'Ningún archivo seleccionado.';
+            // Restaurar la portada original si se cancela la selección
+            if (previewImg && previewWrapper) {
+                if (originalCoverSrc) {
+                    previewImg.src = originalCoverSrc;
+                } else {
+                    previewImg.removeAttribute('src');
+                    previewWrapper.style.display = 'none';
+                }
             }
+        }
     });
 
     // NAVEGACIÓN ELIMINADA - Ahora es un solo paso, no se necesita navegación
