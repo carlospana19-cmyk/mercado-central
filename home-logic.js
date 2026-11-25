@@ -462,7 +462,10 @@ const getVideoEmbedUrl = (videoUrl) => {
             // === RENDER FASE 2: COLUMNAS DE IMPACTO (6 tarjetas) ===
             if (gridAds && gridAds.length > 0) {
                 // Fila 1 de impacto (3 tarjetas)
-                const row1Ads = gridAds.slice(0, 3);
+                // En móvil (2 columnas): fila 1 = 4 tarjetas (2x2), fila 2 = 2 tarjetas. En escritorio: 3 + 3.
+                const isMobileGrid = window.matchMedia('(max-width: 760px)').matches;
+                const firstRowCount = isMobileGrid ? 4 : 3;
+                const row1Ads = gridAds.slice(0, firstRowCount);
                 if (row1Ads.length > 0) {
                     adsHTML += `<div class="ads-row row-3-cols">${row1Ads.map(ad => generateCardHTML(ad)).join('')}</div>`;
                 }
@@ -472,7 +475,7 @@ const getVideoEmbedUrl = (videoUrl) => {
                 }
 
                 // Fila 2 de impacto (3 tarjetas)
-                const row2Ads = gridAds.slice(3, 6);
+                const row2Ads = gridAds.slice(firstRowCount, 6);
                 if (row2Ads.length > 0) {
                     adsHTML += `<div class="ads-row row-3-cols">${row2Ads.map(ad => generateCardHTML(ad)).join('')}</div>`;
                 }
