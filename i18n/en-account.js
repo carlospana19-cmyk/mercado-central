@@ -86,5 +86,34 @@ mcI18nAdd("en", {
 /* ===== Provincias / ubicaciones ===== */
 "Colón": "Colón", "Chiriquí": "Chiriquí", "Veraguas": "Veraguas", "Coclé": "Coclé", "Los Santos": "Los Santos",
 "Herrera": "Herrera", "Darién": "Darién", "Bocas del Toro": "Bocas del Toro", "Ngäbe-Buglé": "Ngäbe-Buglé",
-"Guna Yala": "Guna Yala", "Emberá": "Emberá", "Ubicación": "Location", "Lat:": "Lat:", "Lng:": "Lng:"
+"Guna Yala": "Guna Yala", "Emberá": "Emberá", "Ubicación": "Location", "Lat:": "Lat:", "Lng:": "Lng:",
+
+/* ===== Eliminar mi cuenta (eliminar-cuenta.html y pie de página) ===== */
+"Eliminar mi cuenta | Mercados Central": "Delete my account | Mercados Central",
+"Cómo eliminar tu cuenta de Mercados Central y qué datos se borran.": "How to delete your Mercados Central account and which data is erased.",
+"Eliminar mi cuenta": "Delete my account",
+"Aplica a la web y a la app Mercados Central.": "Applies to the website and the Mercados Central app.",
+"Qué se elimina": "What is deleted",
+"Al eliminar tu cuenta se borran de forma": "When you delete your account, the following are deleted",
+"permanente": "permanently",
+"tu perfil, tus anuncios y sus fotos, tus favoritos, tus reseñas, tus conversaciones y mensajes, y tus datos de acceso. Esta acción no se puede deshacer.": "your profile, your ads and their photos, your favorites, your reviews, your conversations and messages, and your login data. This action cannot be undone.",
+"Cómo hacerlo": "How to do it",
+"En la app:": "In the app:",
+"Mi Panel → Eliminar mi cuenta.": "My Panel → Delete my account.",
+"Desde esta página:": "From this page:",
+"inicia sesión y confirma abajo.": "log in and confirm below.",
+"Si no puedes entrar:": "If you cannot log in:",
+"escribe a": "write to",
+"desde el correo de tu cuenta, o por WhatsApp al": "from your account email, or on WhatsApp at",
+"Procesamos la solicitud en un plazo razonable conforme a la ley.": "We process the request within a reasonable time in accordance with the law.",
+"Para eliminar tu cuenta desde aquí debes iniciar sesión.": "To delete your account from here you must log in.",
+"Sesión:": "Session:",
+"Escribe": "Type",
+"para confirmar:": "to confirm:",
+"Eliminar mi cuenta definitivamente": "Delete my account permanently",
+"Eliminando tu cuenta…": "Deleting your account…",
+"Tu cuenta fue eliminada.": "Your account was deleted.",
+"Gracias por haber usado Mercados Central.": "Thank you for using Mercados Central.",
+"Ir al inicio": "Go to home",
+"No se pudo eliminar tu cuenta. Intenta de nuevo o escríbenos a administrador@mercadoscentral.com.": "Could not delete your account. Try again or write to us at administrador@mercadoscentral.com."
 });

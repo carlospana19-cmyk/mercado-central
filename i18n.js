@@ -25,7 +25,7 @@
 
     var KEY = 'mc_lang';
     var SUPPORTED = ['es', 'en'];
-    var VER = '1';
+    var VER = '2';
     var PARTS = ['en-core', 'en-ads', 'en-forms', 'en-account', 'en-legal', 'en-patterns'];
 
     // Carpeta del script (para cargar i18n/*.js desde el mismo sitio)

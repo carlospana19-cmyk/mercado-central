@@ -115,5 +115,12 @@ mcI18nAdd("en", {
 "11. Modificaciones": "11. Modifications",
 "Podemos actualizar esta Política de Privacidad cuando sea necesario. Cualquier cambio será publicado en esta página con su fecha de actualización.": "We may update this Privacy Policy when necessary. Any change will be published on this page with its update date.",
 "12. Contacto": "12. Contact",
-"Para ejercer tus derechos o hacer consultas sobre privacidad, contacta a Mercados Central a través de los canales publicados en el sitio web.": "To exercise your rights or make privacy inquiries, contact Mercados Central through the channels published on the website."
+"Para ejercer tus derechos o hacer consultas sobre privacidad, contacta a Mercados Central a través de los canales publicados en el sitio web.": "To exercise your rights or make privacy inquiries, contact Mercados Central through the channels published on the website.",
+
+/* ===== Contacto y eliminación de cuenta (textos nuevos) ===== */
+"Para consultas, denuncias o solicitudes relacionadas con estos Términos, escribe a": "For inquiries, complaints or requests related to these Terms, write to",
+"o por WhatsApp al": "or on WhatsApp at",
+"Para ejercer tus derechos o hacer consultas sobre privacidad, escribe a": "To exercise your rights or make privacy inquiries, write to",
+"Puedes eliminar tu cuenta y tus datos en cualquier momento desde la app (Mi Panel → Eliminar mi cuenta) o en": "You can delete your account and your data at any time from the app (My Panel → Delete my account) or at",
+"Para ejercer estos derechos, escríbenos a administrador@mercadoscentral.com. Responderemos en un plazo razonable conforme a la ley.": "To exercise these rights, write to us at administrador@mercadoscentral.com. We will respond within a reasonable time in accordance with the law."
 });
