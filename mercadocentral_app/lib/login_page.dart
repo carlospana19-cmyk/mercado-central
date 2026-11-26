@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,10 +15,12 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _ingresandoGoogle = false;
+  Timer? _timerSinSesion;
   bool _obscurePassword = true;
 
   /// Muestra el paso de verificación con código OTP de 8 dígitos
@@ -148,7 +152,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _googleSignIn() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _ingresandoGoogle = true;
+    });
 
     try {
       final launched = await Supabase.instance.client.auth.signInWithOAuth(
@@ -156,207 +163,285 @@ class _LoginPageState extends State<LoginPage> {
         redirectTo: 'mercadoscentral://login-callback',
       );
       if (!launched) throw Exception('No se pudo abrir el inicio de sesión.');
+      // Éxito: la capa "Ingresando…" permanece hasta que el listener global
+      // reemplace esta ruta por /home. Solo se quita en error (abajo) o si
+      // el usuario vuelve sin sesión (ver didChangeAppLifecycleState).
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _ingresandoGoogle = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text('Error con Google: $e'),
               backgroundColor: Colors.red),
         );
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_ingresandoGoogle) return;
+    // Al volver del navegador el deep link con la sesión puede tardar un
+    // momento. Si pasado ese margen no hay sesión (usuario canceló el
+    // flujo), se quita la capa para no dejarlo bloqueado.
+    _timerSinSesion?.cancel();
+    _timerSinSesion = Timer(const Duration(seconds: 15), () {
+      if (!mounted || !_ingresandoGoogle) return;
+      if (Supabase.instance.client.auth.currentSession == null) {
+        setState(() {
+          _isLoading = false;
+          _ingresandoGoogle = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('El ingreso no se completó, intenta de nuevo'),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timerSinSesion?.cancel();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Widget _capaIngresando() {
+    return const Positioned.fill(
+      child: ColoredBox(
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: Mc.naranja),
+              SizedBox(height: 16),
+              Text(
+                'Ingresando…',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Mc.texto,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Column(
-                children: [
-                  Center(
-                    child: Image.asset(
-                      'assets/images/logo-mercado-central.jpeg',
-                      height: 140,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Bienvenido',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Mc.texto,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Tu plataforma de clasificados',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Mc.grisSuave),
-                  ),
-                  const SizedBox(height: 32),
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Correo electrónico',
-                      prefixIcon: const Icon(Icons.mail_outline),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Mc.grisBorde),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: Mc.naranja, width: 2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                        ),
-                        onPressed: () {
-                          setState(() => _obscurePassword = !_obscurePassword);
-                        },
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Mc.grisBorde),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: Mc.naranja, width: 2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _signIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Mc.naranja,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size.fromHeight(52),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                    ),
-                    child: const Text(
-                      'Entrar',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Row(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
                     children: [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'o',
-                          style: TextStyle(color: Mc.grisSuave),
+                      Center(
+                        child: Image.asset(
+                          'assets/images/logo-mercado-central.jpeg',
+                          height: 140,
+                          fit: BoxFit.contain,
                         ),
                       ),
-                      Expanded(child: Divider()),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Bienvenido',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Mc.texto,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Tu plataforma de clasificados',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: Mc.grisSuave),
+                      ),
+                      const SizedBox(height: 32),
+                      TextField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Correo electrónico',
+                          prefixIcon: const Icon(Icons.mail_outline),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Mc.grisBorde),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Mc.naranja, width: 2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
+                          labelText: 'Contraseña',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                            ),
+                            onPressed: () {
+                              setState(
+                                  () => _obscurePassword = !_obscurePassword);
+                            },
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Mc.grisBorde),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Mc.naranja, width: 2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _signIn,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mc.naranja,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(52),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(26),
+                          ),
+                        ),
+                        child: const Text(
+                          'Entrar',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'o',
+                              style: TextStyle(color: Mc.grisSuave),
+                            ),
+                          ),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      OutlinedButton.icon(
+                        onPressed: _isLoading ? null : _googleSignIn,
+                        icon: SvgPicture.asset(
+                          'assets/images/google_g.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                        label: const Text(
+                          'Continuar con Google',
+                          style: TextStyle(
+                            color: Color(0xFF3C4043),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(52),
+                          side: const BorderSide(color: Mc.grisBorde),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(26),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: _resetPassword,
+                        child: const Text(
+                          '¿Olvidaste tu contraseña?',
+                          style: TextStyle(
+                            color: Mc.naranja,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _signUp,
+                        child: const Text(
+                          'Regístrate',
+                          style: TextStyle(
+                            color: Mc.naranja,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Enlaces legales (obligatorios para Google Play / App Store).
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () => Enlaces.abrirWeb(
+                                context, AppConfig.urlTerminos),
+                            child: const Text(
+                              'Términos y Condiciones',
+                              style:
+                                  TextStyle(color: Mc.grisSuave, fontSize: 12),
+                            ),
+                          ),
+                          const Text('·',
+                              style:
+                                  TextStyle(color: Mc.grisSuave, fontSize: 12)),
+                          TextButton(
+                            onPressed: () => Enlaces.abrirWeb(
+                                context, AppConfig.urlPrivacidad),
+                            child: const Text(
+                              'Política de Privacidad',
+                              style:
+                                  TextStyle(color: Mc.grisSuave, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _googleSignIn,
-                    icon: SvgPicture.asset(
-                      'assets/images/google_g.svg',
-                      width: 20,
-                      height: 20,
-                    ),
-                    label: const Text(
-                      'Continuar con Google',
-                      style: TextStyle(
-                        color: Color(0xFF3C4043),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(52),
-                      side: const BorderSide(color: Mc.grisBorde),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: _resetPassword,
-                    child: const Text(
-                      '¿Olvidaste tu contraseña?',
-                      style: TextStyle(
-                        color: Mc.naranja,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _signUp,
-                    child: const Text(
-                      'Regístrate',
-                      style: TextStyle(
-                        color: Mc.naranja,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // Enlaces legales (obligatorios para Google Play / App Store).
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () => Enlaces.abrirWeb(
-                            context, AppConfig.urlTerminos),
-                        child: const Text(
-                          'Términos y Condiciones',
-                          style: TextStyle(color: Mc.grisSuave, fontSize: 12),
-                        ),
-                      ),
-                      const Text('·',
-                          style: TextStyle(color: Mc.grisSuave, fontSize: 12)),
-                      TextButton(
-                        onPressed: () => Enlaces.abrirWeb(
-                            context, AppConfig.urlPrivacidad),
-                        child: const Text(
-                          'Política de Privacidad',
-                          style: TextStyle(color: Mc.grisSuave, fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          if (_ingresandoGoogle) _capaIngresando(),
+        ],
       ),
     );
   }
